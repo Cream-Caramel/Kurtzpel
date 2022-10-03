@@ -13,10 +13,6 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-#include <Assimp/scene.h>
-#include <Assimp/Importer.hpp>
-#include <Assimp/postprocess.h>
-
 #include <DirectXMath.h>
 using namespace DirectX;
 
