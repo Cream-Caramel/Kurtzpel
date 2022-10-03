@@ -335,12 +335,6 @@ void CAnimModel::SetNextIndex(_uint iNextIndex)
 	m_iNextAnimIndex = iNextIndex;
 }
 
-void CAnimModel::DeleteAnimation(int Index)
-{
-	Safe_Release(m_Animations[Index]);
-	m_Animations.erase(m_Animations.begin() + Index);
-	m_iNumAnimations = m_Animations.size();
-}
 
 HRESULT CAnimModel::LoadBinary(const char * pLoadName)
 {

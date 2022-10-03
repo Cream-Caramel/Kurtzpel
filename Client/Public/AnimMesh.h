@@ -5,7 +5,6 @@
 
 BEGIN(Engine)
 class CShader;
-class CTexture;
 class CRenderer;
 class CTransform;
 class CAnimModel;
@@ -13,7 +12,7 @@ END
 
 BEGIN(Client)
 
-class CAnimMesh final : public CGameObject
+class CAnimMesh : public CGameObject
 {
 public:
 	typedef struct tagMeshInfo
@@ -25,21 +24,20 @@ public:
 
 	}MESHINFO;
 
-private:
+protected:
 	CAnimMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CAnimMesh(const CAnimMesh& rhs);
 	virtual ~CAnimMesh() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
-	virtual void Tick(_float fTimeDelta);
-	virtual void LateTick(_float fTimeDelta);
-	virtual HRESULT Render();
+	virtual HRESULT Initialize_Prototype() override;
+	virtual HRESULT Initialize(void* pArg) override;
+	virtual void Tick(_float fTimeDelta) override;
+	virtual void LateTick(_float fTimeDelta) override;
+	virtual HRESULT Render() override;
 
 public:
 	void Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3);
-	_float3 Get_Angles() { return m_fAngles; }
 	_float3 Get_Pos();
 	void Set_Pos(_float4 Pos);
 	const _tchar* Get_Tag() { return sTag.c_str(); }
@@ -50,41 +48,20 @@ public:
 	void SaveBinary();
 	void ChangeAni(int iAniIndex);
 
-	_float Get_Duration();
-	void Set_Duration(_float fDuration);
 
-	_float Get_TickPerSecond();
-	void Set_TickPerSecond(_float fTickPerSecond);
-
-	_float Get_PlayTime();
-	void Set_PlayTime(_float fPlayTime);
-
-	_float Get_TimeLimit();
-	void Set_TimeLimit(_float fTimeLimit);
-
-	void Change_AniIndex(int Index1, int Index2);
-
-	void Reset_KeyFrame();
-
-	void DeleteAnimation(int Index);
-
-private:
-	_float3 m_fAngles;
+protected:
 	wstring sTag;
 	MESHINFO*				m_MeshInfo;
 
-private:
+protected:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CTransform*				m_pTransformCom = nullptr;
 	CAnimModel*				m_pModelCom = nullptr;
 	
-
-	
-private:
+protected:
 	HRESULT Ready_Components();
 	int m_iAniIndex = 0;
-	int m_iPreAniIndex = 0;
 
 public:
 	static CAnimMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

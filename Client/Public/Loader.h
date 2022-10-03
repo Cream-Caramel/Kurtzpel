@@ -37,6 +37,7 @@ public:
 	HRESULT Loading_ForLogoLevel();
 	HRESULT Loading_ForStage1();
 	HRESULT LoadAnimModel(char* DatName);
+	HRESULT LoadModel(char* DatName);
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;

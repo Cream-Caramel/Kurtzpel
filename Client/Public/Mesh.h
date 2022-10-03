@@ -12,7 +12,7 @@ END
 
 BEGIN(Client)
 
-class CMesh final : public CGameObject
+class CMesh : public CGameObject
 {
 public:
 	typedef struct tagMeshInfo
@@ -30,21 +30,17 @@ private:
 	virtual ~CMesh() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
-	virtual void Tick(_float fTimeDelta);
-	virtual void LateTick(_float fTimeDelta);
-	virtual HRESULT Render();
+	virtual HRESULT Initialize_Prototype()override;
+	virtual HRESULT Initialize(void* pArg)override;
+	virtual void Tick(_float fTimeDelta)override;
+	virtual void LateTick(_float fTimeDelta)override;
+	virtual HRESULT Render()override;
 
 public:
 	void Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3);
 	_float3 Get_Pos();
 	void Set_Pos(_float4 Pos);
-	const _tchar* Get_Tag() { return sTag.c_str(); }
 
-private:
-	_float3 m_fAngles;
-	wstring sTag;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;

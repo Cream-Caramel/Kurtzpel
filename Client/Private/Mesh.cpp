@@ -20,7 +20,6 @@ HRESULT CMesh::Initialize_Prototype()
 HRESULT CMesh::Initialize(void * pArg)
 {
 	m_MeshInfo = ((MESHINFO*)pArg);
-	sTag = m_MeshInfo->sTag;
 
 	/* For.Com_Model */
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, m_MeshInfo->sTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
@@ -32,27 +31,18 @@ HRESULT CMesh::Initialize(void * pArg)
 	m_MeshInfo->fPos.w = 1.f;
 	Set_Pos(m_MeshInfo->fPos);
 	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_MeshInfo->fScale));
-	m_fAngles = m_MeshInfo->fAngle;
-	Rotation(_float3{ 1.f,0.f,0.f }, m_fAngles.x, _float3{ 0.f,1.f,0.f }, m_fAngles.y, _float3{ 0.f,0.f,1.f }, m_fAngles.z);
-	
+	Rotation(_float3{ 1.f,0.f,0.f }, m_MeshInfo->fAngle.x, _float3{ 0.f,1.f,0.f }, m_MeshInfo->fAngle.y, _float3{ 0.f,0.f,1.f }, m_MeshInfo->fAngle.z);
 
 	return S_OK;
 }
 
 void CMesh::Tick(_float fTimeDelta)
 {
-	if (GI->Key_Pressing(DIK_N))
-	{
-		m_pTransformCom->Go_Right(fTimeDelta);
-	}
 }
 
 void CMesh::LateTick(_float fTimeDelta)
 {
-	if (nullptr == m_pRendererCom)
-		return;
-
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	
 }
 
 HRESULT CMesh::Render()
@@ -95,9 +85,6 @@ HRESULT CMesh::Render()
 
 void CMesh::Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3)
 {
-	m_fAngles.x = fRadian;
-	m_fAngles.y = fRadian2;
-	m_fAngles.z = fRadian3;
 	m_pTransformCom->RotationThree(vAxis, fRadian, vAxis2, fRadian2, vAxis3, fRadian3);	
 }
 
@@ -131,7 +118,7 @@ HRESULT CMesh::Ready_Components()
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_STAGE1, TEXT("Prototype_Component_Shader_Model"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Model"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	

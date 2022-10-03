@@ -24,7 +24,8 @@ private:
 	HRESULT Ready_Layer_Monster(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_Effect(const _tchar* pLayerTag);
-	HRESULT Ready_Load_Object(char* DatName);
+	HRESULT Ready_Load_AnimModel(char* DatName);
+	HRESULT Ready_Load_Model(char* DatName);
 
 public:
 	static CLevel_Stage1* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

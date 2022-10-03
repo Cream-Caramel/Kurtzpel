@@ -40,12 +40,6 @@
     <Filter Include="02.GameObjects\Mesh">
       <UniqueIdentifier>{31eb1b41-44ce-4466-8b5f-e8a4f89ce0f5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Mesh\NoneAnim">
-      <UniqueIdentifier>{df264ab9-d49e-4df3-8c77-cedddee2882c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Mesh\Anim">
-      <UniqueIdentifier>{f98cd22c-5aa0-406b-82e3-fede2ca4acc2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Levels\Stage1">
       <UniqueIdentifier>{0d2a1e61-f8a8-4688-bc84-0b1f67902fc9}</UniqueIdentifier>
     </Filter>
@@ -60,6 +54,15 @@
     </Filter>
     <Filter Include="96.Manager\ReleaseManager">
       <UniqueIdentifier>{db5cf084-0a3b-407d-bf83-e7f9fcf79a14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\AnimMesh">
+      <UniqueIdentifier>{7260198f-e26e-4c26-8a8d-ba9d85349578}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\AnimMesh\Player">
+      <UniqueIdentifier>{8b56d514-1fd5-4cc6-a3ba-550735d84e52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Mesh\PlayerParts">
+      <UniqueIdentifier>{976cd8ad-96eb-49a2-a98f-85fa32c7bb0f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -105,12 +108,6 @@
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Mesh.h">
-      <Filter>02.GameObjects\Mesh\NoneAnim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\AnimMesh.h">
-      <Filter>02.GameObjects\Mesh\Anim</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Level_Stage1.h">
       <Filter>01.Levels\Stage1</Filter>
     </ClInclude>
@@ -119,6 +116,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Release_Manager.h">
       <Filter>96.Manager\ReleaseManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimMesh.h">
+      <Filter>02.GameObjects\AnimMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Mesh.h">
+      <Filter>02.GameObjects\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player.h">
+      <Filter>02.GameObjects\AnimMesh\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -152,12 +158,6 @@
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Mesh.cpp">
-      <Filter>02.GameObjects\Mesh\NoneAnim</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\AnimMesh.cpp">
-      <Filter>02.GameObjects\Mesh\Anim</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Level_Stage1.cpp">
       <Filter>01.Levels\Stage1</Filter>
     </ClCompile>
@@ -166,6 +166,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Release_Manager.cpp">
       <Filter>96.Manager\ReleaseManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimMesh.cpp">
+      <Filter>02.GameObjects\AnimMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Mesh.cpp">
+      <Filter>02.GameObjects\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player.cpp">
+      <Filter>02.GameObjects\AnimMesh\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

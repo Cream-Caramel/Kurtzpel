@@ -10,6 +10,7 @@
 #include "AnimModel.h"
 #include "AnimMesh.h"
 #include "Release_Manager.h"
+#include "Player.h"
 
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -89,8 +90,8 @@ HRESULT CLoader::Loading_ForStatic()
 		CMesh::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_AnimMesh"),
-		CAnimMesh::Create(m_pDevice, m_pContext))))
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Player"),
+		CPlayer::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("UI 로딩중"));
@@ -113,6 +114,7 @@ HRESULT CLoader::Loading_ForStatic()
 	lstrcpy(m_szLoadingText, TEXT("모델 로딩중 "));
 
 	LoadAnimModel("Level_Static");
+	LoadModel("Level_Static");
 	
 
 	/* For.Prototype_Component_VIBuffer_Terrain */
@@ -207,7 +209,7 @@ HRESULT CLoader::LoadAnimModel(char * DatName)
 			Safe_Delete_Array(ModelName);
 			break;
 		}
-	
+		
 		if (FAILED(GI->Add_Prototype(LEVEL_STATIC, ProtoName,
 			CAnimModel::Create(m_pDevice, m_pContext, ModelName))))
 		{
@@ -222,6 +224,65 @@ HRESULT CLoader::LoadAnimModel(char * DatName)
 	CloseHandle(hFile);
 	return S_OK;
 	
+}
+
+HRESULT CLoader::LoadModel(char * DatName)
+{
+	string FileSave = DatName;
+
+	string temp = "../Data/ModelData/";
+
+	FileSave = temp + FileSave + ".dat";
+
+	wchar_t FilePath[256] = { 0 };
+
+	for (int i = 0; i < FileSave.size(); i++)
+	{
+		FilePath[i] = FileSave[i];
+	}
+
+	HANDLE		hFile = CreateFile(FilePath,			// 파일 경로와 이름 명시
+		GENERIC_READ,				// 파일 접근 모드 (GENERIC_WRITE 쓰기 전용, GENERIC_READ 읽기 전용)
+		NULL,						// 공유방식, 파일이 열려있는 상태에서 다른 프로세스가 오픈할 때 허용할 것인가, NULL인 경우 공유하지 않는다
+		NULL,						// 보안 속성, 기본값	
+		OPEN_EXISTING,				// 생성 방식, CREATE_ALWAYS는 파일이 없다면 생성, 있다면 덮어 쓰기, OPEN_EXISTING 파일이 있을 경우에면 열기
+		FILE_ATTRIBUTE_NORMAL,		// 파일 속성(읽기 전용, 숨기 등), FILE_ATTRIBUTE_NORMAL 아무런 속성이 없는 일반 파일 생성
+		NULL);						// 생성도리 파일의 속성을 제공할 템플릿 파일, 우리는 사용하지 않아서 NULL
+
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(g_hWnd, _T("Load File"), _T("Fail"), MB_OK);
+		return E_FAIL;
+	}
+
+	DWORD		dwByte = 0;
+
+	while (true)
+	{
+		_tchar* ProtoName = new _tchar[256];
+		ReadFile(hFile, ProtoName, sizeof(_tchar) * 256, &dwByte, nullptr);
+		char* ModelName = new char[256];
+		ReadFile(hFile, ModelName, sizeof(char) * 256, &dwByte, nullptr);
+
+		if (0 == dwByte)	// 더이상 읽을 데이터가 없을 경우
+		{
+			Safe_Delete_Array(ProtoName);
+			Safe_Delete_Array(ModelName);
+			break;
+		}
+
+		if (FAILED(GI->Add_Prototype(LEVEL_STATIC, ProtoName,
+			CModel::Create(m_pDevice, m_pContext, ModelName))))
+		{
+			Safe_Delete(ProtoName);
+			return E_FAIL;
+		}
+		RM->Pushtchar(ProtoName);
+		Safe_Delete(ModelName);
+	}
+	// 3. 파일 소멸
+	CloseHandle(hFile);
+	return S_OK;
 }
 
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
