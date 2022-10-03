@@ -33,8 +33,10 @@ public:
 
 public:
 	HRESULT Initialize(LEVEL eNextLevelID);
+	HRESULT Loading_ForStatic();
 	HRESULT Loading_ForLogoLevel();
-	HRESULT Loading_ForGamePlayLevel();
+	HRESULT Loading_ForStage1();
+	HRESULT LoadAnimModel(char* DatName);
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;

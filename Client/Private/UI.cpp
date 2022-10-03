@@ -66,13 +66,13 @@ HRESULT CUI::Initialize(void * pArg)
 
 	WideCharToMultiByte(CP_ACP, 0, m_UIInfo->TexName, -1, m_UITag, _TexNameSize, 0, 0);
 	
-	GI->Add_Prototype(LEVEL_GAMEPLAY, m_UIInfo->TexName,
+	GI->Add_Prototype(LEVEL_STAGE1, m_UIInfo->TexName,
 		CTexture::Create(m_pDevice, m_pContext, m_UIInfo->TexPath, m_UIInfo->TexNum));
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_UIInfo->TexName, m_UIInfo->TexName, (CComponent**)&m_pTextureCom)))
+	if (FAILED(__super::Add_Component(LEVEL_STAGE1, m_UIInfo->TexName, m_UIInfo->TexName, (CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
 	Safe_Delete(m_UITag);

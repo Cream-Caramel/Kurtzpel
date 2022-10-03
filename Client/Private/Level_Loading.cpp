@@ -3,8 +3,8 @@
 #include "GameInstance.h"
 
 #include "Level_Logo.h"
-#include "Level_GamePlay.h"
-
+#include "Level_Stage1.h"
+#include "Level_Static.h"
 #include "Loader.h"
 
 
@@ -33,7 +33,6 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 
 	if (true == m_pLoader->Get_Finished())
 	{
-	
 			CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 			Safe_AddRef(pGameInstance);
 
@@ -41,11 +40,15 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 
 			switch (m_eNextLevel)
 			{
+			case LEVEL_STATIC:
+				pNewLevel = CLevel_Static::Create(m_pDevice, m_pContext);
+				break;
+
 			case LEVEL_LOGO:
 				pNewLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
 				break;
-			case LEVEL_GAMEPLAY:
-				pNewLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
+			case LEVEL_STAGE1:
+				pNewLevel = CLevel_Stage1::Create(m_pDevice, m_pContext);
 				break;
 			}
 
@@ -54,7 +57,6 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 
 			if (FAILED(pGameInstance->Open_Level(m_eNextLevel, pNewLevel)))
 				goto except;
-
 
 			except:
 			Safe_Release(pGameInstance);

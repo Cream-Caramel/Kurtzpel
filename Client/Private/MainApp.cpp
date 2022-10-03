@@ -2,6 +2,7 @@
 #include "..\Public\MainApp.h"
 #include "GameInstance.h"
 #include "Level_Loading.h"
+#include "Release_Manager.h"
 
 
 using namespace Client;
@@ -30,7 +31,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Prototype_Component()))
 		return E_FAIL;
 
-	if (FAILED(Open_Level(LEVEL_GAMEPLAY)))
+	if (FAILED(Open_Level(LEVEL_STATIC)))
 		return E_FAIL;
 	
 	return S_OK;
@@ -163,6 +164,7 @@ CMainApp * CMainApp::Create()
 
 void CMainApp::Free()
 {
+	CRelease_Manager::Destroy_Instance();
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 	Safe_Release(m_pRenderer);
