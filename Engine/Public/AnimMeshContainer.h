@@ -25,7 +25,6 @@ public:
 	}
 
 public:
-	virtual HRESULT Initialize_Prototype(const aiMesh* pAIMesh, class CAnimModel* pModel, _fmatrix PivotMatrix, CBinary* pBinary);
 	virtual HRESULT Initialize_Prototype(class CAnimModel* pModel, _fmatrix PivotMatrix, CBinary* pBinary);
 	virtual HRESULT Initialize(void* pArg);
 
@@ -46,10 +45,8 @@ private:
 	vector<class CHierarchyNode*>	m_Bones;
 
 private:
-	HRESULT Ready_AnimVertices(const aiMesh* pAIMesh, CAnimModel* pModel, CBinary* pBinary);
 	HRESULT Ready_AnimVertices(CAnimModel* pModel, CBinary* pBinary);
 public:
-	static CAnimMeshContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const aiMesh* pAIMesh, class CAnimModel* pModel, _fmatrix PivotMatrix, CBinary* pBinary);
 	static CAnimMeshContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, class CAnimModel* pModel, _fmatrix PivotMatrix, CBinary* pBinary);
 	virtual CComponent* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;

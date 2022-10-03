@@ -3,6 +3,10 @@
 namespace Engine
 {
 
+	enum TEXTURETYPE { TEX_NONE, TEX_DIFFUSE, TEX_SPECULAR, TEX_AMBIENT, TEX_EMISSIVE, TEX_HEIGHT, TEX_NORMALS, TEX_SHININESS, TEX_OPACITY
+	, TEX_DISPLACEMENT, TEX_LIGHTMAP, TEX_REFLECTION, TEX_BASE_COLOR, TEX_NORMAL_CAMERA, TEX_EMISSION_COLOR, TEX_METALNESS
+	, TEX_DIFFUSE_ROUGHNESS, TEX_AMBIENT_OCCLUSION, TEX_END};
+
 	typedef struct tagKeyFrame
 	{
 		float		fTime;
@@ -58,7 +62,7 @@ namespace Engine
 
 	typedef struct tagMaterialDesc
 	{
-		class CTexture*		pTexture[AI_TEXTURE_TYPE_MAX];
+		class CTexture*		pTexture[18];
 	}MATERIALDESC;
 
 	typedef struct ENGINE_DLL tagVertexTexture_Declaration

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\Mesh.h"
 #include "GameInstance.h"
-#include "ImGui_Manager.h"
 
 CMesh::CMesh(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject(pDevice, pContext)
@@ -32,11 +31,10 @@ HRESULT CMesh::Initialize(void * pArg)
 	m_bDead = false;
 	m_MeshInfo->fPos.w = 1.f;
 	Set_Pos(m_MeshInfo->fPos);
-	Set_Scale(m_MeshInfo->fScale);
+	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_MeshInfo->fScale));
 	m_fAngles = m_MeshInfo->fAngle;
 	Rotation(_float3{ 1.f,0.f,0.f }, m_fAngles.x, _float3{ 0.f,1.f,0.f }, m_fAngles.y, _float3{ 0.f,0.f,1.f }, m_fAngles.z);
 	
-	IG->AddModelObject(this);
 
 	return S_OK;
 }
@@ -80,7 +78,7 @@ HRESULT CMesh::Render()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (FAILED(m_pModelCom->SetUp_OnShader(m_pShaderCom, m_pModelCom->Get_MaterialIndex(i), aiTextureType_DIFFUSE, "g_DiffuseTexture")))
+		if (FAILED(m_pModelCom->SetUp_OnShader(m_pShaderCom, m_pModelCom->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 		/*if (FAILED(m_pModelCom->SetUp_OnShader(m_pShaderCom, m_pModelCom->Get_MaterialIndex(i), aiTextureType_NORMALS, "g_NormalTexture")))
 		return E_FAIL;*/

@@ -7,7 +7,6 @@ namespace Client
 
 	enum LEVEL { LEVEL_STATIC, LEVEL_LOADING, LEVEL_LOGO, LEVEL_GAMEPLAY, LEVEL_END };
 
-#define IG CImGui_Manager::Get_Instance()
 #define GI CGameInstance::Get_Instance()
 }
 

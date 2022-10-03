@@ -1,9 +1,8 @@
 #include "stdafx.h"
 #include "..\Public\MainApp.h"
-
 #include "GameInstance.h"
 #include "Level_Loading.h"
-#include "ImGui_Manager.h"
+
 
 using namespace Client;
 
@@ -33,9 +32,6 @@ HRESULT CMainApp::Initialize()
 
 	if (FAILED(Open_Level(LEVEL_GAMEPLAY)))
 		return E_FAIL;
-
-	if (FAILED(CImGui_Manager::Get_Instance()->Init(m_pDevice, m_pContext)))
-		return E_FAIL;
 	
 	return S_OK;
 }
@@ -50,7 +46,6 @@ void CMainApp::Tick(_float fTimeDelta)
 #endif // _DEBUG
 
 	m_pGameInstance->Tick_Engine(fTimeDelta);
-	CImGui_Manager::Get_Instance()->Tick(fTimeDelta);
 
 	/*RECT Clip;
 	GetClientRect(g_hWnd, &Clip);
@@ -58,10 +53,6 @@ void CMainApp::Tick(_float fTimeDelta)
 	ClientToScreen(g_hWnd, (LPPOINT)(&Clip.right));
 	ClipCursor(&Clip);*/
 
-	if(GI->Key_Down(DIK_ESCAPE))
-	{
-		exit(0);
-	}
 
 }
 
@@ -71,7 +62,7 @@ HRESULT CMainApp::Render()
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
 
-	_float4 BackColor = IG->Get_BackBufferColor();
+	_float4 BackColor = _float4{ 0.f,0.f,0.f,1.f };
 
 	m_pGameInstance->Clear_BackBuffer_View(BackColor);
 	m_pGameInstance->Clear_DepthStencil_View();
@@ -79,7 +70,6 @@ HRESULT CMainApp::Render()
 	m_pRenderer->Draw();
 	m_pGameInstance->Render_Level();
 	
-	CImGui_Manager::Get_Instance()->Render();
 	m_pGameInstance->Present();
 
 #ifdef _DEBUG
@@ -92,11 +82,7 @@ HRESULT CMainApp::Render()
 		m_fTimeAcc = 0.f;
 	}
 
-	// SetWindowText(g_hWnd, m_szFPS);
-#endif // _DEBUG
-
-	
-
+#endif 
 	return S_OK;
 }
 
@@ -181,8 +167,6 @@ void CMainApp::Free()
 	Safe_Release(m_pContext);
 	Safe_Release(m_pRenderer);
 	Safe_Release(m_pGameInstance);
-
 	CGameInstance::Release_Engine();
-	CImGui_Manager::Destroy_Instance();
 
 }

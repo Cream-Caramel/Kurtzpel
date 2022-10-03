@@ -38,11 +38,8 @@ public:
 
 public:
 	void Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3);
-	_float3 Get_Angles() { return m_fAngles; }
 	_float3 Get_Pos();
 	void Set_Pos(_float4 Pos);
-	void Set_Scale(_float3 fScale) { m_pTransformCom->Set_Scale(XMLoadFloat3(&fScale)); }
-	_float3 Get_Scale() { return m_pTransformCom->Get_Scale(); }
 	const _tchar* Get_Tag() { return sTag.c_str(); }
 
 private:

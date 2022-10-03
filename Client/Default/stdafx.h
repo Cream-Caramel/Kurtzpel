@@ -17,10 +17,6 @@
 #include <memory.h>
 #include <tchar.h>
 
-#include "imgui.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
-#include "ImGui_Manager.h"
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <DirectXTK/DDSTextureLoader.h>

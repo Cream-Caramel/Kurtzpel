@@ -22,7 +22,6 @@ public:
 	}
 
 public:
-	virtual HRESULT Initialize_Prototype(const aiMesh* pAIMesh, _fmatrix PivotMatrix, CBinary* pBinary);
 	virtual HRESULT Initialize_Prototype(_fmatrix PivotMatrix, CBinary* pBinary);
 	virtual HRESULT Initialize(void* pArg);
 
@@ -30,7 +29,6 @@ private:
 	_uint				m_iMaterialIndex = 0;
 
 public:
-	static CMeshContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const aiMesh* pAIMesh, _fmatrix PivotMatrix, CBinary* pBinary);
 	static CMeshContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fmatrix PivotMatrix, CBinary* pBinary);
 	virtual CComponent* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;

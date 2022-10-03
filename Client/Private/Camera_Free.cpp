@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\Camera_Free.h"
 #include "GameInstance.h"
-#include "ImGui_Manager.h"
 
 
 CCamera_Free::CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -28,8 +27,6 @@ HRESULT CCamera_Free::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	IG->SetCameraFree(this);
-
 	return S_OK;
 }
 
@@ -37,9 +34,6 @@ void CCamera_Free::Tick(_float fTimeDelta)
 {
 	CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
-
-	if (IG->Get_CamaraMove())
-	{
 
 	if (pGameInstance->Key_Pressing(DIK_W))
 	{
@@ -63,20 +57,16 @@ void CCamera_Free::Tick(_float fTimeDelta)
 
 	_long	MouseMove = 0;
 
-
-		if (MouseMove = pGameInstance->Get_DIMMoveState(DIMM_X))
-		{
-			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), MouseMove * fTimeDelta * 0.05f);
-		}
-
-		if (MouseMove = pGameInstance->Get_DIMMoveState(DIMM_Y))
-		{
-			m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), MouseMove * fTimeDelta * 0.05f);
-		}
+	if (MouseMove = pGameInstance->Get_DIMMoveState(DIMM_X))
+	{
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), MouseMove * fTimeDelta * 0.05f);
 	}
 
+	if (MouseMove = pGameInstance->Get_DIMMoveState(DIMM_Y))
+	{
+		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), MouseMove * fTimeDelta * 0.05f);
+	}
 	
-
 	Safe_Release(pGameInstance);
 
 	__super::Tick(fTimeDelta);

@@ -40,44 +40,8 @@
     <Filter Include="02.GameObjects\Camera">
       <UniqueIdentifier>{753f5023-0e15-42c5-950a-9aefad3b0ead}</UniqueIdentifier>
     </Filter>
-    <Filter Include="90.ImGui">
-      <UniqueIdentifier>{50f065c7-9c1d-4ad2-bbcb-c484c7b8cbfd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="90.ImGui\Manager">
-      <UniqueIdentifier>{86ab8e74-913c-4645-8f37-e2e402daa7ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="90.ImGui\Default">
-      <UniqueIdentifier>{4ddb831e-4766-4b4c-be00-65455c18d1cb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\UI">
       <UniqueIdentifier>{0f66bd0f-1e34-4a6b-87d2-20449690ba55}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Camera\MoveCube">
-      <UniqueIdentifier>{e700398c-fb01-4ea5-8bf8-27e8efed694e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Camera\PosCube">
-      <UniqueIdentifier>{38a332b5-917e-4936-9aec-ecf21fc66dea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Camera\LookCube">
-      <UniqueIdentifier>{5c5344ef-0eb2-436f-a19c-b79088caa5f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Camera\LookAtCube">
-      <UniqueIdentifier>{6b373b64-3e02-41f6-b491-317e5f5363f5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\Tile">
-      <UniqueIdentifier>{3e9277cc-8b09-4fb2-b511-f1ac9e58a525}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="90.ImGui\UITool">
-      <UniqueIdentifier>{120bd1d4-098e-4c72-bc01-aa1accda2b59}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="90.ImGui\CameraTool">
-      <UniqueIdentifier>{006977aa-bf53-405c-a8b9-a9efa2f389b4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="90.ImGui\MapTool">
-      <UniqueIdentifier>{5521d30d-c129-47e2-9879-9b066913a8ea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="90.ImGui\ModelTool">
-      <UniqueIdentifier>{1e540ea2-7a04-4fa0-a463-d7b1f5c1c898}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Mesh">
       <UniqueIdentifier>{31eb1b41-44ce-4466-8b5f-e8a4f89ce0f5}</UniqueIdentifier>
@@ -87,9 +51,6 @@
     </Filter>
     <Filter Include="02.GameObjects\Mesh\Anim">
       <UniqueIdentifier>{f98cd22c-5aa0-406b-82e3-fede2ca4acc2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="90.ImGui\AnimTool">
-      <UniqueIdentifier>{3e3dc447-8af2-4223-89d8-4e155ffeb154}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -132,74 +93,17 @@
     <ClInclude Include="..\Public\Camera_Free.h">
       <Filter>02.GameObjects\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\ImGui_Manager.h">
-      <Filter>90.ImGui\Manager</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\UI.h">
       <Filter>02.GameObjects\UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\imconfig.h">
-      <Filter>90.ImGui\Default</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\imgui.h">
-      <Filter>90.ImGui\Default</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\imgui_impl_dx11.h">
-      <Filter>90.ImGui\Default</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\imgui_impl_win32.h">
-      <Filter>90.ImGui\Default</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\imgui_internal.h">
-      <Filter>90.ImGui\Default</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\imstb_rectpack.h">
-      <Filter>90.ImGui\Default</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\imstb_textedit.h">
-      <Filter>90.ImGui\Default</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\imstb_truetype.h">
-      <Filter>90.ImGui\Default</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MoveCube.h">
-      <Filter>02.GameObjects\Camera\MoveCube</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\PosCube.h">
-      <Filter>02.GameObjects\Camera\PosCube</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LookCube.h">
-      <Filter>02.GameObjects\Camera\LookCube</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LookAtCube.h">
-      <Filter>02.GameObjects\Camera\LookAtCube</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\BaseTile.h">
-      <Filter>02.GameObjects\Tile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\UITool.h">
-      <Filter>90.ImGui\UITool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\CameraTool.h">
-      <Filter>90.ImGui\CameraTool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapTool.h">
-      <Filter>90.ImGui\MapTool</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\ModelTool.h">
-      <Filter>90.ImGui\ModelTool</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Mesh.h">
       <Filter>02.GameObjects\Mesh\NoneAnim</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\AnimMesh.h">
       <Filter>02.GameObjects\Mesh\Anim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\AnimTool.h">
-      <Filter>90.ImGui\AnimTool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -230,71 +134,17 @@
     <ClCompile Include="..\Private\Camera_Free.cpp">
       <Filter>02.GameObjects\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\ImGui_Manager.cpp">
-      <Filter>90.ImGui\Manager</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\UI.cpp">
       <Filter>02.GameObjects\UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\imgui.cpp">
-      <Filter>90.ImGui\Default</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\imgui_demo.cpp">
-      <Filter>90.ImGui\Default</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\imgui_draw.cpp">
-      <Filter>90.ImGui\Default</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\imgui_impl_dx11.cpp">
-      <Filter>90.ImGui\Default</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\imgui_impl_win32.cpp">
-      <Filter>90.ImGui\Default</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\imgui_tables.cpp">
-      <Filter>90.ImGui\Default</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\imgui_widgets.cpp">
-      <Filter>90.ImGui\Default</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MoveCube.cpp">
-      <Filter>02.GameObjects\Camera\MoveCube</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\PosCube.cpp">
-      <Filter>02.GameObjects\Camera\PosCube</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LookCube.cpp">
-      <Filter>02.GameObjects\Camera\LookCube</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LookAtCube.cpp">
-      <Filter>02.GameObjects\Camera\LookAtCube</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\BaseTile.cpp">
-      <Filter>02.GameObjects\Tile</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\UITool.cpp">
-      <Filter>90.ImGui\UITool</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\CameraTool.cpp">
-      <Filter>90.ImGui\CameraTool</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MapTool.cpp">
-      <Filter>90.ImGui\MapTool</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\ModelTool.cpp">
-      <Filter>90.ImGui\ModelTool</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Mesh.cpp">
       <Filter>02.GameObjects\Mesh\NoneAnim</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\AnimMesh.cpp">
       <Filter>02.GameObjects\Mesh\Anim</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\AnimTool.cpp">
-      <Filter>90.ImGui\AnimTool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

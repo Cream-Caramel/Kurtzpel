@@ -42,8 +42,6 @@ public:
 	_float3 Get_Angles() { return m_fAngles; }
 	_float3 Get_Pos();
 	void Set_Pos(_float4 Pos);
-	void Set_Scale(_float3 fScale) { m_pTransformCom->Set_Scale(XMLoadFloat3(&fScale)); }
-	_float3 Get_Scale() { return m_pTransformCom->Get_Scale(); }
 	const _tchar* Get_Tag() { return sTag.c_str(); }
 	int Get_AnimIndex() { return m_iAniIndex; }
 	int Get_NumAnimations();

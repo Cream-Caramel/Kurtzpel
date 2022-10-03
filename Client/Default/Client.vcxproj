@@ -168,36 +168,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\AnimMesh.h" />
-    <ClInclude Include="..\Public\AnimTool.h" />
     <ClInclude Include="..\public\BackGround.h" />
-    <ClInclude Include="..\Public\BaseTile.h" />
-    <ClInclude Include="..\Public\CameraTool.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
-    <ClInclude Include="..\Public\imconfig.h" />
-    <ClInclude Include="..\Public\imgui.h" />
-    <ClInclude Include="..\Public\imgui_impl_dx11.h" />
-    <ClInclude Include="..\Public\imgui_impl_win32.h" />
-    <ClInclude Include="..\Public\imgui_internal.h" />
-    <ClInclude Include="..\Public\ImGui_Manager.h" />
-    <ClInclude Include="..\Public\imstb_rectpack.h" />
-    <ClInclude Include="..\Public\imstb_textedit.h" />
-    <ClInclude Include="..\Public\imstb_truetype.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Loader.h" />
-    <ClInclude Include="..\Public\LookAtCube.h" />
-    <ClInclude Include="..\Public\LookCube.h" />
     <ClInclude Include="..\Public\MainApp.h" />
-    <ClInclude Include="..\Public\MapTool.h" />
     <ClInclude Include="..\Public\Mesh.h" />
-    <ClInclude Include="..\Public\ModelTool.h" />
-    <ClInclude Include="..\Public\MoveCube.h" />
-    <ClInclude Include="..\Public\PosCube.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI.h" />
-    <ClInclude Include="..\Public\UITool.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -205,34 +186,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\AnimMesh.cpp" />
-    <ClCompile Include="..\Private\AnimTool.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
-    <ClCompile Include="..\Private\BaseTile.cpp" />
-    <ClCompile Include="..\Private\CameraTool.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
-    <ClCompile Include="..\Private\imgui.cpp" />
-    <ClCompile Include="..\Private\imgui_demo.cpp" />
-    <ClCompile Include="..\Private\imgui_draw.cpp" />
-    <ClCompile Include="..\Private\imgui_impl_dx11.cpp" />
-    <ClCompile Include="..\Private\imgui_impl_win32.cpp" />
-    <ClCompile Include="..\Private\ImGui_Manager.cpp" />
-    <ClCompile Include="..\Private\imgui_tables.cpp" />
-    <ClCompile Include="..\Private\imgui_widgets.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
-    <ClCompile Include="..\Private\LookAtCube.cpp" />
-    <ClCompile Include="..\Private\LookCube.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
-    <ClCompile Include="..\Private\MapTool.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
-    <ClCompile Include="..\Private\ModelTool.cpp" />
-    <ClCompile Include="..\Private\MoveCube.cpp" />
-    <ClCompile Include="..\Private\PosCube.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI.cpp" />
-    <ClCompile Include="..\Private\UITool.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

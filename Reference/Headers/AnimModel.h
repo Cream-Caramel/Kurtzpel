@@ -29,13 +29,12 @@ public:
 
 
 public:
-	virtual HRESULT Initialize_Prototype(const char* pModelFilePath, const char* pModelFileName, const char* pSaveName, _fmatrix PivotMatrix);
 	virtual HRESULT Initialize_Prototype(const char* pLoadName, _fmatrix PivotMatrix);
 	virtual HRESULT Initialize(void* pArg);
 
 
 public:
-	HRESULT SetUp_OnShader(class CShader* pShader, _uint iMaterialIndex, aiTextureType eTextureType, const char* pConstantName);
+	HRESULT SetUp_OnShader(class CShader* pShader, _uint iMaterialIndex, TEXTURETYPE eTextureType, const char* pConstantName);
 	HRESULT Play_Animation(_float fTimeDelta, CAnimModel* pAnimModel);
 	HRESULT Render(class CShader* pShader, _uint iMeshIndex);
 
@@ -68,13 +67,9 @@ public:
 
 	void DeleteAnimation(int Index);
 	
-	void SaveBinary(const char* FileName);	
-	void SaveEditBinary(const char* FileName);
 	HRESULT LoadBinary(const char* FileName);
 
 private:
-	const aiScene*				m_pAIScene = nullptr;
-	Assimp::Importer			m_Importer;
 	_float4x4					m_PivotMatrix;
 
 private:
@@ -99,18 +94,12 @@ private:
 	CBinary* m_pBinary;
 
 private:
-	HRESULT Ready_MeshContainers(_fmatrix PivotMatrix, CBinary* pBinary);
-	HRESULT Ready_Materials(const char* pModelFilePath, CBinary* pBinary);
-	HRESULT Ready_HierarchyNodes(aiNode* pNode, class CHierarchyNode* pParent, _uint iDepth, CBinary* pBinary);
-	HRESULT Ready_Animations(CBinary* pBinary);
-
 	HRESULT Ready_LMeshContainers(_fmatrix PivotMatrix, CBinary* pBinary);
 	HRESULT Ready_LMaterials(CBinary* pBinary);
 	HRESULT Ready_LHierarchyNodes(class CHierarchyNode* pParent, _uint iDepth, CBinary* pBinary);
 	HRESULT Ready_LAnimations(CBinary* pBinary);
 
 public:
-	static CAnimModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const char* pModelFilePath, const char* pModelFileName, const char* pSaveName, _fmatrix PivotMatrix = XMMatrixIdentity());
 	static CAnimModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const char* pLoadName, _fmatrix PivotMatrix = XMMatrixIdentity());
 	virtual CComponent* Clone(void* pArg = nullptr);
 	virtual void Free() override;

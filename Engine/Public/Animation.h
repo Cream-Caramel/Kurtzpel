@@ -14,7 +14,6 @@ private:
 	virtual ~CAnimation() = default;
 
 public:
-	HRESULT Initialize_Prototype(aiAnimation* pAIAnimation, CBinary* pBinary);
 	HRESULT Initialize_Prototype(CBinary* pBinary);
 	HRESULT Initialize(class CAnimModel* pModel);
 	bool Play_Animation(_float fTimeDelta,  CAnimModel* pAnimModel);
@@ -72,7 +71,6 @@ private:
 	vector<_uint>					m_ChannelOldKeyFrames;
 
 public:
-	static CAnimation* Create(aiAnimation* pAIAnimation, CBinary* pBinary);
 	static CAnimation* Create(CBinary* pBinary);
 	CAnimation* Clone(class CAnimModel* pModel);
 	virtual void Free() override;

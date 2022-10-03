@@ -77,8 +77,6 @@ HRESULT CUI::Initialize(void * pArg)
 
 	Safe_Delete(m_UITag);
 
-	IG->PushUI(this);
-
 	return S_OK;
 }
 

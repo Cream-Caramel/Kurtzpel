@@ -12,7 +12,6 @@ public:
 	virtual ~CChannel() = default;
 
 public:
-	HRESULT Initialize(aiNodeAnim*	pAIChannel, CBinary* pBinary);
 	HRESULT Initialize(CBinary* pBinary);
 	_uint Update_Transformation(_float fPlayTime, _uint iCurrentKeyFrame, class CHierarchyNode* pNode);
 
@@ -44,7 +43,6 @@ private:
 	_float m_fInterpolationTime = 0.f;
 
 public:
-	static CChannel* Create(aiNodeAnim*	pAIChannel, CBinary* pBinary);
 	static CChannel* Create(CBinary* pBinary);
 	virtual void Free() override;
 };

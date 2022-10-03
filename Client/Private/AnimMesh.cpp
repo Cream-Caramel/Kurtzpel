@@ -2,7 +2,6 @@
 #include "..\Public\AnimMesh.h"
 #include "AnimModel.h"
 #include "GameInstance.h"
-#include "ImGui_Manager.h"
 
 
 CAnimMesh::CAnimMesh(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -31,23 +30,23 @@ HRESULT CAnimMesh::Initialize(void * pArg)
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
+
 	m_bDead = false;
 	m_MeshInfo->fPos.w = 1.f;
 	Set_Pos(m_MeshInfo->fPos);
-	Set_Scale(m_MeshInfo->fScale);
+	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_MeshInfo->fScale));
 	m_fAngles = m_MeshInfo->fAngle;
 	m_iPreAniIndex = 0;
 	if(m_pModelCom->Get_NumAnimations() > 0)
-	m_pModelCom->Set_AnimIndex(IG->Get_AniIndex());
-	m_pModelCom->Play_Animation(1.f, m_pModelCom);
-	IG->AddAnimMesh(this);
+	m_pModelCom->Set_AnimIndex(0);
+
 	return S_OK;
 }
 
 void CAnimMesh::Tick(_float fTimeDelta)
 {
 	m_iPreAniIndex = m_iAniIndex;
-	m_iAniIndex = IG->Get_AniIndex();
+	
 }
 
 void CAnimMesh::LateTick(_float fTimeDelta)
@@ -60,10 +59,8 @@ void CAnimMesh::LateTick(_float fTimeDelta)
 		m_pModelCom->SetNextIndex(m_iAniIndex);
 		m_pModelCom->SetChangeBool(true);
 	}
-	if (IG->GetAnimPlay())
-	{
-		m_pModelCom->Play_Animation(fTimeDelta, m_pModelCom);			
-	}
+	m_pModelCom->Play_Animation(fTimeDelta, m_pModelCom);			
+	
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
@@ -73,22 +70,21 @@ HRESULT CAnimMesh::Render()
 		nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &GI->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &GI->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
 		return E_FAIL;
 
-	RELEASE_INSTANCE(CGameInstance);
+
 
 	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (FAILED(m_pModelCom->SetUp_OnShader(m_pShaderCom, m_pModelCom->Get_MaterialIndex(i), aiTextureType_DIFFUSE, "g_DiffuseTexture")))
+		if (FAILED(m_pModelCom->SetUp_OnShader(m_pShaderCom, m_pModelCom->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i)))
@@ -133,21 +129,6 @@ void CAnimMesh::Set_AnimName(const char * Name, int AniIndex)
 	m_pModelCom->Set_Name(Name, AniIndex); 
 }
 
-void CAnimMesh::SaveBinary()
-{
-	const _tchar* temp = sTag.c_str();
-	char* _char;
-
-	int _tcharSize = WideCharToMultiByte(CP_ACP, 0, temp, -1, NULL, 0, NULL, NULL);
-
-	_char = new char[_tcharSize];
-
-	WideCharToMultiByte(CP_ACP, 0, temp, -1, _char, _tcharSize, 0, 0);
-
-	m_pModelCom->SaveEditBinary(_char);
-
-	Safe_Delete(_char);
-}
 
 void CAnimMesh::ChangeAni(int iAniIndex)
 {

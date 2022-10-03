@@ -23,43 +23,6 @@ CAnimation::CAnimation(const CAnimation & rhs)
 
 }
 
-HRESULT CAnimation::Initialize_Prototype(aiAnimation * pAIAnimation, CBinary* pBinary)
-{
-	strcpy_s(m_szName, pAIAnimation->mName.data);
-
-	char* temp = new char[256];
-
-	for (int i = 0; i < 256; ++i)
-	{
-		temp[i] = m_szName[i];
-	}
-
-	pBinary->m_BinaryVector->AnimName.AnimName.push_back(temp);
-
-	m_fDuration = pAIAnimation->mDuration;
-	m_fTickPerSecond = pAIAnimation->mTicksPerSecond;
-
-	/* 현재 애니메이션에서 제어해야할 뼈들의 갯수를 저장한다. */
-	m_iNumChannels = pAIAnimation->mNumChannels;
-
-	pBinary->m_BinaryVector->Durations.Durations.push_back(m_fDuration);
-	pBinary->m_BinaryVector->TickPerSeconds.TickPerSeconds.push_back(m_fTickPerSecond);
-	pBinary->m_BinaryVector->NumChannels.NumChannels.push_back(m_iNumChannels);
-	pBinary->m_BinaryVector->TimeLimits.TimeLimits.push_back(m_fTimeLimit);
-
-	/* 현재 애니메이션에서 제어해야할 뼈정보들을 생성하여 보관한다. */
-	for (_uint i = 0; i < m_iNumChannels; ++i)
-	{
-		CChannel*		pChannel = CChannel::Create(pAIAnimation->mChannels[i], pBinary);
-		if (nullptr == pChannel)
-			return E_FAIL;
-
-		m_Channels.push_back(pChannel);
-	}
-
-	return S_OK;
-}
-
 HRESULT CAnimation::Initialize_Prototype(CBinary * pBinary)
 {
 	strcpy_s(m_szName, sizeof(char) * 256, pBinary->m_BinaryVector->AnimName.AnimName[pBinary->AnimNameIndex++]);
@@ -153,20 +116,6 @@ CChannel * CAnimation::GetChannels(char * sName)
 		}
 	}
 	return nullptr;
-}
-
-
-CAnimation * CAnimation::Create(aiAnimation * pAIAnimation, CBinary* pBinary)
-{
-	CAnimation*			pInstance = new CAnimation();
-
-	if (FAILED(pInstance->Initialize_Prototype(pAIAnimation, pBinary)))
-	{
-		MSG_BOX(TEXT("Failed To Created : CAnimation"));
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
 }
 
 CAnimation * CAnimation::Create(CBinary * pBinary)
