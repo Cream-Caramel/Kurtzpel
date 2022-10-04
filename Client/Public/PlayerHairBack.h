@@ -3,13 +3,13 @@
 #include "Mesh.h"
 BEGIN(Client)
 
-class CPlayerHead final : public CMesh
+class CPlayerHairBack final : public CMesh
 {
 
 private:
-	CPlayerHead(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
-	CPlayerHead(const CPlayerHead& rhs);
-	virtual ~CPlayerHead() = default;
+	CPlayerHairBack(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
+	CPlayerHairBack(const CPlayerHairBack& rhs);
+	virtual ~CPlayerHairBack() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;

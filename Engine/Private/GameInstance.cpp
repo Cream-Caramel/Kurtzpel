@@ -136,6 +136,14 @@ HRESULT CGameInstance::Add_GameObjectToLayer(const _tchar * pPrototypeTag, _uint
 	return m_pObject_Manager->Add_GameObjectToLayer(pPrototypeTag, iLevelIndex, pLayerTag, pArg);
 }
 
+CGameObject * CGameInstance::Clone_GameObject(const _tchar * pPrototypeTag, void * pArg)
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+
+	return m_pObject_Manager->Clone_GameObject(pPrototypeTag, pArg);
+}
+
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const _tchar * pPrototypeTag, CComponent * pPrototype)
 {
 	if (nullptr == m_pComponent_Manager)

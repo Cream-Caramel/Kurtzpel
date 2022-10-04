@@ -1,52 +1,53 @@
 #include "stdafx.h"
-#include "..\Public\PlayerHead.h"
+#include "..\Public\PlayerSword.h"
 #include "GameInstance.h"
 
-CPlayerHead::CPlayerHead(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPlayerSword::CPlayerSword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)
 {
 	m_pModel = nullptr;
 }
 
-CPlayerHead::CPlayerHead(const CPlayerHead& rhs)
+CPlayerSword::CPlayerSword(const CPlayerSword& rhs)
 	: CMesh(rhs)
 {
 }
 
-HRESULT CPlayerHead::Initialize_Prototype()
+HRESULT CPlayerSword::Initialize_Prototype()
 {
 	__super::Initialize_Prototype();
 	return S_OK;
 }
 
-HRESULT CPlayerHead::Initialize(void * pArg)
+HRESULT CPlayerSword::Initialize(void * pArg)
 {
 	__super::Initialize(pArg);
 
 	m_MeshInfo = ((MESHINFO*)pArg);
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerHead", TEXT("PlayerHead"), (CComponent**)&m_pModel)))
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerSword", TEXT("PlayerSword"), (CComponent**)&m_pModel)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ -0.1f,0.f,0.f,1.f });
 
-	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 90.f, _float3{ 0.f,1.f,0.f }, 90.f, _float3{ 0.f,0.f,1.f },0.f);
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ 0.f,0.f,0.f,1.f });
+	m_pTransformCom->Set_Scale(_vector{ 0.8f,0.8f,0.8f });
+	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 90.f, _float3{ 0.f,1.f,0.f }, 180.f, _float3{ 0.f,0.f,1.f }, 0.f);
 
 	return S_OK;
 }
 
-void CPlayerHead::Tick(_float fTimeDelta)
+void CPlayerSword::Tick(_float fTimeDelta)
 {
 }
 
-void CPlayerHead::LateTick(_float fTimeDelta)
+void CPlayerSword::LateTick(_float fTimeDelta)
 {
 
 
 }
 
-HRESULT CPlayerHead::Render()
+HRESULT CPlayerSword::Render()
 {
 	if (nullptr == m_pModel ||
 		nullptr == m_pShaderCom)
@@ -87,37 +88,37 @@ HRESULT CPlayerHead::Render()
 	return S_OK;
 }
 
-CMesh * CPlayerHead::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMesh * CPlayerSword::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CPlayerHead*		pInstance = new CPlayerHead(pDevice, pContext);
+	CPlayerSword*		pInstance = new CPlayerSword(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CPlayerHead"));
+		MSG_BOX(TEXT("Failed To Created : CPlayerSword"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CPlayerHead::Clone(void * pArg)
+CGameObject * CPlayerSword::Clone(void * pArg)
 {
-	CPlayerHead*		pInstance = new CPlayerHead(*this);
+	CPlayerSword*		pInstance = new CPlayerSword(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CPlayerHead"));
+		MSG_BOX(TEXT("Failed To Cloned : CPlayerSword"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPlayerHead::Free()
+void CPlayerSword::Free()
 {
 	__super::Free();
 	Safe_Release(m_pModel);
 
-	
+
 
 }

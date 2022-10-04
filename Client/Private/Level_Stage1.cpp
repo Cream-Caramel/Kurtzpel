@@ -244,6 +244,8 @@ HRESULT CLevel_Stage1::Ready_Load_Model(char * DatName)
 	}
 	// 3. 颇老 家戈
 	CloseHandle(hFile);
+	
+	return S_OK;
 }
 
 HRESULT CLevel_Stage1::Ready_Load_AnimModel(char * DatName)
@@ -331,6 +333,8 @@ HRESULT CLevel_Stage1::Ready_Load_AnimModel(char * DatName)
 	}
 	// 3. 颇老 家戈
 	CloseHandle(hFile);
+
+	return S_OK;
 }
 
 CLevel_Stage1 * CLevel_Stage1::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

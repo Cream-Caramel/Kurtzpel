@@ -67,6 +67,15 @@
     <Filter Include="02.GameObjects\Mesh\PlayerParts\Head">
       <UniqueIdentifier>{fddd989c-d442-40cf-b7eb-1f81adcfeb54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Mesh\PlayerParts\Hair">
+      <UniqueIdentifier>{69566e11-c47f-440a-8f94-3d77c6e8551d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Mesh\PlayerParts\Weapon">
+      <UniqueIdentifier>{74b9cc90-0355-4f4f-b858-5cb275217ceb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Mesh\PlayerParts\Weapon\Sword">
+      <UniqueIdentifier>{35692856-a5e1-4be6-8371-644f6b39cb58}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -129,6 +138,21 @@
     <ClInclude Include="..\Public\PlayerHead.h">
       <Filter>02.GameObjects\Mesh\PlayerParts\Head</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PlayerHairBack.h">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Hair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerHairSide.h">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Hair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerHairTail.h">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Hair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerHairFront.h">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Hair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerSword.h">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Weapon\Sword</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -181,6 +205,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\PlayerHead.cpp">
       <Filter>02.GameObjects\Mesh\PlayerParts\Head</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerHairBack.cpp">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Hair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerHairFront.cpp">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Hair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerHairSide.cpp">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Hair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerHairTail.cpp">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Hair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerSword.cpp">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Weapon\Sword</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

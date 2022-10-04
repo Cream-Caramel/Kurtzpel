@@ -1,52 +1,52 @@
 #include "stdafx.h"
-#include "..\Public\PlayerHead.h"
+#include "..\Public\PlayerHairFront.h"
 #include "GameInstance.h"
 
-CPlayerHead::CPlayerHead(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPlayerHairFront::CPlayerHairFront(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)
 {
 	m_pModel = nullptr;
 }
 
-CPlayerHead::CPlayerHead(const CPlayerHead& rhs)
+CPlayerHairFront::CPlayerHairFront(const CPlayerHairFront& rhs)
 	: CMesh(rhs)
 {
 }
 
-HRESULT CPlayerHead::Initialize_Prototype()
+HRESULT CPlayerHairFront::Initialize_Prototype()
 {
 	__super::Initialize_Prototype();
 	return S_OK;
 }
 
-HRESULT CPlayerHead::Initialize(void * pArg)
+HRESULT CPlayerHairFront::Initialize(void * pArg)
 {
 	__super::Initialize(pArg);
 
 	m_MeshInfo = ((MESHINFO*)pArg);
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerHead", TEXT("PlayerHead"), (CComponent**)&m_pModel)))
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerHairFront", TEXT("PlayerHairFront"), (CComponent**)&m_pModel)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ -0.1f,0.f,0.f,1.f });
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ -1.6f,0.f,0.f,1.f });
 
-	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 90.f, _float3{ 0.f,1.f,0.f }, 90.f, _float3{ 0.f,0.f,1.f },0.f);
+	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 90.f, _float3{ 0.f,1.f,0.f }, 90.f, _float3{ 0.f,0.f,1.f }, 0.f);
 
 	return S_OK;
 }
 
-void CPlayerHead::Tick(_float fTimeDelta)
+void CPlayerHairFront::Tick(_float fTimeDelta)
 {
 }
 
-void CPlayerHead::LateTick(_float fTimeDelta)
+void CPlayerHairFront::LateTick(_float fTimeDelta)
 {
 
 
 }
 
-HRESULT CPlayerHead::Render()
+HRESULT CPlayerHairFront::Render()
 {
 	if (nullptr == m_pModel ||
 		nullptr == m_pShaderCom)
@@ -87,37 +87,37 @@ HRESULT CPlayerHead::Render()
 	return S_OK;
 }
 
-CMesh * CPlayerHead::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMesh * CPlayerHairFront::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CPlayerHead*		pInstance = new CPlayerHead(pDevice, pContext);
+	CPlayerHairFront*		pInstance = new CPlayerHairFront(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CPlayerHead"));
+		MSG_BOX(TEXT("Failed To Created : CPlayerHairFront"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CPlayerHead::Clone(void * pArg)
+CGameObject * CPlayerHairFront::Clone(void * pArg)
 {
-	CPlayerHead*		pInstance = new CPlayerHead(*this);
+	CPlayerHairFront*		pInstance = new CPlayerHairFront(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CPlayerHead"));
+		MSG_BOX(TEXT("Failed To Cloned : CPlayerHairFront"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPlayerHead::Free()
+void CPlayerHairFront::Free()
 {
 	__super::Free();
 	Safe_Release(m_pModel);
 
-	
+
 
 }

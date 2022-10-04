@@ -63,7 +63,7 @@ HRESULT CMainApp::Render()
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
 
-	_float4 BackColor = _float4{ 0.f,0.f,0.f,1.f };
+	_float4 BackColor = _float4{ 0.f,0.f,1.f,1.f };
 
 	m_pGameInstance->Clear_BackBuffer_View(BackColor);
 	m_pGameInstance->Clear_DepthStencil_View();

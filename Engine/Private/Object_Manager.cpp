@@ -30,7 +30,22 @@ HRESULT CObject_Manager::Reserve_Container(_uint iNumLevels)
 	return S_OK;
 }
 
-// Add_Prototype(TEXT("Prototype_GameObject_Player"), CPlayer::Create());
+CGameObject * CObject_Manager::Clone_GameObject(const _tchar * pPrototypeTag, void * pArg)
+{
+	CGameObject*	pPrototype = Find_Prototype(pPrototypeTag);
+
+	if (nullptr == pPrototype)
+		return nullptr;
+
+	CGameObject*	pGameObject = pPrototype->Clone(pArg);
+
+	if (nullptr == pGameObject)
+		return nullptr;
+
+
+	return pGameObject;
+}
+
 
 HRESULT CObject_Manager::Add_Prototype(const _tchar * pPrototypeTag, CGameObject * pPrototype)
 {
@@ -44,12 +59,7 @@ HRESULT CObject_Manager::Add_Prototype(const _tchar * pPrototypeTag, CGameObject
 
 HRESULT CObject_Manager::Add_GameObjectToLayer(const _tchar* pPrototypeTag, _uint iLevelIndex, const _tchar* pLayerTag, void* pArg)
 {
-	CGameObject*	pPrototype = Find_Prototype(pPrototypeTag);
-
-	if (nullptr == pPrototype)
-		return E_FAIL;
-
-	CGameObject*	pGameObject = pPrototype->Clone(pArg);
+	CGameObject*		pGameObject = Clone_GameObject(pPrototypeTag, pArg);
 
 	if (nullptr == pGameObject)
 		return E_FAIL;

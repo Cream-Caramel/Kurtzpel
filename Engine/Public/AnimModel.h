@@ -21,6 +21,10 @@ public:
 		return m_iNumMeshes;
 	}
 
+	_matrix Get_PivotMatrix() {
+		return XMLoadFloat4x4(&m_PivotMatrix);
+	}
+
 	_uint Get_MaterialIndex(_uint iMeshIndex);
 
 	void Set_AnimIndex(_uint iAnimIndex);

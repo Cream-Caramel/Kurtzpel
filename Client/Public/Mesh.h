@@ -24,7 +24,7 @@ public:
 
 	}MESHINFO;
 
-private:
+protected:
 	CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CMesh(const CMesh& rhs);
 	virtual ~CMesh() = default;
@@ -37,19 +37,24 @@ public:
 	virtual HRESULT Render()override;
 
 public:
+	HRESULT SetUp_State(_fmatrix StateMatrix);
+
+
+public:
 	void Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3);
 	_float3 Get_Pos();
 	void Set_Pos(_float4 Pos);
 
-private:
+protected:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CTransform*				m_pTransformCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
 	MESHINFO*				m_MeshInfo;
+	CTransform*				m_pParentTransformCom = nullptr;
 
 
-private:
+protected:
 	HRESULT Ready_Components();
 
 public:

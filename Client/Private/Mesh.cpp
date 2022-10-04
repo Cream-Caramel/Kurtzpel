@@ -21,10 +21,6 @@ HRESULT CMesh::Initialize(void * pArg)
 {
 	m_MeshInfo = ((MESHINFO*)pArg);
 
-	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_STAGE1, m_MeshInfo->sTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
-		return E_FAIL;
-
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 	m_bDead = false;
@@ -47,38 +43,17 @@ void CMesh::LateTick(_float fTimeDelta)
 
 HRESULT CMesh::Render()
 {
-	if (nullptr == m_pModelCom ||
-		nullptr == m_pShaderCom)
-		return E_FAIL;
+	return S_OK;
+}
 
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+HRESULT CMesh::SetUp_State(_fmatrix StateMatrix)
+{
+	m_pParentTransformCom->Set_State(CTransform::STATE_RIGHT, StateMatrix.r[0]);
+	m_pParentTransformCom->Set_State(CTransform::STATE_UP, StateMatrix.r[1]);
+	m_pParentTransformCom->Set_State(CTransform::STATE_LOOK, StateMatrix.r[2]);
+	m_pParentTransformCom->Set_State(CTransform::STATE_POSITION, StateMatrix.r[3]);
 
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Set_RawValue("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_PROJ), sizeof(_float4x4))))
-		return E_FAIL;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-
-
-	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
-
-	for (_uint i = 0; i < iNumMeshes; ++i)
-	{
-		if (FAILED(m_pModelCom->SetUp_OnShader(m_pShaderCom, m_pModelCom->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
-			return E_FAIL;
-		/*if (FAILED(m_pModelCom->SetUp_OnShader(m_pShaderCom, m_pModelCom->Get_MaterialIndex(i), aiTextureType_NORMALS, "g_NormalTexture")))
-		return E_FAIL;*/
-
-		if (FAILED(m_pShaderCom->Begin(0)))
-			return E_FAIL;
-
-		if (FAILED(m_pModelCom->Render(i)))
-			return E_FAIL;
-	}
+	m_pParentTransformCom->Set_Scale(XMVectorSet(1.f, 1.f, 1.f, 1.f));
 
 	return S_OK;
 }
@@ -121,6 +96,9 @@ HRESULT CMesh::Ready_Components()
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Model"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Transform"), TEXT("Com_ParentTransform"), (CComponent**)&m_pParentTransformCom)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -157,4 +135,5 @@ void CMesh::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pTransformCom);
+	Safe_Release(m_pParentTransformCom);
 }

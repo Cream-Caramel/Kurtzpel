@@ -21,6 +21,11 @@ public:
 	_uint Get_MaterialIndex(_uint iMeshIndex) {
 		return m_Meshes[iMeshIndex]->Get_MaterialIndex();
 	}
+
+	_matrix Get_PivotMatrix() {
+		return XMLoadFloat4x4(&m_PivotMatrix);
+	}
+
 public:
 	virtual HRESULT Initialize_Prototype(const char* pLoadName, _fmatrix PivotMatrix);
 	virtual HRESULT Initialize(void* pArg);

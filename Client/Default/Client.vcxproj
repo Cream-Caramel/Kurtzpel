@@ -179,7 +179,12 @@
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\PlayerHairBack.h" />
+    <ClInclude Include="..\Public\PlayerHairFront.h" />
+    <ClInclude Include="..\Public\PlayerHairSide.h" />
+    <ClInclude Include="..\Public\PlayerHairTail.h" />
     <ClInclude Include="..\Public\PlayerHead.h" />
+    <ClInclude Include="..\Public\PlayerSword.h" />
     <ClInclude Include="..\Public\Release_Manager.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI.h" />
@@ -200,7 +205,12 @@
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\PlayerHairBack.cpp" />
+    <ClCompile Include="..\Private\PlayerHairFront.cpp" />
+    <ClCompile Include="..\Private\PlayerHairSide.cpp" />
+    <ClCompile Include="..\Private\PlayerHairTail.cpp" />
     <ClCompile Include="..\Private\PlayerHead.cpp" />
+    <ClCompile Include="..\Private\PlayerSword.cpp" />
     <ClCompile Include="..\Private\Release_Manager.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI.cpp" />

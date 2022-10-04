@@ -6,12 +6,16 @@
 #include "BackGround.h"
 #include "Terrain.h"
 #include "UI.h"
-#include "Mesh.h"
+#include "Model.h"
 #include "AnimModel.h"
-#include "AnimMesh.h"
 #include "Release_Manager.h"
 #include "Player.h"
-
+#include "PlayerHead.h"
+#include "PlayerHairBack.h"
+#include "PlayerHairFront.h"
+#include "PlayerHairSide.h"
+#include "PlayerHairTail.h"
+#include "PlayerSword.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -86,12 +90,32 @@ HRESULT CLoader::Loading_ForStatic()
 		CCamera_Free::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Mesh"),
-		CMesh::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Player"),
 		CPlayer::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerHead"),
+		CPlayerHead::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerHairBack"),
+		CPlayerHairBack::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerHairFront"),
+		CPlayerHairFront::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerHairSide"),
+		CPlayerHairSide::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerHairTail"),
+		CPlayerHairTail::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerSword"),
+		CPlayerSword::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("UI ·ÎµùÁß"));

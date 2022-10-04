@@ -3,13 +3,13 @@
 #include "Mesh.h"
 BEGIN(Client)
 
-class CPlayerHead final : public CMesh
+class CPlayerSword final : public CMesh
 {
 
 private:
-	CPlayerHead(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
-	CPlayerHead(const CPlayerHead& rhs);
-	virtual ~CPlayerHead() = default;
+	CPlayerSword(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
+	CPlayerSword(const CPlayerSword& rhs);
+	virtual ~CPlayerSword() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -18,11 +18,8 @@ public:
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-
-
 private:
 	CModel* m_pModel;
-
 
 public:
 	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
