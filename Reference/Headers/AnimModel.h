@@ -64,8 +64,6 @@ public:
 	void SetNextIndex(_uint iNextIndex);
 
 	CAnimation* GetNextAnimation() { return m_Animations[m_iNextAnimIndex]; }
-
-	void DeleteAnimation(int Index);
 	
 	HRESULT LoadBinary(const char* FileName);
 

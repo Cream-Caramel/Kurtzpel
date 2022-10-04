@@ -164,11 +164,11 @@ CMainApp * CMainApp::Create()
 
 void CMainApp::Free()
 {
-	CRelease_Manager::Destroy_Instance();
+
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 	Safe_Release(m_pRenderer);
 	Safe_Release(m_pGameInstance);
 	CGameInstance::Release_Engine();
-
+	CRelease_Manager::Destroy_Instance();
 }
