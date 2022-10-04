@@ -64,9 +64,9 @@
     <Filter Include="02.GameObjects\Mesh\PlayerParts">
       <UniqueIdentifier>{976cd8ad-96eb-49a2-a98f-85fa32c7bb0f}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <Filter Include="02.GameObjects\Mesh\PlayerParts\Head">
+      <UniqueIdentifier>{fddd989c-d442-40cf-b7eb-1f81adcfeb54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -126,6 +126,9 @@
     <ClInclude Include="..\Public\Player.h">
       <Filter>02.GameObjects\AnimMesh\Player</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PlayerHead.h">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Head</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -176,6 +179,9 @@
     <ClCompile Include="..\Private\Player.cpp">
       <Filter>02.GameObjects\AnimMesh\Player</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\PlayerHead.cpp">
+      <Filter>02.GameObjects\Mesh\PlayerParts\Head</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -206,5 +212,10 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt">
+      <Filter>98.Default</Filter>
+    </Text>
   </ItemGroup>
 </Project>

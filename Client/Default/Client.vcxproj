@@ -179,6 +179,7 @@
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\PlayerHead.h" />
     <ClInclude Include="..\Public\Release_Manager.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\PlayerHead.cpp" />
     <ClCompile Include="..\Private\Release_Manager.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI.cpp" />

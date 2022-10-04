@@ -23,11 +23,6 @@ HRESULT CAnimMesh::Initialize_Prototype()
 HRESULT CAnimMesh::Initialize(void * pArg)
 {
 	m_MeshInfo = ((MESHINFO*)pArg);
-	sTag = m_MeshInfo->sTag;
-
-	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, m_MeshInfo->sTag, TEXT("Com_Model"), (CComponent**)&m_pModelCom)))
-		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
@@ -37,9 +32,6 @@ HRESULT CAnimMesh::Initialize(void * pArg)
 	Set_Pos(m_MeshInfo->fPos);
 	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_MeshInfo->fScale));
 	Rotation(_float3{ 1.f,0.f,0.f }, m_MeshInfo->fAngle.x, _float3{ 0.f,1.f,0.f }, m_MeshInfo->fScale.y, _float3{ 0.f,0.f,1.f }, m_MeshInfo->fAngle.z);
-
-	if(m_pModelCom->Get_NumAnimations() > 0)
-	m_pModelCom->Set_AnimIndex(0);
 
 	return S_OK;
 }
@@ -74,27 +66,6 @@ void CAnimMesh::Set_Pos(_float4 Pos)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&Pos));
 }
 
-int CAnimMesh::Get_NumAnimations()
-{
-	return m_pModelCom->Get_NumAnimations(); 
-}
-
-const char * CAnimMesh::Get_AnimName(int AniIndex)
-{
-	return m_pModelCom->Get_Name(AniIndex); 
-}
-
-void CAnimMesh::Set_AnimName(const char * Name, int AniIndex)
-{
-	m_pModelCom->Set_Name(Name, AniIndex); 
-}
-
-
-void CAnimMesh::ChangeAni(int iAniIndex)
-{
-	m_pModelCom->SetNextIndex(iAniIndex);
-	m_pModelCom->SetChangeBool(true);
-}
 
 HRESULT CAnimMesh::Ready_Components()
 {
@@ -147,7 +118,6 @@ void CAnimMesh::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pTransformCom);

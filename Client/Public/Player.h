@@ -5,7 +5,7 @@ BEGIN(Client)
 
 class CPlayer final : public CAnimMesh
 {
-	enum AnimParts {PARTS_PLAYER, PARTS_TOP, PARTS_BOTTOM, PARTS_END };
+	enum AnimModelParts {PARTS_PLAYER, PARTS_TOP, PARTS_BOTTOM, PARTS_END};
 private:
 	CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
 	CPlayer(const CPlayer& rhs);

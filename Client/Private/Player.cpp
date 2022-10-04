@@ -24,18 +24,28 @@ HRESULT CPlayer::Initialize(void * pArg)
 {
 	__super::Initialize(pArg);
 
-	m_pAnimModel[PARTS_PLAYER] = m_pModelCom;
-	Safe_AddRef(m_pModelCom);
-	_tchar* a = L"Top";
-	_tchar* b = L"Bottom";
+	m_MeshInfo = ((MESHINFO*)pArg);
+	sTag = m_MeshInfo->sTag;
+
+	/* For.Com_Model */
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, m_MeshInfo->sTag, TEXT("Player"), (CComponent**)&m_pAnimModel[PARTS_PLAYER])))
+		return E_FAIL;
+
+	
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"Top", TEXT("Top"), (CComponent**)&m_pAnimModel[PARTS_TOP])))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"Bottom", TEXT("Bottom"), (CComponent**)&m_pAnimModel[PARTS_BOTTOM])))
 		return E_FAIL;
-		
 
+
+
+	for (int i = 0; i < PARTS_END; ++i)
+	{
+		m_pAnimModel[i]->Set_AnimIndex(0);
+	}
+		
 	return S_OK;
 }
 
@@ -59,10 +69,8 @@ void CPlayer::LateTick(_float fTimeDelta)
 
 HRESULT CPlayer::Render()
 {
-	if (nullptr == m_pModelCom ||
-		nullptr == m_pShaderCom)
+	if 	(nullptr == m_pShaderCom)
 		return E_FAIL;
-
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4))))
 		return E_FAIL;
@@ -86,7 +94,6 @@ HRESULT CPlayer::Render()
 			}
 		}
 	}
-
 	return S_OK;
 }
 

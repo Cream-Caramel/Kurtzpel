@@ -114,7 +114,7 @@ HRESULT CLoader::Loading_ForStatic()
 	lstrcpy(m_szLoadingText, TEXT("¸ðµ¨ ·ÎµùÁß "));
 
 	LoadAnimModel("Level_Static");
-	//LoadModel("Level_Static");
+	LoadModel("Level_Static");
 	
 
 	/* For.Prototype_Component_VIBuffer_Terrain */
