@@ -54,6 +54,7 @@ void CPlayer::LateTick(_float fTimeDelta)
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	/*m_pModelCom->SetNextIndex(m_iAniIndex);
 	m_pModelCom->SetChangeBool(true);*/
+
 }
 
 HRESULT CPlayer::Render()
