@@ -38,11 +38,12 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerBottom", TEXT("Bottom"), (CComponent**)&m_pAnimModel[MODEL_BOTTOM])))
 		return E_FAIL;
 
+	m_iAniIndex = 0;
 
 
 	for (int i = 0; i < MODEL_END; ++i)
 	{
-		m_pAnimModel[i]->Set_AnimIndex(0);
+		m_pAnimModel[i]->Set_AnimIndex(m_iAniIndex);
 	}
 		
 	Ready_Sockets();
@@ -54,9 +55,10 @@ void CPlayer::Tick(_float fTimeDelta)
 {
 	if (GI->Key_Down(DIK_UP))
 	{
+		++m_iAniIndex;
 		for (auto& iter : m_pAnimModel)
 		{
-			iter->SetNextIndex(5);
+			iter->SetNextIndex(m_iAniIndex);
 			iter->SetChangeBool(true);
 		}
 	}

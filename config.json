@@ -1,0 +1,101 @@
+{
+    "_Documentation": "https://github.com/Amrsatrio/BlenderUmap/blob/master/README.md",
+    "PaksDirectory": "C:\\Nexon\\KurtzPel\\TheChase\\Content\\Paks\\",
+    "ExportPath": "C:\\Users\\ahs\\Desktop\\Kurtzpel\\",
+    "UEVersion": "GAME_UE4_24",
+    "bDumpAssets": true,
+    "ObjectCacheSize": 10000,
+    "bReadMaterials": true,
+    "bExportToDDSWhenPossible": true,
+    "bExportBuildingFoundations": true,
+    "ExportPackage": "/Game/TheChase/Map/Room/KillMonster/Monster_SubLevel/Repetition/Caverns_of_Beast_RM_20070_DarkElf_Nae_Shae.umap",
+    "EncryptionKeys": [
+        {
+            "Guid": "00000000000000000000000000000000",
+            "Key": "0xE7BECFFD7B408516861CC0385934D286B004690D9013D8263951ACCEA3C888D3"
+        },
+        {
+            "FileName": "pakchunk27-WindowsNoEditor",
+            "Key": "0xE7BECFFD7B408516861CC0385934D286B004690D9013D8263951ACCEA3C888D3"
+        }
+    ],
+    "Textures": {
+        "UV1": {
+            "Diffuse": [
+                "Trunk_BaseColor",
+                "Diffuse",
+                "DiffuseTexture",
+                "Base_Color_Tex",
+                "Tex_Color"
+            ],
+            "Normal": [
+                "Trunk_Normal",
+                "Normals",
+                "Normal",
+                "Base_Normal_Tex",
+                "Tex_Normal"
+            ],
+            "Specular": [
+                "Trunk_Specular",
+                "SpecularMasks"
+            ],
+            "Emission": [
+                "EmissiveTexture"
+            ],
+            "MaskTexture": [
+                "MaskTexture"
+            ]
+        },
+        "UV2": {
+            "Diffuse": [
+                "Diffuse_Texture_3"
+            ],
+            "Normal": [
+                "Normals_Texture_3"
+            ],
+            "Specular": [
+                "Specular_Texture_3"
+            ],
+            "Emission": [
+                "Emissive_Texture_3"
+            ],
+            "MaskTexture": [
+                "MaskTexture_3"
+            ]
+        },
+        "UV3": {
+            "Diffuse": [
+                "Diffuse_Texture_4"
+            ],
+            "Normal": [
+                "Normals_Texture_4"
+            ],
+            "Specular": [
+                "Specular_Texture_4"
+            ],
+            "Emission": [
+                "Emissive_Texture_4"
+            ],
+            "MaskTexture": [
+                "MaskTexture_4"
+            ]
+        },
+        "UV4": {
+            "Diffuse": [
+                "Diffuse_Texture_2"
+            ],
+            "Normal": [
+                "Normals_Texture_2"
+            ],
+            "Specular": [
+                "Specular_Texture_2"
+            ],
+            "Emission": [
+                "Emissive_Texture_2"
+            ],
+            "MaskTexture": [
+                "MaskTexture_2"
+            ]
+        }
+    }
+}

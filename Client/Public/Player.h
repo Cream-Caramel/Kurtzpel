@@ -27,6 +27,9 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	int m_iAniIndex;
+
+private:
 	CAnimModel* m_pAnimModel[MODEL_END];
 
 	vector<CMesh*>				m_Parts;
