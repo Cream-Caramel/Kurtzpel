@@ -170,6 +170,7 @@
     <ClInclude Include="..\Public\AnimMesh.h" />
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
+    <ClInclude Include="..\Public\Camera_Player.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Level_Stage1.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
@@ -185,6 +186,7 @@
     <ClInclude Include="..\Public\PlayerHairTail.h" />
     <ClInclude Include="..\Public\PlayerHead.h" />
     <ClInclude Include="..\Public\PlayerSword.h" />
+    <ClInclude Include="..\Public\Pointer_Manager.h" />
     <ClInclude Include="..\Public\Release_Manager.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI.h" />
@@ -197,6 +199,7 @@
     <ClCompile Include="..\Private\AnimMesh.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
+    <ClCompile Include="..\Private\Camera_Player.cpp" />
     <ClCompile Include="..\Private\Level_Stage1.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
@@ -211,6 +214,7 @@
     <ClCompile Include="..\Private\PlayerHairTail.cpp" />
     <ClCompile Include="..\Private\PlayerHead.cpp" />
     <ClCompile Include="..\Private\PlayerSword.cpp" />
+    <ClCompile Include="..\Private\Pointer_Manager.cpp" />
     <ClCompile Include="..\Private\Release_Manager.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI.cpp" />

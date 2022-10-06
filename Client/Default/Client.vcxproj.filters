@@ -76,6 +76,15 @@
     <Filter Include="02.GameObjects\Mesh\PlayerParts\Weapon\Sword">
       <UniqueIdentifier>{35692856-a5e1-4be6-8371-644f6b39cb58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="96.Manager\PointerManager">
+      <UniqueIdentifier>{800b6a36-99e8-4de3-97d8-e9e36192ea9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Camera\Free">
+      <UniqueIdentifier>{025e0943-3dc6-42f1-afaf-38202bffd6b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Camera\Player">
+      <UniqueIdentifier>{45802bd5-cdcc-4523-926b-3bb267056101}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -107,9 +116,6 @@
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
       <Filter>02.GameObjects\BackGround</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Camera_Free.h">
-      <Filter>02.GameObjects\Camera</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI.h">
       <Filter>02.GameObjects\UI</Filter>
@@ -153,6 +159,15 @@
     <ClInclude Include="..\Public\PlayerSword.h">
       <Filter>02.GameObjects\Mesh\PlayerParts\Weapon\Sword</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Pointer_Manager.h">
+      <Filter>96.Manager\PointerManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Free.h">
+      <Filter>02.GameObjects\Camera\Free</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Player.h">
+      <Filter>02.GameObjects\Camera\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -175,9 +190,6 @@
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
       <Filter>02.GameObjects\BackGround</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Camera_Free.cpp">
-      <Filter>02.GameObjects\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI.cpp">
       <Filter>02.GameObjects\UI</Filter>
@@ -220,6 +232,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\PlayerSword.cpp">
       <Filter>02.GameObjects\Mesh\PlayerParts\Weapon\Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Pointer_Manager.cpp">
+      <Filter>96.Manager\PointerManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Free.cpp">
+      <Filter>02.GameObjects\Camera\Free</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Player.cpp">
+      <Filter>02.GameObjects\Camera\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

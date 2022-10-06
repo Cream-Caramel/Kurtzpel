@@ -85,14 +85,6 @@ HRESULT CTerrain::Ready_Components()
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, TEXT("Prototype_Component_Texture_Terrain"), TEXT("Com_Texture"), (CComponent**)&m_pTextureCom[TYPE_DIFFUSE])))
 		return E_FAIL;
 
-	/* For.Com_Brush*/
-	if (FAILED(__super::Add_Component(LEVEL_STAGE1, TEXT("Prototype_Component_Texture_Brush"), TEXT("Com_Brush"), (CComponent**)&m_pTextureCom[TYPE_BRUSH])))
-		return E_FAIL;
-
-	/* For.Com_Filter */
-	if (FAILED(__super::Add_Component(LEVEL_STAGE1, TEXT("Prototype_Component_Texture_Filter"), TEXT("Com_Filter"), (CComponent**)&m_pTextureCom[TYPE_FILTER])))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -143,21 +135,6 @@ HRESULT CTerrain::SetUp_ShaderResources()
 	RELEASE_INSTANCE(CGameInstance);
 
 	if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Set_SRV(m_pShaderCom, "g_DiffuseTexture", 0)))
-		return E_FAIL;
-	if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Set_SRV(m_pShaderCom, "g_DiffuseTexture1", 1)))
-		return E_FAIL;
-	//if (FAILED(m_pTextureCom[TYPE_FILTER]->Set_SRV(m_pShaderCom, "g_FilterTexture")))
-	//	return E_FAIL;
-
-	/*if (FAILED(m_pShaderCom->Set_ShaderResourceView("g_FilterTexture", m_pFilterSRV)))
-		return E_FAIL;*/
-
-	if (FAILED(m_pTextureCom[TYPE_FILTER]->Set_SRV(m_pShaderCom, "g_FilterTexture")))
-		return E_FAIL;
-
-
-
-	if (FAILED(m_pTextureCom[TYPE_BRUSH]->Set_SRV(m_pShaderCom, "g_BrushTexture")))
 		return E_FAIL;
 
 	return S_OK;

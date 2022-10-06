@@ -10,6 +10,7 @@
 #include "AnimModel.h"
 #include "Release_Manager.h"
 #include "Player.h"
+#include "Camera_Player.h"
 #include "PlayerHead.h"
 #include "PlayerHairBack.h"
 #include "PlayerHairFront.h"
@@ -44,7 +45,7 @@ _uint APIENTRY LoadingMain(void* pArg)
 		pLoader->Loading_ForStage1();
 		break;
 	}
-
+	
 	LeaveCriticalSection(&pLoader->Get_CS());
 
 	return 0;
@@ -90,6 +91,10 @@ HRESULT CLoader::Loading_ForStatic()
 		CCamera_Free::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Player"),
+		CCamera_Player::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Player"),
 		CPlayer::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -123,16 +128,6 @@ HRESULT CLoader::Loading_ForStatic()
 	/* For.Prototype_Component_Texture_Terrain */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STAGE1, TEXT("Prototype_Component_Texture_Terrain"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
-		return E_FAIL;
-
-	/* For.Prototype_Component_Texture_Brush*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STAGE1, TEXT("Prototype_Component_Texture_Brush"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Brush.png"), 1))))
-		return E_FAIL;
-
-	/* For.Prototype_Component_Texture_Filter */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STAGE1, TEXT("Prototype_Component_Texture_Filter"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Filter.bmp"), 1))))
 		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("모델 로딩중 "));

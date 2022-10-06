@@ -9,6 +9,7 @@ namespace Client
 
 #define GI CGameInstance::Get_Instance()
 #define RM CRelease_Manager::Get_Instance()
+#define PM CPointer_Manager::Get_Instance()
 }
 
 extern HINSTANCE g_hInst;

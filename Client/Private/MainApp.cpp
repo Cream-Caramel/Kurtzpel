@@ -3,7 +3,7 @@
 #include "GameInstance.h"
 #include "Level_Loading.h"
 #include "Release_Manager.h"
-
+#include "Pointer_Manager.h"
 
 using namespace Client;
 
@@ -48,11 +48,11 @@ void CMainApp::Tick(_float fTimeDelta)
 
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 
-	/*RECT Clip;
+	RECT Clip;
 	GetClientRect(g_hWnd, &Clip);
 	ClientToScreen(g_hWnd, (LPPOINT)&Clip);
 	ClientToScreen(g_hWnd, (LPPOINT)(&Clip.right));
-	ClipCursor(&Clip);*/
+	ClipCursor(&Clip);
 
 
 }
@@ -131,13 +131,12 @@ HRESULT CMainApp::Ready_Prototype_Component()
 		CTransform::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+
 	/* For.Prototype_Component_Shader_VtxTex */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxTex.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements))))
 		return E_FAIL;
 
-	
-	
 	Safe_AddRef(m_pRenderer);
 
 	return S_OK;
@@ -171,4 +170,5 @@ void CMainApp::Free()
 	Safe_Release(m_pGameInstance);
 	CGameInstance::Release_Engine();
 	CRelease_Manager::Destroy_Instance();
+	CPointer_Manager::Destroy_Instance();
 }

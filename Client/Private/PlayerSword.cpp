@@ -30,7 +30,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 		return E_FAIL;
 
 
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ 0.f,0.f,0.f,1.f });
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ 0.05f,0.f,0.f,1.f });
 	m_pTransformCom->Set_Scale(_vector{ 0.8f,0.8f,0.8f });
 	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 90.f, _float3{ 0.f,1.f,0.f }, 180.f, _float3{ 0.f,0.f,1.f }, 0.f);
 

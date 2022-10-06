@@ -15,26 +15,11 @@ CVIBuffer_Terrain::CVIBuffer_Terrain(const CVIBuffer_Terrain & rhs)
 
 HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeighitMapFilePath)
 {
-	_ulong			dwByte = 0;
-	HANDLE			hFile = CreateFile(pHeighitMapFilePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (0 == hFile)
-		return E_FAIL;
-
-	BITMAPFILEHEADER			fh;
-	ReadFile(hFile, &fh, sizeof(BITMAPFILEHEADER), &dwByte, nullptr);
-
-	BITMAPINFOHEADER			ih;
-	ReadFile(hFile, &ih, sizeof(BITMAPINFOHEADER), &dwByte, nullptr);
-
-	_ulong*						pPixel = new _ulong[ih.biWidth * ih.biHeight];
-	ReadFile(hFile, pPixel, sizeof(_ulong) * ih.biWidth * ih.biHeight, &dwByte, nullptr);
-
-	CloseHandle(hFile);
 
 #pragma region VERTEXBUFFER
 	m_iNumVertexBuffers = 1;
-	m_iNumVerticesX = ih.biWidth;
-	m_iNumVerticesZ = ih.biHeight;
+	m_iNumVerticesX = 100;
+	m_iNumVerticesZ = 100;
 
 	m_iNumVertices = m_iNumVerticesX * m_iNumVerticesZ;
 	m_iStride = sizeof(VTXNORTEX);
@@ -48,15 +33,12 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeighitMapFilePat
 		{
 			_uint		iIndex = i * m_iNumVerticesX + j;
 
-			pVertices[iIndex].vPosition = _float3(_float(j), (pPixel[iIndex] & 0x000000ff) / 10.0f, _float(i));
+			pVertices[iIndex].vPosition = _float3(_float(j), (0.f), _float(i));
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			pVertices[iIndex].vTexture = _float2(_float(j) / _float(m_iNumVerticesX - 1.f), _float(i) / _float(m_iNumVerticesZ - 1.f));
 		}
 	}
 
-
-
-	Safe_Delete_Array(pPixel);
 
 #pragma endregion
 

@@ -2,6 +2,8 @@
 #include "..\Public\Player.h"
 #include "GameInstance.h"
 #include "HierarchyNode.h"
+#include "Pointer_Manager.h"
+
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -26,12 +28,10 @@ HRESULT CPlayer::Initialize(void * pArg)
 	__super::Initialize(pArg);
 
 	m_MeshInfo = ((MESHINFO*)pArg);
-	sTag = m_MeshInfo->sTag;
+	sTag = L"Player";
 
-	
-	
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, m_MeshInfo->sTag, TEXT("Player"), (CComponent**)&m_pAnimModel[MODEL_PLAYER])))
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"Player", TEXT("Player"), (CComponent**)&m_pAnimModel[MODEL_PLAYER])))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerTop", TEXT("Top"), (CComponent**)&m_pAnimModel[MODEL_TOP])))
@@ -46,35 +46,34 @@ HRESULT CPlayer::Initialize(void * pArg)
 		PivotMatrix = XMMatrixRotationY(XMConvertToRadians(270.0f));
 		m_pAnimModel[i]->Set_PivotMatrix(PivotMatrix);
 	}
-	m_AniIndex = IDLE;
-	m_vTargetLook = { 0.f,0.f,1.f,0.f };
+	
+	m_eCurState = IDLE;
+	m_vTargetLook = { 0.f,0.f,1.f};
 
 	Set_AniInfo();
 
 	for (int i = 0; i < MODEL_END; ++i)
 	{
-		m_pAnimModel[i]->Set_AnimIndex(m_AniIndex);
+		m_pAnimModel[i]->Set_AnimIndex(m_eCurState);
 	}
 		
 	Ready_Sockets();
 	Ready_PlayerParts();
+	PM->Add_Player(this);	
+
 	return S_OK;
 }
 
 void CPlayer::Tick(_float fTimeDelta)
 {
-	if (GI->Key_Down(DIK_UP))
-	{
 		
-		
-		for (auto& iter : m_pAnimModel)
-		{
-			iter->SetNextIndex(m_AniIndex);
-			iter->SetChangeBool(true);
-		}
-	}
-	Update_Parts();
+	m_bKeyInput = false;
 
+	Get_KeyInput(fTimeDelta);
+
+	Update(fTimeDelta);
+
+	Update_Parts();
 	for (auto& pPart : m_Parts)
 		pPart->Tick(fTimeDelta);
 }
@@ -82,7 +81,9 @@ void CPlayer::Tick(_float fTimeDelta)
 void CPlayer::LateTick(_float fTimeDelta)
 {
 
-	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_vTargetLook, 0.6f);
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
+
+	
 
 	for(int i = 0; i < MODEL_END; ++i)
 	{
@@ -92,13 +93,14 @@ void CPlayer::LateTick(_float fTimeDelta)
 	for (auto& pPart : m_Parts)
 		pPart->LateTick(fTimeDelta);
 
+	End_Animation();
 
 	for (auto& pPart : m_Parts)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, pPart);
 
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	
-
+	Set_PlayerUseInfo();
 }
 
 HRESULT CPlayer::Render()
@@ -131,6 +133,11 @@ HRESULT CPlayer::Render()
 	return S_OK;
 }
 
+_vector CPlayer::Get_PlayerPos()
+{
+	return m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+}
+
 void CPlayer::Set_State(STATE eState)
 {
 	if (m_eCurState == eState)
@@ -141,168 +148,165 @@ void CPlayer::Set_State(STATE eState)
 	switch (m_eCurState)
 	{
 	case Client::CPlayer::HITBACK:
-		m_AniIndex = HITBACK;
+	
 		break;
 	case Client::CPlayer::HITFRONT:
-		m_AniIndex = HITFRONT;
+		
 		break;
 	case Client::CPlayer::JUMP:
-		m_AniIndex = JUMP;
+		
 		break;
 	case Client::CPlayer::JUMPDOWN:
-		m_AniIndex = JUMPDOWN;
+		
 		break;
 	case Client::CPlayer::JUMPEND:
-		m_AniIndex = JUMPEND;
+	
 		break;
 	case Client::CPlayer::JUMPUP:
-		m_AniIndex = JUMPUP;
+		
 		break;
 	case Client::CPlayer::JUMPSTART:
-		m_AniIndex = JUMPSTART;
+		
 		break;
 	case Client::CPlayer::IDLE:
-		m_AniIndex = IDLE;
+		
 		break;
 	case Client::CPlayer::DASH:
-		m_AniIndex = DASH;
+		m_fDashSpeed = 20.f;
 		break;
 	case Client::CPlayer::DIE:
-		m_AniIndex = DIE;
+		
 		break;
 	case Client::CPlayer::RESPAWN:
-		m_AniIndex = RESPAWN;
+		
 		break;
 	case Client::CPlayer::RUN:
-		m_AniIndex = RUN;
+		m_fRunSpeed = 8.f;
 		break;
 	case Client::CPlayer::RUNEND:
-		m_AniIndex = RUNEND;
+		
 		break;
 	case Client::CPlayer::SPINCOMBOEND:
-		m_AniIndex = SPINCOMBOEND;
+		
 		break;
 	case Client::CPlayer::SPINCOMBOLOOF:
-		m_AniIndex = SPINCOMBOLOOF;
+	
 		break;
 	case Client::CPlayer::SPINCOMBOSTART:
-		m_AniIndex = SPINCOMBOSTART;
+		
 		break;
 	case Client::CPlayer::FASTCOMBOEND:
-		m_AniIndex = FASTCOMBOEND;
+	
 		break;
 	case Client::CPlayer::FASTCOMBOSTART:
-		m_AniIndex = FASTCOMBOSTART;
+		
 		break;
 	case Client::CPlayer::ROCKBREAK:
-		m_AniIndex = ROCKBREAK;
+		
 		break;
 	case Client::CPlayer::CHARGECRASH:
-		m_AniIndex = CHARGECRASH;
+		
 		break;
 	case Client::CPlayer::CHARGEREADY:
-		m_AniIndex = CHARGEREADY;
+	
 		break;
 	case Client::CPlayer::AIRCOMBO1:
-		m_AniIndex = AIRCOMBO1;
+		
 		break;
 	case Client::CPlayer::AIRCOMBO2:
-		m_AniIndex = AIRCOMBO2;
+		
 		break;
 	case Client::CPlayer::AIRCOMBO3:
-		m_AniIndex = AIRCOMBO3;
+		
 		break;
 	case Client::CPlayer::AIRCOMBO4:
-		m_AniIndex = AIRCOMBO4;
+		
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
-		m_AniIndex = AIRCOMBOEND;
+		
 		break;
 	case Client::CPlayer::VOIDFRONTEND:
-		m_AniIndex = VOIDFRONTEND;
+		
 		break;
 	case Client::CPlayer::VOIDBACKEND:
-		m_AniIndex = VOIDBACKEND;
+		
 		break;
 	case Client::CPlayer::VOIDFRONT:
-		m_AniIndex = VOIDFRONT;
+		
 		break;
 	case Client::CPlayer::VOIDBACK:
-		m_AniIndex = VOIDBACK;
+		
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
-		m_AniIndex = NOMALCOMBO1;
+		m_fNC1Speed = 5.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
-		m_AniIndex = NOMALCOMBO2;
+		m_fNC2Speed = 5.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
-		m_AniIndex = NOMALCOMBO3;
+		m_fNC3Speed = 6.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
-		m_AniIndex = NOMALCOMBO4;
+		m_fNC4Speed = 6.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
-		m_AniIndex = NOMALCOMBO5;
+		m_fNC5Speed = 5.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
-		m_AniIndex = NOMALCOMBO6;
+		m_fNC6Speed = 8.f;
 		break;
 	case Client::CPlayer::GROUNDCRASH:
-		m_AniIndex = GROUNDCRASH;
+		
 		break;
 	case Client::CPlayer::GROUNDREADY:
-		m_AniIndex = GROUNDREADY;
+		
 		break;
 	case Client::CPlayer::GROUNDRUN:
-		m_AniIndex = GROUNDRUN;
+		
 		break;
 	case Client::CPlayer::LEAPDOWN:
-		m_AniIndex = LEAPDOWN;
+	
 		break;
 	case Client::CPlayer::LEAPUP:
-		m_AniIndex = LEAPUP;
+	
 		break;
 	case Client::CPlayer::LEAPEND:
-		m_AniIndex = LEAPEND;
+	
 		break;
 	case Client::CPlayer::LEAPREADY:
-		m_AniIndex = LEAPREADY;
+	
 		break;
 	case Client::CPlayer::LEAPRUN:
-		m_AniIndex = LEAPRUN;
+	
 		break;
 	case Client::CPlayer::LEAPSTART:
-		m_AniIndex = LEAPSTART;
+		
 		break;
 	case Client::CPlayer::BLADEATTACK:
-		m_AniIndex = BLADEATTACK;
+		
 		break;
 	case Client::CPlayer::SLASHATTACK:
-		m_AniIndex = SLASHATTACK;
+		
 		break;
 	case Client::CPlayer::ROCKSHOT:
-		m_AniIndex = ROCKSHOT;
+		
 		break;
 	case Client::CPlayer::EX1ATTACK:
-		m_AniIndex = EX1ATTACK;
+		
 		break;
 	case Client::CPlayer::EX2ATTACK:
-		m_AniIndex = EX2ATTACK;
+		
 		break;
 	case Client::CPlayer::EX1READY:
-		m_AniIndex = EX1READY;
+		
 		break;
-	case Client::CPlayer::EX2READY:
-		m_AniIndex = EX2READY;
+	case Client::CPlayer::EX2READY:	
 		break;
-	default:
-		m_AniIndex = IDLE;
-		break;
+	
 	}
 	for (int i = 0; i < MODEL_END; ++i)
 	{
-		m_pAnimModel[i]->SetNextIndex(m_AniIndex);
+		m_pAnimModel[i]->SetNextIndex(m_eCurState);
 		m_pAnimModel[i]->SetChangeBool(true);
 	}
 }
@@ -317,28 +321,28 @@ void CPlayer::Set_Dir(DIR eDir)
 	switch (m_eDir)
 	{
 	case Client::CPlayer::DIR_UP:
-		m_vTargetLook = { 0.f,0.f,1.f,0.f };
+		m_vTargetLook = { 0.f,0.f,1.f };
 		break;
 	case Client::CPlayer::DIR_DOWN:
-		m_vTargetLook = { 0.f,0.f,-1.f,0.f };
+		m_vTargetLook = { 0.f,0.f,-1.f };
 		break;
 	case Client::CPlayer::DIR_RIGHT:
-		m_vTargetLook = { 1.f,0.f,0.f,0.f };
+		m_vTargetLook = { 1.f,0.f,0.f };
 		break;
 	case Client::CPlayer::DIR_LEFT:
-		m_vTargetLook = { -1.f,0.f,0.f,0.f };
+		m_vTargetLook = { -1.f,0.f,0.f };
 		break;
 	case Client::CPlayer::DIR_LU:
-		m_vTargetLook = { -1.f,0.f,1.f,0.f };
+		m_vTargetLook = { -1.f,0.f,1.f };
 		break;
 	case Client::CPlayer::DIR_RU:
-		m_vTargetLook = { 1.f,0.f,1.f,0.f };
+		m_vTargetLook = { 1.f,0.f,1.f };
 		break;
 	case Client::CPlayer::DIR_LD:
-		m_vTargetLook = { -1.f,0.f,-1.f,0.f };
+		m_vTargetLook = { -1.f,0.f,-1.f };
 		break;
 	case Client::CPlayer::DIR_RD:
-		m_vTargetLook = { 1.f,0.f,-1.f,0.f };
+		m_vTargetLook = { 1.f,0.f,-1.f };
 		break;
 	default:
 		break;
@@ -349,11 +353,390 @@ void CPlayer::End_Animation()
 {
 	if (m_pAnimModel[0]->GetAniEnd())
 	{
-
+		switch (m_eCurState)
+		{
+		case Client::CPlayer::HITBACK:
+			break;
+		case Client::CPlayer::HITFRONT:
+			break;
+		case Client::CPlayer::JUMP:
+			break;
+		case Client::CPlayer::JUMPDOWN:
+			break;
+		case Client::CPlayer::JUMPEND:
+			break;
+		case Client::CPlayer::JUMPUP:
+			break;
+		case Client::CPlayer::JUMPSTART:
+			break;
+		case Client::CPlayer::IDLE:
+			break;
+		case Client::CPlayer::DASH:
+			Set_State(IDLE);
+			m_fDashSpeed = 20.f;
+			break;
+		case Client::CPlayer::DIE:
+			break;
+		case Client::CPlayer::RESPAWN:
+			break;
+		case Client::CPlayer::RUN:
+			break;
+		case Client::CPlayer::RUNEND:
+			Set_State(IDLE);
+			break;
+		case Client::CPlayer::SPINCOMBOEND:
+			break;
+		case Client::CPlayer::SPINCOMBOLOOF:
+			break;
+		case Client::CPlayer::SPINCOMBOSTART:
+			break;
+		case Client::CPlayer::FASTCOMBOEND:
+			break;
+		case Client::CPlayer::FASTCOMBOSTART:
+			break;
+		case Client::CPlayer::ROCKBREAK:
+			break;
+		case Client::CPlayer::CHARGECRASH:
+			break;
+		case Client::CPlayer::CHARGEREADY:
+			break;
+		case Client::CPlayer::AIRCOMBO1:
+			break;
+		case Client::CPlayer::AIRCOMBO2:
+			break;
+		case Client::CPlayer::AIRCOMBO3:
+			break;
+		case Client::CPlayer::AIRCOMBO4:
+			break;
+		case Client::CPlayer::AIRCOMBOEND:
+			break;
+		case Client::CPlayer::VOIDFRONTEND:
+			break;
+		case Client::CPlayer::VOIDBACKEND:
+			break;
+		case Client::CPlayer::VOIDFRONT:
+			break;
+		case Client::CPlayer::VOIDBACK:
+			break;
+		case Client::CPlayer::NOMALCOMBO1:
+			Set_State(IDLE);
+			break;
+		case Client::CPlayer::NOMALCOMBO2:
+			Set_State(IDLE);
+			break;
+		case Client::CPlayer::NOMALCOMBO3:
+			Set_State(IDLE);
+			break;
+		case Client::CPlayer::NOMALCOMBO4:
+			Set_State(IDLE);
+			break;
+		case Client::CPlayer::NOMALCOMBO5:
+			Set_State(IDLE);
+			break;
+		case Client::CPlayer::NOMALCOMBO6:
+			Set_State(IDLE);
+			break;
+		case Client::CPlayer::GROUNDCRASH:
+			break;
+		case Client::CPlayer::GROUNDREADY:
+			break;
+		case Client::CPlayer::GROUNDRUN:
+			break;
+		case Client::CPlayer::LEAPDOWN:
+			break;
+		case Client::CPlayer::LEAPUP:
+			break;
+		case Client::CPlayer::LEAPEND:
+			break;
+		case Client::CPlayer::LEAPREADY:
+			break;
+		case Client::CPlayer::LEAPRUN:
+			break;
+		case Client::CPlayer::LEAPSTART:
+			break;
+		case Client::CPlayer::BLADEATTACK:
+			break;
+		case Client::CPlayer::SLASHATTACK:
+			break;
+		case Client::CPlayer::ROCKSHOT:
+			break;
+		case Client::CPlayer::EX1ATTACK:
+			break;
+		case Client::CPlayer::EX2ATTACK:
+			break;
+		case Client::CPlayer::EX1READY:
+			break;
+		case Client::CPlayer::EX2READY:
+			break;
+		case Client::CPlayer::STATE_END:
+			break;
+		default:
+			break;
+		}
 	}
 }
 
 void CPlayer::Get_KeyInput(_float fTimeDelta)
+{
+	switch (m_eCurState)
+	{
+	case Client::CPlayer::JUMP:
+		Jump_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::JUMPDOWN:
+		JumpDown_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::JUMPUP:
+		JumpUp_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::IDLE:
+		Idle_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::RUN:
+		Run_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::RUNEND:
+		RunEnd_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::SPINCOMBOLOOF:
+		SpinComboLoof_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::FASTCOMBOSTART:
+		FastComboStart_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::CHARGEREADY:
+		ChargeReady_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::AIRCOMBO1:
+		AirCombo1_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::AIRCOMBO2:
+		AirCombo2_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::AIRCOMBO3:
+		AirCombo3_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::NOMALCOMBO1:
+		NomalCombo1_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::NOMALCOMBO2:
+		NomalCombo2_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::NOMALCOMBO3:
+		NomalCombo3_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::NOMALCOMBO4:
+		NomalCombo4_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::NOMALCOMBO5:
+		NomalCombo5_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::GROUNDREADY:
+		GroundReady_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::GROUNDRUN:
+		GroundRun_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::LEAPREADY:
+		LeapReady_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::LEAPRUN:
+		LeapRun_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::EX1READY:
+		Ex1Ready_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::EX2READY:
+		Ex2Ready_KeyInput(fTimeDelta);
+		break;
+	}
+}
+
+bool CPlayer::Input_Direction()
+{
+	if (PM->Get_CameraPlayerPos().z < m_vPlayerPos.z && m_fCamDistanceZ > m_fCamDistanceX)
+	{
+		if (GI->Key_Pressing(DIK_W))
+		{
+			Set_Dir(DIR_UP);
+			m_bKeyInput = true;
+			if (GI->Key_Pressing(DIK_D))
+			{
+				Set_Dir(DIR_RU);
+				m_bKeyInput = true;
+			}
+			if (GI->Key_Pressing(DIK_A))
+			{
+				Set_Dir(DIR_LU);
+				m_bKeyInput = true;
+			}
+		}
+		else if (GI->Key_Pressing(DIK_S))
+		{
+			Set_Dir(DIR_DOWN);
+			m_bKeyInput = true;
+			if (GI->Key_Pressing(DIK_D))
+			{
+				Set_Dir(DIR_RD);
+				m_bKeyInput = true;
+			}
+			if (GI->Key_Pressing(DIK_A))
+			{
+				Set_Dir(DIR_LD);
+				m_bKeyInput = true;
+			}
+
+		}
+		else if (GI->Key_Pressing(DIK_D))
+		{
+			Set_Dir(DIR_RIGHT);
+			m_bKeyInput = true;
+		}
+		else if (GI->Key_Pressing(DIK_A))
+		{
+			Set_Dir(DIR_LEFT);
+			m_bKeyInput = true;
+		}
+	}
+	else if(PM->Get_CameraPlayerPos().z > m_vPlayerPos.z && m_fCamDistanceZ > m_fCamDistanceX)
+	{
+		if (GI->Key_Pressing(DIK_W))
+		{
+			Set_Dir(DIR_DOWN);
+			m_bKeyInput = true;
+			if (GI->Key_Pressing(DIK_D))
+			{
+				Set_Dir(DIR_LD);
+				m_bKeyInput = true;
+			}
+			if (GI->Key_Pressing(DIK_A))
+			{
+				Set_Dir(DIR_RD);
+				m_bKeyInput = true;
+			}
+		}
+		else if (GI->Key_Pressing(DIK_S))
+		{
+			Set_Dir(DIR_UP);
+			m_bKeyInput = true;
+			if (GI->Key_Pressing(DIK_D))
+			{
+				Set_Dir(DIR_LU);
+				m_bKeyInput = true;
+			}
+			if (GI->Key_Pressing(DIK_A))
+			{
+				Set_Dir(DIR_RU);
+				m_bKeyInput = true;
+			}
+
+		}
+		else if (GI->Key_Pressing(DIK_D))
+		{
+			Set_Dir(DIR_LEFT);
+			m_bKeyInput = true;
+		}
+		else if (GI->Key_Pressing(DIK_A))
+		{
+			Set_Dir(DIR_RIGHT);
+			m_bKeyInput = true;
+		}
+	}
+
+	else if (PM->Get_CameraPlayerPos().x < m_vPlayerPos.x && m_fCamDistanceZ < m_fCamDistanceX)
+	{
+		if (GI->Key_Pressing(DIK_W))
+		{
+			Set_Dir(DIR_RIGHT);
+			m_bKeyInput = true;
+			if (GI->Key_Pressing(DIK_D))
+			{
+				Set_Dir(DIR_RD);
+				m_bKeyInput = true;
+			}
+			if (GI->Key_Pressing(DIK_A))
+			{
+				Set_Dir(DIR_RU);
+				m_bKeyInput = true;
+			}
+		}
+		else if (GI->Key_Pressing(DIK_S))
+		{
+			Set_Dir(DIR_LEFT);
+			m_bKeyInput = true;
+			if (GI->Key_Pressing(DIK_D))
+			{
+				Set_Dir(DIR_LD);
+				m_bKeyInput = true;
+			}
+			if (GI->Key_Pressing(DIK_A))
+			{
+				Set_Dir(DIR_LU);
+				m_bKeyInput = true;
+			}
+
+		}
+		else if (GI->Key_Pressing(DIK_D))
+		{
+			Set_Dir(DIR_DOWN);
+			m_bKeyInput = true;
+		}
+		else if (GI->Key_Pressing(DIK_A))
+		{
+			Set_Dir(DIR_UP);
+			m_bKeyInput = true;
+		}
+	}
+
+	else if (PM->Get_CameraPlayerPos().x > m_vPlayerPos.x && m_fCamDistanceZ < m_fCamDistanceX)
+	{
+		if (GI->Key_Pressing(DIK_W))
+		{
+			Set_Dir(DIR_LEFT);
+			m_bKeyInput = true;
+			if (GI->Key_Pressing(DIK_D))
+			{
+				Set_Dir(DIR_LU);
+				m_bKeyInput = true;
+			}
+			if (GI->Key_Pressing(DIK_A))
+			{
+				Set_Dir(DIR_LD);
+				m_bKeyInput = true;
+			}
+		}
+		else if (GI->Key_Pressing(DIK_S))
+		{
+			Set_Dir(DIR_RIGHT);
+			m_bKeyInput = true;
+			if (GI->Key_Pressing(DIK_D))
+			{
+				Set_Dir(DIR_RU);
+				m_bKeyInput = true;
+			}
+			if (GI->Key_Pressing(DIK_A))
+			{
+				Set_Dir(DIR_RD);
+				m_bKeyInput = true;
+			}
+
+		}
+		else if (GI->Key_Pressing(DIK_D))
+		{
+			Set_Dir(DIR_UP);
+			m_bKeyInput = true;
+		}
+		else if (GI->Key_Pressing(DIK_A))
+		{
+			Set_Dir(DIR_DOWN);
+			m_bKeyInput = true;
+		}
+	}
+	return m_bKeyInput;
+	
+}
+
+void CPlayer::Update(_float fTimeDelta)
 {
 	switch (m_eCurState)
 	{
@@ -374,14 +757,23 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 	case Client::CPlayer::IDLE:
 		break;
 	case Client::CPlayer::DASH:
+		if (m_fDashSpeed > 0.5f)
+			m_fDashSpeed -= 0.5f;
+		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fDashSpeed, fTimeDelta);
 		break;
 	case Client::CPlayer::DIE:
 		break;
 	case Client::CPlayer::RESPAWN:
 		break;
 	case Client::CPlayer::RUN:
+		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), 8.f, fTimeDelta);
 		break;
 	case Client::CPlayer::RUNEND:
+		if (m_fRunSpeed > 0.15f)
+		{
+			m_fRunSpeed -= 0.15f;
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
+		}
 		break;
 	case Client::CPlayer::SPINCOMBOEND:
 		break;
@@ -418,16 +810,54 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 	case Client::CPlayer::VOIDBACK:
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
+		if (m_fNC1Speed > 0.15f)
+		{
+			m_fNC1Speed -= 0.15f;
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC1Speed, fTimeDelta);
+		}
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
+		if (m_fNC2Speed > 0.15f)
+		{
+			m_fNC2Speed -= 0.15f;
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC2Speed, fTimeDelta);
+		}
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
+		if (m_fNC3Speed > 0.1f)
+		{
+			m_fNC3Speed -= 0.1f;
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC3Speed, fTimeDelta);
+		}
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
+		if (m_fNC4Speed > 0.1f)
+		{
+			m_fNC4Speed -= 0.1f;
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC4Speed, fTimeDelta);
+		}
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
+		if (m_fNC5Speed > 0.15f)
+		{
+			m_fNC5Speed -= 0.1f;
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC5Speed, fTimeDelta);
+		}
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
+		if (m_fNC6Speed > 0.f)
+		{		
+			if (m_fNC6Speed >= 4.f)
+			{
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,0.1f,0.f,0.f });
+			}
+			else
+			{
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,-0.1f,0.f,0.f });
+			}
+			m_fNC6Speed -= 0.15f;
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC6Speed, fTimeDelta);
+		}
 		break;
 	case Client::CPlayer::GROUNDCRASH:
 		break;
@@ -468,50 +898,6 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 	}
 }
 
-void CPlayer::Input_Direction()
-{
-	if (GI->Key_Pressing(DIK_UP))
-	{
-		Set_Dir(DIR_UP);
-		if (GI->Key_Pressing(DIK_RIGHT))
-		{
-			Set_Dir(DIR_RU);
-		}
-		if (GI->Key_Pressing(DIK_LEFT))
-		{
-			Set_Dir(DIR_LU);
-		}
-	}
-
-	else if (GI->Key_Pressing(DIK_DOWN))
-	{
-		Set_Dir(DIR_DOWN);
-		if (GI->Key_Pressing(DIK_RIGHT))
-		{
-			Set_Dir(DIR_RD);
-		}
-		if (GI->Key_Pressing(DIK_LEFT))
-		{
-			Set_Dir(DIR_LD);
-		}
-
-	}
-
-	else if (GI->Key_Pressing(DIK_RIGHT))
-	{
-		Set_Dir(DIR_RIGHT);
-	}
-
-	else if (GI->Key_Pressing(DIK_LEFT))
-	{
-		Set_Dir(DIR_LEFT);
-	}
-}
-
-void CPlayer::Update(_float fTimeDelta)
-{
-}
-
 void CPlayer::Set_AniInfo()
 {
 	int AniNums = m_pAnimModel[0]->Get_NumAnimations();
@@ -529,6 +915,207 @@ void CPlayer::Set_AniInfo()
 		m_pAnimModel[2]->SetTimeLimit(m_pAnimModel[0]->GetTimeLimit());
 		++AniIndex;
 	}
+}
+
+void CPlayer::Set_PlayerUseInfo()
+{
+	XMStoreFloat3(&m_vPlayerPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	m_fCamDistanceX = fabs(PM->Get_CameraPlayerPos().x - m_vPlayerPos.x);
+	m_fCamDistanceZ = fabs(PM->Get_CameraPlayerPos().z - m_vPlayerPos.z);
+}
+
+void CPlayer::Jump_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::JumpDown_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::JumpUp_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::Idle_KeyInput(_float fTimeDelta)
+{
+	//Input_Direction();
+	if (GI->Key_Down(DIK_W) || GI->Key_Down(DIK_A) || GI->Key_Down(DIK_S) || GI->Key_Down(DIK_D))
+	{
+		Set_State(RUN);
+		return;
+	}
+
+	if (GI->Key_Down(DIK_LSHIFT))
+	{
+		Set_State(DASH);
+		return;
+	}
+
+	if (GI->Mouse_Down(DIMK_LBUTTON))
+	{
+		Set_State(NOMALCOMBO1);
+		return;
+	}
+
+		
+}
+
+void CPlayer::Run_KeyInput(_float fTimeDelta)
+{
+	if (!Input_Direction())
+	{
+		Set_State(RUNEND);
+		return;
+	}
+	if (GI->Key_Down(DIK_LSHIFT))
+	{
+		Set_State(DASH);
+		return;
+	}
+
+	if (GI->Mouse_Down(DIMK_LBUTTON))
+	{
+		Set_State(NOMALCOMBO1);
+		return;
+	}
+
+}
+
+void CPlayer::RunEnd_KeyInput(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() > 15.f)
+	{
+		if (GI->Key_Down(DIK_W) || GI->Key_Down(DIK_A) || GI->Key_Down(DIK_S) || GI->Key_Down(DIK_D))
+		{
+			Set_State(RUN);
+			return;
+		}
+		else if (GI->Key_Down(DIK_LSHIFT))
+		{
+			Set_State(DASH);
+			return;
+		}
+	}
+
+
+}
+
+void CPlayer::SpinComboLoof_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::FastComboStart_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::ChargeReady_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::AirCombo1_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::AirCombo2_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::AirCombo3_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::NomalCombo1_KeyInput(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit())
+	{
+		if (GI->Mouse_Down(DIMK_LBUTTON))
+		{
+			Set_State(NOMALCOMBO2);
+			return;
+		}
+
+		if (GI->Mouse_Down(DIMK_RBUTTON))
+		{
+			Set_State(NOMALCOMBO5);
+			return;
+		}
+	}
+}
+
+void CPlayer::NomalCombo2_KeyInput(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit())
+	{
+		if (GI->Mouse_Down(DIMK_LBUTTON))
+		{
+			Set_State(NOMALCOMBO3);
+			return;
+		}
+
+		if (GI->Mouse_Down(DIMK_RBUTTON))
+		{
+			Set_State(NOMALCOMBO4);
+			return;
+		}
+	}
+}
+
+void CPlayer::NomalCombo3_KeyInput(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit())
+	{
+		if (Input_Direction())
+		{
+			Set_State(RUN);
+		}
+	}
+}
+
+void CPlayer::NomalCombo4_KeyInput(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit())
+	{
+		if (Input_Direction())
+		{
+			Set_State(RUN);
+		}
+	}
+}
+
+void CPlayer::NomalCombo5_KeyInput(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit())
+	{
+		if (GI->Mouse_Down(DIMK_RBUTTON))
+		{
+			Set_State(NOMALCOMBO6);
+			Input_Direction();
+		}
+	}
+}
+
+void CPlayer::GroundReady_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::GroundRun_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::LeapReady_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::LeapRun_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::Ex1Ready_KeyInput(_float fTimeDelta)
+{
+}
+
+void CPlayer::Ex2Ready_KeyInput(_float fTimeDelta)
+{
 }
 
 HRESULT CPlayer::Ready_Sockets()

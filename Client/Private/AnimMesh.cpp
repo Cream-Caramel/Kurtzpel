@@ -26,7 +26,7 @@ HRESULT CAnimMesh::Initialize(void * pArg)
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
-
+	
 	m_bDead = false;
 	m_MeshInfo->fPos.w = 1.f;
 	Set_Pos(m_MeshInfo->fPos);

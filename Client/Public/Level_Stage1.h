@@ -19,12 +19,8 @@ public:
 private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_Layer_Camera(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_Player(const _tchar* pLayerTag);
 	HRESULT Ready_Layer_BackGround(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_Monster(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_UI(const _tchar* pLayerTag);
-	HRESULT Ready_Layer_Effect(const _tchar* pLayerTag);
-	HRESULT Ready_Load_AnimModel(char* DatName);
+	HRESULT Ready_Player(const _tchar* pLayerTag);
 	HRESULT Ready_Load_Model(char* DatName);
 
 public:
