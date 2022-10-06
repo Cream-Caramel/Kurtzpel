@@ -31,7 +31,7 @@ HRESULT CAnimMesh::Initialize(void * pArg)
 	m_MeshInfo->fPos.w = 1.f;
 	Set_Pos(m_MeshInfo->fPos);
 	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_MeshInfo->fScale));
-	Rotation(_float3{ 1.f,0.f,0.f }, m_MeshInfo->fAngle.x, _float3{ 0.f,1.f,0.f }, m_MeshInfo->fScale.y, _float3{ 0.f,0.f,1.f }, m_MeshInfo->fAngle.z);
+	Rotation(_float3{ 1.f,0.f,0.f }, m_MeshInfo->fAngle.x, _float3{ 0.f,1.f,0.f }, m_MeshInfo->fAngle.y, _float3{ 0.f,0.f,1.f }, m_MeshInfo->fAngle.z);
 
 	return S_OK;
 }

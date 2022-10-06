@@ -26,6 +26,8 @@ public:
 		return XMLoadFloat4x4(&m_PivotMatrix);
 	}
 
+	void Set_PivotMatrix(_matrix PivotMatrix) { XMStoreFloat4x4(&m_PivotMatrix, PivotMatrix); }
+
 public:
 	virtual HRESULT Initialize_Prototype(const char* pLoadName, _fmatrix PivotMatrix);
 	virtual HRESULT Initialize(void* pArg);

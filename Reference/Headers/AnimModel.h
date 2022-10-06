@@ -31,6 +31,7 @@ public:
 
 	_uint Get_NumAnimations() { return m_iNumAnimations; }
 
+	void Set_PivotMatrix(_matrix PivotMatrix) { XMStoreFloat4x4(&m_PivotMatrix, PivotMatrix); }
 
 public:
 	virtual HRESULT Initialize_Prototype(const char* pLoadName, _fmatrix PivotMatrix);
