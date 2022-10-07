@@ -141,7 +141,7 @@ namespace Engine
 
 	typedef struct tagTimeLimits
 	{
-		vector<_float> TimeLimits;
+		vector<vector<_float>> TimeLimits;
 	}TIMELIMITS;
 
 	typedef struct tagBinaryData

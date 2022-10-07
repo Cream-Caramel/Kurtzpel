@@ -48,11 +48,11 @@ void CMainApp::Tick(_float fTimeDelta)
 
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 
-	RECT Clip;
+	/*RECT Clip;
 	GetClientRect(g_hWnd, &Clip);
 	ClientToScreen(g_hWnd, (LPPOINT)&Clip);
 	ClientToScreen(g_hWnd, (LPPOINT)(&Clip.right));
-	ClipCursor(&Clip);
+	ClipCursor(&Clip);*/
 
 
 }

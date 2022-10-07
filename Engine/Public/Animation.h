@@ -29,17 +29,17 @@ public:
 		strcpy_s(m_szName, sizeof(char) * 256, AnimName);
 	}
 
-	_float GetTickPerSecond() { return m_fTickPerSecond; }
+	_float& GetTickPerSecond() { return m_fTickPerSecond; }
 	void SetTickPerSecond(_float fSecond) { m_fTickPerSecond = fSecond; }
 
-	_float GetDuration() { return m_fDuration; }
+	_float& GetDuration() { return m_fDuration; }
 	void SetDuration(_float fDuration) { m_fDuration = fDuration; }
 
-	_float GetPlayTime() { return m_fPlayTime; }
+	_float& GetPlayTime() { return m_fPlayTime; }
 	void SetPlayTime(_float fPlayTime) { m_fPlayTime = fPlayTime; }
 
-	_float GetTimeLimit() { return m_fTimeLimit; }
-	void SetTimeLimit(_float fTimeLimit) { m_fTimeLimit = fTimeLimit; }
+	_float& GetTimeLimit(int iIndex) { return m_TimeLimit[iIndex]; }
+	void SetTimeLimit(_float fTimeLimit, int iIndex) { m_TimeLimit[iIndex] = fTimeLimit; }
 
 	int Get_ChannelSize() { return m_Channels.size(); }
 	CChannel* GetChannel(int Index) { return m_Channels[Index]; }
@@ -62,7 +62,7 @@ private:
 
 	_float						m_fPlayTime = 0.f;
 
-	_float m_fTimeLimit = 0.f;
+	vector<_float> m_TimeLimit;
 
 	bool m_bAnimEnd = false;
 

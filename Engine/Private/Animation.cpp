@@ -14,7 +14,7 @@ CAnimation::CAnimation(const CAnimation & rhs)
 	, m_fTickPerSecond(rhs.m_fTickPerSecond)
 	, m_fPlayTime(rhs.m_fPlayTime)
 	, m_ChannelOldKeyFrames(rhs.m_ChannelOldKeyFrames)
-	, m_fTimeLimit(rhs.m_fTimeLimit)
+	, m_TimeLimit(rhs.m_TimeLimit)
 {
 	for (auto& pChannel : m_Channels)
 		Safe_AddRef(pChannel);
@@ -31,7 +31,7 @@ HRESULT CAnimation::Initialize_Prototype(CBinary * pBinary)
 	m_fTickPerSecond = pBinary->m_BinaryVector->TickPerSeconds.TickPerSeconds[pBinary->TickPerSecondsIndex++];
 
 	m_iNumChannels = pBinary->m_BinaryVector->NumChannels.NumChannels[pBinary->NumChannelsIndex++];
-	m_fTimeLimit = pBinary->m_BinaryVector->TimeLimits.TimeLimits[pBinary->TimeLimitIndex++];
+	m_TimeLimit = pBinary->m_BinaryVector->TimeLimits.TimeLimits[pBinary->TimeLimitIndex++];
 	for (_uint i = 0; i < m_iNumChannels; ++i)
 	{
 		CChannel*		pChannel = CChannel::Create(pBinary);

@@ -23,7 +23,7 @@ HRESULT CLevel_Stage1::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Player(TEXT("Layer_Player"))))
+	if (FAILED(Ready_Load_AnimModel("Level_Stage1")))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
@@ -112,11 +112,93 @@ HRESULT CLevel_Stage1::Ready_Layer_BackGround(const _tchar * pLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_Stage1::Ready_Player(const _tchar * pLayerTag)
+
+HRESULT CLevel_Stage1::Ready_Load_AnimModel(char * DatName)
 {
-	CAnimMesh::MESHINFO MeshInfo;
-	MeshInfo.fScale = { 1.f,1.f,1.f };
-	if(FAILED(GI->Add_GameObjectToLayer(TEXT("Player"), LEVEL_STATIC, pLayerTag, &MeshInfo)))
+
+	string FileSave = DatName;
+
+	string temp = "../Data/AnimModelObject/";
+
+	FileSave = temp + FileSave + ".dat";
+
+	wchar_t FilePath[256] = { 0 };
+
+	for (int i = 0; i < FileSave.size(); i++)
+	{
+		FilePath[i] = FileSave[i];
+	}
+
+	HANDLE		hFile = CreateFile(FilePath,			
+		GENERIC_READ,				
+		NULL,						
+		NULL,						
+		OPEN_EXISTING,				
+		FILE_ATTRIBUTE_NORMAL,		
+		NULL);						
+
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(g_hWnd, _T("Load File"), _T("Fail"), MB_OK);
+		return E_FAIL;
+	}
+
+	DWORD		dwByte = 0;
+
+	int ModelObjectSize;
+	ReadFile(hFile, &ModelObjectSize, sizeof(int), &dwByte, nullptr);
+
+	for (int i = 0; i < ModelObjectSize; ++i)
+	{
+		char Name[256];
+		ReadFile(hFile, Name, sizeof(char) * 256, &dwByte, nullptr);
+	}
+
+	while (true)
+	{
+		_tchar* ModelName = new _tchar[256];
+		ReadFile(hFile, ModelName, sizeof(_tchar) * 256, &dwByte, nullptr);
+
+		_float3 fScale;
+		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+
+		_float4 fPos;
+		ReadFile(hFile, &fPos, sizeof(_float4), &dwByte, nullptr);
+
+		_float3 fAngle;
+		ReadFile(hFile, &fAngle, sizeof(_float3), &dwByte, nullptr);
+
+		CAnimMesh::MESHINFO* MeshInfo;
+		MeshInfo = new CAnimMesh::MESHINFO;
+		MeshInfo->sTag = ModelName;
+		MeshInfo->fScale = fScale;
+		MeshInfo->fPos = fPos;
+		MeshInfo->fAngle = fAngle;
+
+		if (0 == dwByte)	
+		{
+			Safe_Delete_Array(ModelName);
+			Safe_Delete(MeshInfo);
+			break;
+		}
+		if (FAILED(GI->Add_GameObjectToLayer(ModelName, LEVEL_STAGE1, L"Layer_AnimModelObject", MeshInfo)))
+		{
+			wstring a = L"Please Load ProtoType";
+			wstring b = a + ModelName;
+			const _tchar* c = b.c_str();
+			MSG_BOX(c);
+
+			Safe_Delete_Array(ModelName);
+			Safe_Delete(MeshInfo);
+			return E_FAIL;
+		}
+
+		Safe_Delete_Array(ModelName);
+		Safe_Delete(MeshInfo);
+	}
+
+	CloseHandle(hFile);
+
 	return S_OK;
 }
 

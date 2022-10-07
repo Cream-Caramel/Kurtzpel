@@ -315,14 +315,14 @@ void CAnimModel::SetPlayTime(_float fPlayTime)
 	m_Animations[m_iCurrentAnimIndex]->SetPlayTime(fPlayTime);
 }
 
-_float CAnimModel::GetTimeLimit()
+_float& CAnimModel::GetTimeLimit(int iIndex)
 {
-	return m_Animations[m_iCurrentAnimIndex]->GetTimeLimit(); 
+	return m_Animations[m_iCurrentAnimIndex]->GetTimeLimit(iIndex);
 }
 
-void CAnimModel::SetTimeLimit(_float TimeLimit)
+void CAnimModel::SetTimeLimit(_float TimeLimit, int iIndex)
 {
-	m_Animations[m_iCurrentAnimIndex]->SetTimeLimit(TimeLimit); 
+	m_Animations[m_iCurrentAnimIndex]->SetTimeLimit(TimeLimit, iIndex);
 }
 
 void CAnimModel::ResetKeyFrame()
@@ -636,9 +636,18 @@ HRESULT CAnimModel::LoadBinary(const char * pLoadName)
 
 	for (int i = 0; i < TimeLimitSize; ++i)
 	{
-		_float TimeLimit;
-		ReadFile(hFile, &TimeLimit, sizeof(_float), &dwByte, nullptr);
-		m_pBinary->m_BinaryVector->TimeLimits.TimeLimits.push_back(TimeLimit);
+
+		int TimeLimitValueSize;
+		ReadFile(hFile, &TimeLimitValueSize, sizeof(int), &dwByte, nullptr);
+		vector<_float> vTimeLimit;
+		for (int j = 0; j < TimeLimitValueSize; ++j)
+		{
+			_float TimeLimit;
+			ReadFile(hFile, &TimeLimit, sizeof(_float), &dwByte, nullptr);
+			vTimeLimit.push_back(TimeLimit);
+
+		}
+		m_pBinary->m_BinaryVector->TimeLimits.TimeLimits.push_back(vTimeLimit);
 	}
 
 	CloseHandle(hFile);

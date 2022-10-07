@@ -56,8 +56,8 @@ public:
 	_float GetPlayTime();
 	void SetPlayTime(_float fPlayTime);
 
-	_float GetTimeLimit(); 
-	void SetTimeLimit(_float TimeLimit); 
+	_float& GetTimeLimit(int iIndex); 
+	void SetTimeLimit(_float TimeLimit, int iIndex); 
 
 	bool GetAniEnd() {return m_bAniEnd;}
 
