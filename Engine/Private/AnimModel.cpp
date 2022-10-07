@@ -315,7 +315,7 @@ void CAnimModel::SetPlayTime(_float fPlayTime)
 	m_Animations[m_iCurrentAnimIndex]->SetPlayTime(fPlayTime);
 }
 
-_float& CAnimModel::GetTimeLimit(int iIndex)
+_float CAnimModel::GetTimeLimit(int iIndex)
 {
 	return m_Animations[m_iCurrentAnimIndex]->GetTimeLimit(iIndex);
 }

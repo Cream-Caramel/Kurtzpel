@@ -1021,18 +1021,21 @@ void CPlayer::AirCombo3_KeyInput(_float fTimeDelta)
 
 void CPlayer::NomalCombo1_KeyInput(_float fTimeDelta)
 {
-	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
+	if (!m_pAnimModel[0]->GetChangeBool())
 	{
-		if (GI->Mouse_Down(DIMK_LBUTTON))
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
 		{
-			Set_State(NOMALCOMBO2);
-			return;
-		}
+			if (GI->Mouse_Down(DIMK_LBUTTON))
+			{
+				Set_State(NOMALCOMBO2);
+				return;
+			}
 
-		if (GI->Mouse_Down(DIMK_RBUTTON))
-		{
-			Set_State(NOMALCOMBO5);
-			return;
+			if (GI->Mouse_Down(DIMK_RBUTTON))
+			{
+				Set_State(NOMALCOMBO5);
+				return;
+			}
 		}
 	}
 }
