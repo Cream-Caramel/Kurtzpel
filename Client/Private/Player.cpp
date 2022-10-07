@@ -145,7 +145,7 @@ void CPlayer::Set_State(STATE eState)
 
 	m_eNextState = eState;
 
-	switch (m_eCurState)
+	switch (m_eNextState)
 	{
 	case Client::CPlayer::HITBACK:
 	
@@ -229,13 +229,13 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::VOIDBACKEND:
-		
+		m_fVoidBack = 4.f;
 		break;
 	case Client::CPlayer::VOIDFRONT:
-		
+		m_fVoidFront = 20.f;
 		break;
 	case Client::CPlayer::VOIDBACK:
-		
+		m_fVoidBack = 4.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
 		m_fNC1Speed = 5.f;
@@ -373,7 +373,6 @@ void CPlayer::End_Animation()
 			break;
 		case Client::CPlayer::DASH:
 			Set_State(IDLE);
-			m_fDashSpeed = 20.f;
 			break;
 		case Client::CPlayer::DIE:
 			break;
@@ -411,12 +410,16 @@ void CPlayer::End_Animation()
 		case Client::CPlayer::AIRCOMBOEND:
 			break;
 		case Client::CPlayer::VOIDFRONTEND:
+			Set_State(IDLE);
 			break;
 		case Client::CPlayer::VOIDBACKEND:
+			Set_State(IDLE);
 			break;
 		case Client::CPlayer::VOIDFRONT:
+			Set_State(VOIDFRONTEND);
 			break;
 		case Client::CPlayer::VOIDBACK:
+			Set_State(VOIDBACKEND);
 			break;
 		case Client::CPlayer::NOMALCOMBO1:
 			Set_State(IDLE);
@@ -492,11 +495,20 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 	case Client::CPlayer::IDLE:
 		Idle_KeyInput(fTimeDelta);
 		break;
+	case Client::CPlayer::DASH:
+		Dash_KeyInput(fTimeDelta);
+		break;
 	case Client::CPlayer::RUN:
 		Run_KeyInput(fTimeDelta);
 		break;
 	case Client::CPlayer::RUNEND:
 		RunEnd_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::VOIDFRONTEND:
+		VoidFrontEnd_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::VOIDBACKEND:
+		VoidBackEnd_KeyInput(fTimeDelta);
 		break;
 	case Client::CPlayer::SPINCOMBOLOOF:
 		SpinComboLoof_KeyInput(fTimeDelta);
@@ -806,8 +818,14 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::VOIDBACKEND:
 		break;
 	case Client::CPlayer::VOIDFRONT:
+		if (m_fVoidFront > 0.5f)
+			m_fVoidFront -= 0.5f;		
+		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fVoidFront, fTimeDelta);
 		break;
 	case Client::CPlayer::VOIDBACK:
+		if(m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
+			m_fVoidBack += 0.5f;	
+		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), -m_fVoidBack, fTimeDelta);
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
 		if (m_fNC1Speed > 0.15f)
@@ -936,7 +954,6 @@ void CPlayer::JumpUp_KeyInput(_float fTimeDelta)
 
 void CPlayer::Idle_KeyInput(_float fTimeDelta)
 {
-	//Input_Direction();
 	if (GI->Key_Down(DIK_W) || GI->Key_Down(DIK_A) || GI->Key_Down(DIK_S) || GI->Key_Down(DIK_D))
 	{
 		Set_State(RUN);
@@ -955,7 +972,28 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 		return;
 	}
 
+	if (GI->Key_Down(DIK_C))
+	{
+		Set_State(VOIDFRONT);
+		return;
+	}
+
+	if (GI->Key_Down(DIK_V))
+	{
+		Set_State(VOIDBACK);
+		return;
+	}
+
 		
+}
+
+void CPlayer::Dash_KeyInput(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
+	{
+		if (Input_Direction())
+			Set_State(RUN);
+	}
 }
 
 void CPlayer::Run_KeyInput(_float fTimeDelta)
@@ -974,6 +1012,18 @@ void CPlayer::Run_KeyInput(_float fTimeDelta)
 	if (GI->Mouse_Down(DIMK_LBUTTON))
 	{
 		Set_State(NOMALCOMBO1);
+		return;
+	}
+
+	if (GI->Key_Down(DIK_C))
+	{
+		Set_State(VOIDFRONT);
+		return;
+	}
+
+	if (GI->Key_Down(DIK_V))
+	{
+		Set_State(VOIDBACK);
 		return;
 	}
 
@@ -996,6 +1046,24 @@ void CPlayer::RunEnd_KeyInput(_float fTimeDelta)
 	}
 
 
+}
+
+void CPlayer::VoidFrontEnd_KeyInput(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
+	{
+		if(Input_Direction())
+		Set_State(RUN);
+	}
+}
+
+void CPlayer::VoidBackEnd_KeyInput(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
+	{
+		if (Input_Direction())
+			Set_State(RUN);
+	}
 }
 
 void CPlayer::SpinComboLoof_KeyInput(_float fTimeDelta)
@@ -1042,6 +1110,12 @@ void CPlayer::NomalCombo1_KeyInput(_float fTimeDelta)
 				Set_State(NOMALCOMBO5);
 				return;
 			}
+
+			if (GI->Key_Down(DIK_LSHIFT))
+			{
+				Set_State(DASH);
+				return;
+			}
 		}	
 }
 
@@ -1065,6 +1139,12 @@ void CPlayer::NomalCombo2_KeyInput(_float fTimeDelta)
 			Set_State(NOMALCOMBO4);
 			return;
 		}
+
+		if (GI->Key_Down(DIK_LSHIFT))
+		{
+			Set_State(DASH);
+			return;
+		}
 	}
 }
 
@@ -1076,9 +1156,6 @@ void CPlayer::NomalCombo3_KeyInput(_float fTimeDelta)
 		Input_Direction();
 	}
 
-	float a = m_pAnimModel[0]->GetTimeLimit(0);
-	float b = m_pAnimModel[0]->GetTimeLimit(1);
-	float c = m_pAnimModel[0]->GetPlayTime();
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		if (Input_Direction())

@@ -52,8 +52,11 @@ private:
 	void JumpDown_KeyInput(_float fTimeDelta);
 	void JumpUp_KeyInput(_float fTimeDelta);
 	void Idle_KeyInput(_float fTimeDelta);
+	void Dash_KeyInput(_float fTimeDelta);
 	void Run_KeyInput(_float fTimeDelta);
 	void RunEnd_KeyInput(_float fTimeDelta);
+	void VoidFrontEnd_KeyInput(_float fTimeDelta);
+	void VoidBackEnd_KeyInput(_float fTimeDelta);
 	void SpinComboLoof_KeyInput(_float fTimeDelta);
 	void FastComboStart_KeyInput(_float fTimeDelta);
 	void ChargeReady_KeyInput(_float fTimeDelta);
@@ -86,6 +89,8 @@ private:
 	_float m_fNC6Speed = 8.f; //공격1 전진속도
 	_float m_fCamDistanceX; // 플레이어와 카메라의 X축거리 차이
 	_float m_fCamDistanceZ; // 플레이어와 카메라의 Z축거리 차이
+	_float m_fVoidFront = 20.f;
+	_float m_fVoidBack = 4.f;
 #pragma endregion Variable
 
 private:
