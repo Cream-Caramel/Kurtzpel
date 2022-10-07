@@ -43,10 +43,6 @@ public:
 	HRESULT Play_Animation(_float fTimeDelta, CAnimModel* pAnimModel);
 	HRESULT Render(class CShader* pShader, _uint iMeshIndex);
 
-	const char* Get_Name(int AnimIndex); 
-	void Set_Name(const char* AnimName, int AnimIndex);
-	void ChangeAnimIndex(int Index1, int Index2);
-
 	_float GetTickPerSecond();
 	void SetTickPerSecond(_float fSecond);
 
@@ -55,6 +51,7 @@ public:
 
 	_float GetPlayTime();
 	void SetPlayTime(_float fPlayTime);
+	void SetPlayTime(_float fPlayTime, int iNextIndex);
 
 	_float GetTimeLimit(int iIndex); 
 	void SetTimeLimit(_float TimeLimit, int iIndex); 

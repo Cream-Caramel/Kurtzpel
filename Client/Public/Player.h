@@ -90,6 +90,7 @@ private:
 
 private:
 	STATE m_eCurState; // 현재 상태
+	STATE m_eNextState; // 바꿔야할 상태
 	DIR m_eDir = DIR_UP; // 현재 방향
 	_float m_fJumpSpeed; // 점프 스피드
 	_float3 m_vTargetLook; // 플레이어가 바라봐야할 방향

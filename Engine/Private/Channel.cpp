@@ -88,7 +88,7 @@ _uint CChannel::Interpolation(_float fTimeDelta, _uint iNextIndex, _float fPlayT
 	if (m_fInterpolationTime >= 0.1f)
 	{
 		pAnimModel->SetChangeBool(false);
-		pAnimModel->Set_AnimIndex(iNextIndex);		
+		pAnimModel->Set_AnimIndex(iNextIndex);	
 		m_fInterpolationTime = 0.f;
 
 		return iCurrentKeyFrame;

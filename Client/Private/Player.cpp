@@ -48,6 +48,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	}
 	
 	m_eCurState = IDLE;
+	m_eNextState = IDLE;
 	m_vTargetLook = { 0.f,0.f,1.f};
 
 	Set_AniInfo();
@@ -66,11 +67,13 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 void CPlayer::Tick(_float fTimeDelta)
 {
-		
+	if (!m_pAnimModel[0]->GetChangeBool())
+		m_eCurState = m_eNextState;
+
 	m_bKeyInput = false;
 
 	Get_KeyInput(fTimeDelta);
-
+	
 	Update(fTimeDelta);
 
 	Update_Parts();
@@ -137,10 +140,10 @@ _vector CPlayer::Get_PlayerPos()
 
 void CPlayer::Set_State(STATE eState)
 {
-	if (m_eCurState == eState)
+	if (m_eNextState == eState)
 		return;
 
-	m_eCurState = eState;
+	m_eNextState = eState;
 
 	switch (m_eCurState)
 	{
@@ -303,7 +306,7 @@ void CPlayer::Set_State(STATE eState)
 	}
 	for (int i = 0; i < MODEL_END; ++i)
 	{
-		m_pAnimModel[i]->SetNextIndex(m_eCurState);
+		m_pAnimModel[i]->SetNextIndex(m_eNextState);
 		m_pAnimModel[i]->SetChangeBool(true);
 	}
 }
@@ -1021,8 +1024,11 @@ void CPlayer::AirCombo3_KeyInput(_float fTimeDelta)
 
 void CPlayer::NomalCombo1_KeyInput(_float fTimeDelta)
 {
-	if (!m_pAnimModel[0]->GetChangeBool())
-	{
+	
+		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
+		{
+			Input_Direction();
+		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
 		{
 			if (GI->Mouse_Down(DIMK_LBUTTON))
@@ -1036,12 +1042,16 @@ void CPlayer::NomalCombo1_KeyInput(_float fTimeDelta)
 				Set_State(NOMALCOMBO5);
 				return;
 			}
-		}
-	}
+		}	
 }
 
 void CPlayer::NomalCombo2_KeyInput(_float fTimeDelta)
 {
+	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
+	{
+		Input_Direction();
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		if (GI->Mouse_Down(DIMK_LBUTTON))
@@ -1060,28 +1070,50 @@ void CPlayer::NomalCombo2_KeyInput(_float fTimeDelta)
 
 void CPlayer::NomalCombo3_KeyInput(_float fTimeDelta)
 {
+	
+	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
+	{
+		Input_Direction();
+	}
+
+	float a = m_pAnimModel[0]->GetTimeLimit(0);
+	float b = m_pAnimModel[0]->GetTimeLimit(1);
+	float c = m_pAnimModel[0]->GetPlayTime();
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		if (Input_Direction())
-		{
 			Set_State(RUN);
-		}
+
+		if (GI->Key_Down(DIK_LSHIFT))
+			Set_State(DASH);
 	}
+	
 }
 
 void CPlayer::NomalCombo4_KeyInput(_float fTimeDelta)
 {
+	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
+	{
+		Input_Direction();
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		if (Input_Direction())
-		{
 			Set_State(RUN);
-		}
+
+		if (GI->Key_Down(DIK_LSHIFT))
+			Set_State(DASH);
 	}
 }
 
 void CPlayer::NomalCombo5_KeyInput(_float fTimeDelta)
 {
+	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
+	{
+		Input_Direction();
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		if (GI->Mouse_Down(DIMK_RBUTTON))

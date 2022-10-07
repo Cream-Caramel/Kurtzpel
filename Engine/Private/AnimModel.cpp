@@ -191,22 +191,6 @@ HRESULT CAnimModel::Render(CShader* pShader, _uint iMeshIndex)
 	return S_OK;
 }
 
-const char * CAnimModel::Get_Name(int AnimIndex)
-{
-	return m_Animations[AnimIndex]->Get_Name();
-}
-
-void CAnimModel::Set_Name(const char * AnimName, int AnimIndex)
-{
-	m_Animations[AnimIndex]->Set_Name(AnimName);
-}
-
-void CAnimModel::ChangeAnimIndex(int Index1, int Index2)
-{
-	CAnimation* temp = m_Animations[Index1];
-	m_Animations[Index1] = m_Animations[Index2];
-	m_Animations[Index2] = temp;	
-}
 
 HRESULT CAnimModel::Ready_LMeshContainers(_fmatrix PivotMatrix, CBinary * pBinary)
 {
@@ -313,6 +297,11 @@ _float CAnimModel::GetPlayTime()
 void CAnimModel::SetPlayTime(_float fPlayTime)
 {
 	m_Animations[m_iCurrentAnimIndex]->SetPlayTime(fPlayTime);
+}
+
+void CAnimModel::SetPlayTime(_float fPlayTime, int iNextIndex)
+{
+	m_Animations[iNextIndex]->SetPlayTime(fPlayTime);
 }
 
 _float CAnimModel::GetTimeLimit(int iIndex)
