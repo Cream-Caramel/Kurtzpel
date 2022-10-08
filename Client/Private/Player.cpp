@@ -162,7 +162,6 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::JUMP:
-		
 		break;
 	case Client::CPlayer::JUMPEND:
 	
@@ -216,13 +215,11 @@ void CPlayer::Set_State(STATE eState)
 	
 		break;
 	case Client::CPlayer::AIRCOMBO1:
-		
+		m_fJumpPower = 0.f;
 		break;
 	case Client::CPlayer::AIRCOMBO2:
-		
 		break;
 	case Client::CPlayer::AIRCOMBO3:
-		
 		break;
 	case Client::CPlayer::AIRCOMBO4:
 		
@@ -419,14 +416,18 @@ void CPlayer::End_Animation()
 		case Client::CPlayer::CHARGEREADY:
 			break;
 		case Client::CPlayer::AIRCOMBO1:
+			Set_State(JUMP);
 			break;
 		case Client::CPlayer::AIRCOMBO2:
+			Set_State(JUMP);
 			break;
 		case Client::CPlayer::AIRCOMBO3:
+			Set_State(JUMP);
 			break;
 		case Client::CPlayer::AIRCOMBO4:
 			break;
 		case Client::CPlayer::AIRCOMBOEND:
+			Set_State(IDLE);
 			break;
 		case Client::CPlayer::VOIDFRONTEND:
 			Set_State(IDLE);
@@ -558,6 +559,9 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 		break;
 	case Client::CPlayer::AIRCOMBO3:
 		AirCombo3_KeyInput(fTimeDelta);
+		break;
+	case Client::CPlayer::AIRCOMBOEND:
+		AirComboEnd_KeyInput(fTimeDelta);
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
 		NomalCombo1_KeyInput(fTimeDelta);
@@ -791,12 +795,13 @@ void CPlayer::Update(_float fTimeDelta)
 		if (!m_pAnimModel[0]->GetChangeBool())
 		{
 			JumpMove(fTimeDelta);
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f });
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f } );
 			if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0 && m_bJump)
 			{
 				m_bJump = false;
 				m_fGravity = 0.f;
 				Set_State(JUMPEND);
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
 			}
 		}
 		break;
@@ -804,11 +809,11 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::JUMPUP:
 		JumpMove(fTimeDelta);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f });	
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f } );
 		break;
 	case Client::CPlayer::JUMPSTART:
 		JumpMove(fTimeDelta);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f });
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f } );
 		break;
 	case Client::CPlayer::IDLE:
 		break;
@@ -858,14 +863,58 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::CHARGEREADY:
 		break;
 	case Client::CPlayer::AIRCOMBO1:
+		if(m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1) + 1.f)
+		m_fGravity = 0.f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,m_fGravity,0.f,0.f });
+		if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0)
+		{
+			m_bJump = false;
+			m_fGravity = 0.f;
+			Set_State(JUMPEND);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
+		}
 		break;
 	case Client::CPlayer::AIRCOMBO2:
+		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1) + 1.f)
+			m_fGravity = 0.f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,m_fGravity,0.f,0.f });
+		if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0)
+		{
+			m_bJump = false;
+			m_fGravity = 0.f;
+			Set_State(JUMPEND);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
+		}
 		break;
 	case Client::CPlayer::AIRCOMBO3:
+		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1) + 1.f)
+			m_fGravity = 0.f;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,m_fGravity,0.f,0.f });
+		if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0)
+		{
+			m_bJump = false;
+			m_fGravity = 0.f;
+			Set_State(JUMPEND);
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
+		}
 		break;
 	case Client::CPlayer::AIRCOMBO4:
+		if (!m_pAnimModel[0]->GetChangeBool())
+		{
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
+				m_fGravity = 1.f;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,m_fGravity,0.f,0.f });
+			if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0)
+			{
+				m_bJump = false;
+				m_fGravity = 0.f;
+				Set_State(AIRCOMBOEND);
+				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
+			}
+		}
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
+		
 		break;
 	case Client::CPlayer::VOIDFRONTEND:
 		break;
@@ -1032,6 +1081,14 @@ void CPlayer::JumpMove(_float fTimeDelta)
 void CPlayer::Jump_KeyInput(_float fTimeDelta)
 {
 	Input_Direction();
+	
+	if (GI->Mouse_Pressing(DIMK_LBUTTON))
+	{
+		Set_State(AIRCOMBO1);
+		return;
+	}
+
+	//if()
 }
 
 void CPlayer::JumpUp_KeyInput(_float fTimeDelta)
@@ -1110,6 +1167,18 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 	if (GI->Key_Pressing(DIK_SPACE))
 	{
 		Set_State(JUMPSTART);
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_F))
+	{
+		Set_State(BLADEATTACK);
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_R))
+	{
+		Set_State(SLASHATTACK);
 		return;
 	}
 
@@ -1347,14 +1416,65 @@ void CPlayer::ChargeReady_KeyInput(_float fTimeDelta)
 
 void CPlayer::AirCombo1_KeyInput(_float fTimeDelta)
 {
+	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
+		Input_Direction();
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1))
+	{
+		if (GI->Mouse_Pressing(DIMK_LBUTTON))
+			Set_State(AIRCOMBO2);
+	}
 }
 
 void CPlayer::AirCombo2_KeyInput(_float fTimeDelta)
 {
+	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
+		Input_Direction();
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1))
+	{
+		if (GI->Mouse_Pressing(DIMK_LBUTTON))
+			Set_State(AIRCOMBO3);
+	}
 }
 
 void CPlayer::AirCombo3_KeyInput(_float fTimeDelta)
 {
+	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
+		Input_Direction();
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1))
+	{
+		if (GI->Mouse_Pressing(DIMK_LBUTTON))
+			Set_State(AIRCOMBO4);
+	}
+}
+
+void CPlayer::AirComboEnd_KeyInput(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
+	{
+		if (Input_Direction())
+		{
+			Set_State(RUN);
+			return;
+		}
+		if (GI->Key_Pressing(DIK_C))
+		{
+			Set_State(VOIDFRONT);
+			return;
+		}
+		if (GI->Key_Pressing(DIK_V))
+		{
+			Set_State(VOIDBACK);
+			return;
+		}
+		if (GI->Key_Pressing(DIK_LSHIFT))
+		{
+			Set_State(DASH);
+			return;
+		}
+	}
 }
 
 void CPlayer::NomalCombo1_KeyInput(_float fTimeDelta)

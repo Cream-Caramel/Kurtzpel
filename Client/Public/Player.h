@@ -71,6 +71,7 @@ private:
 	void AirCombo1_KeyInput(_float fTimeDelta);
 	void AirCombo2_KeyInput(_float fTimeDelta);
 	void AirCombo3_KeyInput(_float fTimeDelta);
+	void AirComboEnd_KeyInput(_float fTimeDelta);
 	void NomalCombo1_KeyInput(_float fTimeDelta);
 	void NomalCombo2_KeyInput(_float fTimeDelta);
 	void NomalCombo3_KeyInput(_float fTimeDelta);
@@ -90,8 +91,7 @@ private:
 	_bool m_bSpinComboEnd = false; // 스핀콤보가 끝났는지
 	_float m_fGravity = 0.f; //중력 
 	_float m_fJumpPower = 5.f; //뛰어오르는 힘
-	_float m_fJumpSpeed; // 점프기존 스피드
-	_float m_fJumpKeySpeed; //점프중 키입력에 따른 스피드
+	_float m_fJumpSpeed; // 점프중 스피드
 	DIR m_eJumpDir = DIR_END; //점프시작시 바라봤던 방향
 	_float m_fRunSpeed = 8.f; // 달리기이동스피드
 	_float m_fRunEndSpeed = 8.f; //달리기엔드스피드
