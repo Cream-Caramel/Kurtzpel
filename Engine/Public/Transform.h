@@ -56,6 +56,14 @@ public:
 	void Go_Backward(_float fTimeDelta);
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);
+	void Move_Up(_float fTimeDelta, _float fSpeed);
+	void Move_Down(_float fTimeDelta, _float fSpeed);
+	void Move_Right(_float fTimeDelta, _float fSpeed);
+	void Move_Left(_float fTimeDelta, _float fSpeed);
+	void Move_RU(_float fTimeDelta, _float fSpeed);
+	void Move_LU(_float fTimeDelta, _float fSpeed);
+	void Move_RD(_float fTimeDelta, _float fSpeed);
+	void Move_LD(_float fTimeDelta, _float fSpeed);
 
 	void Go_Dir(_fvector vDir, _float fSpeed, _float fTimeDelta);
 

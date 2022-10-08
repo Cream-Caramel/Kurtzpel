@@ -14,8 +14,8 @@ public:
 	enum AnimModel {MODEL_PLAYER, MODEL_TOP, MODEL_BOTTOM, MODEL_END};
 	enum Parts { PARTS_HEAD, PARTS_HAIRBACK, PARTS_HAIRFRONT, PARTS_HAIRSIDE, PARTS_HAIRTAIL, PARTS_SWORD, PARTS_END };
 	enum Socket {SOCKET_HEAD, SOCKET_WEAPONHANDR, SOCKET_END};
-	enum DIR {DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_LEFT, DIR_LU, DIR_RU, DIR_LD, DIR_RD};
-	enum STATE {HITBACK, HITFRONT, JUMP, JUMPDOWN, JUMPEND, JUMPUP, JUMPSTART, IDLE, DASH, DIE, RESPAWN, RUN, RUNEND, SPINCOMBOEND, SPINCOMBOLOOF
+	enum DIR {DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_LEFT, DIR_LU, DIR_RU, DIR_LD, DIR_RD, DIR_END};
+	enum STATE {HITBACK, HITFRONT, JUMP, JUMPEND, JUMPUP, JUMPSTART, IDLE, DASH, DIE, RESPAWN, RUN, RUNEND, SPINCOMBOEND, SPINCOMBOLOOF
 		,SPINCOMBOSTART, FASTCOMBOEND, FASTCOMBOSTART, ROCKBREAK, CHARGECRASH, CHARGEREADY, AIRCOMBO1, AIRCOMBO2, AIRCOMBO3, AIRCOMBO4, AIRCOMBOEND
 		,VOIDFRONTEND, VOIDBACKEND, VOIDFRONT, VOIDBACK, NOMALCOMBO1, NOMALCOMBO2, NOMALCOMBO3, NOMALCOMBO4, NOMALCOMBO5, NOMALCOMBO6, GROUNDCRASH
 		,GROUNDREADY, GROUNDRUN, LEAPDOWN, LEAPUP, LEAPEND, LEAPREADY, LEAPRUN, LEAPSTART, BLADEATTACK, SLASHATTACK, ROCKSHOT, EX1ATTACK, EX2ATTACK
@@ -33,31 +33,39 @@ public:
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-
+#pragma region MainFunction
 public:
 	_vector Get_PlayerPos();
 
-	void Set_State(STATE eState); // 상태를 설정
+	void Set_State(STATE eState); // 상태를 설정 보간을 하는 애니메이션은 여기서 애니메이션 셋팅
 	void Set_Dir(DIR eDir); // 방향을 설정
-	void End_Animation(); // 애니메이션이 끝났을 때 작업을 수행
+	void End_Animation(); // 애니메이션이 끝났을 때 작업을 수행 보간을 안할 애니메이션은 여기서 애니메이션 셋팅
 	void Get_KeyInput(_float fTimeDelta); // 현재 상태에 따라 키입력 함수 호출
-	bool Input_Direction(); // 키입력에 따라 방향갱신
 	void Update(_float fTimeDelta); // 현재 상태에 따라 작업수행
 	void Set_AniInfo(); // 애니메이션 정보 동기화
 	void Set_PlayerUseInfo(); //다른곳에서 사용할 플레이어의 정보를 갱신함
+#pragma endregion MainFunction
+
+#pragma region UtilFunction
+	void Jump(_float fTimeDelta); // 중력에 따라 Y값 조정 처음 점프할 때 방향에 따라 XZ값 조정
+	void JumpMove(_float fTimeDelta); // 점프할 때 방향에 따라 이동값 조정
+#pragma endregion UtilFunction
 	
 #pragma region KeyInput
 private:
+	bool Input_Direction(); // 키입력에 따라 방향갱신
 	void Jump_KeyInput(_float fTimeDelta);
-	void JumpDown_KeyInput(_float fTimeDelta);
 	void JumpUp_KeyInput(_float fTimeDelta);
+	void JumpEnd_KeyInput(_float fTimeDelta);
 	void Idle_KeyInput(_float fTimeDelta);
 	void Dash_KeyInput(_float fTimeDelta);
 	void Run_KeyInput(_float fTimeDelta);
 	void RunEnd_KeyInput(_float fTimeDelta);
 	void VoidFrontEnd_KeyInput(_float fTimeDelta);
 	void VoidBackEnd_KeyInput(_float fTimeDelta);
+	void SpinComboEnd_KeyInput(_float fTimeDelta);
 	void SpinComboLoof_KeyInput(_float fTimeDelta);
+	void SpinComboStart_KeyInput(_float fTimeDelta);
 	void FastComboStart_KeyInput(_float fTimeDelta);
 	void ChargeReady_KeyInput(_float fTimeDelta);
 	void AirCombo1_KeyInput(_float fTimeDelta);
@@ -79,7 +87,14 @@ private:
 #pragma region Variable
 	_bool m_bJump = false; //점프중인지
 	_bool m_bKeyInput = false; //방향키가 눌렸는지
+	_bool m_bSpinComboEnd = false; // 스핀콤보가 끝났는지
+	_float m_fGravity = 0.f; //중력 
+	_float m_fJumpPower = 5.f; //뛰어오르는 힘
+	_float m_fJumpSpeed; // 점프기존 스피드
+	_float m_fJumpKeySpeed; //점프중 키입력에 따른 스피드
+	DIR m_eJumpDir = DIR_END; //점프시작시 바라봤던 방향
 	_float m_fRunSpeed = 8.f; // 달리기이동스피드
+	_float m_fRunEndSpeed = 8.f; //달리기엔드스피드
 	_float m_fDashSpeed = 20.f; // 대쉬이동스피드
 	_float m_fNC1Speed = 5.f; //공격1 전진속도
 	_float m_fNC2Speed = 5.f; //공격1 전진속도
@@ -89,15 +104,18 @@ private:
 	_float m_fNC6Speed = 8.f; //공격1 전진속도
 	_float m_fCamDistanceX; // 플레이어와 카메라의 X축거리 차이
 	_float m_fCamDistanceZ; // 플레이어와 카메라의 Z축거리 차이
-	_float m_fVoidFront = 20.f;
-	_float m_fVoidBack = 4.f;
+	_float m_fVoidFront = 20.f; //앞구르기 스피드
+	_float m_fVoidBack = 4.f; // 덤블링 스피드
+	_float m_fNomalCombo1Acc = 0.f; // NomalCombo1에서 좌클릭이 얼마동안 눌렸는지
+	_float m_fSpinComboSpeed = 2.f; // 스핀콤보 이동속도
+	_float m_fSpinComboStartSpeed = 5.f; //스핀콤보시작 전진속도
+	_float m_fSpinComboEndSpeed = 6.f; //스핀콤보마무리 전진속도
 #pragma endregion Variable
 
 private:
 	STATE m_eCurState; // 현재 상태
 	STATE m_eNextState; // 바꿔야할 상태
 	DIR m_eDir = DIR_UP; // 현재 방향
-	_float m_fJumpSpeed; // 점프 스피드
 	_float3 m_vTargetLook; // 플레이어가 바라봐야할 방향
 	_float3 m_vPlayerPos; // 현재 플레이어의 위치
 	

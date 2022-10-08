@@ -124,6 +124,63 @@ void CTransform::Go_Right(_float fTimeDelta)
 	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
+void CTransform::Move_Up(_float fTimeDelta, _float fSpeed)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	vPosition += _vector{ 0.f,0.f,1.f } *fSpeed * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+void CTransform::Move_Down(_float fTimeDelta, _float fSpeed)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	vPosition += _vector{ 0.f,0.f,-1.f } *fSpeed * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+void CTransform::Move_Right(_float fTimeDelta, _float fSpeed)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	vPosition += _vector{ 1.f,0.f,0.f } *fSpeed * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+void CTransform::Move_Left(_float fTimeDelta, _float fSpeed)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	vPosition += _vector{ -1.f,0.f,0.f } *fSpeed * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+void CTransform::Move_RU(_float fTimeDelta, _float fSpeed)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	vPosition += _vector{ 1.f,0.f,1.f } *fSpeed * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+void CTransform::Move_LU(_float fTimeDelta, _float fSpeed)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	vPosition += _vector{ -1.f,0.f,1.f } *fSpeed * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+void CTransform::Move_RD(_float fTimeDelta, _float fSpeed)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	vPosition += _vector{ 1.f,0.f,-1.f } *fSpeed * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+void CTransform::Move_LD(_float fTimeDelta, _float fSpeed)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
+	vPosition += _vector{ -1.f,0.f,-1.f } *fSpeed * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
+
 void CTransform::Go_Dir(_fvector vDir, _float fSpeed, _float fTimeDelta)
 {
 	_vector vPosition = Get_State(CTransform::STATE_POSITION);
