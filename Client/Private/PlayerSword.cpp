@@ -88,7 +88,7 @@ HRESULT CPlayerSword::Render()
 	return S_OK;
 }
 
-CMesh * CPlayerSword::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CPlayerSword * CPlayerSword::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CPlayerSword*		pInstance = new CPlayerSword(pDevice, pContext);
 

@@ -968,8 +968,8 @@ void CPlayer::Update(_float fTimeDelta)
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fVoidFront, fTimeDelta);
 		break;
 	case Client::CPlayer::VOIDBACK:
-		if(m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
-			m_fVoidBack += 0.5f;	
+		if (m_fVoidBack > 0.5f)
+			m_fVoidBack += 0.2f;	
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), -m_fVoidBack, fTimeDelta);
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
@@ -1888,7 +1888,7 @@ HRESULT CPlayer::Update_Parts()
 	return S_OK;
 }
 
-CAnimMesh * CPlayer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CPlayer * CPlayer::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CPlayer*		pInstance = new CPlayer(pDevice, pContext);
 

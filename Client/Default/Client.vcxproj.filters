@@ -34,9 +34,6 @@
     <Filter Include="02.GameObjects\Camera">
       <UniqueIdentifier>{753f5023-0e15-42c5-950a-9aefad3b0ead}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI">
-      <UniqueIdentifier>{0f66bd0f-1e34-4a6b-87d2-20449690ba55}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Mesh">
       <UniqueIdentifier>{31eb1b41-44ce-4466-8b5f-e8a4f89ce0f5}</UniqueIdentifier>
     </Filter>
@@ -85,6 +82,12 @@
     <Filter Include="02.GameObjects\Camera\Player">
       <UniqueIdentifier>{45802bd5-cdcc-4523-926b-3bb267056101}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.UI">
+      <UniqueIdentifier>{56a621fc-18f2-409f-83d5-e0aa81cc775b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\SkillFrame">
+      <UniqueIdentifier>{5664f06b-95c4-4432-8c72-73f200af7b8b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -116,9 +119,6 @@
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
       <Filter>02.GameObjects\BackGround</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\UI.h">
-      <Filter>02.GameObjects\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
@@ -168,6 +168,12 @@
     <ClInclude Include="..\Public\Camera_Player.h">
       <Filter>02.GameObjects\Camera\Player</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI.h">
+      <Filter>03.UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkillFrame.h">
+      <Filter>03.UI\SkillFrame</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -190,9 +196,6 @@
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
       <Filter>02.GameObjects\BackGround</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\UI.cpp">
-      <Filter>02.GameObjects\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
@@ -241,6 +244,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Player.cpp">
       <Filter>02.GameObjects\Camera\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI.cpp">
+      <Filter>03.UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkillFrame.cpp">
+      <Filter>03.UI\SkillFrame</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
