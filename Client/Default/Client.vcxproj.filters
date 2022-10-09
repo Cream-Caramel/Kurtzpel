@@ -25,9 +25,6 @@
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{84640545-3351-4721-a11c-de1b2a88ed44}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\BackGround">
-      <UniqueIdentifier>{3cb37fbb-5a48-442b-857d-c8d7bd9d9f34}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Terrain">
       <UniqueIdentifier>{7cbdf00b-05f3-4112-a0c9-09e6a54c4fa7}</UniqueIdentifier>
     </Filter>
@@ -88,6 +85,9 @@
     <Filter Include="03.UI\SkillFrame">
       <UniqueIdentifier>{5664f06b-95c4-4432-8c72-73f200af7b8b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="96.Manager\UIManager">
+      <UniqueIdentifier>{f9c47aa5-2ae3-4eec-b890-1595b919d392}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -116,9 +116,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Loader.h">
       <Filter>01.Levels\00.Loading\Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\BackGround.h">
-      <Filter>02.GameObjects\BackGround</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
@@ -174,6 +171,7 @@
     <ClInclude Include="..\Public\SkillFrame.h">
       <Filter>03.UI\SkillFrame</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UI_Manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -193,9 +191,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
       <Filter>01.Levels\00.Loading\Loader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\BackGround.cpp">
-      <Filter>02.GameObjects\BackGround</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
@@ -251,6 +246,7 @@
     <ClCompile Include="..\Private\SkillFrame.cpp">
       <Filter>03.UI\SkillFrame</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\UI_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

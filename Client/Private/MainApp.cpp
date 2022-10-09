@@ -4,6 +4,7 @@
 #include "Level_Loading.h"
 #include "Release_Manager.h"
 #include "Pointer_Manager.h"
+#include "UI_Manager.h"
 
 using namespace Client;
 
@@ -171,4 +172,5 @@ void CMainApp::Free()
 	CGameInstance::Release_Engine();
 	CRelease_Manager::Destroy_Instance();
 	CPointer_Manager::Destroy_Instance();
+	CUI_Manager::Destroy_Instance();
 }

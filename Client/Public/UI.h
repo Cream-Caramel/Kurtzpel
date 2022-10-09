@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "GameInstance.h"
 
 BEGIN(Engine)
 class CShader;
@@ -9,6 +10,7 @@ class CTexture;
 class CRenderer;
 class CTransform;
 class CVIBuffer_Rect;
+
 END
 
 BEGIN(Client)
@@ -23,6 +25,7 @@ protected:
 public:
 	typedef struct UIInfo
 	{
+		LEVEL eLevel;
 		const _tchar* TexPath;
 		const _tchar* TexName;
 		int TexNum;
@@ -51,8 +54,6 @@ public:
 	UIInfo* Get_UiInfo() { return m_UIInfo; }
 
 protected:
-	const _tchar* TexPath;
-	const _tchar* TexName;
 	float m_fSizeX;
 	float m_fSizeY;
 	float m_fX;

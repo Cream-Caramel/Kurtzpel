@@ -5,6 +5,7 @@
 #include "AnimMesh.h"
 #include "Mesh.h"
 #include "Pointer_Manager.h"
+#include "UI.h"
 
 
 CLevel_Stage1::CLevel_Stage1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -24,6 +25,9 @@ HRESULT CLevel_Stage1::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Load_AnimModel("Level_Stage1")))
+		return E_FAIL;
+
+	if (FAILED(Ready_UI("Level_Stage1")))
 		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
@@ -181,7 +185,7 @@ HRESULT CLevel_Stage1::Ready_Load_AnimModel(char * DatName)
 			Safe_Delete(MeshInfo);
 			break;
 		}
-		if (FAILED(GI->Add_GameObjectToLayer(ModelName, LEVEL_STAGE1, L"Layer_AnimModelObject", MeshInfo)))
+		if (FAILED(GI->Add_GameObjectToLayer(ModelName, LEVEL_STATIC, L"Layer_AnimModelObject", MeshInfo)))
 		{
 			wstring a = L"Please Load ProtoType";
 			wstring b = a + ModelName;
@@ -195,6 +199,102 @@ HRESULT CLevel_Stage1::Ready_Load_AnimModel(char * DatName)
 
 		Safe_Delete_Array(ModelName);
 		Safe_Delete(MeshInfo);
+	}
+
+	CloseHandle(hFile);
+
+	return S_OK;
+}
+
+HRESULT CLevel_Stage1::Ready_UI(char * DatName)
+{
+	string FileSave = DatName;
+
+	string temp = "../Data/UIData/";
+
+	FileSave = temp + FileSave + ".dat";
+
+	wchar_t FilePath[256] = { 0 };
+
+	for (int i = 0; i < FileSave.size(); i++)
+	{
+		FilePath[i] = FileSave[i];
+	}
+
+	HANDLE		hFile = CreateFile(FilePath,
+		GENERIC_READ,
+		NULL,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(g_hWnd, _T("Load File"), _T("Fail"), MB_OK);
+		return E_FAIL;
+	}
+
+	DWORD		dwByte = 0;
+
+	while (true)
+	{
+		_tchar temp[256];
+		_tchar temp2[256];
+		ReadFile(hFile, temp, sizeof(_tchar) * 256, &dwByte, nullptr);
+		ReadFile(hFile, temp2, sizeof(_tchar) * 256, &dwByte, nullptr);
+		_tchar* UIPath = new _tchar[256];
+		_tchar* UIName = new _tchar[256];
+		for (int i = 0; i < 256; ++i)
+		{
+			UIPath[i] = temp[i];
+			UIName[i] = temp2[i];
+		}
+		int UITexNum;
+		_float UIPosX;
+		_float UIPosY;
+		_float UISizeX;
+		_float UISizeY;
+		ReadFile(hFile, &UITexNum, sizeof(int), &dwByte, nullptr);
+		ReadFile(hFile, &UIPosX, sizeof(_float), &dwByte, nullptr);
+		ReadFile(hFile, &UIPosY, sizeof(_float), &dwByte, nullptr);
+		ReadFile(hFile, &UISizeX, sizeof(_float), &dwByte, nullptr);
+		ReadFile(hFile, &UISizeY, sizeof(_float), &dwByte, nullptr);
+
+		if (0 == dwByte)	// 더이상 읽을 데이터가 없을 경우
+		{
+			Safe_Delete(UIPath);
+			Safe_Delete(UIName);
+			break;
+		}
+
+		CUI::UIINFO* UIInfo;
+		UIInfo = new CUI::UIINFO;
+		UIInfo->eLevel = LEVEL_STATIC;
+		UIInfo->TexPath = UIPath;
+		UIInfo->TexName = UIName;
+		UIInfo->TexNum = UITexNum;
+		UIInfo->UIPosX = UIPosX;
+		UIInfo->UIPosY = UIPosY;
+		UIInfo->UISizeX = UISizeX;
+		UIInfo->UISizeY = UISizeY;
+
+		if (FAILED(GI->Add_GameObjectToLayer(UIName, LEVEL_STATIC, L"Layer_UI", &UIInfo)))
+		{
+			wstring a = L"Please Load ProtoType";
+			wstring b = a + UIName;
+			const _tchar* c = b.c_str();
+			MSG_BOX(c);
+
+			Safe_Delete_Array(UIPath);
+			Safe_Delete_Array(UIName);
+			Safe_Delete(UIInfo);
+			return E_FAIL;
+		}
+
+		Safe_Delete(UIInfo);
+		Safe_Delete(UIPath);
+		Safe_Delete(UIName);
 	}
 
 	CloseHandle(hFile);

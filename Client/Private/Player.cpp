@@ -1871,6 +1871,80 @@ HRESULT CPlayer::Ready_PlayerParts()
 	Safe_Delete(MeshInfo);
 
 	return S_OK;
+
+	/*
+	MESHINFO* MeshInfo = new MESHINFO;
+
+	CGameObject*		pPlayerHead = GI->Clone_GameObject(TEXT("PlayerHead"),MeshInfo);	
+	if (nullptr == pPlayerHead)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerHead);
+
+	CGameObject*		pPlayerHairBack = GI->Clone_GameObject(TEXT("PlayerHairBack"), MeshInfo);
+	if (nullptr == pPlayerHairBack)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerHairBack);
+
+	CGameObject*		pPlayerHairFront = GI->Clone_GameObject(TEXT("PlayerHairFront"), MeshInfo);
+	if (nullptr == pPlayerHairFront)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerHairFront);
+
+	CGameObject*		pPlayerHairSide = GI->Clone_GameObject(TEXT("PlayerHairSide"), MeshInfo);
+	if (nullptr == pPlayerHairSide)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerHairSide);
+
+	CGameObject*		pPlayerHairTail = GI->Clone_GameObject(TEXT("PlayerHairTail"), MeshInfo);
+	if (nullptr == pPlayerHairTail)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerHairTail);
+
+	CGameObject*		pPlayerSword = GI->Clone_GameObject(TEXT("PlayerSword"), MeshInfo);
+	if (nullptr == pPlayerSword)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerSword);
+	
+
+	Safe_Delete(MeshInfo);
+
+	return S_OK;MESHINFO* MeshInfo = new MESHINFO;
+
+	CGameObject*		pPlayerHead = GI->Clone_GameObject(TEXT("PlayerHead"),MeshInfo);	
+	if (nullptr == pPlayerHead)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerHead);
+
+	CGameObject*		pPlayerHairBack = GI->Clone_GameObject(TEXT("PlayerHairBack"), MeshInfo);
+	if (nullptr == pPlayerHairBack)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerHairBack);
+
+	CGameObject*		pPlayerHairFront = GI->Clone_GameObject(TEXT("PlayerHairFront"), MeshInfo);
+	if (nullptr == pPlayerHairFront)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerHairFront);
+
+	CGameObject*		pPlayerHairSide = GI->Clone_GameObject(TEXT("PlayerHairSide"), MeshInfo);
+	if (nullptr == pPlayerHairSide)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerHairSide);
+
+	CGameObject*		pPlayerHairTail = GI->Clone_GameObject(TEXT("PlayerHairTail"), MeshInfo);
+	if (nullptr == pPlayerHairTail)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerHairTail);
+
+	CGameObject*		pPlayerSword = GI->Clone_GameObject(TEXT("PlayerSword"), MeshInfo);
+	if (nullptr == pPlayerSword)
+		return E_FAIL;
+	m_Parts.push_back((CMesh*)pPlayerSword);
+	
+
+	Safe_Delete(MeshInfo);
+
+	return S_OK;
+	*/
 }
 
 HRESULT CPlayer::Update_Parts()

@@ -19,6 +19,11 @@ public:
 	virtual HRESULT Render() override;
 
 
+private:
+	_float m_fCoolTime;
+	_float m_fMaxCoolTime;
+	bool m_bCoolTime;
+	bool m_bUse;
 
 public:
 	static CSkillFrame* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
