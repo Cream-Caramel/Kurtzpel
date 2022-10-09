@@ -66,7 +66,10 @@ private:
 	void SpinComboEnd_KeyInput(_float fTimeDelta);
 	void SpinComboLoof_KeyInput(_float fTimeDelta);
 	void SpinComboStart_KeyInput(_float fTimeDelta);
+	void FastComboEnd_KeyInput(_float fTimeDelta);
 	void FastComboStart_KeyInput(_float fTimeDelta);
+	void RockBreak_KeyInput(_float fTimeDelta);
+	void ChargeCrash_KeyInput(_float fTimeDelta);
 	void ChargeReady_KeyInput(_float fTimeDelta);
 	void AirCombo1_KeyInput(_float fTimeDelta);
 	void AirCombo2_KeyInput(_float fTimeDelta);
@@ -77,6 +80,7 @@ private:
 	void NomalCombo3_KeyInput(_float fTimeDelta);
 	void NomalCombo4_KeyInput(_float fTimeDelta);
 	void NomalCombo5_KeyInput(_float fTimeDelta);
+	void NomalCombo6_KeyInput(_float fTimeDelta);
 	void GroundReady_KeyInput(_float fTimeDelta);
 	void GroundRun_KeyInput(_float fTimeDelta);
 	void LeapReady_KeyInput(_float fTimeDelta);
@@ -110,6 +114,10 @@ private:
 	_float m_fSpinComboSpeed = 2.f; // 스핀콤보 이동속도
 	_float m_fSpinComboStartSpeed = 5.f; //스핀콤보시작 전진속도
 	_float m_fSpinComboEndSpeed = 6.f; //스핀콤보마무리 전진속도
+	_float m_fFastComboStartSpeed = 5.f;
+	_float m_fFastComboEndSpeed = 8.f;
+	_float m_fRockBreakSpeed = 6.f;
+	_float m_fChargeCrashSpeed = 6.f;
 #pragma endregion Variable
 
 private:
