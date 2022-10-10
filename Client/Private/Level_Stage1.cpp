@@ -251,11 +251,13 @@ HRESULT CLevel_Stage1::Ready_UI(char * DatName)
 			UIName[i] = temp2[i];
 		}
 		int UITexNum;
+		int UIIndex;
 		_float UIPosX;
 		_float UIPosY;
 		_float UISizeX;
 		_float UISizeY;
 		ReadFile(hFile, &UITexNum, sizeof(int), &dwByte, nullptr);
+		ReadFile(hFile, &UIIndex, sizeof(int), &dwByte, nullptr);
 		ReadFile(hFile, &UIPosX, sizeof(_float), &dwByte, nullptr);
 		ReadFile(hFile, &UIPosY, sizeof(_float), &dwByte, nullptr);
 		ReadFile(hFile, &UISizeX, sizeof(_float), &dwByte, nullptr);

@@ -20,18 +20,45 @@ HRESULT CSkillFrame::Initialize_Prototype()
 HRESULT CSkillFrame::Initialize(void * pArg)
 {
 	__super::Initialize(pArg);
-	m_fCoolTime = 0.f;
-	m_fMaxCoolTime = 10.f;
-	m_bCoolTime = true;
+
+	Setting();
+	UM->Add_SkillFrame(this);
 	return S_OK;
 }
 
 void CSkillFrame::Tick(_float fTimeDelta)
 {
-	m_fCoolTime += 1.f * fTimeDelta;
-	if (m_fCoolTime >= m_fMaxCoolTime)
+	if (m_bCoolTime)
 	{
-		m_fCoolTime = 0.f;
+		m_fCoolTime += 1.f * fTimeDelta;
+		if (m_fCoolTime >= m_fMaxCoolTime)
+		{
+			m_bCoolTimeOn = true;
+			m_bCoolTime = false;
+			m_fCoolTime = 0.f;
+		}
+	}
+
+	if (m_bCoolTimeOn)
+	{
+		if (!m_bCoolTimeOn2)
+		{
+			m_fCoolTimeOn += 1.f * fTimeDelta;
+			if (m_fCoolTimeOn >= m_fMaxCoolTimeOn)
+			{
+				m_bCoolTimeOn2 = true;
+			}
+		}
+		else
+		{
+			m_fCoolTimeOn -= 1.f * fTimeDelta;
+			if (m_fCoolTimeOn <= 0.f)
+			{
+				m_fCoolTimeOn = 0.f;
+				m_bCoolTimeOn = false;
+				m_bCoolTimeOn2 = false;
+			}
+		}
 	}
 }
 
@@ -40,6 +67,7 @@ void CSkillFrame::LateTick(_float fTimeDelta)
 	if (nullptr == m_pRendererCom)
 		return;
 	ShaderCoolTime = m_fCoolTime / m_fMaxCoolTime;
+	ShaderCoolTimeOn = m_fCoolTimeOn / m_fMaxCoolTimeOn;
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
 
 }
@@ -54,33 +82,80 @@ HRESULT CSkillFrame::Render()
 	m_pShaderCom->Set_RawValue("g_ViewMatrix", &GI->Get_TransformFloat4x4(CPipeLine::D3DTS_IDENTITY), sizeof(_float4x4));
 	m_pShaderCom->Set_RawValue("g_ProjMatrix", &GI->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_UIPROJ), sizeof(_float4x4));
 	m_pShaderCom->Set_RawValue("g_fCoolTime", &ShaderCoolTime, sizeof(float));
+	m_pShaderCom->Set_RawValue("g_fCoolTimeOn", &ShaderCoolTimeOn, sizeof(float));
 
 	if (FAILED(m_pTextureCom->Set_SRV(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
 
-	if (!UM->Get_UseSkill())
+	
+	if (m_bCoolTime)
+	{
+		if (FAILED(m_pShaderCom->Begin(1)))
+			return E_FAIL;
+	}
+
+	else if (m_bCoolTimeOn)
+	{
+		if (FAILED(m_pShaderCom->Begin(3)))
+			return E_FAIL;
+	}
+
+	else if (!UM->Get_UseSkill())
 	{
 		if (FAILED(m_pShaderCom->Begin(2)))
 			return E_FAIL;
 	}
 
-	else if (m_bCoolTime)
-	{
-		if (FAILED(m_pShaderCom->Begin(1)))
-			return E_FAIL;
-	}
 	else
 	{
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
 	}
 
-	
-
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CSkillFrame::Setting()
+{
+	if (m_UIInfo->UIPosX == 230)
+	{
+		m_fCoolTime = 0.f;
+		m_fMaxCoolTime = 8.f;		
+		m_iIndex = 0;
+	}
+	else if (m_UIInfo->UIPosX == 290)
+	{
+		m_fCoolTime = 0.f;
+		m_fMaxCoolTime = 2.f;	
+		m_iIndex = 1;
+	}
+	else if (m_UIInfo->UIPosX == 350)
+	{
+		m_fCoolTime = 0.f;
+		m_fMaxCoolTime = 10.f;	
+		m_iIndex = 2;
+	}
+	else if (m_UIInfo->UIPosX == 320)
+	{
+		m_fCoolTime = 0.f;
+		m_fMaxCoolTime = 5.f;	
+		m_iIndex = 3;
+	}
+	else if (m_UIInfo->UIPosX == 260)
+	{
+		m_fCoolTime = 0.f;
+		m_fMaxCoolTime = 2.f;	
+		m_iIndex = 4;
+	}
+
+	m_fCoolTimeOn = 0.f;
+	m_fMaxCoolTimeOn = 0.3f;
+	m_bCoolTime = false;
+	m_bCoolTimeOn = false;
+	m_bCoolTimeOn2 = false;
 }
 
 CSkillFrame * CSkillFrame::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

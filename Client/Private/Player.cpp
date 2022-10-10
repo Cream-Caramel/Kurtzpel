@@ -892,6 +892,8 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fFastComboStartSpeed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fFastComboStartSpeed, fTimeDelta);
 		}
+		/*if (!UM->Get_CoolTime(0))
+		UM->Set_CoolTime(0);*/
 		break;
 	case Client::CPlayer::ROCKBREAK:
 		if (m_fRockBreakSpeed > 0.15f)
@@ -899,6 +901,8 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fRockBreakSpeed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRockBreakSpeed, fTimeDelta);
 		}
+		/*if (!UM->Get_CoolTime(1))
+		UM->Set_CoolTime(1);*/
 		break;
 	case Client::CPlayer::CHARGECRASH:
 		if (m_fChargeCrashSpeed > 0.1f)
@@ -1189,7 +1193,7 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_LSHIFT))
 	{
-		Set_State(DASH);
+			Set_State(DASH);	
 		return;
 	}
 
@@ -1201,13 +1205,21 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_C))
 	{
-		Set_State(VOIDFRONT);
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
 		return;
 	}
 
 	if (GI->Key_Pressing(DIK_V))
 	{
-		Set_State(VOIDBACK);
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
 		return;
 	}
 
@@ -1219,7 +1231,11 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_F))
 	{
-		Set_State(BLADEATTACK);
+		if (!UM->Get_CoolTime(2))
+		{
+			UM->Set_CoolTime(2);
+			Set_State(BLADEATTACK);
+		}
 		return;
 	}
 
@@ -1231,13 +1247,21 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_Q))
 	{
-		Set_State(FASTCOMBOSTART);
+		if (!UM->Get_CoolTime(0))
+		{
+			UM->Set_CoolTime(0);
+			Set_State(FASTCOMBOSTART);
+		}
 		return;
 	}
 
 	if (GI->Key_Pressing(DIK_E))
 	{
-		Set_State(ROCKBREAK);
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
 		return;
 	}
 
@@ -1279,13 +1303,21 @@ void CPlayer::Run_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_C))
 	{
-		Set_State(VOIDFRONT);
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
 		return;
 	}
 
 	if (GI->Key_Pressing(DIK_V))
 	{
-		Set_State(VOIDBACK);
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
 		return;
 	}
 
@@ -1297,7 +1329,12 @@ void CPlayer::Run_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_F))
 	{
-		Set_State(BLADEATTACK);
+		if (!UM->Get_CoolTime(2))
+		{
+			UM->Set_CoolTime(2);
+			Set_State(BLADEATTACK);
+		}
+			
 		return;
 	}
 
@@ -1309,13 +1346,21 @@ void CPlayer::Run_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_Q))
 	{
-		Set_State(FASTCOMBOSTART);
+		if (!UM->Get_CoolTime(0))
+		{
+			UM->Set_CoolTime(0);
+			Set_State(FASTCOMBOSTART);
+		}
 		return;
 	}
 
 	if (GI->Key_Pressing(DIK_E))
 	{
-		Set_State(ROCKBREAK);
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
 		return;
 	}
 

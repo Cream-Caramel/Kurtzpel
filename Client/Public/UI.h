@@ -30,6 +30,7 @@ public:
 		const _tchar* TexPath;
 		const _tchar* TexName;
 		int TexNum;
+		int UIIndex = 0;
 		float UIPosX = 400.f;
 		float UIPosY = 300.f;
 		float UISizeX = 100.f;
