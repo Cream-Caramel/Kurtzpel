@@ -44,6 +44,7 @@ public:
 	void Update(_float fTimeDelta); // 현재 상태에 따라 작업수행
 	void Set_AniInfo(); // 애니메이션 정보 동기화
 	void Set_PlayerUseInfo(); //다른곳에서 사용할 플레이어의 정보를 갱신함
+	_bool Get_UseSkill() { return m_bUseSkill; } //스킬을 사용할수있는상태인지 체크
 #pragma endregion MainFunction
 
 #pragma region UtilFunction
@@ -90,6 +91,7 @@ private:
 #pragma endregion KeyInput
 
 #pragma region Variable
+	_bool m_bUseSkill = true; //스킬을 사용할수있는지 대기 or 달리기 도중에 가능
 	_bool m_bJump = false; //점프중인지
 	_bool m_bKeyInput = false; //방향키가 눌렸는지
 	_bool m_bSpinComboEnd = false; // 스핀콤보가 끝났는지

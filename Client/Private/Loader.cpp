@@ -1,23 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Loader.h"
 
-#include "GameInstance.h"
-#include "Camera_Free.h"
-#include "Terrain.h"
-#include "Model.h"
-#include "AnimModel.h"
-#include "Release_Manager.h"
-#include "UI.h"
-#include "Texture.h"
-#include "Player.h"
-#include "Camera_Player.h"
-#include "PlayerHead.h"
-#include "PlayerHairBack.h"
-#include "PlayerHairFront.h"
-#include "PlayerHairSide.h"
-#include "PlayerHairTail.h"
-#include "PlayerSword.h"
-#include "SkillFrame.h"
+#include "LoaderInclude.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -71,6 +55,41 @@ HRESULT CLoader::Loading_ForStatic()
 	CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
+	Loading_ObjectProtoType();
+
+	lstrcpy(m_szLoadingText, TEXT("텍스처 로딩중"));
+	LoadTexture("Level_Static");
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STAGE1, TEXT("Prototype_Component_Texture_Terrain"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_VIBuffer_Terrain */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"),
+		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height.bmp")))))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("모델 로딩중 "));
+
+	LoadAnimModel("Level_Static");
+	LoadModel("Level_Static");
+
+	Loading_Shader();
+
+	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다.  "));
+
+	Safe_Release(pGameInstance);
+
+	m_isFinished = true;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_ObjectProtoType()
+{
+	CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
+	Safe_AddRef(pGameInstance);
+
 	lstrcpy(m_szLoadingText, TEXT("객체원형 로딩중"));
 
 	/* 개ㅑㄱ체원형 로드한다. */
@@ -116,56 +135,121 @@ HRESULT CLoader::Loading_ForStatic()
 		CPlayerSword::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	lstrcpy(m_szLoadingText, TEXT("UI 로딩중"));
-
-	/* For.Prototype_Component_Texture_Terrain */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STAGE1, TEXT("Prototype_Component_Texture_Terrain"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
-		return E_FAIL;
-
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("SkillFrame"),
 		CSkillFrame::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	lstrcpy(m_szLoadingText, TEXT("모델 로딩중 "));
-
-	LoadAnimModel("Level_Static");
-	LoadModel("Level_Static");
-	LoadTexture("Level_Static");
-	
-
-	/* For.Prototype_Component_VIBuffer_Terrain */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height.bmp")))))
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("ExSkillFrame"),
+		CExSkillFrame::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("ExGauge"),
+		CExGauge::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("KeyE"),
+		CKeyE::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("KeyF"),
+		CKeyF::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("KeyR"),
+		CKeyR::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("KeyQ"),
+		CKeyQ::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("KeyShift"),
+		CKeyShift::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("KeyTab"),
+		CKeyTab::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("SkillIconE"),
+		CSkillIconE::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("SkillIconQ"),
+		CSkillIconQ::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("SkillIconR"),
+		CSkillIconR::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("SkillIconF"),
+		CSkillIconF::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("SkillIconShift"),
+		CSkillIconShift::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("SkillIconTab"),
+		CSkillIconTab::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("HPBarFrame"),
+		CHPBarFrame::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("HPBar"),
+		CHPBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("MPBarFrame"),
+		CMPBarFrame::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("MPBar"),
+		CMPBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("BarLine"),
+		CBarLine::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+
+	Safe_Release(pGameInstance);
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_Shader()
+{
 	/* For.Prototype_Component_Shader_Terrain */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Terrain"),
+	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Terrain"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX_DECLARATION::Elements, VTXNORTEX_DECLARATION::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_ColorCube*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Cube"),
+	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Cube"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_Cube.hlsl"), VTXCUBE_DECLARATION::Elements, VTXCUBE_DECLARATION::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_Model */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Model"),
+	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_Model"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModel.hlsl"), VTXMODEL_DECLARATION::Elements, VTXMODEL_DECLARATION::iNumElements))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Shader_AnimModel */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_AnimModel"),
+	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_AnimModel"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMODEL_DECLARATION::Elements, VTXANIMMODEL_DECLARATION::iNumElements))))
 		return E_FAIL;
 
-	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다.  "));
-
-	Safe_Release(pGameInstance);
-
-	m_isFinished = true;
-
 	return S_OK;
+}
+
+HRESULT CLoader::Loading_Component()
+{
+	return E_NOTIMPL;
 }
 
 HRESULT CLoader::Loading_ForLogoLevel()

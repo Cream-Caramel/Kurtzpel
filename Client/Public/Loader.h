@@ -33,7 +33,13 @@ public:
 
 public:
 	HRESULT Initialize(LEVEL eNextLevelID);
+#pragma region Static
 	HRESULT Loading_ForStatic();
+
+	HRESULT Loading_ObjectProtoType();
+	HRESULT Loading_Shader();
+	HRESULT Loading_Component();
+#pragma endregion Static
 	HRESULT Loading_ForLogoLevel();
 	HRESULT Loading_ForStage1();
 	HRESULT LoadAnimModel(char* DatName);

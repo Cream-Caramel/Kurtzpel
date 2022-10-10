@@ -4,12 +4,12 @@
 
 BEGIN(Client)
 
-class CSkillFrame final : public CUI
+class CSkillIconF final : public CUI
 {
 private:
-	CSkillFrame(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
-	CSkillFrame(const CSkillFrame& rhs);
-	virtual ~CSkillFrame() = default;
+	CSkillIconF(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
+	CSkillIconF(const CSkillIconF& rhs);
+	virtual ~CSkillIconF() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -18,15 +18,8 @@ public:
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-
-private:
-	_float m_fCoolTime;
-	_float m_fMaxCoolTime;
-	_float ShaderCoolTime;
-	bool m_bCoolTime;
-
 public:
-	static CSkillFrame* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CSkillIconF* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
 };

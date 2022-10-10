@@ -23,7 +23,6 @@ HRESULT CSkillFrame::Initialize(void * pArg)
 	m_fCoolTime = 0.f;
 	m_fMaxCoolTime = 10.f;
 	m_bCoolTime = true;
-	m_bUse = false;
 	return S_OK;
 }
 
@@ -40,9 +39,7 @@ void CSkillFrame::LateTick(_float fTimeDelta)
 {
 	if (nullptr == m_pRendererCom)
 		return;
-
-	
-
+	ShaderCoolTime = m_fCoolTime / m_fMaxCoolTime;
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
 
 }
@@ -52,16 +49,16 @@ HRESULT CSkillFrame::Render()
 	if (nullptr == m_pVIBufferCom ||
 		nullptr == m_pShaderCom)
 		return E_FAIL;
-	_float a = m_fCoolTime / m_fMaxCoolTime;
+
 	m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4));
 	m_pShaderCom->Set_RawValue("g_ViewMatrix", &GI->Get_TransformFloat4x4(CPipeLine::D3DTS_IDENTITY), sizeof(_float4x4));
 	m_pShaderCom->Set_RawValue("g_ProjMatrix", &GI->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_UIPROJ), sizeof(_float4x4));
-	m_pShaderCom->Set_RawValue("g_fPercent", &a, sizeof(float));
+	m_pShaderCom->Set_RawValue("g_fCoolTime", &ShaderCoolTime, sizeof(float));
 
 	if (FAILED(m_pTextureCom->Set_SRV(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
 
-	if (m_bUse)
+	if (!UM->Get_UseSkill())
 	{
 		if (FAILED(m_pShaderCom->Begin(2)))
 			return E_FAIL;

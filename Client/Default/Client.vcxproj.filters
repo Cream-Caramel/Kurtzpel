@@ -88,6 +88,15 @@
     <Filter Include="96.Manager\UIManager">
       <UniqueIdentifier>{f9c47aa5-2ae3-4eec-b890-1595b919d392}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.UI\SkillIcon">
+      <UniqueIdentifier>{d9e55ad0-0cd8-4114-a928-da7fa3e57455}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\Bar">
+      <UniqueIdentifier>{238ae1fe-7019-4e02-8ff4-b8bbec088892}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\KeyIcon">
+      <UniqueIdentifier>{4473948c-cad0-481e-a961-e5adb7b148e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -171,7 +180,69 @@
     <ClInclude Include="..\Public\SkillFrame.h">
       <Filter>03.UI\SkillFrame</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\UI_Manager.h" />
+    <ClInclude Include="..\Public\ExSkillFrame.h">
+      <Filter>03.UI\SkillFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkillIconE.h">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkillIconF.h">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkillIconQ.h">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkillIconR.h">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkillIconShift.h">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkillIconTab.h">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ExGauge.h">
+      <Filter>03.UI\SkillFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KeyQ.h">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KeyR.h">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KeyShift.h">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KeyTab.h">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KeyE.h">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KeyF.h">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HPBar.h">
+      <Filter>03.UI\Bar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HPBarFrame.h">
+      <Filter>03.UI\Bar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MPBar.h">
+      <Filter>03.UI\Bar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MPBarFrame.h">
+      <Filter>03.UI\Bar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BarLine.h">
+      <Filter>03.UI\Bar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LoaderInclude.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Manager.h">
+      <Filter>96.Manager\UIManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -246,7 +317,66 @@
     <ClCompile Include="..\Private\SkillFrame.cpp">
       <Filter>03.UI\SkillFrame</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\UI_Manager.cpp" />
+    <ClCompile Include="..\Private\ExSkillFrame.cpp">
+      <Filter>03.UI\SkillFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkillIconE.cpp">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkillIconF.cpp">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkillIconQ.cpp">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkillIconR.cpp">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkillIconShift.cpp">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkillIconTab.cpp">
+      <Filter>03.UI\SkillIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ExGauge.cpp">
+      <Filter>03.UI\SkillFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KeyE.cpp">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KeyF.cpp">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KeyQ.cpp">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KeyR.cpp">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KeyShift.cpp">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KeyTab.cpp">
+      <Filter>03.UI\KeyIcon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HPBar.cpp">
+      <Filter>03.UI\Bar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HPBarFrame.cpp">
+      <Filter>03.UI\Bar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MPBar.cpp">
+      <Filter>03.UI\Bar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MPBarFrame.cpp">
+      <Filter>03.UI\Bar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BarLine.cpp">
+      <Filter>03.UI\Bar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Manager.cpp">
+      <Filter>96.Manager\UIManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

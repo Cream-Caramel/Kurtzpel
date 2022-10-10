@@ -168,16 +168,30 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\AnimMesh.h" />
+    <ClInclude Include="..\Public\BarLine.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Camera_Player.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\ExGauge.h" />
+    <ClInclude Include="..\Public\ExSkillFrame.h" />
+    <ClInclude Include="..\Public\HPBar.h" />
+    <ClInclude Include="..\Public\HPBarFrame.h" />
+    <ClInclude Include="..\Public\KeyE.h" />
+    <ClInclude Include="..\Public\KeyF.h" />
+    <ClInclude Include="..\Public\KeyQ.h" />
+    <ClInclude Include="..\Public\KeyR.h" />
+    <ClInclude Include="..\Public\KeyShift.h" />
+    <ClInclude Include="..\Public\KeyTab.h" />
     <ClInclude Include="..\Public\Level_Stage1.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_Static.h" />
     <ClInclude Include="..\Public\Loader.h" />
+    <ClInclude Include="..\Public\LoaderInclude.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\Mesh.h" />
+    <ClInclude Include="..\Public\MPBar.h" />
+    <ClInclude Include="..\Public\MPBarFrame.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerHairBack.h" />
     <ClInclude Include="..\Public\PlayerHairFront.h" />
@@ -188,6 +202,12 @@
     <ClInclude Include="..\Public\Pointer_Manager.h" />
     <ClInclude Include="..\Public\Release_Manager.h" />
     <ClInclude Include="..\Public\SkillFrame.h" />
+    <ClInclude Include="..\Public\SkillIconE.h" />
+    <ClInclude Include="..\Public\SkillIconF.h" />
+    <ClInclude Include="..\Public\SkillIconQ.h" />
+    <ClInclude Include="..\Public\SkillIconR.h" />
+    <ClInclude Include="..\Public\SkillIconShift.h" />
+    <ClInclude Include="..\Public\SkillIconTab.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI.h" />
     <ClInclude Include="..\Public\UI_Manager.h" />
@@ -198,8 +218,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\AnimMesh.cpp" />
+    <ClCompile Include="..\Private\BarLine.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_Player.cpp" />
+    <ClCompile Include="..\Private\ExGauge.cpp" />
+    <ClCompile Include="..\Private\ExSkillFrame.cpp" />
+    <ClCompile Include="..\Private\HPBar.cpp" />
+    <ClCompile Include="..\Private\HPBarFrame.cpp" />
+    <ClCompile Include="..\Private\KeyE.cpp" />
+    <ClCompile Include="..\Private\KeyF.cpp" />
+    <ClCompile Include="..\Private\KeyQ.cpp" />
+    <ClCompile Include="..\Private\KeyR.cpp" />
+    <ClCompile Include="..\Private\KeyShift.cpp" />
+    <ClCompile Include="..\Private\KeyTab.cpp" />
     <ClCompile Include="..\Private\Level_Stage1.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
@@ -207,6 +238,8 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
+    <ClCompile Include="..\Private\MPBar.cpp" />
+    <ClCompile Include="..\Private\MPBarFrame.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerHairBack.cpp" />
     <ClCompile Include="..\Private\PlayerHairFront.cpp" />
@@ -217,6 +250,12 @@
     <ClCompile Include="..\Private\Pointer_Manager.cpp" />
     <ClCompile Include="..\Private\Release_Manager.cpp" />
     <ClCompile Include="..\Private\SkillFrame.cpp" />
+    <ClCompile Include="..\Private\SkillIconE.cpp" />
+    <ClCompile Include="..\Private\SkillIconF.cpp" />
+    <ClCompile Include="..\Private\SkillIconQ.cpp" />
+    <ClCompile Include="..\Private\SkillIconR.cpp" />
+    <ClCompile Include="..\Private\SkillIconShift.cpp" />
+    <ClCompile Include="..\Private\SkillIconTab.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\private\UI.cpp" />
     <ClCompile Include="..\Private\UI_Manager.cpp" />

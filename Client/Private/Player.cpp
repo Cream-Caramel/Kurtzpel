@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "HierarchyNode.h"
 #include "Pointer_Manager.h"
+#include "UI_Manager.h"
 
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -61,6 +62,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	Ready_Sockets();
 	Ready_PlayerParts();
 	PM->Add_Player(this);	
+	UM->Add_Player(this);
 
 	return S_OK;
 }
@@ -74,8 +76,6 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	Get_KeyInput(fTimeDelta);
 
-
-	
 	Update(fTimeDelta);
 
 	if (m_bJump)
@@ -102,6 +102,11 @@ void CPlayer::LateTick(_float fTimeDelta)
 		pPart->LateTick(fTimeDelta);
 
 	End_Animation();
+
+	if (m_eCurState == IDLE || m_eCurState == RUN)
+		m_bUseSkill = true;
+	else
+		m_bUseSkill = false;
 
 	for (auto& pPart : m_Parts)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, pPart);
@@ -1230,13 +1235,7 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_Q))
-	{
-		Set_State(FASTCOMBOSTART);
-		return;
-	}
-
-	if (GI->Key_Pressing(DIK_1))
+	if (GI->Key_Pressing(DIK_E))
 	{
 		Set_State(ROCKBREAK);
 		return;
@@ -1314,7 +1313,7 @@ void CPlayer::Run_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_1))
+	if (GI->Key_Pressing(DIK_E))
 	{
 		Set_State(ROCKBREAK);
 		return;
