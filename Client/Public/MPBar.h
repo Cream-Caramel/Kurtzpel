@@ -18,6 +18,10 @@ public:
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+private:
+	_float m_fPlayerMp;
+	_float m_fShaderMp;
+
 public:
 	static CMPBar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);

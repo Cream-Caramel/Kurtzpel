@@ -174,7 +174,6 @@
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\ExGauge.h" />
     <ClInclude Include="..\Public\ExSkillFrame.h" />
-    <ClInclude Include="..\Public\HPBar.h" />
     <ClInclude Include="..\Public\HPBarFrame.h" />
     <ClInclude Include="..\Public\KeyE.h" />
     <ClInclude Include="..\Public\KeyF.h" />
@@ -210,6 +209,7 @@
     <ClInclude Include="..\Public\SkillIconTab.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\UI.h" />
+    <ClInclude Include="..\Public\UIInclude.h" />
     <ClInclude Include="..\Public\UI_Manager.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
@@ -223,7 +223,6 @@
     <ClCompile Include="..\Private\Camera_Player.cpp" />
     <ClCompile Include="..\Private\ExGauge.cpp" />
     <ClCompile Include="..\Private\ExSkillFrame.cpp" />
-    <ClCompile Include="..\Private\HPBar.cpp" />
     <ClCompile Include="..\Private\HPBarFrame.cpp" />
     <ClCompile Include="..\Private\KeyE.cpp" />
     <ClCompile Include="..\Private\KeyF.cpp" />
@@ -279,7 +278,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_UI.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

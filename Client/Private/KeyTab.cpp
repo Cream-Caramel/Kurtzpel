@@ -20,13 +20,23 @@ HRESULT CKeyTab::Initialize_Prototype()
 HRESULT CKeyTab::Initialize(void * pArg)
 {
 	__super::Initialize(pArg);
-
+	m_bDown = false;
+	m_fDownAcc = 0.f;
+	UM->AddKeyTab(this);
 	return S_OK;
 }
 
 void CKeyTab::Tick(_float fTimeDelta)
 {
-
+	if (m_bDown)
+	{
+		m_fDownAcc += 1.f * fTimeDelta;
+		if (m_fDownAcc >= 0.1f)
+		{
+			m_bDown = false;
+			m_fDownAcc = 0.f;
+		}
+	}
 }
 
 void CKeyTab::LateTick(_float fTimeDelta)
@@ -50,10 +60,16 @@ HRESULT CKeyTab::Render()
 
 	if (FAILED(m_pTextureCom->Set_SRV(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Begin(0)))
-		return E_FAIL;
-
+	if (m_bDown)
+	{
+		if (FAILED(m_pShaderCom->Begin(PASS_KEYDOWN)))
+			return E_FAIL;
+	}
+	else
+	{
+		if (FAILED(m_pShaderCom->Begin(PASS_DEFAULT)))
+			return E_FAIL;
+	}
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
 

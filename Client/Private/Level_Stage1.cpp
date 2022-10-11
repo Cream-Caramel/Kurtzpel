@@ -276,6 +276,7 @@ HRESULT CLevel_Stage1::Ready_UI(char * DatName)
 		UIInfo->TexPath = UIPath;
 		UIInfo->TexName = UIName;
 		UIInfo->TexNum = UITexNum;
+		UIInfo->UIIndex = UIIndex;
 		UIInfo->UIPosX = UIPosX;
 		UIInfo->UIPosY = UIPosY;
 		UIInfo->UISizeX = UISizeX;

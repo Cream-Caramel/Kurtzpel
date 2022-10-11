@@ -90,25 +90,25 @@ HRESULT CSkillFrame::Render()
 	
 	if (m_bCoolTime)
 	{
-		if (FAILED(m_pShaderCom->Begin(1)))
+		if (FAILED(m_pShaderCom->Begin(PASS_COOLTIME)))
 			return E_FAIL;
 	}
 
 	else if (m_bCoolTimeOn)
 	{
-		if (FAILED(m_pShaderCom->Begin(3)))
+		if (FAILED(m_pShaderCom->Begin(PASS_COOLTIMEON)))
 			return E_FAIL;
 	}
 
 	else if (!UM->Get_UseSkill())
 	{
-		if (FAILED(m_pShaderCom->Begin(2)))
+		if (FAILED(m_pShaderCom->Begin(PASS_IMPOSSIBLE)))
 			return E_FAIL;
 	}
 
 	else
 	{
-		if (FAILED(m_pShaderCom->Begin(0)))
+		if (FAILED(m_pShaderCom->Begin(PASS_DEFAULT)))
 			return E_FAIL;
 	}
 

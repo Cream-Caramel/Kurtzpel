@@ -54,7 +54,7 @@ HRESULT CExSkillFrame::Render()
 	
 
 
-	if (FAILED(m_pShaderCom->Begin(0)))
+	if (FAILED(m_pShaderCom->Begin(PASS_DEFAULT)))
 		return E_FAIL;
 	
 

@@ -222,9 +222,6 @@
     <ClInclude Include="..\Public\KeyF.h">
       <Filter>03.UI\KeyIcon</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HPBar.h">
-      <Filter>03.UI\Bar</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\HPBarFrame.h">
       <Filter>03.UI\Bar</Filter>
     </ClInclude>
@@ -242,6 +239,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\UI_Manager.h">
       <Filter>96.Manager\UIManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UIInclude.h">
+      <Filter>99.Defines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -359,9 +359,6 @@
     <ClCompile Include="..\Private\KeyTab.cpp">
       <Filter>03.UI\KeyIcon</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HPBar.cpp">
-      <Filter>03.UI\Bar</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\HPBarFrame.cpp">
       <Filter>03.UI\Bar</Filter>
     </ClCompile>
@@ -392,9 +389,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
@@ -405,6 +399,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_UI.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

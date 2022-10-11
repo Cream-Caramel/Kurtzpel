@@ -21,6 +21,7 @@ HRESULT CUI::Initialize(void * pArg)
 {	
 	m_UIInfo = *(UIINFO**)pArg;
 	
+	m_iUIIndex = m_UIInfo->UIIndex;
 	m_fSizeX = m_UIInfo->UISizeX;
 	m_fSizeY = m_UIInfo->UISizeY;
 	m_fX = m_UIInfo->UIPosX;
@@ -68,7 +69,7 @@ HRESULT CUI::Ready_Components()
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxTex"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_UI"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */

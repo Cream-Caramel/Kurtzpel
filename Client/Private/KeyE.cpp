@@ -20,13 +20,23 @@ HRESULT CKeyE::Initialize_Prototype()
 HRESULT CKeyE::Initialize(void * pArg)
 {
 	__super::Initialize(pArg);
-
+	m_bDown = false;
+	m_fDownAcc = 0.f;
+	UM->AddKeyE(this);
 	return S_OK;
 }
 
 void CKeyE::Tick(_float fTimeDelta)
 {
-
+	if (m_bDown)
+	{
+		m_fDownAcc += 1.f * fTimeDelta;
+		if (m_fDownAcc >= 0.1f)
+		{
+			m_bDown = false;
+			m_fDownAcc = 0.f;
+		}
+	}
 }
 
 void CKeyE::LateTick(_float fTimeDelta)
@@ -51,9 +61,16 @@ HRESULT CKeyE::Render()
 	if (FAILED(m_pTextureCom->Set_SRV(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(0)))
-		return E_FAIL;
-
+	if (m_bDown)
+	{
+		if (FAILED(m_pShaderCom->Begin(PASS_KEYDOWN)))
+			return E_FAIL;
+	}
+	else
+	{
+		if (FAILED(m_pShaderCom->Begin(PASS_DEFAULT)))
+			return E_FAIL;
+	}
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;
 

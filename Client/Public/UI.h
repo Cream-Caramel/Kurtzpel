@@ -56,6 +56,7 @@ public:
 	UIInfo* Get_UiInfo() { return m_UIInfo; }
 
 protected:
+	int m_iUIIndex;
 	float m_fSizeX;
 	float m_fSizeY;
 	float m_fX;

@@ -14,6 +14,9 @@ private:
 public:
 	virtual HRESULT Initialize_Prototype(const _tchar* pTextureFilePath, _uint iNumTextures);
 	virtual HRESULT Initialize(void* pArg);
+
+	_uint Get_TextureNums() { return m_iNumTextures; }
+
 	ID3D11ShaderResourceView* Get_Texture(_uint iTextureNum)
 	{
 		if (iTextureNum >= m_iNumTextures)

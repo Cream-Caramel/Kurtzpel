@@ -199,10 +199,6 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CHPBarFrame::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("HPBar"),
-		CHPBar::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("MPBarFrame"),
 		CMPBarFrame::Create(m_pDevice, m_pContext))))
 		return E_FAIL;

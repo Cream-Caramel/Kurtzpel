@@ -59,6 +59,11 @@ HRESULT CPlayer::Initialize(void * pArg)
 		m_pAnimModel[i]->Set_AnimIndex(m_eCurState);
 	}
 		
+	m_fMaxPlayerHp = 100;
+	m_fMaxPlayerMp = 100.f;
+	m_fNowPlayerHp = m_fMaxPlayerHp;
+	m_fNowPlayerMp = m_fMaxPlayerMp;
+
 	Ready_Sockets();
 	Ready_PlayerParts();
 	PM->Add_Player(this);	
@@ -73,6 +78,7 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_eCurState = m_eNextState;
 
 	m_bKeyInput = false;
+
 
 	Get_KeyInput(fTimeDelta);
 
@@ -90,7 +96,8 @@ void CPlayer::Tick(_float fTimeDelta)
 
 void CPlayer::LateTick(_float fTimeDelta)
 {
-
+	if (GI->Key_Down(DIK_I))
+		m_fNowPlayerHp -= 10;
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
 
 	for(int i = 0; i < MODEL_END; ++i)
@@ -187,6 +194,7 @@ void CPlayer::Set_State(STATE eState)
 		m_eJumpDir = DIR_END;
 		break;
 	case Client::CPlayer::DASH:
+		m_fNowPlayerMp -= 5.f;
 		m_fDashSpeed = 20.f;
 		break;
 	case Client::CPlayer::DIE:
@@ -204,20 +212,25 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::SPINCOMBOEND:
 		
 		break;
+	case Client::CPlayer::SPINCOMBOSTART:
+		m_fNowPlayerMp -= 15.f;
+		break;
 	case Client::CPlayer::FASTCOMBOEND:
 		
 		break;
 	case Client::CPlayer::FASTCOMBOSTART:
+		m_fNowPlayerMp -= 10.f;
 		m_fFastComboStartSpeed = 5.f;
 		break;
 	case Client::CPlayer::ROCKBREAK:
+		m_fNowPlayerMp -= 5.f;
 		m_fRockBreakSpeed = 6.f;
 		break;
 	case Client::CPlayer::CHARGECRASH:
 		m_fChargeCrashSpeed = 6.f;
 		break;
 	case Client::CPlayer::CHARGEREADY:
-	
+		m_fNowPlayerMp -= 10.f;
 		break;
 	case Client::CPlayer::AIRCOMBO1:
 		m_fJumpPower = 0.f;
@@ -235,25 +248,37 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::VOIDFRONTEND:
 		
 		break;
+	case Client::CPlayer::VOIDFRONT:
+		m_fNowPlayerMp -= 10.f;
+		break;
 	case Client::CPlayer::VOIDBACKEND:
+		break;
+	case Client::CPlayer::VOIDBACK:
+		m_fNowPlayerMp -= 10.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
 		m_fNC1Speed = 5.f;
 		m_fNomalCombo1Acc = 0.f;
+		m_fNowPlayerMp -= 2.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
+		m_fNowPlayerMp -= 3.f;
 		m_fNC2Speed = 5.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
+		m_fNowPlayerMp -= 5.f;
 		m_fNC3Speed = 6.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
+		m_fNowPlayerMp -= 5.f;
 		m_fNC4Speed = 6.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
+		m_fNowPlayerMp -= 3.f;
 		m_fNC5Speed = 5.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
+		m_fNowPlayerMp -= 5.f;
 		m_fNC6Speed = 8.f;
 		break;
 	case Client::CPlayer::GROUNDCRASH:
@@ -284,10 +309,10 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::BLADEATTACK:
-		
+		m_fNowPlayerMp -= 20.f;
 		break;
 	case Client::CPlayer::SLASHATTACK:
-		
+		m_fNowPlayerMp -= 30.f;
 		break;
 	case Client::CPlayer::ROCKSHOT:
 		
@@ -469,7 +494,7 @@ void CPlayer::End_Animation()
 		case Client::CPlayer::NOMALCOMBO3:
 			Set_State(IDLE);
 			break;
-		case Client::CPlayer::NOMALCOMBO4:
+		case Client::CPlayer::NOMALCOMBO4:		
 			Set_State(IDLE);
 			break;
 		case Client::CPlayer::NOMALCOMBO5:
@@ -500,6 +525,7 @@ void CPlayer::End_Animation()
 			Set_State(IDLE);
 			break;
 		case Client::CPlayer::SLASHATTACK:
+			
 			Set_State(IDLE);
 			break;
 		case Client::CPlayer::ROCKSHOT:
@@ -522,6 +548,23 @@ void CPlayer::End_Animation()
 
 void CPlayer::Get_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Down(DIK_Q))
+		UM->Set_KeyDown(0);
+
+	if (GI->Key_Down(DIK_E))
+		UM->Set_KeyDown(1);
+
+	if (GI->Key_Down(DIK_F))
+		UM->Set_KeyDown(2);
+
+	if (GI->Key_Down(DIK_R))
+		UM->Set_KeyDown(3);
+
+	if (GI->Key_Down(DIK_TAB))
+		UM->Set_KeyDown(4);
+
+	if (GI->Key_Down(DIK_LSHIFT))
+		UM->Set_KeyDown(5);
 	switch (m_eCurState)
 	{
 	case Client::CPlayer::JUMP:
@@ -1231,8 +1274,8 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_F))
 	{
-		if (!UM->Get_CoolTime(2))
-		{
+		if (!UM->Get_CoolTime(2) && m_fNowPlayerMp >= 20.f)
+		{ 
 			UM->Set_CoolTime(2);
 			Set_State(BLADEATTACK);
 		}
@@ -1241,7 +1284,11 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_R))
 	{
-		Set_State(SLASHATTACK);
+		if (m_fNowPlayerMp >= 30.f && UM->Get_ExGaugeTex() >= 43)
+		{
+			Set_State(SLASHATTACK);
+			UM->Reset_ExGaugeTex();
+		}
 		return;
 	}
 
@@ -1341,6 +1388,7 @@ void CPlayer::Run_KeyInput(_float fTimeDelta)
 	if (GI->Key_Pressing(DIK_R))
 	{
 		Set_State(SLASHATTACK);
+		UM->Reset_ExGaugeTex();
 		return;
 	}
 
@@ -1389,14 +1437,20 @@ void CPlayer::RunEnd_KeyInput(_float fTimeDelta)
 
 		if (GI->Key_Pressing(DIK_C))
 		{
-			Set_State(VOIDFRONT);
-			return;
+			if (!UM->Get_CoolTime(4))
+			{
+				UM->Set_CoolTime(4);
+				Set_State(VOIDFRONT);
+			}
 		}
 
 		if (GI->Key_Pressing(DIK_V))
 		{
-			Set_State(VOIDBACK);
-			return;
+			if (!UM->Get_CoolTime(4))
+			{
+				UM->Set_CoolTime(4);
+				Set_State(VOIDBACK);
+			}
 		}
 	}
 
@@ -1916,79 +1970,7 @@ HRESULT CPlayer::Ready_PlayerParts()
 
 	return S_OK;
 
-	/*
-	MESHINFO* MeshInfo = new MESHINFO;
-
-	CGameObject*		pPlayerHead = GI->Clone_GameObject(TEXT("PlayerHead"),MeshInfo);	
-	if (nullptr == pPlayerHead)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerHead);
-
-	CGameObject*		pPlayerHairBack = GI->Clone_GameObject(TEXT("PlayerHairBack"), MeshInfo);
-	if (nullptr == pPlayerHairBack)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerHairBack);
-
-	CGameObject*		pPlayerHairFront = GI->Clone_GameObject(TEXT("PlayerHairFront"), MeshInfo);
-	if (nullptr == pPlayerHairFront)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerHairFront);
-
-	CGameObject*		pPlayerHairSide = GI->Clone_GameObject(TEXT("PlayerHairSide"), MeshInfo);
-	if (nullptr == pPlayerHairSide)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerHairSide);
-
-	CGameObject*		pPlayerHairTail = GI->Clone_GameObject(TEXT("PlayerHairTail"), MeshInfo);
-	if (nullptr == pPlayerHairTail)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerHairTail);
-
-	CGameObject*		pPlayerSword = GI->Clone_GameObject(TEXT("PlayerSword"), MeshInfo);
-	if (nullptr == pPlayerSword)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerSword);
 	
-
-	Safe_Delete(MeshInfo);
-
-	return S_OK;MESHINFO* MeshInfo = new MESHINFO;
-
-	CGameObject*		pPlayerHead = GI->Clone_GameObject(TEXT("PlayerHead"),MeshInfo);	
-	if (nullptr == pPlayerHead)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerHead);
-
-	CGameObject*		pPlayerHairBack = GI->Clone_GameObject(TEXT("PlayerHairBack"), MeshInfo);
-	if (nullptr == pPlayerHairBack)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerHairBack);
-
-	CGameObject*		pPlayerHairFront = GI->Clone_GameObject(TEXT("PlayerHairFront"), MeshInfo);
-	if (nullptr == pPlayerHairFront)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerHairFront);
-
-	CGameObject*		pPlayerHairSide = GI->Clone_GameObject(TEXT("PlayerHairSide"), MeshInfo);
-	if (nullptr == pPlayerHairSide)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerHairSide);
-
-	CGameObject*		pPlayerHairTail = GI->Clone_GameObject(TEXT("PlayerHairTail"), MeshInfo);
-	if (nullptr == pPlayerHairTail)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerHairTail);
-
-	CGameObject*		pPlayerSword = GI->Clone_GameObject(TEXT("PlayerSword"), MeshInfo);
-	if (nullptr == pPlayerSword)
-		return E_FAIL;
-	m_Parts.push_back((CMesh*)pPlayerSword);
-	
-
-	Safe_Delete(MeshInfo);
-
-	return S_OK;
-	*/
 }
 
 HRESULT CPlayer::Update_Parts()

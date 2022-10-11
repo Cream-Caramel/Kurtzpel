@@ -18,6 +18,13 @@ public:
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	void Set_Down() { m_bDown = true; }
+
+
+private:
+	_bool m_bDown;
+	_float m_fDownAcc;
+
 public:
 	static CKeyR* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);

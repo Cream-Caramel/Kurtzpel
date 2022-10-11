@@ -41,7 +41,6 @@
 #include "SkillIconShift.h"
 #include "SkillIconTab.h"
 #include "HPBarFrame.h"
-#include "HPBar.h"
 #include "MPBarFrame.h"
 #include "MPBar.h"
 #include "BarLine.h"

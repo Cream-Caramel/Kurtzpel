@@ -45,11 +45,16 @@ public:
 	void Set_AniInfo(); // 애니메이션 정보 동기화
 	void Set_PlayerUseInfo(); //다른곳에서 사용할 플레이어의 정보를 갱신함
 	_bool Get_UseSkill() { return m_bUseSkill; } //스킬을 사용할수있는상태인지 체크
+	STATE Get_State() { return m_eCurState; }
 #pragma endregion MainFunction
 
 #pragma region UtilFunction
 	void Jump(_float fTimeDelta); // 중력에 따라 Y값 조정 처음 점프할 때 방향에 따라 XZ값 조정
 	void JumpMove(_float fTimeDelta); // 점프할 때 방향에 따라 이동값 조정
+	_float Get_PlayerHp() { return m_fNowPlayerHp; }
+	void Set_PlayerHp(_float iHp) { m_fNowPlayerHp = iHp; }
+	_float Get_PlayerMp() { return m_fNowPlayerMp; }
+	void Set_PlayerMp(_float iMp) { m_fNowPlayerMp = iMp; }
 #pragma endregion UtilFunction
 	
 #pragma region KeyInput
@@ -91,6 +96,10 @@ private:
 #pragma endregion KeyInput
 
 #pragma region Variable
+	_float m_fNowPlayerHp;
+	_float m_fMaxPlayerHp;
+	_float m_fNowPlayerMp;
+	_float m_fMaxPlayerMp;
 	_bool m_bUseSkill = true; //스킬을 사용할수있는지 대기 or 달리기 도중에 가능
 	_bool m_bJump = false; //점프중인지
 	_bool m_bKeyInput = false; //방향키가 눌렸는지
