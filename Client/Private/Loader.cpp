@@ -76,6 +76,8 @@ HRESULT CLoader::Loading_ForStatic()
 
 	Loading_Shader();
 
+	Loading_Component();
+
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다.  "));
 
 	Safe_Release(pGameInstance);
@@ -245,7 +247,21 @@ HRESULT CLoader::Loading_Shader()
 
 HRESULT CLoader::Loading_Component()
 {
-	return E_NOTIMPL;
+	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Collider_AABB"),
+		CAABB::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Collider_OBB */
+	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"),
+		COBB::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Collider_Sphere */
+	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
+		CSphere::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 HRESULT CLoader::Loading_ForLogoLevel()

@@ -4,6 +4,8 @@
 #include "HierarchyNode.h"
 #include "Pointer_Manager.h"
 #include "UI_Manager.h"
+#include "Collider.h"
+#include "OBB.h"
 
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -31,6 +33,8 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_MeshInfo = ((MESHINFO*)pArg);
 	sTag = m_MeshInfo->sTag;
 
+    if (FAILED(Ready_Collider()))
+		return E_FAIL;
 	
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, m_MeshInfo->sTag, TEXT("Player"), (CComponent**)&m_pAnimModel[MODEL_PLAYER])))
 		return E_FAIL;
@@ -150,12 +154,48 @@ HRESULT CPlayer::Render()
 			}
 		}
 	}
+
+	for (_uint i = 0; i < OBB_END; ++i)
+	{
+		if (nullptr != m_pOBB[i])
+			m_pOBB[i]->Render();
+	}
 	return S_OK;
 }
 
 _vector CPlayer::Get_PlayerPos()
 {
 	return m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+}
+
+HRESULT CPlayer::Ready_Collider()
+{
+	CCollider::COLLIDERDESC		ColliderDesc;
+	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
+
+	ColliderDesc.vSize = _float3(1.3f, 1.3f, 1.3f);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
+	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(45.f), 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Head"), (CComponent**)&m_pOBB[OBB_HEAD], &ColliderDesc)))
+		return E_FAIL;
+
+	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
+
+	ColliderDesc.vSize = _float3(1.3f, 1.3f, 1.3f);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
+	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(45.f), 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Body"), (CComponent**)&m_pOBB[OBB_BODY], &ColliderDesc)))
+		return E_FAIL;
+
+	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
+
+	ColliderDesc.vSize = _float3(1.3f, 1.3f, 1.3f);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
+	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(45.f), 0.f);
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Sword"), (CComponent**)&m_pOBB[OBB_SWORD], &ColliderDesc)))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 void CPlayer::Set_State(STATE eState)

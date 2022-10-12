@@ -109,6 +109,21 @@
     <ClCompile Include="..\Private\Binary.cpp">
       <Filter>03.Components\06.Model\Model\BInary</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Collider.cpp">
+      <Filter>07.Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AABB.cpp">
+      <Filter>07.Collider\AABB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OBB.cpp">
+      <Filter>07.Collider\OBB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sphere.cpp">
+      <Filter>07.Collider\SPHERE</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DebugDraw.cpp">
+      <Filter>07.Collider\00.DebugDraw</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -237,6 +252,21 @@
     <ClInclude Include="..\Public\Binary.h">
       <Filter>03.Components\06.Model\Model\BInary</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Collider.h">
+      <Filter>07.Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AABB.h">
+      <Filter>07.Collider\AABB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\OBB.h">
+      <Filter>07.Collider\OBB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sphere.h">
+      <Filter>07.Collider\SPHERE</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DebugDraw.h">
+      <Filter>07.Collider\00.DebugDraw</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="99.Defines">
@@ -361,6 +391,21 @@
     </Filter>
     <Filter Include="03.Components\06.Model\Model\BInary">
       <UniqueIdentifier>{64d63eeb-4015-4151-a568-fd429afbbdb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="07.Collider">
+      <UniqueIdentifier>{4791f4a9-0509-4727-826c-6748edc3de3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="07.Collider\AABB">
+      <UniqueIdentifier>{d4988a19-050c-4a87-b78d-36b3f88b7759}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="07.Collider\OBB">
+      <UniqueIdentifier>{16cdb0e7-ce0f-4c41-8913-f565d3749061}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="07.Collider\SPHERE">
+      <UniqueIdentifier>{4461da53-1b49-4d66-a590-7b9b1679cbfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="07.Collider\00.DebugDraw">
+      <UniqueIdentifier>{18a78bd5-d82c-4bb5-bace-261d75f4e8d5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

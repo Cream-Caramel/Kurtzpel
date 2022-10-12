@@ -4,6 +4,7 @@
 #include "Mesh.h"
 BEGIN(Engine)
 class CHierarchyNode;
+class COBB;
 END
 
 BEGIN(Client)
@@ -20,6 +21,7 @@ public:
 		,VOIDFRONTEND, VOIDBACKEND, VOIDFRONT, VOIDBACK, NOMALCOMBO1, NOMALCOMBO2, NOMALCOMBO3, NOMALCOMBO4, NOMALCOMBO5, NOMALCOMBO6, GROUNDCRASH
 		,GROUNDREADY, GROUNDRUN, LEAPDOWN, LEAPUP, LEAPEND, LEAPREADY, LEAPRUN, LEAPSTART, BLADEATTACK, SLASHATTACK, ROCKSHOT, EX1ATTACK, EX2ATTACK
 		,EX1READY, EX2READY, STATE_END};
+	enum OBB {OBB_HEAD, OBB_BODY, OBB_SWORD, OBB_END};
 
 private:
 	CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
@@ -36,7 +38,7 @@ public:
 #pragma region MainFunction
 public:
 	_vector Get_PlayerPos();
-
+	HRESULT Ready_Collider();
 	void Set_State(STATE eState); // 상태를 설정 보간을 하는 애니메이션은 여기서 애니메이션 셋팅
 	void Set_Dir(DIR eDir); // 방향을 설정
 	void End_Animation(); // 애니메이션이 끝났을 때 작업을 수행 보간을 안할 애니메이션은 여기서 애니메이션 셋팅
@@ -45,7 +47,7 @@ public:
 	void Set_AniInfo(); // 애니메이션 정보 동기화
 	void Set_PlayerUseInfo(); //다른곳에서 사용할 플레이어의 정보를 갱신함
 	_bool Get_UseSkill() { return m_bUseSkill; } //스킬을 사용할수있는상태인지 체크
-	STATE Get_State() { return m_eCurState; }
+	STATE Get_State() { return m_eCurState; } // 다른곳에서 사용하기위한 플레이어 상태를 넘겨줌
 #pragma endregion MainFunction
 
 #pragma region UtilFunction
@@ -96,10 +98,10 @@ private:
 #pragma endregion KeyInput
 
 #pragma region Variable
-	_float m_fNowPlayerHp;
-	_float m_fMaxPlayerHp;
-	_float m_fNowPlayerMp;
-	_float m_fMaxPlayerMp;
+	_float m_fNowPlayerHp; //현재 HP
+	_float m_fMaxPlayerHp; // 최대HP
+	_float m_fNowPlayerMp; // 현재MP
+	_float m_fMaxPlayerMp; // 최대MP
 	_bool m_bUseSkill = true; //스킬을 사용할수있는지 대기 or 달리기 도중에 가능
 	_bool m_bJump = false; //점프중인지
 	_bool m_bKeyInput = false; //방향키가 눌렸는지
@@ -125,10 +127,10 @@ private:
 	_float m_fSpinComboSpeed = 2.f; // 스핀콤보 이동속도
 	_float m_fSpinComboStartSpeed = 5.f; //스핀콤보시작 전진속도
 	_float m_fSpinComboEndSpeed = 6.f; //스핀콤보마무리 전진속도
-	_float m_fFastComboStartSpeed = 5.f;
-	_float m_fFastComboEndSpeed = 8.f;
-	_float m_fRockBreakSpeed = 6.f;
-	_float m_fChargeCrashSpeed = 6.f;
+	_float m_fFastComboStartSpeed = 5.f; //FAST콤보시작 전진속도
+	_float m_fFastComboEndSpeed = 8.f; // FAST콤보 마무리 전진속도
+	_float m_fRockBreakSpeed = 6.f; // RockBreak 전진속도
+	_float m_fChargeCrashSpeed = 6.f; //ChargeCrash 전진속도
 #pragma endregion Variable
 
 private:
@@ -140,6 +142,7 @@ private:
 	
 private:
 	CAnimModel* m_pAnimModel[MODEL_END]; // 플레이어, 상의, 하의 모델
+	COBB* m_pOBB[OBB_END]{ nullptr };
 
 	vector<CMesh*>				m_Parts;
 	vector<class CHierarchyNode*>		m_Sockets;

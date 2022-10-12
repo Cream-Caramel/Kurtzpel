@@ -6,6 +6,9 @@
 #include "Camera_Free.h"
 #include "Camera_Player.h"
 #include "Terrain.h"
+#include "AABB.h"
+#include "OBB.h"
+#include "Sphere.h"
 #pragma endregion Main클래스
 
 #pragma region AnimModel클래스
