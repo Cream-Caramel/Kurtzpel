@@ -17,7 +17,7 @@ public:
 public:
 	HRESULT Add_Timer(const _tchar* pTimerTag);
 	HRESULT Update_Timer(const _tchar* pTimerTag);
-
+	void Set_Speed(const _tchar* pTimerTag, _float fSpeed);
 private:
 	map<const _tchar*, class CTimer*>			m_Timers;
 	typedef map<const _tchar*, class CTimer*>	TIMERS;

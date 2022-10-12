@@ -21,7 +21,7 @@ public:
 		,VOIDFRONTEND, VOIDBACKEND, VOIDFRONT, VOIDBACK, NOMALCOMBO1, NOMALCOMBO2, NOMALCOMBO3, NOMALCOMBO4, NOMALCOMBO5, NOMALCOMBO6, GROUNDCRASH
 		,GROUNDREADY, GROUNDRUN, LEAPDOWN, LEAPUP, LEAPEND, LEAPREADY, LEAPRUN, LEAPSTART, BLADEATTACK, SLASHATTACK, ROCKSHOT, EX1ATTACK, EX2ATTACK
 		,EX1READY, EX2READY, STATE_END};
-	enum OBB {OBB_HEAD, OBB_BODY, OBB_SWORD, OBB_END};
+	enum OBB {OBB_BODY, OBB_END};
 
 private:
 	CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
@@ -34,6 +34,7 @@ public:
 	virtual void Tick(_float fTimeDelta) override;
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual void Collision(CGameObject* pOther, string sTag)override;
 
 #pragma region MainFunction
 public:

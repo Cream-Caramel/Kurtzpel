@@ -81,8 +81,10 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (!m_pAnimModel[0]->GetChangeBool())
 		m_eCurState = m_eNextState;
 
-	m_bKeyInput = false;
+	if (GI->Key_Down(DIK_0))
+		m_bCollider = !m_bCollider;
 
+	m_bKeyInput = false;
 
 	Get_KeyInput(fTimeDelta);
 
@@ -102,6 +104,9 @@ void CPlayer::LateTick(_float fTimeDelta)
 {
 	if (GI->Key_Down(DIK_I))
 		m_fNowPlayerHp -= 10;
+
+	if (GI->Key_Down(DIK_U))
+		UM->Set_ExGaugeTex(1);
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
 
 	for(int i = 0; i < MODEL_END; ++i)
@@ -114,13 +119,11 @@ void CPlayer::LateTick(_float fTimeDelta)
 
 	End_Animation();
 
-	if (m_eCurState == IDLE || m_eCurState == RUN)
-		m_bUseSkill = true;
-	else
-		m_bUseSkill = false;
-
 	for (auto& pPart : m_Parts)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, pPart);
+
+	for (int i = 0; i < OBB_END; ++i)
+		m_pOBB[i]->Update(m_pTransformCom->Get_WorldMatrix());
 
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	
@@ -157,10 +160,17 @@ HRESULT CPlayer::Render()
 
 	for (_uint i = 0; i < OBB_END; ++i)
 	{
-		if (nullptr != m_pOBB[i])
-			m_pOBB[i]->Render();
+		if (m_bCollider)
+		{
+			if (m_eCurState != VOIDBACK && m_eCurState != VOIDFRONT && m_eCurState != VOIDBACKEND && m_eCurState != VOIDFRONTEND)
+				m_pOBB[i]->Render();
+		}
 	}
 	return S_OK;
+}
+
+void CPlayer::Collision(CGameObject * pOther, string sTag)
+{
 }
 
 _vector CPlayer::Get_PlayerPos()
@@ -171,29 +181,17 @@ _vector CPlayer::Get_PlayerPos()
 HRESULT CPlayer::Ready_Collider()
 {
 	CCollider::COLLIDERDESC		ColliderDesc;
-	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
 
-	ColliderDesc.vSize = _float3(1.3f, 1.3f, 1.3f);
+	ColliderDesc.vSize = _float3(0.7f, 2.f, 0.7f);
 	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
-	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(45.f), 0.f);
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Head"), (CComponent**)&m_pOBB[OBB_HEAD], &ColliderDesc)))
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.sTag = "Player_Body";
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Head"), (CComponent**)&m_pOBB[OBB_BODY], &ColliderDesc)))
 		return E_FAIL;
 
-	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
-
-	ColliderDesc.vSize = _float3(1.3f, 1.3f, 1.3f);
-	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
-	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(45.f), 0.f);
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Body"), (CComponent**)&m_pOBB[OBB_BODY], &ColliderDesc)))
-		return E_FAIL;
-
-	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
-
-	ColliderDesc.vSize = _float3(1.3f, 1.3f, 1.3f);
-	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
-	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(45.f), 0.f);
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Sword"), (CComponent**)&m_pOBB[OBB_SWORD], &ColliderDesc)))
-		return E_FAIL;
+	m_pOBBs.push_back(m_pOBB[OBB_BODY]);
+	Safe_AddRef(m_pOBB[OBB_BODY]);
+	
 
 	return S_OK;
 }
@@ -603,7 +601,7 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 	if (GI->Key_Down(DIK_TAB))
 		UM->Set_KeyDown(4);
 
-	if (GI->Key_Down(DIK_LSHIFT))
+	if (GI->Key_Down(DIK_C) || GI->Key_Down(DIK_V))
 		UM->Set_KeyDown(5);
 	switch (m_eCurState)
 	{
@@ -926,8 +924,12 @@ void CPlayer::Update(_float fTimeDelta)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f } );
 		break;
 	case Client::CPlayer::IDLE:
+		for(int i = 0; i < OBB_END; ++i)
+			m_pOBB[i]->ChangeExtents(_float3(0.7f, 2.f, 0.7f));
 		break;
 	case Client::CPlayer::DASH:
+		for (int i = 0; i < OBB_END; ++i)
+			m_pOBB[i]->ChangeExtents(_float3(0.7f, 1.5f, 1.4f));
 		if (m_fDashSpeed > 0.5f)
 			m_fDashSpeed -= 0.5f;
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fDashSpeed, fTimeDelta);
@@ -937,6 +939,8 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::RESPAWN:
 		break;
 	case Client::CPlayer::RUN:
+		for (int i = 0; i < OBB_END; ++i)
+			m_pOBB[i]->ChangeExtents(_float3(0.7f, 1.5f, 1.2f));
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
 		break;
 	case Client::CPlayer::RUNEND:
@@ -1651,23 +1655,6 @@ void CPlayer::FastComboEnd_KeyInput(_float fTimeDelta)
 			Set_State(RUN);
 			return;
 		}
-		if (GI->Key_Pressing(DIK_C))
-		{
-			Set_State(VOIDFRONT);
-			return;
-		}
-
-		if (GI->Key_Pressing(DIK_V))
-		{
-			Set_State(VOIDBACK);
-			return;
-		}
-
-		if (GI->Key_Pressing(DIK_SPACE))
-		{
-			Set_State(JUMPSTART);
-			return;
-		}
 	}
 }
 
@@ -2057,6 +2044,9 @@ CGameObject * CPlayer::Clone(void * pArg)
 void CPlayer::Free()
 {
 	__super::Free();
+	for (int i = 0; i < OBB_END; ++i)
+		Safe_Release(m_pOBB[i]);
+
 	Safe_Release(m_pAnimModel[MODEL_PLAYER]);
 	Safe_Release(m_pAnimModel[MODEL_TOP]);
 	Safe_Release(m_pAnimModel[MODEL_BOTTOM]);

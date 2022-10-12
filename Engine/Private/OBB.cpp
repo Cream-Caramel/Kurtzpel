@@ -18,7 +18,7 @@ HRESULT COBB::Initialize_Prototype(CCollider::TYPE eColliderType)
 {
 	if (FAILED(__super::Initialize_Prototype(eColliderType)))
 		return E_FAIL;
-
+	
 	m_eColliderType = CCollider::TYPE_OBB;
 
 	return S_OK;
@@ -73,6 +73,12 @@ _bool COBB::Collision(CCollider * pTargetCollider)
 	}
 
 	return m_isColl;
+}
+
+void COBB::ChangeExtents(_float3 vExtents)
+{
+	_float3 Extents = { vExtents.x * 0.5f, vExtents.y * 0.5f, vExtents.z * 0.5f };
+	m_pOriginal_OBB->Extents = Extents;
 }
 
 

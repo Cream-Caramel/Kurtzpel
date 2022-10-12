@@ -35,6 +35,7 @@ public:
 	virtual void Tick(_float fTimeDelta) override;
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual void Collision(CGameObject* pOther, string sTag) {};
 
 public:
 	void Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3);

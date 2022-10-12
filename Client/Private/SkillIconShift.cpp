@@ -51,7 +51,7 @@ HRESULT CSkillIconShift::Render()
 	if (FAILED(m_pTextureCom->Set_SRV(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(0)))
+	if (FAILED(m_pShaderCom->Begin(PASS_SKILLICON)))
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Render()))

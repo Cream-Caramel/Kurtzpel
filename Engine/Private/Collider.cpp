@@ -24,6 +24,7 @@ CCollider::CCollider(const CCollider & rhs)
 
 HRESULT CCollider::Initialize_Prototype(TYPE eColliderType)
 {
+	m_sTag = "";
 	m_eColliderType = eColliderType;
 
 #ifdef _DEBUG
@@ -49,9 +50,8 @@ HRESULT CCollider::Initialize(void * pArg)
 {
 	if (nullptr == pArg)
 		return E_FAIL;
-
-	memcpy(&m_ColliderDesc, pArg, sizeof(COLLIDERDESC));
-
+   	memcpy(&m_ColliderDesc, pArg, sizeof(COLLIDERDESC));
+	m_sTag = m_ColliderDesc.sTag;
 	return S_OK;
 }
 

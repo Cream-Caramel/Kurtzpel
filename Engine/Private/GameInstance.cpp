@@ -182,6 +182,14 @@ HRESULT CGameInstance::Update_Timer(const _tchar * pTimerTag)
 	return m_pTimer_Manager->Update_Timer(pTimerTag);
 }
 
+void CGameInstance::Set_Speed(const _tchar * pTimerTag, _float fSpeed)
+{
+	if (nullptr == m_pTimer_Manager)
+		return;
+
+	return m_pTimer_Manager->Set_Speed(pTimerTag, fSpeed);
+}
+
 _long CGameInstance::Get_DIMMoveState(DIMM eMouseMoveID)
 {
 	if (nullptr == m_pInput_Device)

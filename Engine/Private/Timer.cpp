@@ -39,6 +39,11 @@ void CTimer::Update(void)
 
 }
 
+void CTimer::Set_Speed(_float fSpeed)
+{
+	m_fSpeed = fSpeed;
+}
+
 CTimer * CTimer::Create()
 {
 	CTimer*			pInstance = new CTimer();

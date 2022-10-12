@@ -35,6 +35,7 @@ public:
 	virtual void Tick(_float fTimeDelta)override;
 	virtual void LateTick(_float fTimeDelta)override;
 	virtual HRESULT Render()override;
+	virtual void Collision(CGameObject* pOther, string sTag) {};
 
 public:
 	HRESULT SetUp_State(_fmatrix StateMatrix);

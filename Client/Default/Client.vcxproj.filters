@@ -97,6 +97,9 @@
     <Filter Include="03.UI\KeyIcon">
       <UniqueIdentifier>{4473948c-cad0-481e-a961-e5adb7b148e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="96.Manager\Collider_Manager">
+      <UniqueIdentifier>{3f938abd-13ba-414d-940e-3cb77041e18a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -243,6 +246,12 @@
     <ClInclude Include="..\Public\UIInclude.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Collider_Manager.h">
+      <Filter>96.Manager\Collider_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
+      <Filter>97.ShaderFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -373,6 +382,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_Manager.cpp">
       <Filter>96.Manager\UIManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Collider_Manager.cpp">
+      <Filter>96.Manager\Collider_Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

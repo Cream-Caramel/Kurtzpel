@@ -16,6 +16,7 @@ public:
 		_float3			vCenter;
 		_float3			vSize;
 		_float3			vRotation;
+		char* sTag;
 	}COLLIDERDESC;
 
 protected:
@@ -33,7 +34,7 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 	virtual void Update(_fmatrix TransformMatrix) = 0;
 	virtual _bool Collision(CCollider* pTargetCollider) = 0;
-
+	string Get_Tag() { return m_sTag; }
 
 #ifdef _DEBUG
 public:
@@ -44,7 +45,7 @@ protected:
 	TYPE					m_eColliderType = TYPE_END;
 	COLLIDERDESC			m_ColliderDesc;
 	_bool					m_isColl = false;
-	
+	string					m_sTag;
 
 #ifdef _DEBUG
 protected:

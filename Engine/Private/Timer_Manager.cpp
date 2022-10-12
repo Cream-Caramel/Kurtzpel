@@ -41,6 +41,17 @@ HRESULT CTimer_Manager::Update_Timer(const _tchar * pTimerTag)
 	return S_OK;
 }
 
+void CTimer_Manager::Set_Speed(const _tchar * pTimerTag, _float fSpeed)
+{
+	CTimer*		pTimer = Find_Timer(pTimerTag);
+	if (nullptr == pTimer)
+		return;
+
+	pTimer->Set_Speed(fSpeed);
+
+	return;
+}
+
 CTimer * CTimer_Manager::Find_Timer(const _tchar * pTimerTag)
 {
 	auto	iter = find_if(m_Timers.begin(), m_Timers.end(), CTag_Finder(pTimerTag));

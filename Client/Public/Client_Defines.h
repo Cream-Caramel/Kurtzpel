@@ -7,12 +7,13 @@ namespace Client
 
 	enum LEVEL { LEVEL_STATIC, LEVEL_LOADING, LEVEL_LOGO, LEVEL_STAGE1, LEVEL_END };
 	enum UIPASS { PASS_DEFAULT, PASS_COOLTIME, PASS_IMPOSSIBLE, PASS_COOLTIMEON, PASS_KEYDOWN, PASS_HPBARFRAME, PASS_HPBAR, PASS_EXGAUGE,  
-		PASS_MPBAR, PASS_END };
+		PASS_MPBAR, PASS_SKILLICON, PASS_END };
 
 #define GI CGameInstance::Get_Instance()
 #define RM CRelease_Manager::Get_Instance()
 #define PM CPointer_Manager::Get_Instance()
 #define UM CUI_Manager::Get_Instance()
+#define CM CCollider_Manager::Get_Instance()
 }
 
 extern HINSTANCE g_hInst;

@@ -82,7 +82,7 @@ HRESULT CExGauge::Render()
 
 	if (!m_bMaxTexture)
 	{
-		if (FAILED(m_pShaderCom->Begin(PASS_DEFAULT)))
+		if (FAILED(m_pShaderCom->Begin(PASS_SKILLICON)))
 			return E_FAIL;
 	}
 

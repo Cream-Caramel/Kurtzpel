@@ -1,6 +1,8 @@
 #include "..\Public\GameObject.h"
 #include "GameInstance.h"
 #include "Component.h"
+#include "OBB.h"
+
 
 
 CGameObject::CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -45,6 +47,7 @@ void CGameObject::LateTick(_float fTimeDelta)
 {
 }
 
+
 HRESULT CGameObject::Render()
 {
 	return S_OK;
@@ -86,6 +89,11 @@ CComponent * CGameObject::Find_Component(const _tchar * pComponentTag)
 
 void CGameObject::Free()
 {
+	for (auto& iter : m_pOBBs)
+		Safe_Release(iter);
+	m_pOBBs.clear();
+
+
 	for (auto& Pair : m_Components)
 		Safe_Release(Pair.second);
 

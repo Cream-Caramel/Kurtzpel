@@ -17,10 +17,10 @@
       <Filter>01.Levels</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Timer.cpp">
-      <Filter>04.Utility\00.Tijmers</Filter>
+      <Filter>04.Utility\00.Timer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Timer_Manager.cpp">
-      <Filter>04.Utility\00.Tijmers\00.Manager</Filter>
+      <Filter>04.Utility\00.Timer\00.Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Component_Manager.cpp">
       <Filter>03.Components\00.Manager</Filter>
@@ -160,10 +160,10 @@
       <Filter>01.Levels</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Timer.h">
-      <Filter>04.Utility\00.Tijmers</Filter>
+      <Filter>04.Utility\00.Timer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Timer_Manager.h">
-      <Filter>04.Utility\00.Tijmers\00.Manager</Filter>
+      <Filter>04.Utility\00.Timer\00.Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Component_Manager.h">
       <Filter>03.Components\00.Manager</Filter>
@@ -299,12 +299,6 @@
     <Filter Include="05.System\01.Input">
       <UniqueIdentifier>{9cc8e11b-5005-4bd6-9db9-8c179ac5c304}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04.Utility\00.Tijmers">
-      <UniqueIdentifier>{3378d695-3c24-442f-b782-8395b3438830}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="04.Utility\00.Tijmers\00.Manager">
-      <UniqueIdentifier>{5d095fe2-8db8-473e-b791-8a35419607a7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03.Components\00.Manager">
       <UniqueIdentifier>{e6fd675b-5459-4def-84e7-146ece62fe31}</UniqueIdentifier>
     </Filter>
@@ -406,6 +400,12 @@
     </Filter>
     <Filter Include="07.Collider\00.DebugDraw">
       <UniqueIdentifier>{18a78bd5-d82c-4bb5-bace-261d75f4e8d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Utility\00.Timer">
+      <UniqueIdentifier>{3378d695-3c24-442f-b782-8395b3438830}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Utility\00.Timer\00.Manager">
+      <UniqueIdentifier>{5d095fe2-8db8-473e-b791-8a35419607a7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

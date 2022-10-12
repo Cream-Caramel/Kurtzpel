@@ -4,6 +4,7 @@
 #include "Level_Loading.h"
 #include "Release_Manager.h"
 #include "Pointer_Manager.h"
+#include "Collider_Manager.h"
 #include "UI_Manager.h"
 
 using namespace Client;
@@ -49,6 +50,10 @@ void CMainApp::Tick(_float fTimeDelta)
 
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 
+	
+
+
+	CM->End_Collision();
 	/*RECT Clip;
 	GetClientRect(g_hWnd, &Clip);
 	ClientToScreen(g_hWnd, (LPPOINT)&Clip);
@@ -173,4 +178,5 @@ void CMainApp::Free()
 	CRelease_Manager::Destroy_Instance();
 	CPointer_Manager::Destroy_Instance();
 	CUI_Manager::Destroy_Instance();
+	CCollider_Manager::Destroy_Instance();
 }

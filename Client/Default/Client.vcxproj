@@ -167,11 +167,13 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Bin\ShaderFiles\Client_Shader_Defines.hpp" />
     <ClInclude Include="..\Public\AnimMesh.h" />
     <ClInclude Include="..\Public\BarLine.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Camera_Player.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Collider_Manager.h" />
     <ClInclude Include="..\Public\ExGauge.h" />
     <ClInclude Include="..\Public\ExSkillFrame.h" />
     <ClInclude Include="..\Public\HPBarFrame.h" />
@@ -221,6 +223,7 @@
     <ClCompile Include="..\Private\BarLine.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_Player.cpp" />
+    <ClCompile Include="..\Private\Collider_Manager.cpp" />
     <ClCompile Include="..\Private\ExGauge.cpp" />
     <ClCompile Include="..\Private\ExSkillFrame.cpp" />
     <ClCompile Include="..\Private\HPBarFrame.cpp" />

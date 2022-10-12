@@ -1,6 +1,11 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Mesh.h"
+
+BEGIN(Engine)
+class COBB;
+END
+
 BEGIN(Client)
 
 class CPlayerSword final : public CMesh
@@ -19,7 +24,8 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CModel* m_pModel;
+	CModel* m_pModel = nullptr;
+	COBB* m_pOBB = nullptr;
 
 public:
 	static CPlayerSword* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
