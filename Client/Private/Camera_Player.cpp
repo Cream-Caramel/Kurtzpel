@@ -34,9 +34,9 @@ HRESULT CCamera_Player::Initialize(void * pArg)
 
 	PM->Add_CameraPlayer(this);
 
-	m_vDistance = { 0.f,1.f,-6.f };
+	m_vDistance = { 0.f,0.f,-6.f };
 
-	m_pTransformCom->LookAt(m_pPlayer->Get_PlayerPos() + _vector{ 0.f,2.f,0.f,0.f });
+	m_pTransformCom->LookAt(m_pPlayer->Get_PlayerPos() + _vector{ 0.f,4.f,0.f,0.f });
 
 	return S_OK;
 }
@@ -53,25 +53,43 @@ void CCamera_Player::Tick(_float fTimeDelta)
 	}
 
 	if (MouseMove = GI->Get_DIMMoveState(DIMM_Y))
-	{
-		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), MouseMove * fTimeDelta * 0.05f);
+	{	
+		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), MouseMove * fTimeDelta * 0.05f);	
+		
 	}
-
+	
 }
 
 void CCamera_Player::LateTick(_float fTimeDelta)
 {
-
+	
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pPlayer->Get_PlayerPos());
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(XMLoadFloat3(&m_vDistance), m_pTransformCom->Get_WorldMatrix()));
-
-	if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0.f)
+	
+	_float4 _vCurPos;
+	XMStoreFloat4(&_vCurPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] < 0.1f)
 	{
 		_float4 Pos;
 		XMStoreFloat4(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ Pos.x,0.1f,Pos.z,1.f });
+
+
 	}
+	if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] <= 0.1f)
+	{
+		if (m_vDistance.z < -2.f)
+		{
+			m_vDistance.z += 0.1f;
+		}
+	}
+
+	else if (m_vDistance.z > -6.f)
+	{
+		m_vDistance.z -= 0.1f;
+	}
+
 		
 	__super::Tick(fTimeDelta);
 
