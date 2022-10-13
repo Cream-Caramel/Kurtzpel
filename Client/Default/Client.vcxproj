@@ -170,6 +170,10 @@
     <ClInclude Include="..\Bin\ShaderFiles\Client_Shader_Defines.hpp" />
     <ClInclude Include="..\Public\AnimMesh.h" />
     <ClInclude Include="..\Public\BarLine.h" />
+    <ClInclude Include="..\Public\BossBarLine.h" />
+    <ClInclude Include="..\Public\BossHPBarFrame.h" />
+    <ClInclude Include="..\Public\BossMPBar.h" />
+    <ClInclude Include="..\Public\BossMPBarFrame.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Camera_Player.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
@@ -222,6 +226,10 @@
   <ItemGroup>
     <ClCompile Include="..\Private\AnimMesh.cpp" />
     <ClCompile Include="..\Private\BarLine.cpp" />
+    <ClCompile Include="..\Private\BossBarLine.cpp" />
+    <ClCompile Include="..\Private\BossHPBarFrame.cpp" />
+    <ClCompile Include="..\Private\BossMPBar.cpp" />
+    <ClCompile Include="..\Private\BossMPBarFrame.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_Player.cpp" />
     <ClCompile Include="..\Private\Collider_Manager.cpp" />

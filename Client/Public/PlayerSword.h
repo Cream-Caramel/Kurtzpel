@@ -7,7 +7,7 @@ class COBB;
 END
 
 BEGIN(Client)
-
+class CPlayer;
 class CPlayerSword final : public CMesh
 {
 
@@ -26,6 +26,7 @@ public:
 private:
 	CModel* m_pModel = nullptr;
 	COBB* m_pOBB = nullptr;
+	CPlayer* m_pPlayer = nullptr;
 
 public:
 	static CPlayerSword* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

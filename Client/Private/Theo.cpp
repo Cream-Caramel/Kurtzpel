@@ -2,6 +2,12 @@
 #include "..\Public\Theo.h"
 #include "GameInstance.h"
 #include "OBB.h"
+#include "Collider_Manager.h"
+#include "HierarchyNode.h"
+#include "UI.h"
+#include "UI_Manager.h"
+#include "Pointer_Manager.h"
+#include "Player.h"
 
 CTheo::CTheo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -27,22 +33,36 @@ HRESULT CTheo::Initialize(void * pArg)
 	m_MeshInfo = ((MESHINFO*)pArg);
 	sTag = m_MeshInfo->sTag;
 
-	if (FAILED(Ready_Collider()))
-		return E_FAIL;
-
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, m_MeshInfo->sTag, TEXT("Theo"), (CComponent**)&m_pAnimModel)))
 		return E_FAIL;
 
-	m_eCurState = IDLE;
-	m_eNextState = IDLE;
+	Ready_Sockets();
+
+	if (FAILED(Ready_Collider()))
+		return E_FAIL;
+
+	m_bColliderRender = true;
+
+	m_eCurState = APPEAR;
+	m_eNextState = APPEAR;
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 100;
+	m_fMaxHp = 300;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
-	m_fNowMp = m_fMaxMp;
+	m_fNowMp = 10.f;
+	m_fDamage = 10.f;
+
+	m_fColiisionTime = 1.f;
+
+	m_pTarget = PM->Get_PlayerPointer();
+	Safe_AddRef(m_pTarget);
+
+	UM->Add_Boss(this);
+	Load_UI("BossBar");
+	
 
 	return S_OK;
 }
@@ -53,7 +73,27 @@ void CTheo::Tick(_float fTimeDelta)
 		m_eCurState = m_eNextState;
 
 	if (GI->Key_Down(DIK_0))
-		m_bCollider = !m_bCollider;
+		m_bColliderRender = !m_bColliderRender;
+
+	if (!m_bCollision)
+	{
+		m_fCollisionAcc += 1.f * fTimeDelta;
+		if (m_fCollisionAcc >= m_fColiisionTime)
+		{
+			m_fCollisionAcc = 0.f;
+			m_bCollision = true;
+		}
+	}
+
+	if (m_bCollision)
+	{
+		m_fCollisionAcc += 1.f * fTimeDelta;
+		if (m_fCollisionAcc >= 0.3f)
+		{
+			m_bCollision = false;
+			m_fCollisionAcc = 0.f;
+		}
+	}
 
 	Update(fTimeDelta);
 }
@@ -66,7 +106,28 @@ void CTheo::LateTick(_float fTimeDelta)
 
 	End_Animation();
 
-	m_pOBB->Update(m_pTransformCom->Get_WorldMatrix());
+	m_pOBB[OBB_BODY]->Update(m_pTransformCom->Get_WorldMatrix());
+
+	_matrix LHand = m_Sockets[SOCKET_LHAND]->Get_CombinedTransformation() * m_pAnimModel->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+	LHand.r[0] = XMVector3Normalize(LHand.r[0]);
+	LHand.r[1] = XMVector3Normalize(LHand.r[1]);
+	LHand.r[2] = XMVector3Normalize(LHand.r[2]);
+	m_pOBB[OBB_LHAND]->Update(LHand);
+
+	_matrix RHand = m_Sockets[SOCKET_RHAND]->Get_CombinedTransformation() * m_pAnimModel->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+	RHand.r[0] = XMVector3Normalize(RHand.r[0]);
+	RHand.r[1] = XMVector3Normalize(RHand.r[1]);
+	RHand.r[2] = XMVector3Normalize(RHand.r[2]);
+	m_pOBB[OBB_RHAND]->Update(RHand);
+
+	if(m_bCollision)
+		CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTER, this, m_pOBB[OBB_BODY]);
+
+	if(m_bLHand)
+		CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB[OBB_LHAND]);
+
+	if (m_bRHand)
+		CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB[OBB_RHAND]);
 
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
@@ -89,51 +150,363 @@ HRESULT CTheo::Render()
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 
-		if (FAILED(m_pAnimModel->Render(m_pShaderCom, j)))
+		if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, 1)))
 			return E_FAIL;
 	}
 
-	m_pOBB->Render();
-
+	for (int i = 0; i < OBB_END; ++i)
+	{
+		if(m_bColliderRender)
+			m_pOBB[i]->Render();
+	}
 	return S_OK;
 }
 
 void CTheo::Collision(CGameObject * pOther, string sTag)
 {
+	if (sTag == "Player_Body")
+	{
+		m_fNowMp += 5.f;	
+	}
+
+	if (sTag == "Player_Sword")
+	{
+		m_bCollision = false;
+		m_fNowHp -= pOther->Get_Damage();
+	}
 }
 
 HRESULT CTheo::Ready_Collider()
 {
 	CCollider::COLLIDERDESC		ColliderDesc;
 
-	ColliderDesc.vSize = _float3(0.7f, 2.f, 0.7f);
-	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
+	ColliderDesc.vSize = _float3(5.f, 5.f, 5.f);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 1.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
-	ColliderDesc.sTag = "Theo";
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Body"), (CComponent**)&m_pOBB, &ColliderDesc)))
+	ColliderDesc.sTag = "Monster_Body";
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Body"), (CComponent**)&m_pOBB[OBB_BODY], &ColliderDesc)))
 		return E_FAIL;
 
-	m_pOBBs.push_back(m_pOBB);
-	Safe_AddRef(m_pOBB);
+
+	ColliderDesc.vSize = _float3(5.f, 5.f, 5.f);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 1.f);
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.sTag = "Monster_Pattern";
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Pattern"), (CComponent**)&m_pOBB[OBB_PATTERN], &ColliderDesc)))
+		return E_FAIL;
+
+
+	_float4x4 LHand = m_Sockets[SOCKET_LHAND]->Get_Transformation();
+
+	ColliderDesc.vSize = _float3(2.f, 1.f, 1.f);
+	ColliderDesc.vCenter = _float3(LHand._41, LHand._42, LHand._43);
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.sTag = "Monster_Attack";
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_LHand"), (CComponent**)&m_pOBB[OBB_LHAND], &ColliderDesc)))
+		return E_FAIL;
+
+
+	_float4x4 RHand = m_Sockets[SOCKET_RHAND]->Get_Transformation();
+
+	ColliderDesc.vSize = _float3(2.f, 1.f, 1.f);
+	ColliderDesc.vCenter = _float3(RHand._41, RHand._42, RHand._43);
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.sTag = "Monster_Attack";
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_RHand"), (CComponent**)&m_pOBB[OBB_RHAND], &ColliderDesc)))
+		return E_FAIL;
 
 
 	return S_OK;
 }
 
+void CTheo::Set_NextMotion()
+{
+	int random = GI->Get_Random(1, 4);
+	if (random == 1)
+	{
+		Set_State(IDLE);
+		return;
+	}
+	if (random == 2)
+	{
+		Set_State(WALK);
+		return;
+	}
+	if (random == 3)
+	{
+		Set_State(RUN);
+		return;
+	}
+}
+
 void CTheo::Set_State(STATE eState)
 {
+	if (m_eNextState == eState)
+		return;
+
+	m_eNextState = eState;
+
+	switch (m_eNextState)
+	{
+	case Client::CTheo::DOWN:
+		break;
+	case Client::CTheo::HITEND:
+		break;
+	case Client::CTheo::HITLOOF:
+		break;
+	case Client::CTheo::HITSTART:
+		break;
+	case Client::CTheo::RUN:
+		break;
+	case Client::CTheo::SKILL1:
+		break;
+	case Client::CTheo::SKILL2:
+		break;
+	case Client::CTheo::SKILL3:
+		break;
+	case Client::CTheo::SKILL4:
+		break;
+	case Client::CTheo::SKILL5:
+		break;
+	case Client::CTheo::SKILL6:
+		break;
+	case Client::CTheo::APPEAR:
+		break;
+	case Client::CTheo::IDLE:
+		break;
+	case Client::CTheo::WALKBACK:
+		break;
+	case Client::CTheo::WALK:
+		break;
+	}
+
+	m_pAnimModel->SetNextIndex(m_eNextState);
+	m_pAnimModel->SetChangeBool(true);
 }
 
 void CTheo::Set_Dir()
 {
+	XMStoreFloat3(&m_vTargetLook, XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 }
 
 void CTheo::End_Animation()
 {
+	if (m_pAnimModel->GetAniEnd())
+	{
+		switch (m_eCurState)
+		{
+		case Client::CTheo::DOWN:
+			break;
+		case Client::CTheo::HITEND:
+			Set_NextMotion();
+			break;
+		case Client::CTheo::HITLOOF:
+			Set_State(WALK);
+			break;
+		case Client::CTheo::HITSTART:
+			Set_State(HITLOOF);
+			break;
+		case Client::CTheo::RUN:
+			break;
+		case Client::CTheo::SKILL1:
+			Set_NextMotion();
+			break;
+		case Client::CTheo::SKILL2:
+			Set_NextMotion();
+			break;
+		case Client::CTheo::SKILL3:
+			Set_NextMotion();
+			break;
+		case Client::CTheo::SKILL4:
+			Set_NextMotion();
+			break;
+		case Client::CTheo::SKILL5:
+			Set_NextMotion();
+			break;
+		case Client::CTheo::SKILL6:
+			Set_NextMotion();
+			break;
+		case Client::CTheo::APPEAR:
+			Set_NextMotion();
+			break;
+		case Client::CTheo::IDLE:
+			Set_State(WALK);
+			break;
+		case Client::CTheo::WALKBACK:
+			Set_NextMotion();
+			break;
+		case Client::CTheo::WALK:
+			Set_State(RUN);
+			break;
+		}
+	}
 }
 
 void CTheo::Update(_float fTimeDelta)
 {
+	switch (m_eCurState)
+	{
+	case Client::CTheo::DOWN:
+		break;
+	case Client::CTheo::HITEND:
+		break;
+	case Client::CTheo::HITLOOF:
+		break;
+	case Client::CTheo::HITSTART:
+		break;
+	case Client::CTheo::RUN:
+		Set_Dir();
+		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
+		break;
+	case Client::CTheo::SKILL1:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			Set_Dir();
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+		{
+			m_bLHand = true;
+			m_bRHand = true;
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+		{
+
+		}
+		break;
+	case Client::CTheo::SKILL2:
+		break;
+	case Client::CTheo::SKILL3:
+		break;
+	case Client::CTheo::SKILL4:
+		break;
+	case Client::CTheo::SKILL5:
+		break;
+	case Client::CTheo::SKILL6:
+		break;
+	case Client::CTheo::APPEAR:
+		Set_Dir();
+		break;
+	case Client::CTheo::IDLE:
+		break;
+	case Client::CTheo::WALKBACK:
+		break;
+	case Client::CTheo::WALK:
+		Set_Dir();
+		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fWalkSpeed, fTimeDelta);
+		break;
+	}
+}
+
+HRESULT CTheo::Ready_Sockets()
+{
+	CHierarchyNode*		Bip001_L_Hand = m_pAnimModel->Get_HierarchyNode("Bip001-L-Hand");
+	if (nullptr == Bip001_L_Hand)
+		return E_FAIL;
+	m_Sockets.push_back(Bip001_L_Hand);
+
+	CHierarchyNode*		Bip001_R_Hand = m_pAnimModel->Get_HierarchyNode("Bip001-R-Hand");
+	if (nullptr == Bip001_R_Hand)
+		return E_FAIL;
+	m_Sockets.push_back(Bip001_R_Hand);
+
+	return S_OK;
+}
+
+HRESULT CTheo::Load_UI(char* DatName)
+{
+	string FileSave = DatName;
+
+	string temp = "../Data/UIData/";
+
+	FileSave = temp + FileSave + ".dat";
+
+	wchar_t FilePath[256] = { 0 };
+
+	for (int i = 0; i < FileSave.size(); i++)
+	{
+		FilePath[i] = FileSave[i];
+	}
+
+	HANDLE		hFile = CreateFile(FilePath,
+		GENERIC_READ,
+		NULL,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		MessageBox(g_hWnd, _T("Load File"), _T("Fail"), MB_OK);
+		return E_FAIL;
+	}
+
+	DWORD		dwByte = 0;
+
+	while (true)
+	{
+		_tchar temp[256];
+		_tchar temp2[256];
+		ReadFile(hFile, temp, sizeof(_tchar) * 256, &dwByte, nullptr);
+		ReadFile(hFile, temp2, sizeof(_tchar) * 256, &dwByte, nullptr);
+		_tchar* UIPath = new _tchar[256];
+		_tchar* UIName = new _tchar[256];
+		for (int i = 0; i < 256; ++i)
+		{
+			UIPath[i] = temp[i];
+			UIName[i] = temp2[i];
+		}
+		int UITexNum;
+		int UIIndex;
+		_float UIPosX;
+		_float UIPosY;
+		_float UISizeX;
+		_float UISizeY;
+		ReadFile(hFile, &UITexNum, sizeof(int), &dwByte, nullptr);
+		ReadFile(hFile, &UIIndex, sizeof(int), &dwByte, nullptr);
+		ReadFile(hFile, &UIPosX, sizeof(_float), &dwByte, nullptr);
+		ReadFile(hFile, &UIPosY, sizeof(_float), &dwByte, nullptr);
+		ReadFile(hFile, &UISizeX, sizeof(_float), &dwByte, nullptr);
+		ReadFile(hFile, &UISizeY, sizeof(_float), &dwByte, nullptr);
+
+		if (0 == dwByte)	// 더이상 읽을 데이터가 없을 경우
+		{
+			Safe_Delete(UIPath);
+			Safe_Delete(UIName);
+			break;
+		}
+
+		CUI::UIINFO* UIInfo;
+		UIInfo = new CUI::UIINFO;
+		UIInfo->eLevel = LEVEL_STATIC;
+		UIInfo->TexPath = UIPath;
+		UIInfo->TexName = UIName;
+		UIInfo->TexNum = UITexNum;
+		UIInfo->UIIndex = UIIndex;
+		UIInfo->UIPosX = UIPosX;
+		UIInfo->UIPosY = UIPosY;
+		UIInfo->UISizeX = UISizeX;
+		UIInfo->UISizeY = UISizeY;
+
+		if (FAILED(GI->Add_GameObjectToLayer(UIName, LEVEL_STATIC, L"Layer_UI", &UIInfo)))
+		{
+			wstring a = L"Please Load ProtoType";
+			wstring b = a + UIName;
+			const _tchar* c = b.c_str();
+			MSG_BOX(c);
+
+			Safe_Delete_Array(UIPath);
+			Safe_Delete_Array(UIName);
+			Safe_Delete(UIInfo);
+			return E_FAIL;
+		}
+
+		Safe_Delete(UIInfo);
+		Safe_Delete(UIPath);
+		Safe_Delete(UIName);
+	}
+
+	CloseHandle(hFile);
+
+	return S_OK;
 }
 
 CTheo * CTheo::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -166,5 +539,9 @@ void CTheo::Free()
 {
 	__super::Free();
 	Safe_Release(m_pAnimModel);
-	Safe_Release(m_pOBB);
+
+	Safe_Release(m_pTarget);
+
+	for(auto& iter : m_pOBB)
+	Safe_Release(iter);
 }

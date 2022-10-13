@@ -175,7 +175,7 @@ HRESULT CAnimModel::Play_Animation(_float fTimeDelta, CAnimModel* pAnimModel)
 	return S_OK;
 }
 
-HRESULT CAnimModel::Render(CShader* pShader, _uint iMeshIndex)
+HRESULT CAnimModel::Render(CShader* pShader, _uint iMeshIndex, _uint iPass)
 {
 	_float4x4		BoneMatrices[256];
 
@@ -184,7 +184,7 @@ HRESULT CAnimModel::Render(CShader* pShader, _uint iMeshIndex)
 	if (FAILED(pShader->Set_RawValue("g_BoneMatrices", BoneMatrices, sizeof(_float4x4) * 256)))
 		return E_FAIL;	
 
-	pShader->Begin(0);
+	pShader->Begin(iPass);
 
 	m_Meshes[iMeshIndex]->Render();
 

@@ -10,40 +10,42 @@ CCollider_Manager::CCollider_Manager()
 
 HRESULT CCollider_Manager::Check_Collision(COLLIDER_GROUP eGroup1, COLLIDER_GROUP eGroup2)
 {
-	for (auto& Object1 : m_OBBObjects[eGroup1])
+	for (auto& Pair1 : m_Pairs[eGroup1])
 	{
-		for (auto& Object2 : m_OBBObjects[eGroup2])
+		for (auto& Pair2 : m_Pairs[eGroup2])
 		{
-
-		}
-	}
-
-	return S_OK;
-}
-
-HRESULT CCollider_Manager::Check_OBB(CGameObject * pObject1, CGameObject * pObject2)
-{
-	for (auto& OBB1 : pObject1->Get_OBBs())
-	{
-		for (auto& OBB2 : pObject2->Get_OBBs())
-		{
-			if (OBB1->Collision(OBB2))
+			if (Pair1.second->Collision(Pair2.second))
 			{
-				pObject1->Collision(pObject2, OBB2->Get_Tag().c_str());
-				pObject2->Collision(pObject1, OBB1->Get_Tag().c_str());
+				Pair1.first->Collision(Pair2.first, Pair2.second->Get_Tag().c_str());
+				Pair2.first->Collision(Pair1.first, Pair1.second->Get_Tag().c_str());
 			}
 		}
 	}
+
 	return S_OK;
 }
 
-HRESULT CCollider_Manager::Add_OBBObject(COLLIDER_GROUP eGroup, CGameObject* pObject)
+
+HRESULT CCollider_Manager::Add_OBBObject(COLLIDER_GROUP eGroup, CGameObject* pObject, COBB* pOBB)
 {
 	if (pObject == nullptr)
 		return E_FAIL;
+	
+	m_Pairs[eGroup].push_back(make_pair(pObject,pOBB));
+	Safe_AddRef(pObject);
+	Safe_AddRef(pOBB);
+	return S_OK;
+}
 
-	m_OBBObjects[eGroup].push_back(pObject);
-
+HRESULT CCollider_Manager::Collider_Render()
+{
+	for (int i = 0; i < COLLIDER_END; ++i)
+	{
+		for (auto& iter : m_Pairs[i])
+		{
+			iter.second->Render();
+		}
+	}
 	return S_OK;
 }
 
@@ -51,11 +53,12 @@ void CCollider_Manager::End_Collision()
 {
 	for (int i = 0; i < COLLIDER_END; ++i)
 	{
-		for (auto& iter : m_OBBObjects[i])
+		for (auto& iter : m_Pairs[i])
 		{
-			Safe_Release(iter);
+			Safe_Release(iter.first);
+			Safe_Release(iter.second);
 		}
-		m_OBBObjects[i].clear();
+		m_Pairs[i].clear();
 	}
 }
 

@@ -143,6 +143,8 @@ PS_OUT HpBarFrame_MAIN(PS_IN In)
 	return Out;
 }
 
+
+
 PS_OUT HpBar_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
@@ -158,6 +160,28 @@ PS_OUT HpBar_MAIN(PS_IN In)
 	{
 		Out.vColor.r = 1.f;
 		Out.vColor.gb = 0.f;
+	}
+
+	clip(Out.vColor.a <= 0.f ? -1.f : 1.f);
+
+	return Out;
+}
+
+PS_OUT BossHpBar_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	if (In.vTexUV.x < g_fNowPlayerHp)
+	{
+		Out.vColor.r = 1.f;
+		Out.vColor.gb = 0.f;
+	}
+	else if (In.vTexUV.x < g_fPrePlayerHp)
+	{
+		Out.vColor.rg = 1.f;
+		Out.vColor.b = 0.f;
 	}
 
 	clip(Out.vColor.a <= 0.f ? -1.f : 1.f);
@@ -189,6 +213,29 @@ PS_OUT MpBar_MAIN(PS_IN In)
 	{
 		Out.vColor.rb = 0.64f;
 		Out.vColor.g = 0.29f;
+	}
+	else if (In.vTexUV.x > g_fPlayerMp)
+	{
+		Out.vColor.r = 0.f;
+		Out.vColor.gb = 0.f;
+	}
+
+	clip(Out.vColor.a <= 0.f ? -1.f : 1.f);
+
+	return Out;
+}
+
+PS_OUT BossMpBar_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	if (In.vTexUV.x < g_fPlayerMp)
+	{
+		Out.vColor.r = 1.f;
+		Out.vColor.g = 0.5f;
+		Out.vColor.b = 0.f;
 	}
 	else if (In.vTexUV.x > g_fPlayerMp)
 	{
@@ -285,6 +332,16 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 HpBar_MAIN();
 	}
 
+	pass BossHPBar
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 BossHpBar_MAIN();
+	}
+
 	pass ExGauge
 	{
 		SetRasterizerState(RS_Default);
@@ -303,6 +360,16 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 MpBar_MAIN();
+	}
+
+	pass BossMPBar
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 BossMpBar_MAIN();
 	}
 
 	pass SkillIcon

@@ -35,6 +35,10 @@ public:
 		XMStoreFloat4x4(&m_Transformation, Transformation);
 	}
 
+	_float4x4 Get_Transformation() {
+		return m_Transformation;
+	}
+
 public:
 	HRESULT Initialize(class CHierarchyNode* pParent, _uint iDepth, CBinary* pBinary);
 	void Set_CombinedTransformation();

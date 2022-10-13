@@ -15,6 +15,12 @@ void CUI_Manager::Add_Player(CPlayer * pPlayer)
 	Safe_AddRef(m_pPlayer);
 }
 
+void CUI_Manager::Add_Boss(CGameObject * pBoss)
+{
+	m_pBoss = pBoss;
+	Safe_AddRef(m_pBoss);
+}
+
 void CUI_Manager::Add_ExGauge(CExGauge * pGauge)
 {
 	m_pExGauge = pGauge;
@@ -31,9 +37,39 @@ _float CUI_Manager::Get_PlayerHp()
 	return m_pPlayer->Get_Hp();
 }
 
+_float CUI_Manager::Get_PlayerMaxHp()
+{
+	return m_pPlayer->Get_MaxHp();
+}
+
 _float CUI_Manager::Get_PlayerMp()
 {
 	return m_pPlayer->Get_Mp();
+}
+
+_float CUI_Manager::Get_BossHp()
+{
+	return m_pBoss->Get_Hp();
+}
+
+_float CUI_Manager::Get_BossMaxHp()
+{
+	return m_pBoss->Get_MaxHp();
+}
+
+_float CUI_Manager::Get_BossMp()
+{
+	return m_pBoss->Get_Mp();
+}
+
+_bool CUI_Manager::Get_Die()
+{
+	return m_pPlayer->Get_Die();
+}
+
+_bool CUI_Manager::Get_Respwan()
+{
+	return m_pPlayer->Get_Respawn();
 }
 
 void CUI_Manager::Set_PlayerHp(_float iHp)
@@ -44,6 +80,16 @@ void CUI_Manager::Set_PlayerHp(_float iHp)
 void CUI_Manager::Set_PlayerMp(_float iMp)
 {
 	m_pPlayer->Set_Mp(iMp);
+}
+
+void CUI_Manager::Set_BossHp(_float iHp)
+{
+	m_pBoss->Set_Hp(iHp);
+}
+
+void CUI_Manager::Set_BossMp(_float iMp)
+{
+	m_pBoss->Set_Mp(iMp);
 }
 
 void CUI_Manager::Add_SkillFrame(CSkillFrame * pSkillFrame)
@@ -157,6 +203,7 @@ void CUI_Manager::Free()
 	Safe_Release(m_pKeyQ);
 	Safe_Release(m_pKeyR);
 	Safe_Release(m_pKeyShift);
+	Safe_Release(m_pBoss);
 	for (auto& iter : m_SkillFrame)
 	{
 		Safe_Release(iter);

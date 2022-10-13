@@ -48,5 +48,9 @@
 #include "MPBarFrame.h"
 #include "MPBar.h"
 #include "BarLine.h"
+#include "BossBarLine.h"
+#include "BossHPBarFrame.h"
+#include "BossMPBar.h"
+#include "BossMPBarFrame.h"
 
 #pragma endregion UIÅ¬·¡½º

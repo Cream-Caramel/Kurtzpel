@@ -1,7 +1,6 @@
 #include "..\Public\GameObject.h"
 #include "GameInstance.h"
 #include "Component.h"
-#include "OBB.h"
 
 
 
@@ -89,10 +88,6 @@ CComponent * CGameObject::Find_Component(const _tchar * pComponentTag)
 
 void CGameObject::Free()
 {
-	for (auto& iter : m_pOBBs)
-		Safe_Release(iter);
-	m_pOBBs.clear();
-
 
 	for (auto& Pair : m_Components)
 		Safe_Release(Pair.second);

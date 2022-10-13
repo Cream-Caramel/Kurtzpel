@@ -59,6 +59,7 @@ HRESULT CLoader::Loading_ForStatic()
 
 	lstrcpy(m_szLoadingText, TEXT("텍스처 로딩중"));
 	LoadTexture("Level_Static");
+	LoadTexture("BossBar");
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STAGE1, TEXT("Prototype_Component_Texture_Terrain"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Grass_%d.dds"), 2))))
@@ -218,6 +219,23 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CBarLine::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("BossHPBarFrame"),
+		CBossHPBarFrame::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("BossMPBarFrame"),
+		CBossMPBarFrame::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("BossMPBar"),
+		CBossMPBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("BossBarLine"),
+		CBossBarLine::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 
 	Safe_Release(pGameInstance);
@@ -327,7 +345,7 @@ HRESULT CLoader::LoadAnimModel(char * DatName)
 			Safe_Delete_Array(ModelName);
 			break;
 		}
-		_matrix PivotMatrix;
+		_matrix PivotMatrix = XMMatrixIdentity();
 		PivotMatrix = XMMatrixRotationY(XMConvertToRadians(270.0f));
 		if (FAILED(GI->Add_Prototype(LEVEL_STATIC, ProtoName,
 			CAnimModel::Create(m_pDevice, m_pContext, ModelName, PivotMatrix))))

@@ -41,7 +41,7 @@ public:
 public:
 	HRESULT SetUp_OnShader(class CShader* pShader, _uint iMaterialIndex, TEXTURETYPE eTextureType, const char* pConstantName);
 	HRESULT Play_Animation(_float fTimeDelta, CAnimModel* pAnimModel);
-	HRESULT Render(class CShader* pShader, _uint iMeshIndex);
+	HRESULT Render(class CShader* pShader, _uint iMeshIndex, _uint iPass = 0);
 
 	_float GetTickPerSecond();
 	void SetTickPerSecond(_float fSecond);

@@ -27,31 +27,66 @@ HRESULT CHPBarFrame::Initialize(void * pArg)
 
 void CHPBarFrame::Tick(_float fTimeDelta)
 {
-
-	if (m_fPrePlayerHp > m_fNowPlayerHp)
-	{
-		m_fPrePlayerHp -= 10.f * fTimeDelta;
-		if (m_fPrePlayerHp <= m_fNowPlayerHp)
-		{
-			m_fPrePlayerHp = m_fNowPlayerHp;
-		}
-	}
-
-	else
+	if (UM->Get_Respwan())
 	{
 		if (m_fNowPlayerHp < 100.f)
 		{
-			m_fNowPlayerHp += 3.f * fTimeDelta;
-			m_fPrePlayerHp += 3.f * fTimeDelta;
+			m_fNowPlayerHp += 70.f * fTimeDelta;
+			m_fPrePlayerHp = m_fNowPlayerHp;
 			if (m_fNowPlayerHp >= 100.f)
 			{
 				m_fNowPlayerHp = 100.f;
-				m_fPrePlayerHp = 100.f;
+				m_fPrePlayerHp = m_fNowPlayerHp;
 			}
 
 			UM->Set_PlayerHp(m_fNowPlayerHp);
 		}
+		return;
 	}
+	if (!UM->Get_Die())
+	{
+		m_fNowPlayerHp = UM->Get_PlayerHp();
+
+		if (m_fPrePlayerHp > m_fNowPlayerHp)
+		{
+			m_fPrePlayerHp -= 10.f * fTimeDelta;
+			if (m_fPrePlayerHp <= m_fNowPlayerHp)
+			{
+				m_fPrePlayerHp = m_fNowPlayerHp;
+			}
+		}
+
+		else
+		{
+			if (m_fNowPlayerHp < 100.f)
+			{
+				m_fNowPlayerHp += 3.f * fTimeDelta;
+				m_fPrePlayerHp = m_fNowPlayerHp;
+				if (m_fNowPlayerHp >= 100.f)
+				{
+					m_fNowPlayerHp = 100.f;
+					m_fPrePlayerHp = m_fNowPlayerHp;
+				}
+
+				UM->Set_PlayerHp(m_fNowPlayerHp);
+			}
+		}
+	}
+	else
+	{
+		if (m_fPrePlayerHp > m_fNowPlayerHp)
+		{
+			m_fPrePlayerHp -= 10.f * fTimeDelta;
+			if (m_fPrePlayerHp <= m_fNowPlayerHp)
+			{
+				m_fPrePlayerHp = m_fNowPlayerHp;
+			}
+		}
+		m_fNowPlayerHp = 0.f;
+		UM->Set_PlayerHp(m_fNowPlayerHp);
+	}
+
+	
 }
 
 void CHPBarFrame::LateTick(_float fTimeDelta)
@@ -59,8 +94,7 @@ void CHPBarFrame::LateTick(_float fTimeDelta)
 	if (nullptr == m_pRendererCom)
 		return;
 
-	if (m_fNowPlayerHp != (_float)UM->Get_PlayerHp())
-		m_fNowPlayerHp = UM->Get_PlayerHp();
+	
 
 
 	m_fShaderNowHp = m_fNowPlayerHp / 100.f;

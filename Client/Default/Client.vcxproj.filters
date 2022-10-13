@@ -91,9 +91,6 @@
     <Filter Include="03.UI\SkillIcon">
       <UniqueIdentifier>{d9e55ad0-0cd8-4114-a928-da7fa3e57455}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.UI\Bar">
-      <UniqueIdentifier>{238ae1fe-7019-4e02-8ff4-b8bbec088892}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03.UI\KeyIcon">
       <UniqueIdentifier>{4473948c-cad0-481e-a961-e5adb7b148e8}</UniqueIdentifier>
     </Filter>
@@ -105,6 +102,12 @@
     </Filter>
     <Filter Include="02.GameObjects\AnimMesh\Monster\Theo">
       <UniqueIdentifier>{85498a72-49fe-42c9-929b-c8daebab9384}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\PlayerBar">
+      <UniqueIdentifier>{238ae1fe-7019-4e02-8ff4-b8bbec088892}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\BossBar">
+      <UniqueIdentifier>{e940db24-b484-4f64-8c02-c5c3b1cb83f2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -232,16 +235,16 @@
       <Filter>03.UI\KeyIcon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HPBarFrame.h">
-      <Filter>03.UI\Bar</Filter>
+      <Filter>03.UI\PlayerBar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MPBar.h">
-      <Filter>03.UI\Bar</Filter>
+      <Filter>03.UI\PlayerBar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MPBarFrame.h">
-      <Filter>03.UI\Bar</Filter>
+      <Filter>03.UI\PlayerBar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BarLine.h">
-      <Filter>03.UI\Bar</Filter>
+      <Filter>03.UI\PlayerBar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LoaderInclude.h">
       <Filter>99.Defines</Filter>
@@ -260,6 +263,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Theo.h">
       <Filter>02.GameObjects\AnimMesh\Monster\Theo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossBarLine.h">
+      <Filter>03.UI\BossBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossHPBarFrame.h">
+      <Filter>03.UI\BossBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossMPBar.h">
+      <Filter>03.UI\BossBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossMPBarFrame.h">
+      <Filter>03.UI\BossBar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -378,16 +393,16 @@
       <Filter>03.UI\KeyIcon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HPBarFrame.cpp">
-      <Filter>03.UI\Bar</Filter>
+      <Filter>03.UI\PlayerBar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MPBar.cpp">
-      <Filter>03.UI\Bar</Filter>
+      <Filter>03.UI\PlayerBar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MPBarFrame.cpp">
-      <Filter>03.UI\Bar</Filter>
+      <Filter>03.UI\PlayerBar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BarLine.cpp">
-      <Filter>03.UI\Bar</Filter>
+      <Filter>03.UI\PlayerBar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_Manager.cpp">
       <Filter>96.Manager\UIManager</Filter>
@@ -397,6 +412,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Theo.cpp">
       <Filter>02.GameObjects\AnimMesh\Monster\Theo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossBarLine.cpp">
+      <Filter>03.UI\BossBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossHPBarFrame.cpp">
+      <Filter>03.UI\BossBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossMPBar.cpp">
+      <Filter>03.UI\BossBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossMPBarFrame.cpp">
+      <Filter>03.UI\BossBar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

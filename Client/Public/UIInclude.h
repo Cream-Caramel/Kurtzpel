@@ -13,3 +13,7 @@
 #include "BarLine.h"
 #include "ExSkillFrame.h"
 #include "ExGauge.h"
+#include "BossBarLine.h"
+#include "BossHPBarFrame.h"
+#include "BossMPBar.h"
+#include "BossMPBarFrame.h"

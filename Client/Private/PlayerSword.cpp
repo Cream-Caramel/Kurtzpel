@@ -2,6 +2,9 @@
 #include "..\Public\PlayerSword.h"
 #include "GameInstance.h"
 #include "OBB.h"
+#include "Collider_Manager.h"
+#include "Pointer_Manager.h"
+#include "Player.h"
 
 CPlayerSword::CPlayerSword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)
@@ -30,6 +33,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerSword", TEXT("PlayerSword"), (CComponent**)&m_pModel)))
 		return E_FAIL;
 
+	m_bColliderRender = true;
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ 0.05f,0.f,0.f,1.f });
 	m_pTransformCom->Set_Scale(_vector{ 0.8f,0.8f,0.8f });
@@ -43,8 +47,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Sword"), (CComponent**)&m_pOBB, &ColliderDesc)))
 		return E_FAIL;
 
-	m_pOBBs.push_back(m_pOBB);
-	Safe_AddRef(m_pOBB);
+	m_pPlayer = PM->Get_PlayerPointer();
 
 	return S_OK;
 }
@@ -52,14 +55,17 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 void CPlayerSword::Tick(_float fTimeDelta)
 {
 	if (GI->Key_Down(DIK_0))
-		m_bCollider = !m_bCollider;
+		m_bColliderRender = !m_bColliderRender;
+
 }
 
 void CPlayerSword::LateTick(_float fTimeDelta)
 {
 	_float4x4		WorldMatrix;
-
-	//XMStoreFloat4x4(&WorldMatrix, XMMatrixTranspose());
+	m_fDamage = m_pPlayer->Get_Damage();
+	if (m_bCollision)
+		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYERSWORD, this, m_pOBB);
+		
 	m_pOBB->Update(m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix());
 }
 
@@ -92,8 +98,6 @@ HRESULT CPlayerSword::Render()
 	{
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
-		/*if (FAILED(m_pModelCom->SetUp_OnShader(m_pShaderCom, m_pModelCom->Get_MaterialIndex(i), aiTextureType_NORMALS, "g_NormalTexture")))
-		return E_FAIL;*/
 
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
@@ -101,7 +105,7 @@ HRESULT CPlayerSword::Render()
 		if (FAILED(m_pModel->Render(i)))
 			return E_FAIL;
 	}
-	if(m_bCollider)
+	if(m_bColliderRender)
 		m_pOBB->Render();
 	return S_OK;
 }
@@ -137,6 +141,4 @@ void CPlayerSword::Free()
 	__super::Free();
 	Safe_Release(m_pModel);
 	Safe_Release(m_pOBB);
-
-
 }
