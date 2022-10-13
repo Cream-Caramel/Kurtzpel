@@ -109,6 +109,7 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CCamera_Player::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Player"),
 		CPlayer::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -135,6 +136,10 @@ HRESULT CLoader::Loading_ObjectProtoType()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerSword"),
 		CPlayerSword::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Theo"),
+		CTheo::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("SkillFrame"),
@@ -322,9 +327,10 @@ HRESULT CLoader::LoadAnimModel(char * DatName)
 			Safe_Delete_Array(ModelName);
 			break;
 		}
-		
+		_matrix PivotMatrix;
+		PivotMatrix = XMMatrixRotationY(XMConvertToRadians(270.0f));
 		if (FAILED(GI->Add_Prototype(LEVEL_STATIC, ProtoName,
-			CAnimModel::Create(m_pDevice, m_pContext, ModelName))))
+			CAnimModel::Create(m_pDevice, m_pContext, ModelName, PivotMatrix))))
 		{
 			Safe_Delete(ProtoName);
 			

@@ -45,12 +45,6 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerBottom", TEXT("Bottom"), (CComponent**)&m_pAnimModel[MODEL_BOTTOM])))
 		return E_FAIL;
 
-	for (int i = 0; i < MODEL_END; ++i)
-	{
-		_matrix PivotMatrix = m_pAnimModel[i]->Get_PivotMatrix();
-		PivotMatrix = XMMatrixRotationY(XMConvertToRadians(270.0f));
-		m_pAnimModel[i]->Set_PivotMatrix(PivotMatrix);
-	}
 	
 	m_eCurState = IDLE;
 	m_eNextState = IDLE;
@@ -62,11 +56,11 @@ HRESULT CPlayer::Initialize(void * pArg)
 	{
 		m_pAnimModel[i]->Set_AnimIndex(m_eCurState);
 	}
-		
-	m_fMaxPlayerHp = 100;
-	m_fMaxPlayerMp = 100.f;
-	m_fNowPlayerHp = m_fMaxPlayerHp;
-	m_fNowPlayerMp = m_fMaxPlayerMp;
+	
+	m_fMaxHp = 100;
+	m_fMaxMp = 100.f;
+	m_fNowHp = m_fMaxHp;
+	m_fNowMp = m_fMaxMp;
 
 	Ready_Sockets();
 	Ready_PlayerParts();
@@ -103,7 +97,7 @@ void CPlayer::Tick(_float fTimeDelta)
 void CPlayer::LateTick(_float fTimeDelta)
 {
 	if (GI->Key_Down(DIK_I))
-		m_fNowPlayerHp -= 10;
+		m_fNowHp -= 10;
 
 	if (GI->Key_Down(DIK_U))
 		UM->Set_ExGaugeTex(1);
@@ -232,7 +226,7 @@ void CPlayer::Set_State(STATE eState)
 		m_eJumpDir = DIR_END;
 		break;
 	case Client::CPlayer::DASH:
-		m_fNowPlayerMp -= 5.f;
+		m_fNowMp -= 5.f;
 		m_fDashSpeed = 20.f;
 		break;
 	case Client::CPlayer::DIE:
@@ -251,24 +245,24 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::SPINCOMBOSTART:
-		m_fNowPlayerMp -= 15.f;
+		m_fNowMp -= 15.f;
 		break;
 	case Client::CPlayer::FASTCOMBOEND:
 		
 		break;
 	case Client::CPlayer::FASTCOMBOSTART:
-		m_fNowPlayerMp -= 10.f;
+		m_fNowMp -= 10.f;
 		m_fFastComboStartSpeed = 5.f;
 		break;
 	case Client::CPlayer::ROCKBREAK:
-		m_fNowPlayerMp -= 5.f;
+		m_fNowMp -= 5.f;
 		m_fRockBreakSpeed = 6.f;
 		break;
 	case Client::CPlayer::CHARGECRASH:
 		m_fChargeCrashSpeed = 6.f;
 		break;
 	case Client::CPlayer::CHARGEREADY:
-		m_fNowPlayerMp -= 10.f;
+		m_fNowMp -= 10.f;
 		break;
 	case Client::CPlayer::AIRCOMBO1:
 		m_fJumpPower = 0.f;
@@ -287,36 +281,36 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::VOIDFRONT:
-		m_fNowPlayerMp -= 10.f;
+		m_fNowMp -= 10.f;
 		break;
 	case Client::CPlayer::VOIDBACKEND:
 		break;
 	case Client::CPlayer::VOIDBACK:
-		m_fNowPlayerMp -= 10.f;
+		m_fNowMp -= 10.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
 		m_fNC1Speed = 5.f;
 		m_fNomalCombo1Acc = 0.f;
-		m_fNowPlayerMp -= 2.f;
+		m_fNowMp -= 2.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
-		m_fNowPlayerMp -= 3.f;
+		m_fNowMp -= 3.f;
 		m_fNC2Speed = 5.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
-		m_fNowPlayerMp -= 5.f;
+		m_fNowMp -= 5.f;
 		m_fNC3Speed = 6.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
-		m_fNowPlayerMp -= 5.f;
+		m_fNowMp -= 5.f;
 		m_fNC4Speed = 6.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
-		m_fNowPlayerMp -= 3.f;
+		m_fNowMp -= 3.f;
 		m_fNC5Speed = 5.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
-		m_fNowPlayerMp -= 5.f;
+		m_fNowMp -= 5.f;
 		m_fNC6Speed = 8.f;
 		break;
 	case Client::CPlayer::GROUNDCRASH:
@@ -347,10 +341,10 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::BLADEATTACK:
-		m_fNowPlayerMp -= 20.f;
+		m_fNowMp -= 20.f;
 		break;
 	case Client::CPlayer::SLASHATTACK:
-		m_fNowPlayerMp -= 30.f;
+		m_fNowMp -= 30.f;
 		break;
 	case Client::CPlayer::ROCKSHOT:
 		
@@ -1318,7 +1312,7 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_F))
 	{
-		if (!UM->Get_CoolTime(2) && m_fNowPlayerMp >= 20.f)
+		if (!UM->Get_CoolTime(2) && m_fNowMp >= 20.f)
 		{ 
 			UM->Set_CoolTime(2);
 			Set_State(BLADEATTACK);
@@ -1328,7 +1322,7 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_R))
 	{
-		if (m_fNowPlayerMp >= 30.f && UM->Get_ExGaugeTex() >= 43)
+		if (m_fNowMp >= 30.f && UM->Get_ExGaugeTex() >= 43)
 		{
 			Set_State(SLASHATTACK);
 			UM->Reset_ExGaugeTex();

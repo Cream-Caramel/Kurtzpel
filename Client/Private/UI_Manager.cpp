@@ -28,22 +28,22 @@ _bool CUI_Manager::Get_UseSkill()
 
 _float CUI_Manager::Get_PlayerHp()
 {
-	return m_pPlayer->Get_PlayerHp();
+	return m_pPlayer->Get_Hp();
 }
 
 _float CUI_Manager::Get_PlayerMp()
 {
-	return m_pPlayer->Get_PlayerMp();
+	return m_pPlayer->Get_Mp();
 }
 
 void CUI_Manager::Set_PlayerHp(_float iHp)
 {
-	m_pPlayer->Set_PlayerHp(iHp);
+	m_pPlayer->Set_Hp(iHp);
 }
 
 void CUI_Manager::Set_PlayerMp(_float iMp)
 {
-	m_pPlayer->Set_PlayerMp(iMp);
+	m_pPlayer->Set_Mp(iMp);
 }
 
 void CUI_Manager::Add_SkillFrame(CSkillFrame * pSkillFrame)

@@ -30,6 +30,13 @@ public:
 	void Set_Tag(string sTag) { m_sTag = sTag; }
 	string Get_Tag() { return m_sTag; }
 
+	_float Get_Hp() { return m_fNowHp; }
+	void Set_Hp(_float fHp) { m_fNowHp = fHp; }
+	_float Get_Mp() { return m_fNowMp; }
+	void Set_Mp(_float fMp) { m_fNowMp = fMp; }
+	_float Get_Damage() { return m_fDamage; }
+	void Set_Damage(_float fDamage) { m_fDamage = fDamage; }
+
 	list<COBB*> Get_OBBs() { return m_pOBBs; }
 
 protected:
@@ -44,6 +51,11 @@ protected:
 	_float				m_fCamDistance = 0.f;
 	bool				m_bDead = false;
 	string m_sTag = "";
+	_float m_fMaxHp;
+	_float m_fNowHp;
+	_float m_fMaxMp;
+	_float m_fNowMp;
+	_float m_fDamage;
 	
 	list<COBB*> m_pOBBs;
 

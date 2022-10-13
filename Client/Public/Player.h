@@ -54,10 +54,10 @@ public:
 #pragma region UtilFunction
 	void Jump(_float fTimeDelta); // 중력에 따라 Y값 조정 처음 점프할 때 방향에 따라 XZ값 조정
 	void JumpMove(_float fTimeDelta); // 점프할 때 방향에 따라 이동값 조정
-	_float Get_PlayerHp() { return m_fNowPlayerHp; }
-	void Set_PlayerHp(_float iHp) { m_fNowPlayerHp = iHp; }
-	_float Get_PlayerMp() { return m_fNowPlayerMp; }
-	void Set_PlayerMp(_float iMp) { m_fNowPlayerMp = iMp; }
+	_float Get_PlayerHp() { return m_fNowHp; }
+	void Set_PlayerHp(_float iHp) { m_fNowHp = iHp; }
+	_float Get_PlayerMp() { return m_fNowMp; }
+	void Set_PlayerMp(_float iMp) { m_fNowMp = iMp; }
 #pragma endregion UtilFunction
 	
 #pragma region KeyInput
@@ -99,10 +99,6 @@ private:
 #pragma endregion KeyInput
 
 #pragma region Variable
-	_float m_fNowPlayerHp; //현재 HP
-	_float m_fMaxPlayerHp; // 최대HP
-	_float m_fNowPlayerMp; // 현재MP
-	_float m_fMaxPlayerMp; // 최대MP
 	_bool m_bUseSkill = true; //스킬을 사용할수있는지 대기 or 달리기 도중에 가능
 	_bool m_bJump = false; //점프중인지
 	_bool m_bKeyInput = false; //방향키가 눌렸는지

@@ -66,6 +66,13 @@ void CCamera_Player::LateTick(_float fTimeDelta)
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(XMLoadFloat3(&m_vDistance), m_pTransformCom->Get_WorldMatrix()));
 
+	if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0.f)
+	{
+		_float4 Pos;
+		XMStoreFloat4(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ Pos.x,0.1f,Pos.z,1.f });
+	}
+		
 	__super::Tick(fTimeDelta);
 
 }

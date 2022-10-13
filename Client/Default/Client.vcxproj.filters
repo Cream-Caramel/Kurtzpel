@@ -100,6 +100,12 @@
     <Filter Include="96.Manager\Collider_Manager">
       <UniqueIdentifier>{3f938abd-13ba-414d-940e-3cb77041e18a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\AnimMesh\Monster">
+      <UniqueIdentifier>{53519431-2da2-491e-a388-a5117151871e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\AnimMesh\Monster\Theo">
+      <UniqueIdentifier>{85498a72-49fe-42c9-929b-c8daebab9384}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -252,6 +258,9 @@
     <ClInclude Include="..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
       <Filter>97.ShaderFiles</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Theo.h">
+      <Filter>02.GameObjects\AnimMesh\Monster\Theo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -385,6 +394,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Collider_Manager.cpp">
       <Filter>96.Manager\Collider_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Theo.cpp">
+      <Filter>02.GameObjects\AnimMesh\Monster\Theo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

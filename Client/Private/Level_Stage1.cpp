@@ -24,6 +24,9 @@ HRESULT CLevel_Stage1::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
+	if (FAILED(Ready_Load_AnimModel("Level_Static")))
+		return E_FAIL;
+
 	if (FAILED(Ready_Load_AnimModel("Level_Stage1")))
 		return E_FAIL;
 
@@ -45,8 +48,6 @@ HRESULT CLevel_Stage1::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
-
-	SetWindowText(g_hWnd, TEXT("게임플레이레벨임"));
 
 	return S_OK;
 }
@@ -185,6 +186,8 @@ HRESULT CLevel_Stage1::Ready_Load_AnimModel(char * DatName)
 			Safe_Delete(MeshInfo);
 			break;
 		}
+		wstring Create = ModelName;
+		
 		if (FAILED(GI->Add_GameObjectToLayer(ModelName, LEVEL_STATIC, L"Layer_AnimModelObject", MeshInfo)))
 		{
 			wstring a = L"Please Load ProtoType";
