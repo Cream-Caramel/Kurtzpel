@@ -416,12 +416,44 @@ void CPlayer::Set_Dir(DIR eDir)
 {
 	m_eJumpDir = eDir;
 
-	if (m_eDir == eDir)
-		return;
-
 	m_eDir = eDir;
 
+	_matrix View = XMLoadFloat4x4(&GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW));
+	_vector vCamLook = View.r[2];
+
+	_vector vCamRight = XMVector3Normalize(XMVector3Cross(_vector{ 0.f,1.f,0.f }, vCamLook));
+	
+	vCamLook = XMVector3Normalize(XMVector3Cross(vCamRight, _vector{ 0.f,1.f,0.f }));
+
 	switch (m_eDir)
+	{
+	case Client::CPlayer::DIR_UP:
+		XMStoreFloat3(&m_vTargetLook, (vCamLook));
+		break;
+	case Client::CPlayer::DIR_DOWN:
+		XMStoreFloat3(&m_vTargetLook, (vCamLook * -1.f));
+		break;
+	case Client::CPlayer::DIR_RIGHT:
+		XMStoreFloat3(&m_vTargetLook, (vCamRight));
+		break;
+	case Client::CPlayer::DIR_LEFT:
+		XMStoreFloat3(&m_vTargetLook, (vCamRight * -1.f));
+		break;
+	case Client::CPlayer::DIR_LU:
+		XMStoreFloat3(&m_vTargetLook, XMVector3Normalize(vCamLook - vCamRight));
+		break;
+	case Client::CPlayer::DIR_RU:
+		XMStoreFloat3(&m_vTargetLook, XMVector3Normalize(vCamLook + vCamRight));
+		break;
+	case Client::CPlayer::DIR_LD:
+		XMStoreFloat3(&m_vTargetLook, XMVector3Normalize(vCamLook * -1.f + vCamRight * -1.f));
+		break;
+	case Client::CPlayer::DIR_RD:
+		XMStoreFloat3(&m_vTargetLook, XMVector3Normalize(vCamLook * -1.f + vCamRight));
+		break;
+	}
+
+	/*switch (m_eDir)
 	{
 	case Client::CPlayer::DIR_UP:
 		m_vTargetLook = { 0.f,0.f,1.f };
@@ -447,9 +479,7 @@ void CPlayer::Set_Dir(DIR eDir)
 	case Client::CPlayer::DIR_RD:
 		m_vTargetLook = { 1.f,0.f,-1.f };
 		break;
-	default:
-		break;
-	}
+	}*/
 }
 
 void CPlayer::End_Animation()
@@ -766,7 +796,51 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 
 bool CPlayer::Input_Direction()
 {
-	if (PM->Get_CameraPlayerPos().z < m_vPlayerPos.z && m_fCamDistanceZ > m_fCamDistanceX)
+
+	if (GI->Key_Pressing(DIK_W))
+	{
+		Set_Dir(DIR_UP);
+		m_bKeyInput = true;
+		if (GI->Key_Pressing(DIK_D))
+		{
+			Set_Dir(DIR_RU);
+			m_bKeyInput = true;
+		}
+		if (GI->Key_Pressing(DIK_A))
+		{
+			Set_Dir(DIR_LU);
+			m_bKeyInput = true;
+		}
+	}
+	else if (GI->Key_Pressing(DIK_S))
+	{
+		Set_Dir(DIR_DOWN);
+		m_bKeyInput = true;
+		if (GI->Key_Pressing(DIK_D))
+		{
+			Set_Dir(DIR_RD);
+			m_bKeyInput = true;
+		}
+		if (GI->Key_Pressing(DIK_A))
+		{
+			Set_Dir(DIR_LD);
+			m_bKeyInput = true;
+		}
+
+	}
+	else if (GI->Key_Pressing(DIK_D))
+	{
+		Set_Dir(DIR_RIGHT);
+		m_bKeyInput = true;
+	}
+	else if (GI->Key_Pressing(DIK_A))
+	{
+		Set_Dir(DIR_LEFT);
+		m_bKeyInput = true;
+	}
+	
+	return m_bKeyInput; 
+	/*if (PM->Get_CameraPlayerPos().z < m_vPlayerPos.z && m_fCamDistanceZ > m_fCamDistanceX)
 	{
 		if (GI->Key_Pressing(DIK_W))
 		{
@@ -944,7 +1018,7 @@ bool CPlayer::Input_Direction()
 			m_bKeyInput = true;
 		}
 	}
-	return m_bKeyInput;
+	return m_bKeyInput;*/
 	
 }
 
