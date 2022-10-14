@@ -78,6 +78,9 @@ void CTheo::Tick(_float fTimeDelta)
 	if (m_fNowMp >= 100.f)
 		m_fNowMp = 100.f;
 
+	if (m_fNowHp >= m_fMaxHp)
+		m_fNowHp = m_fMaxHp;
+
 	if (!m_pAnimModel->GetChangeBool())
 		m_eCurState = m_eNextState;
 
@@ -104,6 +107,7 @@ void CTheo::Tick(_float fTimeDelta)
 		}
 	}
 
+	m_bPattern = false;
 	
 	Update(fTimeDelta);
 }
@@ -285,63 +289,32 @@ void CTheo::Set_NextAttack()
 	int random = GI->Get_Random(1, 6);
 	if (random == 1)
 	{
-		if (m_eCurState != SKILL1)
-		{
-			Set_State(SKILL1);
-			return;
-		}
-		Set_NextAttack();
-		return;
-		
+		Set_State(SKILL1);
+		return;	
 	}
 	if (random == 2)
 	{
-		if (m_eCurState != SKILL2)
-		{
-			Set_State(SKILL2);
-			return;
-		}
-		Set_NextAttack();
+		Set_State(SKILL2);
 		return;
 	}
 	if (random == 3)
 	{
-		if (m_eCurState != SKILL3)
-		{
-			Set_State(SKILL3);
-			return;
-		}
-		Set_NextAttack();
+		Set_State(SKILL3);
 		return;
 	}
 	if (random == 4)
 	{
-		if (m_eCurState != SKILL4)
-		{
-			Set_State(SKILL4);
-			return;
-		}
-		Set_NextAttack();
+		Set_State(SKILL4);
 		return;
 	}
 	if (random == 5)
 	{
-		if (m_eCurState != SKILL5)
-		{
-			Set_State(SKILL5);
-			return;
-		}
-		Set_NextAttack();
+		Set_State(SKILL5);
 		return;
 	}
 	if (random == 6)
 	{
-		if (m_eCurState != SKILL6)
-		{
-			Set_State(SKILL6);
-			return;
-		}
-		Set_NextAttack();
+		Set_State(SKILL6);
 		return;
 	}
 }
@@ -578,7 +551,7 @@ void CTheo::Update(_float fTimeDelta)
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
-			//m_pTransformCom->Go_Dir(m_vTargetLook, 5.f, fTimeDelta);
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed * 4.f, fTimeDelta);
 			m_bLHand = true;
 			m_bRHand = true;
 		}

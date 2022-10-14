@@ -288,6 +288,7 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::SPINCOMBOSTART:
 		m_fNowMp -= 15.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		break;
 	case Client::CPlayer::FASTCOMBOEND:
 		
@@ -295,27 +296,37 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::FASTCOMBOSTART:
 		m_fNowMp -= 10.f;
 		m_fFastComboStartSpeed = 5.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		break;
 	case Client::CPlayer::ROCKBREAK:
 		m_fNowMp -= 5.f;
 		m_fRockBreakSpeed = 6.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(1.f);
 		break;
 	case Client::CPlayer::CHARGECRASH:
 		m_fChargeCrashSpeed = 6.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(40.f);
 		
 		break;
 	case Client::CPlayer::CHARGEREADY:
 		m_fNowMp -= 10.f;
 		break;
 	case Client::CPlayer::AIRCOMBO1:
+		m_fNowMp -= 3.f;
 		m_fJumpPower = 0.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
 		break;
 	case Client::CPlayer::AIRCOMBO2:
+		m_fNowMp -= 3.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
 		break;
 	case Client::CPlayer::AIRCOMBO3:
+		m_fNowMp -= 3.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
 		break;
 	case Client::CPlayer::AIRCOMBO4:
-		
+		m_fNowMp -= 3.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(14.f);
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
 		m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -335,26 +346,32 @@ void CPlayer::Set_State(STATE eState)
 		m_fNC1Speed = 5.f;
 		m_fNomalCombo1Acc = 0.f;
 		m_fNowMp -= 2.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
 		m_fNowMp -= 3.f;
 		m_fNC2Speed = 5.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
 		m_fNowMp -= 5.f;
 		m_fNC3Speed = 6.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(14.f);
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
 		m_fNowMp -= 5.f;
 		m_fNC4Speed = 6.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(14.f);
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
 		m_fNowMp -= 3.f;
 		m_fNC5Speed = 5.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
 		m_fNowMp -= 5.f;
 		m_fNC6Speed = 8.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(20.f);
 		break;
 	case Client::CPlayer::GROUNDCRASH:
 		
@@ -385,9 +402,11 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::BLADEATTACK:
 		m_fNowMp -= 20.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(15.f);
 		break;
 	case Client::CPlayer::SLASHATTACK:
 		m_fNowMp -= 30.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(20.f);
 		break;
 	case Client::CPlayer::ROCKSHOT:
 		
@@ -1155,7 +1174,7 @@ void CPlayer::Update(_float fTimeDelta)
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
-		m_Parts[PARTS_SWORD]->Set_Damage(1.f);
+		
 		break;
 	case Client::CPlayer::CHARGECRASH:
 		m_bMotionChange = false;
@@ -1245,6 +1264,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
 		m_bMotionChange = false;
+		m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::VOIDFRONTEND:
 		break;
@@ -1713,9 +1733,16 @@ void CPlayer::RunEnd_KeyInput(_float fTimeDelta)
 			Set_State(RUN);
 			return;
 		}
+
 		if (GI->Key_Pressing(DIK_LSHIFT))
 		{
 			Set_State(DASH);
+			return;
+		}
+
+		if (GI->Mouse_Down(DIMK_LBUTTON))
+		{
+			Set_State(NOMALCOMBO1);
 			return;
 		}
 
@@ -1726,6 +1753,7 @@ void CPlayer::RunEnd_KeyInput(_float fTimeDelta)
 				UM->Set_CoolTime(4);
 				Set_State(VOIDFRONT);
 			}
+			return;
 		}
 
 		if (GI->Key_Pressing(DIK_V))
@@ -1735,6 +1763,59 @@ void CPlayer::RunEnd_KeyInput(_float fTimeDelta)
 				UM->Set_CoolTime(4);
 				Set_State(VOIDBACK);
 			}
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_SPACE))
+		{
+			Set_State(JUMPSTART);
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_F))
+		{
+			if (!UM->Get_CoolTime(2) && m_fNowMp >= 20.f)
+			{
+				UM->Set_CoolTime(2);
+				Set_State(BLADEATTACK);
+			}
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_R))
+		{
+			if (m_fNowMp >= 30.f && UM->Get_ExGaugeTex() >= 43)
+			{
+				Set_State(SLASHATTACK);
+				UM->Reset_ExGaugeTex();
+			}
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_Q))
+		{
+			if (!UM->Get_CoolTime(0))
+			{
+				UM->Set_CoolTime(0);
+				Set_State(FASTCOMBOSTART);
+			}
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_E))
+		{
+			if (!UM->Get_CoolTime(1))
+			{
+				UM->Set_CoolTime(1);
+				Set_State(ROCKBREAK);
+			}
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_2))
+		{
+			Set_State(CHARGEREADY);
+			return;
 		}
 	}
 
