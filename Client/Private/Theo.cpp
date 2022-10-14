@@ -55,7 +55,7 @@ HRESULT CTheo::Initialize(void * pArg)
 	m_fNowMp = 10.f;
 	m_fDamage = 10.f;
 
-	m_fColiisionTime = 1.f;
+	m_fColiisionTime = 0.5f;
 
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
@@ -69,6 +69,15 @@ HRESULT CTheo::Initialize(void * pArg)
 
 void CTheo::Tick(_float fTimeDelta)
 {
+	if (m_fNowHp <= 0)
+		m_fNowHp = 0;
+
+	if (m_fNowMp <= 0)
+		m_fNowMp = 0;
+
+	if (m_fNowMp >= 100.f)
+		m_fNowMp = 100.f;
+
 	if (!m_pAnimModel->GetChangeBool())
 		m_eCurState = m_eNextState;
 
@@ -85,21 +94,32 @@ void CTheo::Tick(_float fTimeDelta)
 		}
 	}
 
-	if (m_bCollision)
+	if (m_bHit)
 	{
-		m_fCollisionAcc += 1.f * fTimeDelta;
-		if (m_fCollisionAcc >= 0.3f)
+		m_fHitAcc += 1.f * fTimeDelta;
+		if (m_fHitAcc >= 0.2f)
 		{
-			m_bCollision = false;
-			m_fCollisionAcc = 0.f;
+			m_fHitAcc = 0.f;
+			m_bHit = false;
 		}
 	}
 
+	
 	Update(fTimeDelta);
 }
 
 void CTheo::LateTick(_float fTimeDelta)
 {
+	if (m_fNowHp <= 0 && !m_bDie)
+	{
+		Set_State(HITLOOF);
+		m_bDie = true;
+		m_bPattern = false;
+		m_bCollision = false;
+		m_bRHand = false;
+		m_bLHand = false;
+	}
+
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
 
 	m_pAnimModel->Play_Animation(fTimeDelta, m_pAnimModel);
@@ -120,15 +140,17 @@ void CTheo::LateTick(_float fTimeDelta)
 	RHand.r[2] = XMVector3Normalize(RHand.r[2]);
 	m_pOBB[OBB_RHAND]->Update(RHand);
 
-	if(m_bCollision)
-		CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTER, this, m_pOBB[OBB_BODY]);
+	if (!m_bDie)
+	{
+		if (m_bCollision)
+			CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTER, this, m_pOBB[OBB_BODY]);
 
-	if(m_bLHand)
-		CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB[OBB_LHAND]);
+		if (m_bLHand)
+			CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB[OBB_LHAND]);
 
-	if (m_bRHand)
-		CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB[OBB_RHAND]);
-
+		if (m_bRHand)
+			CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB[OBB_RHAND]);
+	}
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
@@ -149,9 +171,22 @@ HRESULT CTheo::Render()
 	{
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
+		if (m_bPattern)
+		{
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
+				return E_FAIL;
+		}
 
-		if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, 1)))
-			return E_FAIL;
+		else if (m_bHit)
+		{
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
+				return E_FAIL;
+		}
+		else
+		{
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
+				return E_FAIL;
+		}
 	}
 
 	for (int i = 0; i < OBB_END; ++i)
@@ -166,13 +201,26 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 {
 	if (sTag == "Player_Body")
 	{
-		m_fNowMp += 5.f;	
+		m_fNowMp += 10.f;	
 	}
 
 	if (sTag == "Player_Sword")
 	{
+		
+		if (m_bPattern && pOther->Get_Damage() == 1.f)
+		{
+			m_bPattern = false;
+			m_bLHand = false;
+			m_bRHand = false;
+			Set_State(HITSTART);
+			m_fNowMp -= 10.f;
+		}
 		m_bCollision = false;
-		m_fNowHp -= pOther->Get_Damage();
+		m_bHit = true;
+		if (m_eCurState == HITSTART || m_eCurState == HITLOOF)
+			m_fNowHp -= pOther->Get_Damage() * 2;
+		else
+			m_fNowHp -= pOther->Get_Damage();
 	}
 }
 
@@ -180,25 +228,17 @@ HRESULT CTheo::Ready_Collider()
 {
 	CCollider::COLLIDERDESC		ColliderDesc;
 
-	ColliderDesc.vSize = _float3(5.f, 5.f, 5.f);
+	ColliderDesc.vSize = _float3(6.f, 6.f, 6.f);
 	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 1.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.sTag = "Monster_Body";
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Body"), (CComponent**)&m_pOBB[OBB_BODY], &ColliderDesc)))
 		return E_FAIL;
 
-
-	ColliderDesc.vSize = _float3(5.f, 5.f, 5.f);
-	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 1.f);
-	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
-	ColliderDesc.sTag = "Monster_Pattern";
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Pattern"), (CComponent**)&m_pOBB[OBB_PATTERN], &ColliderDesc)))
-		return E_FAIL;
-
-
 	_float4x4 LHand = m_Sockets[SOCKET_LHAND]->Get_Transformation();
 
-	ColliderDesc.vSize = _float3(2.f, 1.f, 1.f);
+	//ColliderDesc.vSize = _float3(2.f, 1.f, 1.f);
+	ColliderDesc.vSize = _float3(6.f, 6.f, 6.f);
 	ColliderDesc.vCenter = _float3(LHand._41, LHand._42, LHand._43);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.sTag = "Monster_Attack";
@@ -208,7 +248,8 @@ HRESULT CTheo::Ready_Collider()
 
 	_float4x4 RHand = m_Sockets[SOCKET_RHAND]->Get_Transformation();
 
-	ColliderDesc.vSize = _float3(2.f, 1.f, 1.f);
+	//ColliderDesc.vSize = _float3(2.f, 1.f, 1.f);
+	ColliderDesc.vSize = _float3(4.f, 4.f, 4.f);
 	ColliderDesc.vCenter = _float3(RHand._41, RHand._42, RHand._43);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.sTag = "Monster_Attack";
@@ -239,6 +280,72 @@ void CTheo::Set_NextMotion()
 	}
 }
 
+void CTheo::Set_NextAttack()
+{
+	int random = GI->Get_Random(1, 6);
+	if (random == 1)
+	{
+		if (m_eCurState != SKILL1)
+		{
+			Set_State(SKILL1);
+			return;
+		}
+		Set_NextAttack();
+		return;
+		
+	}
+	if (random == 2)
+	{
+		if (m_eCurState != SKILL2)
+		{
+			Set_State(SKILL2);
+			return;
+		}
+		Set_NextAttack();
+		return;
+	}
+	if (random == 3)
+	{
+		if (m_eCurState != SKILL3)
+		{
+			Set_State(SKILL3);
+			return;
+		}
+		Set_NextAttack();
+		return;
+	}
+	if (random == 4)
+	{
+		if (m_eCurState != SKILL4)
+		{
+			Set_State(SKILL4);
+			return;
+		}
+		Set_NextAttack();
+		return;
+	}
+	if (random == 5)
+	{
+		if (m_eCurState != SKILL5)
+		{
+			Set_State(SKILL5);
+			return;
+		}
+		Set_NextAttack();
+		return;
+	}
+	if (random == 6)
+	{
+		if (m_eCurState != SKILL6)
+		{
+			Set_State(SKILL6);
+			return;
+		}
+		Set_NextAttack();
+		return;
+	}
+}
+
 void CTheo::Set_State(STATE eState)
 {
 	if (m_eNextState == eState)
@@ -251,6 +358,7 @@ void CTheo::Set_State(STATE eState)
 	case Client::CTheo::DOWN:
 		break;
 	case Client::CTheo::HITEND:
+		
 		break;
 	case Client::CTheo::HITLOOF:
 		break;
@@ -259,14 +367,35 @@ void CTheo::Set_State(STATE eState)
 	case Client::CTheo::RUN:
 		break;
 	case Client::CTheo::SKILL1:
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 20.f;
+		else
+			m_fDamage = 10.f;
+		
 		break;
 	case Client::CTheo::SKILL2:
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 30.f;
+		else
+			m_fDamage = 15.f;
 		break;
 	case Client::CTheo::SKILL3:
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 10.f;
+		else
+			m_fDamage = 5.f;
 		break;
 	case Client::CTheo::SKILL4:
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 40.f;
+		else
+			m_fDamage = 20.f;
 		break;
 	case Client::CTheo::SKILL5:
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 20.f;
+		else
+			m_fDamage = 10.f;
 		break;
 	case Client::CTheo::SKILL6:
 		break;
@@ -276,7 +405,7 @@ void CTheo::Set_State(STATE eState)
 		break;
 	case Client::CTheo::WALKBACK:
 		break;
-	case Client::CTheo::WALK:
+	case Client::CTheo::WALK:		
 		break;
 	}
 
@@ -296,12 +425,16 @@ void CTheo::End_Animation()
 		switch (m_eCurState)
 		{
 		case Client::CTheo::DOWN:
+			Set_Dead();
 			break;
 		case Client::CTheo::HITEND:
-			Set_NextMotion();
+			Set_State(IDLE);
 			break;
 		case Client::CTheo::HITLOOF:
-			Set_State(WALK);
+			if (m_bDie)
+				Set_State(DOWN);
+			else
+			Set_State(HITEND);
 			break;
 		case Client::CTheo::HITSTART:
 			Set_State(HITLOOF);
@@ -344,6 +477,7 @@ void CTheo::End_Animation()
 
 void CTheo::Update(_float fTimeDelta)
 {
+	
 	switch (m_eCurState)
 	{
 	case Client::CTheo::DOWN:
@@ -351,35 +485,124 @@ void CTheo::Update(_float fTimeDelta)
 	case Client::CTheo::HITEND:
 		break;
 	case Client::CTheo::HITLOOF:
+		m_bPattern = false;
 		break;
 	case Client::CTheo::HITSTART:
+		m_bPattern = false;
 		break;
 	case Client::CTheo::RUN:
+	{
+		if (m_fNowMp >= 100.f)
+			m_fRunSpeed = 6.f;
+		else
+			m_fRunSpeed = 3.f;
 		Set_Dir();
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
+		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
+		if (Distance < 5.f)
+			Set_NextAttack();
 		break;
+	}
 	case Client::CTheo::SKILL1:
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
 			m_bLHand = true;
 			m_bRHand = true;
 		}
+		else
+		{
+			m_bLHand = false;
+			m_bRHand = false;
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 		{
-
+			m_bPattern = true;
 		}
+		else
+			m_bPattern = false;
 		break;
 	case Client::CTheo::SKILL2:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			Set_Dir();
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+			m_bRHand = true;
+		else
+			m_bRHand = false;
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+			m_bPattern = true;
+		else
+			m_bPattern = false;
 		break;
 	case Client::CTheo::SKILL3:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0))
+			Set_Dir();
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			m_bRHand = true;
+		else
+			m_bRHand = false;
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+		{
+			m_bRHand = true;
+			m_bLHand = true;
+		}
+		else
+		{
+			m_bRHand = false;
+			m_bLHand = false;
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+			m_bPattern = true;
+		else
+			m_bPattern = false;
 		break;
 	case Client::CTheo::SKILL4:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0))
+			Set_Dir();
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+			m_bRHand = true;
+		else
+			m_bRHand = false;
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+			m_bPattern = true;
+		else
+			m_bPattern = false;
 		break;
 	case Client::CTheo::SKILL5:
+		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			m_bPattern = true;
+		else
+			m_bPattern = false;
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			Set_Dir();
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+		{
+			//m_pTransformCom->Go_Dir(m_vTargetLook, 5.f, fTimeDelta);
+			m_bLHand = true;
+			m_bRHand = true;
+		}
+		else
+		{
+			m_bLHand = false;
+			m_bRHand = false;
+		}
 		break;
 	case Client::CTheo::SKILL6:
+		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			m_bPattern = true;
+		else
+			m_bPattern = false;
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0))
+		{
+			if (m_fNowMp >= 100.f)
+				m_fNowHp += 1.f;
+			else
+			{
+				m_fNowHp += 0.5f;
+				m_fNowMp += 0.1f;
+			}
+		}
 		break;
 	case Client::CTheo::APPEAR:
 		Set_Dir();
@@ -389,9 +612,19 @@ void CTheo::Update(_float fTimeDelta)
 	case Client::CTheo::WALKBACK:
 		break;
 	case Client::CTheo::WALK:
+	{
+		if (m_fNowMp >= 100.f)
+			m_fWalkSpeed = 1.5f;
+		else
+			m_fWalkSpeed = 3.f;
 		Set_Dir();
-		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fWalkSpeed, fTimeDelta);
+		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
+		if (Distance < 5.f)
+			Set_State(RUN);
+		else
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
 		break;
+	}
 	}
 }
 

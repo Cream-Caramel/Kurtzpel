@@ -48,12 +48,14 @@ public:
 	void Set_AnimName(const char* Name, int AniIndex);
 	void SaveBinary();
 	void ChangeAni(int iAniIndex);
-
+	_bool Get_Die() { return m_bDie; }
 
 protected:
 	wstring sTag;
 	MESHINFO*				m_MeshInfo;
-
+	_bool m_bHit = false;
+	_float m_fHitAcc = 0.f;
+	_bool m_bDie = false;
 protected:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;

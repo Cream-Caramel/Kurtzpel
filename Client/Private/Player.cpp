@@ -109,9 +109,6 @@ void CPlayer::Tick(_float fTimeDelta)
 
 void CPlayer::LateTick(_float fTimeDelta)
 {
-	if (GI->Key_Down(DIK_I))
-		m_fNowHp -= 10;
-
 	if (GI->Key_Down(DIK_U))
 		UM->Set_ExGaugeTex(1);
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
@@ -131,8 +128,6 @@ void CPlayer::LateTick(_float fTimeDelta)
 
 	for (int i = 0; i < OBB_END; ++i)
 		m_pOBB[i]->Update(m_pTransformCom->Get_WorldMatrix());
-
-	m_Parts[PARTS_SWORD]->Set_Collision(true);
 
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	
@@ -232,9 +227,6 @@ HRESULT CPlayer::Ready_Collider()
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Head"), (CComponent**)&m_pOBB[OBB_BODY], &ColliderDesc)))
 		return E_FAIL;
 
-	m_pOBBs.push_back(m_pOBB[OBB_BODY]);
-	Safe_AddRef(m_pOBB[OBB_BODY]);
-	
 
 	return S_OK;
 }
@@ -273,6 +265,7 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::IDLE:
 		m_eJumpDir = DIR_END;
+		m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::DASH:
 		m_fNowMp -= 5.f;
@@ -309,6 +302,7 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::CHARGECRASH:
 		m_fChargeCrashSpeed = 6.f;
+		
 		break;
 	case Client::CPlayer::CHARGEREADY:
 		m_fNowMp -= 10.f;
@@ -324,7 +318,7 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
-		
+		m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::VOIDFRONTEND:
 		
@@ -503,6 +497,7 @@ void CPlayer::End_Animation()
 			break;
 		case Client::CPlayer::SPINCOMBOEND:
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::SPINCOMBOLOOF:
 			if (m_bSpinComboEnd)
@@ -513,6 +508,7 @@ void CPlayer::End_Animation()
 			m_bSpinComboEnd = false;
 			m_fSpinComboEndSpeed = 6.f;
 			}
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::SPINCOMBOSTART:
 			for (int i = 0; i < MODEL_END; ++i)
@@ -520,35 +516,45 @@ void CPlayer::End_Animation()
 			m_eNextState = SPINCOMBOLOOF;
 			m_fSpinComboSpeed = 2.f;
 			m_fSpinComboStartSpeed = 5.f;
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::FASTCOMBOEND:
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::FASTCOMBOSTART:
 			for (int i = 0; i < MODEL_END; ++i)
 				m_pAnimModel[i]->Set_AnimIndex(FASTCOMBOEND);
 			m_eNextState = FASTCOMBOEND;
 			m_fFastComboEndSpeed = 8.f;
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::ROCKBREAK:
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::CHARGECRASH:
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			Set_State(IDLE);
 			break;
 		case Client::CPlayer::CHARGEREADY:
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::AIRCOMBO1:
 			Set_State(JUMP);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::AIRCOMBO2:
 			Set_State(JUMP);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::AIRCOMBO3:
 			Set_State(JUMP);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::AIRCOMBO4:
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::AIRCOMBOEND:
 			Set_State(IDLE);
@@ -573,21 +579,27 @@ void CPlayer::End_Animation()
 			break;
 		case Client::CPlayer::NOMALCOMBO1:
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::NOMALCOMBO2:
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::NOMALCOMBO3:
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::NOMALCOMBO4:		
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::NOMALCOMBO5:
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::NOMALCOMBO6:
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::GROUNDCRASH:
 			break;
@@ -609,10 +621,11 @@ void CPlayer::End_Animation()
 			break;
 		case Client::CPlayer::BLADEATTACK:
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
-		case Client::CPlayer::SLASHATTACK:
-			
+		case Client::CPlayer::SLASHATTACK:			
 			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::ROCKSHOT:
 			break;
@@ -623,10 +636,6 @@ void CPlayer::End_Animation()
 		case Client::CPlayer::EX1READY:
 			break;
 		case Client::CPlayer::EX2READY:
-			break;
-		case Client::CPlayer::STATE_END:
-			break;
-		default:
 			break;
 		}
 	}
@@ -1019,9 +1028,14 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fSpinComboEndSpeed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fSpinComboEndSpeed, fTimeDelta);
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::SPINCOMBOLOOF:
 		m_bMotionChange = false;
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		break;
 	case Client::CPlayer::SPINCOMBOSTART:
 		m_bMotionChange = false;
@@ -1030,6 +1044,10 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fSpinComboStartSpeed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fSpinComboStartSpeed, fTimeDelta);
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::FASTCOMBOEND:
 		m_bMotionChange = false;
@@ -1038,6 +1056,10 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fFastComboEndSpeed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fFastComboEndSpeed, fTimeDelta);
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::FASTCOMBOSTART:
 		m_bMotionChange = false;
@@ -1046,8 +1068,7 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fFastComboStartSpeed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fFastComboStartSpeed, fTimeDelta);
 		}
-		/*if (!UM->Get_CoolTime(0))
-		UM->Set_CoolTime(0);*/
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		break;
 	case Client::CPlayer::ROCKBREAK:
 		m_bMotionChange = false;
@@ -1056,8 +1077,11 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fRockBreakSpeed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRockBreakSpeed, fTimeDelta);
 		}
-		/*if (!UM->Get_CoolTime(1))
-		UM->Set_CoolTime(1);*/
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
+		m_Parts[PARTS_SWORD]->Set_Damage(1.f);
 		break;
 	case Client::CPlayer::CHARGECRASH:
 		m_bMotionChange = false;
@@ -1066,6 +1090,10 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fChargeCrashSpeed -= 0.1f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fChargeCrashSpeed, fTimeDelta);
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::CHARGEREADY:
 		m_bMotionChange = false;
@@ -1082,6 +1110,10 @@ void CPlayer::Update(_float fTimeDelta)
 			Set_State(JUMPEND);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::AIRCOMBO2:
 		m_bMotionChange = false;
@@ -1095,6 +1127,10 @@ void CPlayer::Update(_float fTimeDelta)
 			Set_State(JUMPEND);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::AIRCOMBO3:
 		m_bMotionChange = false;
@@ -1108,6 +1144,10 @@ void CPlayer::Update(_float fTimeDelta)
 			Set_State(JUMPEND);
 			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::AIRCOMBO4:
 		m_bMotionChange = false;
@@ -1123,6 +1163,10 @@ void CPlayer::Update(_float fTimeDelta)
 				Set_State(AIRCOMBOEND);
 				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
 			}
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		}
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
@@ -1151,6 +1195,10 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fNC1Speed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC1Speed, fTimeDelta);
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
 		m_bMotionChange = false;
@@ -1159,6 +1207,10 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fNC2Speed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC2Speed, fTimeDelta);
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
 		m_bMotionChange = false;
@@ -1167,6 +1219,12 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fNC3Speed -= 0.1f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC3Speed, fTimeDelta);
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
 		m_bMotionChange = false;
@@ -1175,6 +1233,12 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fNC4Speed -= 0.1f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC4Speed, fTimeDelta);
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
 		m_bMotionChange = false;
@@ -1183,6 +1247,10 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fNC5Speed -= 0.1f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC5Speed, fTimeDelta);
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
 		m_bMotionChange = false;
@@ -1199,6 +1267,10 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fNC6Speed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC6Speed, fTimeDelta);
 		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::GROUNDCRASH:
 		break;
@@ -1220,9 +1292,19 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::BLADEATTACK:
 		m_bCollision = false;
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::SLASHATTACK:
 		m_bCollision = false;
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::ROCKSHOT:
 		break;

@@ -18,6 +18,9 @@ public:
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	_bool m_bDie = false;
+	_float m_fDieAcc = 0.f;
+
 public:
 	static CBossBarLine* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);

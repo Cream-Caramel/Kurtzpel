@@ -21,7 +21,8 @@ public:
 private:
 	_float m_fBossMp;
 	_float m_fShaderMp;
-
+	_bool m_bDie = false;
+	_float m_fDieAcc = 0.f;
 public:
 	static CBossMPBar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);

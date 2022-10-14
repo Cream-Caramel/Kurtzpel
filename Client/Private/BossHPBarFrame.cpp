@@ -27,6 +27,20 @@ HRESULT CBossHPBarFrame::Initialize(void * pArg)
 
 void CBossHPBarFrame::Tick(_float fTimeDelta)
 {		
+	if (!m_bDie)
+	{
+		if (UM->Get_BossDie())
+			m_bDie = true;
+	}
+	else
+	{
+		m_fDieAcc += 1.f * fTimeDelta;
+		if (m_fDieAcc >= 4.2f)
+		{
+			Set_Dead();
+		}
+	}
+
  	m_fNowBossHp = UM->Get_BossHp();
 
 	if (m_fPreBossHp > m_fNowBossHp)

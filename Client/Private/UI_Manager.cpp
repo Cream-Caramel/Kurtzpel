@@ -15,7 +15,7 @@ void CUI_Manager::Add_Player(CPlayer * pPlayer)
 	Safe_AddRef(m_pPlayer);
 }
 
-void CUI_Manager::Add_Boss(CGameObject * pBoss)
+void CUI_Manager::Add_Boss(CAnimMesh * pBoss)
 {
 	m_pBoss = pBoss;
 	Safe_AddRef(m_pBoss);
@@ -70,6 +70,11 @@ _bool CUI_Manager::Get_Die()
 _bool CUI_Manager::Get_Respwan()
 {
 	return m_pPlayer->Get_Respawn();
+}
+
+_bool CUI_Manager::Get_BossDie()
+{
+	return m_pBoss->Get_Die();
 }
 
 void CUI_Manager::Set_PlayerHp(_float iHp)

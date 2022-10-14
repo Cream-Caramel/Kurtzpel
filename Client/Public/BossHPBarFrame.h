@@ -19,7 +19,8 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	
+	_bool m_bDie = false;
+	_float m_fDieAcc = 0.f;
 	_float m_fNowBossHp;
 	_float m_fPreBossHp;
 	_float m_fShaderNowHp;

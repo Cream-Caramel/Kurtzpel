@@ -26,7 +26,19 @@ HRESULT CBossMPBarFrame::Initialize(void * pArg)
 
 void CBossMPBarFrame::Tick(_float fTimeDelta)
 {
-
+	if (!m_bDie)
+	{
+		if (UM->Get_BossDie())
+			m_bDie = true;
+	}
+	else
+	{
+		m_fDieAcc += 1.f * fTimeDelta;
+		if (m_fDieAcc >= 4.2f)
+		{
+			Set_Dead();
+		}
+	}
 }
 
 void CBossMPBarFrame::LateTick(_float fTimeDelta)

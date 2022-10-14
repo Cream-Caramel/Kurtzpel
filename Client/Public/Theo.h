@@ -15,7 +15,7 @@ class CTheo final : public CAnimMesh
 		DOWN, HITEND, HITLOOF, HITSTART, RUN, SKILL1, SKILL2, SKILL3, SKILL4
 		, SKILL5, SKILL6, APPEAR, IDLE, WALKBACK, WALK, STATE_END};
 
-	enum OBB {OBB_BODY, OBB_LHAND, OBB_RHAND, OBB_PATTERN, OBB_END};
+	enum OBB {OBB_BODY, OBB_LHAND, OBB_RHAND,  OBB_END};
 	enum SOCKET {SOCKET_LHAND, SOCKET_RHAND, SOCKET_END};
 private:
 	CTheo(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
@@ -31,6 +31,7 @@ public:
 	virtual void Collision(CGameObject* pOther, string sTag)override;
 	HRESULT Ready_Collider();
 	void Set_NextMotion();
+	void Set_NextAttack();
 
 private:
 	void Set_State(STATE eState); // 상태를 설정 보간을 하는 애니메이션은 여기서 애니메이션 셋팅
@@ -39,16 +40,18 @@ private:
 	void Update(_float fTimeDelta); // 현재 상태에 따라 작업수행
 	HRESULT Ready_Sockets();
 	HRESULT Load_UI(char* DatName);
+	
 private:
 	STATE m_eCurState; // 현재 상태
 	STATE m_eNextState; // 바꿔야할 상태
 	_float3 m_vTargetLook; // 플레이어가 바라봐야할 방향
-	_float m_fWalkSpeed = 2.f;
-	_float m_fRunSpeed = 5.f;
+	_float m_fWalkSpeed = 1.5f;
+	_float m_fRunSpeed = 3.f;
 private:
 	_bool m_bLHand = false;
 	_bool m_bRHand = false;
 	_bool m_bPattern = false;
+	
 	CAnimModel* m_pAnimModel = nullptr;
 	COBB* m_pOBB[OBB_END]{ nullptr };
 	CPlayer* m_pTarget = nullptr;

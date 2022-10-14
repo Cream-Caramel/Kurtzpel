@@ -34,6 +34,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_bColliderRender = true;
+	m_bCollision = false;
 
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ 0.05f,0.f,0.f,1.f });
 	m_pTransformCom->Set_Scale(_vector{ 0.8f,0.8f,0.8f });
@@ -62,7 +63,6 @@ void CPlayerSword::Tick(_float fTimeDelta)
 void CPlayerSword::LateTick(_float fTimeDelta)
 {
 	_float4x4		WorldMatrix;
-	m_fDamage = m_pPlayer->Get_Damage();
 	if (m_bCollision)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYERSWORD, this, m_pOBB);
 		

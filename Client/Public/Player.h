@@ -58,7 +58,6 @@ public:
 	void Set_PlayerHp(_float iHp) { m_fNowHp = iHp; }
 	_float Get_PlayerMp() { return m_fNowMp; }
 	void Set_PlayerMp(_float iMp) { m_fNowMp = iMp; }
-	_bool Get_Die() { return m_bDie; }
 	_bool Get_Respawn() { return m_bRespawn; }
 #pragma endregion UtilFunction
 	
@@ -105,7 +104,6 @@ private:
 	_bool m_bJump = false; //점프중인지
 	_bool m_bKeyInput = false; //방향키가 눌렸는지
 	_bool m_bSpinComboEnd = false; // 스핀콤보가 끝났는지
-	_bool m_bDie = false;
 	_bool m_bRespawn = false; 
 	_float m_fGravity = 0.f; //중력 
 	_float m_fJumpPower = 5.f; //뛰어오르는 힘
