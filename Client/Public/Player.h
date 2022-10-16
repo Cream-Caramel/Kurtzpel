@@ -130,6 +130,7 @@ private:
 	_float m_fFastComboEndSpeed = 8.f; // FAST콤보 마무리 전진속도
 	_float m_fRockBreakSpeed = 6.f; // RockBreak 전진속도
 	_float m_fChargeCrashSpeed = 6.f; //ChargeCrash 전진속도
+	_bool m_bSpinCombo = false;
 #pragma endregion Variable
 
 private:

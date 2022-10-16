@@ -111,6 +111,7 @@ void CPlayer::LateTick(_float fTimeDelta)
 {
 	if (GI->Key_Down(DIK_U))
 		UM->Set_ExGaugeTex(1);
+	if(!m_bSpinCombo)
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
 
 	for(int i = 0; i < MODEL_END; ++i)
@@ -1115,6 +1116,7 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::SPINCOMBOEND:
+		m_bSpinCombo = false;
 		m_bMotionChange = false;
 		if (m_fSpinComboEndSpeed > 0.15f)
 		{
@@ -1447,33 +1449,7 @@ void CPlayer::Jump(_float fTimeDelta)
 
 void CPlayer::JumpMove(_float fTimeDelta)
 {
-	switch (m_eJumpDir)
-	{
-	case Client::CPlayer::DIR_UP:
-		m_pTransformCom->Move_Up(fTimeDelta, m_fJumpSpeed);
-		break;
-	case Client::CPlayer::DIR_DOWN:
-		m_pTransformCom->Move_Down(fTimeDelta, m_fJumpSpeed);
-		break;
-	case Client::CPlayer::DIR_RIGHT:
-		m_pTransformCom->Move_Right(fTimeDelta, m_fJumpSpeed);
-		break;
-	case Client::CPlayer::DIR_LEFT:
-		m_pTransformCom->Move_Left(fTimeDelta, m_fJumpSpeed);
-		break;
-	case Client::CPlayer::DIR_LU:
-		m_pTransformCom->Move_LU(fTimeDelta, m_fJumpSpeed);
-		break;
-	case Client::CPlayer::DIR_RU:
-		m_pTransformCom->Move_RU(fTimeDelta, m_fJumpSpeed);
-		break;
-	case Client::CPlayer::DIR_LD:
-		m_pTransformCom->Move_LD(fTimeDelta, m_fJumpSpeed);
-		break;
-	case Client::CPlayer::DIR_RD:
-		m_pTransformCom->Move_RD(fTimeDelta, m_fJumpSpeed);
-		break;
-	}
+	m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 15.f, fTimeDelta);
 }
 
 void CPlayer::Jump_KeyInput(_float fTimeDelta)
@@ -1865,7 +1841,14 @@ void CPlayer::SpinComboLoof_KeyInput(_float fTimeDelta)
 		m_bSpinComboEnd = true;
 	}
 
-	if (GI->Key_Pressing(DIK_W))
+	m_bSpinCombo = true;
+
+
+	Input_Direction();
+
+	m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 5.f, fTimeDelta);
+
+	/*if (GI->Key_Pressing(DIK_W))
 	{	
 		if (GI->Key_Pressing(DIK_D))
 		{
@@ -1907,7 +1890,7 @@ void CPlayer::SpinComboLoof_KeyInput(_float fTimeDelta)
 	{
 		m_fSpinComboSpeed = 3;
 		m_pTransformCom->Move_Left(fTimeDelta, m_fSpinComboSpeed);
-	}
+	}*/
 
 }
 

@@ -419,6 +419,8 @@ HRESULT CLoader::LoadModel(char * DatName)
 		RM->Pushtchar(ProtoName);
 		Safe_Delete(ModelName);
 	}
+
+	delete SavePath;
 	// 3. ÆÄÀÏ ¼Ò¸ê
 	CloseHandle(hFile);
 	return S_OK;
