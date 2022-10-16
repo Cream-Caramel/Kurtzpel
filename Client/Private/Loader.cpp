@@ -366,7 +366,6 @@ HRESULT CLoader::LoadAnimModel(char * DatName)
 HRESULT CLoader::LoadModel(char * DatName)
 {
 	string FileSave = DatName;
-
 	string temp = "../Data/ModelData/";
 
 	FileSave = temp + FileSave + ".dat";
@@ -394,6 +393,9 @@ HRESULT CLoader::LoadModel(char * DatName)
 
 	DWORD		dwByte = 0;
 
+	char* SavePath = new char[256];
+	strcpy_s(SavePath, sizeof(char) * 256, DatName);
+
 	while (true)
 	{
 		_tchar* ProtoName = new _tchar[256];
@@ -409,7 +411,7 @@ HRESULT CLoader::LoadModel(char * DatName)
 		}
 
 		if (FAILED(GI->Add_Prototype(LEVEL_STATIC, ProtoName,
-			CModel::Create(m_pDevice, m_pContext, ModelName))))
+			CModel::Create(m_pDevice, m_pContext, ModelName, DatName))))
 		{
 			Safe_Delete(ProtoName);
 			return E_FAIL;

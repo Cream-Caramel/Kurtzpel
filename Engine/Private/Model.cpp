@@ -29,10 +29,10 @@ CModel::CModel(const CModel & rhs)
 }
 
 
-HRESULT CModel::Initialize_Prototype(const char * pLoadName, _fmatrix PivotMatrix)
+HRESULT CModel::Initialize_Prototype(const char * pLoadName, const char* pSavePath, _fmatrix PivotMatrix)
 {
 	m_pBinary = new CBinary;
-	if (FAILED(LoadBinary(pLoadName)))
+	if (FAILED(LoadBinary(pLoadName, pSavePath)))
 	{
 		MSG_BOX(TEXT("Fail To Load"));
 		return E_FAIL;
@@ -74,13 +74,13 @@ HRESULT CModel::Render(_uint iMeshIndex)
 }
 
 
-HRESULT CModel::LoadBinary(const char * FileName)
+HRESULT CModel::LoadBinary(const char * FileName, const char* pSavePath)
 {
 	string FileSave = FileName;
-
+	string SavePath = pSavePath;
 	string temp = "../Data/ModelBinary/";
 
-	FileSave = temp + FileSave + ".dat";
+	FileSave = temp + SavePath + "/" + FileSave + ".dat";
 
 	wchar_t FilePath[256] = { 0 };
 
@@ -222,11 +222,11 @@ HRESULT CModel::Ready_Materials()
 	return S_OK;
 }
 
-CModel * CModel::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const char * pLoadName, _fmatrix PivotMatrix)
+CModel * CModel::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const char * pLoadName, const char* pSavePath, _fmatrix PivotMatrix)
 {
 	CModel*			pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(pLoadName, PivotMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(pLoadName, pSavePath, PivotMatrix)))
 	{
 		MSG_BOX(TEXT("Failed To Created : CTexture"));
 		Safe_Release(pInstance);

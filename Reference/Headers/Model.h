@@ -29,13 +29,13 @@ public:
 	void Set_PivotMatrix(_matrix PivotMatrix) { XMStoreFloat4x4(&m_PivotMatrix, PivotMatrix); }
 
 public:
-	virtual HRESULT Initialize_Prototype(const char* pLoadName, _fmatrix PivotMatrix);
+	virtual HRESULT Initialize_Prototype(const char* pLoadName, const char* pSavePath, _fmatrix PivotMatrix);
 	virtual HRESULT Initialize(void* pArg);
 
 public:
 	HRESULT SetUp_OnShader(class CShader* pShader, _uint iMaterialIndex, TEXTURETYPE eTextureType, const char* pConstantName);
 	HRESULT Render(_uint iMeshIndex);
-	HRESULT LoadBinary(const char* FileName);
+	HRESULT LoadBinary(const char* FileName, const char* pSavePath);
 private:
 	_float4x4					m_PivotMatrix;
 
@@ -54,7 +54,7 @@ private:
 	HRESULT Ready_Materials();
 
 public:
-	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,  const char* pLoadName, _fmatrix PivotMatrix = XMMatrixIdentity());
+	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,  const char* pLoadName, const char* pSavePath, _fmatrix PivotMatrix = XMMatrixIdentity());
 	virtual CComponent* Clone(void* pArg = nullptr);
 	virtual void Free() override;
 };
