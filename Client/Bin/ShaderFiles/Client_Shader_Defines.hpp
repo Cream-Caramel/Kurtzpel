@@ -10,6 +10,13 @@ RasterizerState RS_Skybox
 	FrontCounterClockwise = false;
 };
 
+RasterizerState RS_Trail
+{
+
+CullMode = None;
+
+};
+
 
 RasterizerState RS_Default
 {
@@ -34,6 +41,7 @@ DepthStencilState DSS_Skybox
 	DepthEnable = false;
 	DepthWriteMask = zero;	
 };
+
 
 
 BlendState BS_Default

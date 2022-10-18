@@ -215,6 +215,7 @@
     <ClInclude Include="..\Public\SkillIconTab.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Theo.h" />
+    <ClInclude Include="..\Public\Trail.h" />
     <ClInclude Include="..\public\UI.h" />
     <ClInclude Include="..\Public\UIInclude.h" />
     <ClInclude Include="..\Public\UI_Manager.h" />
@@ -269,6 +270,7 @@
     <ClCompile Include="..\Private\SkillIconTab.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Theo.cpp" />
+    <ClCompile Include="..\Private\Trail.cpp" />
     <ClCompile Include="..\private\UI.cpp" />
     <ClCompile Include="..\Private\UI_Manager.cpp" />
     <ClCompile Include="Client.cpp" />

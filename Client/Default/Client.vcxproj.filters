@@ -109,6 +109,12 @@
     <Filter Include="03.UI\BossBar">
       <UniqueIdentifier>{e940db24-b484-4f64-8c02-c5c3b1cb83f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="95.Component">
+      <UniqueIdentifier>{3d4def9d-7b21-478d-b6d5-2fe93b7ead1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95.Component\Trail">
+      <UniqueIdentifier>{5987a23f-e07e-4926-868c-75688f616fe2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -276,6 +282,9 @@
     <ClInclude Include="..\Public\BossMPBarFrame.h">
       <Filter>03.UI\BossBar</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Trail.h">
+      <Filter>95.Component\Trail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -424,6 +433,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BossMPBarFrame.cpp">
       <Filter>03.UI\BossBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Trail.cpp">
+      <Filter>95.Component\Trail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

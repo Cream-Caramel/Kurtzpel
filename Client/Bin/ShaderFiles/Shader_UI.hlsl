@@ -9,6 +9,7 @@ float g_fPrePlayerHp;
 float g_fPlayerMp;
 float g_fExGauge;
 float4 g_fTileColor;
+float4 g_fTrailColor;
 
 sampler DefaultSampler = sampler_state {
 
@@ -45,6 +46,19 @@ VS_OUT VS_MAIN(VS_IN In)
 	
 	return Out;
 }
+VS_OUT VS_MAIN_Trail(VS_IN In)
+{
+	VS_OUT		Out = (VS_OUT)0;
+
+	matrix		matWV, matWVP;
+
+	matWVP = mul(g_ViewMatrix, g_ProjMatrix);
+
+	Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
+	Out.vTexUV = In.vTexUV;
+
+	return Out;
+}
 
 struct PS_IN
 {
@@ -66,6 +80,19 @@ PS_OUT PS_MAIN(PS_IN In)
 	clip(Out.vColor.a <= 0.f ? -1.f : 1.f);
 
 	return Out;	
+}
+
+PS_OUT PS_Trail(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_fTrailColor;
+
+	Out.vColor.a = 1.f - In.vTexUV.y;
+
+	clip(Out.vColor.a <= 0.f ? -1.f : 1.f);
+
+	return Out;
 }
 
 PS_OUT CoolTime_MAIN(PS_IN In)
@@ -380,6 +407,16 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 SkillIcon_MAIN();
+	}
+
+	pass Trail
+	{
+		SetRasterizerState(RS_Trail);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 VS_MAIN_Trail();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_Trail();
 	}
 
 

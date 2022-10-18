@@ -125,7 +125,7 @@ void CPlayer::LateTick(_float fTimeDelta)
 	End_Animation();
 
 	for (auto& pPart : m_Parts)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, pPart);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, pPart);
 
 	for (int i = 0; i < OBB_END; ++i)
 		m_pOBB[i]->Update(m_pTransformCom->Get_WorldMatrix());

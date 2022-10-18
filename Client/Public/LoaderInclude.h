@@ -9,6 +9,7 @@
 #include "AABB.h"
 #include "OBB.h"
 #include "Sphere.h"
+#include "Trail.h"
 #pragma endregion Main클래스
 
 #pragma region AnimModel클래스

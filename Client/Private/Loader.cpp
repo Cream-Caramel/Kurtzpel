@@ -70,9 +70,14 @@ HRESULT CLoader::Loading_ForStatic()
 		CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height.bmp")))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Trail"),
+		CTrail::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	lstrcpy(m_szLoadingText, TEXT("¸ðµ¨ ·ÎµùÁß "));
 
 	LoadAnimModel("Level_Static");
+
 	LoadModel("Level_Static");
 
 	Loading_Shader();

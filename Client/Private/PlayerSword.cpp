@@ -5,6 +5,7 @@
 #include "Collider_Manager.h"
 #include "Pointer_Manager.h"
 #include "Player.h"
+#include "Trail.h"
 
 CPlayerSword::CPlayerSword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)
@@ -33,9 +34,26 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerSword", TEXT("PlayerSword"), (CComponent**)&m_pModel)))
 		return E_FAIL;
 
+	CTrail::TRAILPOS TrailPos;
+	TrailPos.vHigh = { 0.f,3.f,0.f };
+	TrailPos.vLow = { 0.f,0.f,0.f };
+	
+	CTrail::TRAILINFO TrailInfo;
+	TrailInfo._HighAndLow = TrailPos;
+	TrailInfo._Color = _float4{ 0.8f,0.8f,0.f,1.f };
+	
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"Prototype_Component_Trail", TEXT("SwordTrail"), (CComponent**)&m_pTrail,&TrailInfo)))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"SwordTrail01", TEXT("SwordTrail01"), (CComponent**)&m_pTexture)))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"Prototype_Component_Shader_UI", TEXT("Shader_UI"), (CComponent**)&m_pTexShader)))
+		return E_FAIL;
+
 	m_bColliderRender = true;
 	m_bCollision = false;
-
+	
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ 0.05f,0.f,0.f,1.f });
 	m_pTransformCom->Set_Scale(_vector{ 0.8f,0.8f,0.8f });
 	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 90.f, _float3{ 0.f,1.f,0.f }, 180.f, _float3{ 0.f,0.f,1.f }, 0.f);
@@ -57,6 +75,8 @@ void CPlayerSword::Tick(_float fTimeDelta)
 {
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
+	
+	
 
 }
 
@@ -67,6 +87,13 @@ void CPlayerSword::LateTick(_float fTimeDelta)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYERSWORD, this, m_pOBB);
 		
 	m_pOBB->Update(m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix());
+
+	_matrix _WorldMatrix;
+	_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix();
+
+	if (!m_pTrail->Get_On())
+		m_pTrail->TrailOn(_WorldMatrix);
+	m_pTrail->Tick(fTimeDelta, _WorldMatrix);
 }
 
 HRESULT CPlayerSword::Render()
@@ -107,6 +134,11 @@ HRESULT CPlayerSword::Render()
 	}
 	if(m_bColliderRender)
 		m_pOBB->Render();
+
+	
+	if (FAILED(m_pTexture->Set_SRV(m_pTexShader, "g_DiffuseTexture")))
+		return E_FAIL;
+	m_pTrail->Render();
 	return S_OK;
 }
 
