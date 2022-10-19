@@ -7,6 +7,7 @@
 #include "Collider.h"
 #include "OBB.h"
 #include "Collider_Manager.h"
+#include "Navigation.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -43,6 +44,9 @@ HRESULT CPlayer::Initialize(void * pArg)
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerBottom", TEXT("Bottom"), (CComponent**)&m_pAnimModel[MODEL_BOTTOM])))
+		return E_FAIL;
+
+	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation)))
 		return E_FAIL;
 
 	
@@ -173,6 +177,8 @@ HRESULT CPlayer::Render()
 			m_pOBB[i]->Render();
 		}
 	}
+
+	m_pNavigation->Render();
 	return S_OK;
 }
 

@@ -54,8 +54,8 @@ void CMainApp::Tick(_float fTimeDelta)
 
 	CM->Check_Collision(CCollider_Manager::COLLIDER_PLAYER, CCollider_Manager::COLLIDER_MONSTERATTACK);
 	CM->Check_Collision(CCollider_Manager::COLLIDER_PLAYERSWORD, CCollider_Manager::COLLIDER_MONSTER);
-	RECT Clip;
-	/*GetClientRect(g_hWnd, &Clip);
+	/*RECT Clip;
+	GetClientRect(g_hWnd, &Clip);
 	ClientToScreen(g_hWnd, (LPPOINT)&Clip);
 	ClientToScreen(g_hWnd, (LPPOINT)(&Clip.right));
 	ClipCursor(&Clip);*/

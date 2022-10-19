@@ -10,6 +10,7 @@
 #include "VIBuffer_Tile.h"
 #include "Model.h"
 #include "AnimModel.h"
+#include "Navigation.h"
 
 BEGIN(Engine)
 

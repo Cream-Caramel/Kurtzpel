@@ -35,7 +35,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 		return E_FAIL;
 
 	CTrail::TRAILPOS TrailPos;
-	TrailPos.vHigh = { 0.f,3.f,0.f };
+	TrailPos.vHigh = { 0.f,2.1f,0.f };
 	TrailPos.vLow = { 0.f,0.f,0.f };
 	
 	CTrail::TRAILINFO TrailInfo;
@@ -173,4 +173,7 @@ void CPlayerSword::Free()
 	__super::Free();
 	Safe_Release(m_pModel);
 	Safe_Release(m_pOBB);
+	Safe_Release(m_pTexShader);
+	Safe_Release(m_pTrail);
+	Safe_Release(m_pTexture);
 }

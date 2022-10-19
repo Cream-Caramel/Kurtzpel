@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CHierarchyNode;
 class COBB;
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -143,6 +144,7 @@ private:
 private:
 	CAnimModel* m_pAnimModel[MODEL_END]; // 플레이어, 상의, 하의 모델
 	COBB* m_pOBB[OBB_END]{ nullptr };
+	CNavigation* m_pNavigation = nullptr;
 
 	vector<CMesh*>				m_Parts;
 	vector<class CHierarchyNode*>		m_Sockets;

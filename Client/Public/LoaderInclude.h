@@ -10,6 +10,7 @@
 #include "OBB.h"
 #include "Sphere.h"
 #include "Trail.h"
+#include "Navigation.h"
 #pragma endregion Main클래스
 
 #pragma region AnimModel클래스

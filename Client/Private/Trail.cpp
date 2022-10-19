@@ -196,7 +196,7 @@ void CTrail::Tick(const _float& _fTimeDelta, _matrix _matWeapon)
 		//D3DXVec3TransformCoord(&pVertices[m_iVtxCount].vPosition, &Low, &_matWeapon);
 		//D3DXVec3TransformCoord(&pVertices[m_iVtxCount + 1].vPosition, &High, &_matWeapon);
 
-		for (_uint i = 0; i < m_iVtxCount; i += 2)
+		for (int i = 0; i < m_iVtxCount; i += 2)
 		{
 			_float _iVtxCount = 0.f;
 			if (m_iVtxCount < 1)

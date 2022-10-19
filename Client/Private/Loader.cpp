@@ -80,6 +80,7 @@ HRESULT CLoader::Loading_ForStatic()
 
 	LoadModel("Level_Static");
 
+	
 	Loading_Shader();
 
 	Loading_Component();
@@ -299,6 +300,9 @@ HRESULT CLoader::Loading_ForLogoLevel()
 
 HRESULT CLoader::Loading_ForStage1()
 {
+	if (FAILED(GI->Add_Prototype(LEVEL_STAGE1, TEXT("NavigationStage1"),
+		CNavigation::Create(m_pDevice, m_pContext, "Level_Stage1"))))
+		return E_FAIL;
 	m_isFinished = true;
 	return S_OK;
 }
@@ -498,6 +502,7 @@ HRESULT CLoader::LoadTexture(char * DatName)
 
 	return S_OK;
 }
+
 
 CLoader * CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {
