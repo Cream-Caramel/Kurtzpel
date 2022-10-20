@@ -189,8 +189,13 @@ void CTransform::Go_Dir(_fvector vDir, _float fSpeed, CNavigation* pNavigation, 
 	vPosition += vDir * fSpeed * fTimeDelta;
 	if (pNavigation->isMove(vPosition) == true)
 	{	
-		vPosition = XMVectorSetY(vPosition, pNavigation->Set_PosY(vPosition));
-		Set_State(CTransform::STATE_POSITION, vPosition);
+		if (!m_bJump)
+		{
+			vPosition = XMVectorSetY(vPosition, pNavigation->Get_PosY(vPosition));
+			Set_State(CTransform::STATE_POSITION, vPosition);
+		}
+		else
+			Set_State(CTransform::STATE_POSITION, vPosition);
 	}
 }
 
@@ -292,6 +297,28 @@ _bool  CTransform::Move(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _
 
 	Set_State(CTransform::STATE_POSITION, vPosition);
 	return false;
+}
+
+void CTransform::Jump(_float fTimeDelta)
+{
+	m_fGravity += 1.f * fTimeDelta;
+	Set_State(CTransform::STATE_POSITION, Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f });
+}
+
+_bool CTransform::Get_JumpEnd(_fvector vPos, CNavigation * pNavigation)
+{
+	_float PosY = XMVectorGetY(Get_State(STATE_POSITION));
+	if (pNavigation->Get_PosY(vPos) >= PosY)
+		return true;
+	return false;
+}
+
+void CTransform::Set_JumpEndPos(CNavigation * pNavigation)
+{
+	_vector vPosition = Get_State(CTransform::STATE_POSITION);
+	
+	vPosition = XMVectorSetY(vPosition, pNavigation->Get_PosY(vPosition));
+	Set_State(CTransform::STATE_POSITION, vPosition);
 }
 
 CTransform * CTransform::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

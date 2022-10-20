@@ -80,9 +80,23 @@ public:
 
 	_float Get_Speed() { return m_TransformDesc.fSpeedPerSec; }
 	void Set_Speed(_float fSpeed) { m_TransformDesc.fSpeedPerSec = fSpeed; }
+
+	void Jump(_float fTimeDelta);
+
+	_bool Get_Jump() { return m_bJump; }
+	_float Get_JumpPower() { return m_fJumpPower; }
+	_float Get_Gravity() { return m_fGravity; }
+	void Set_Jump(_bool bJump) { m_bJump = bJump; }
+	void Set_JumpPower(_float fJumpPower) { m_fJumpPower = fJumpPower; }
+	void Set_Gravity(_float fGravity) { m_fGravity = fGravity; }
+	_bool Get_JumpEnd(_fvector vPos, CNavigation* pNavigation);
+	void Set_JumpEndPos(CNavigation* pNavigation);
 private:
 	_float4x4				m_WorldMatrix;
 	TRANSFORMDESC			m_TransformDesc;
+	_float m_fGravity = 0.f; //중력 
+	_bool m_bJump = false; //점프중인지
+	_float m_fJumpPower = 5.f; //뛰어오르는 힘
 
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

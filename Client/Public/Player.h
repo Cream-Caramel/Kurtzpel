@@ -17,11 +17,27 @@ public:
 	enum Parts { PARTS_HEAD, PARTS_HAIRBACK, PARTS_HAIRFRONT, PARTS_HAIRSIDE, PARTS_HAIRTAIL, PARTS_SWORD, PARTS_END };
 	enum Socket {SOCKET_HEAD, SOCKET_WEAPONHANDR, SOCKET_END};
 	enum DIR {DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_LEFT, DIR_LU, DIR_RU, DIR_LD, DIR_RD, DIR_END};
-	enum STATE {HITBACK, HITFRONT, JUMP, JUMPEND, JUMPUP, JUMPSTART, IDLE, DASH, DIE, RESPAWN, RUN, RUNEND, SPINCOMBOEND, SPINCOMBOLOOF
-		,SPINCOMBOSTART, FASTCOMBOEND, FASTCOMBOSTART, ROCKBREAK, CHARGECRASH, CHARGEREADY, AIRCOMBO1, AIRCOMBO2, AIRCOMBO3, AIRCOMBO4, AIRCOMBOEND
-		,VOIDFRONTEND, VOIDBACKEND, VOIDFRONT, VOIDBACK, NOMALCOMBO1, NOMALCOMBO2, NOMALCOMBO3, NOMALCOMBO4, NOMALCOMBO5, NOMALCOMBO6, GROUNDCRASH
-		,GROUNDREADY, GROUNDRUN, LEAPDOWN, LEAPUP, LEAPEND, LEAPREADY, LEAPRUN, LEAPSTART, BLADEATTACK, SLASHATTACK, ROCKSHOT, EX1ATTACK, EX2ATTACK
-		,EX1READY, EX2READY, STATE_END};
+	enum STATE {HITBACK, HITFRONT
+		, JUMP, JUMPEND, JUMPUP, JUMPSTART
+		, IDLE
+		, DASH
+		, DIE, RESPAWN
+		, RUN, RUNEND
+		, SPINCOMBOEND, SPINCOMBOLOOF, SPINCOMBOSTART
+		, FASTCOMBOEND, FASTCOMBOSTART
+		, ROCKBREAK
+		, CHARGECRASH, CHARGEREADY
+		, AIRCOMBO1, AIRCOMBO2, AIRCOMBO3, AIRCOMBO4, AIRCOMBOEND
+		, VOIDFRONTEND, VOIDBACKEND, VOIDFRONT, VOIDBACK
+		, NOMALCOMBO1, NOMALCOMBO2, NOMALCOMBO3, NOMALCOMBO4, NOMALCOMBO5, NOMALCOMBO6
+		, GROUNDCRASH, GROUNDREADY, GROUNDRUN
+		, LEAPDOWN, LEAPUP, LEAPEND, LEAPREADY, LEAPRUN, LEAPSTART
+		, BLADEATTACK
+		, SLASHATTACK
+		, ROCKSHOT
+		, EX1ATTACK	, EX2ATTACK
+		, EX1READY, EX2READY
+		, STATE_END};
 	enum OBB {OBB_BODY, OBB_END};
 
 private:
@@ -53,8 +69,6 @@ public:
 #pragma endregion MainFunction
 
 #pragma region UtilFunction
-	void Jump(_float fTimeDelta); // 중력에 따라 Y값 조정 처음 점프할 때 방향에 따라 XZ값 조정
-	void JumpMove(_float fTimeDelta); // 점프할 때 방향에 따라 이동값 조정
 	_float Get_PlayerHp() { return m_fNowHp; }
 	void Set_PlayerHp(_float iHp) { m_fNowHp = iHp; }
 	_float Get_PlayerMp() { return m_fNowMp; }
@@ -102,14 +116,11 @@ private:
 
 #pragma region Variable
 	_bool m_bUseSkill = true; //스킬을 사용할수있는지 대기 or 달리기 도중에 가능
-	_bool m_bJump = false; //점프중인지
+	
 	_bool m_bKeyInput = false; //방향키가 눌렸는지
 	_bool m_bSpinComboEnd = false; // 스핀콤보가 끝났는지
 	_bool m_bRespawn = false; 
-	_float m_fGravity = 0.f; //중력 
-	_float m_fJumpPower = 5.f; //뛰어오르는 힘
-	_float m_fJumpSpeed; // 점프중 스피드
-	DIR m_eJumpDir = DIR_END; //점프시작시 바라봤던 방향
+	_float m_fJumpSpeed = 15.f; // 점프중 스피드
 	_float m_fRunSpeed = 8.f; // 달리기이동스피드
 	_float m_fRunEndSpeed = 8.f; //달리기엔드스피드
 	_float m_fDashSpeed = 20.f; // 대쉬이동스피드

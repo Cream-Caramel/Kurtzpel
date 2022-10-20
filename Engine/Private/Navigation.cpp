@@ -147,7 +147,7 @@ void CNavigation::Load_Cell(const char* pFileName)
 	CloseHandle(hFile);
 }
 
-_float CNavigation::Set_PosY(_fvector vPos)
+_float CNavigation::Get_PosY(_fvector vPos)
 {
 	
 	_vector PointA = XMVectorSetW(XMLoadFloat3(&m_Cells[m_NavigationDesc.iCurrentIndex]->Get_Point(CCell::POINT_A)), 1);

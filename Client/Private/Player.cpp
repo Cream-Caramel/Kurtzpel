@@ -76,6 +76,9 @@ HRESULT CPlayer::Initialize(void * pArg)
 	UM->Add_Player(this);
 	m_bColliderRender = true;
 	
+	m_pTransformCom->Set_Gravity(0.f);
+	m_pTransformCom->Set_JumpPower(0.6f);
+
 	return S_OK;
 }
 
@@ -105,9 +108,9 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	Update(fTimeDelta);
 
-	if (m_bJump)
+	if (m_pTransformCom->Get_Jump())
 	{
-		m_fGravity += 1.f * fTimeDelta;
+		m_pTransformCom->Jump(fTimeDelta);
 	}
 
 	Update_Parts();
@@ -266,16 +269,12 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::JUMPSTART:
-		m_bJump = true;
-		m_fGravity = 0.f;
-		m_fJumpPower = 0.6f;
-		if (m_eJumpDir == DIR_END)
-			m_fJumpSpeed = 0.f;
-		else
-			m_fJumpSpeed = 10.f;
+		m_pTransformCom->Set_Jump(true);
+		m_pTransformCom->Set_Gravity(0.f);
+		m_pTransformCom->Set_JumpPower(0.6f);
+		m_fJumpSpeed = 10.f;
 		break;
 	case Client::CPlayer::IDLE:
-		m_eJumpDir = DIR_END;
 		m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::DASH:
@@ -324,7 +323,7 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::AIRCOMBO1:
 		m_fNowMp -= 3.f;
-		m_fJumpPower = 0.f;
+		m_pTransformCom->Set_JumpPower(0.f);
 		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
 		break;
 	case Client::CPlayer::AIRCOMBO2:
@@ -444,8 +443,6 @@ void CPlayer::Set_State(STATE eState)
 
 void CPlayer::Set_Dir(DIR eDir)
 {
-	m_eJumpDir = eDir;
-
 	m_eDir = eDir;
 
 	_matrix View = XMLoadFloat4x4(&GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW));
@@ -1066,14 +1063,13 @@ void CPlayer::Update(_float fTimeDelta)
 		m_bMotionChange = false;
 		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			JumpMove(fTimeDelta);
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f } );
-			if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0 && m_bJump)
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fJumpSpeed, m_pNavigation, fTimeDelta);
+			if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
 			{
-				m_bJump = false;
-				m_fGravity = 0.f;
+				m_pTransformCom->Set_Jump(false);
+				m_pTransformCom->Set_Gravity(0.f);
 				Set_State(JUMPEND);
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
+				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
 			}
 		}
 		break;
@@ -1082,13 +1078,12 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::JUMPUP:
 		m_bMotionChange = false;
-		JumpMove(fTimeDelta);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f } );
+		m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 15.f, m_pNavigation, fTimeDelta);
 		break;
 	case Client::CPlayer::JUMPSTART:
 		m_bMotionChange = false;
-		JumpMove(fTimeDelta);
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f } );
+		m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 15.f, m_pNavigation, fTimeDelta);
+		m_pTransformCom->Set_Jump(true);
 		break;
 	case Client::CPlayer::IDLE:
 		m_bMotionChange = true;
@@ -1205,15 +1200,21 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::AIRCOMBO1:
 		m_bMotionChange = false;
-		if(m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1) + 1.f)
-		m_fGravity = 0.f;
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,m_fGravity,0.f,0.f });
-		if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0)
+		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1) + 1.f)
 		{
-			m_bJump = false;
-			m_fGravity = 0.f;
-			Set_State(JUMPEND);
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
+			m_pTransformCom->Set_Gravity(0.f);
+			m_pTransformCom->Set_Jump(false);
+		}
+		else
+		{
+			m_pTransformCom->Set_Jump(true);
+			if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
+			{
+				m_pTransformCom->Set_Jump(false);
+				m_pTransformCom->Set_Gravity(0.f);
+				Set_State(JUMPEND);
+				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
+			}
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -1223,14 +1224,20 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::AIRCOMBO2:
 		m_bMotionChange = false;
 		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1) + 1.f)
-			m_fGravity = 0.f;
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,m_fGravity,0.f,0.f });
-		if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0)
 		{
-			m_bJump = false;
-			m_fGravity = 0.f;
-			Set_State(JUMPEND);
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
+			m_pTransformCom->Set_Gravity(0.f);
+			m_pTransformCom->Set_Jump(false);
+		}
+		else
+		{
+			m_pTransformCom->Set_Jump(true);
+			if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
+			{
+				m_pTransformCom->Set_Jump(false);
+				m_pTransformCom->Set_Gravity(0.f);
+				Set_State(JUMPEND);
+				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
+			}
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -1240,14 +1247,20 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::AIRCOMBO3:
 		m_bMotionChange = false;
 		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1) + 1.f)
-			m_fGravity = 0.f;
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,m_fGravity,0.f,0.f });
-		if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0)
 		{
-			m_bJump = false;
-			m_fGravity = 0.f;
-			Set_State(JUMPEND);
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
+			m_pTransformCom->Set_Gravity(0.f);
+			m_pTransformCom->Set_Jump(false);
+		}
+		else
+		{
+			m_pTransformCom->Set_Jump(true);
+			if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
+			{
+				m_pTransformCom->Set_Jump(false);
+				m_pTransformCom->Set_Gravity(0.f);
+				Set_State(JUMPEND);
+				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
+			}
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -1259,15 +1272,18 @@ void CPlayer::Update(_float fTimeDelta)
 		if (!m_pAnimModel[0]->GetChangeBool())
 		{
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
-				m_fGravity = 1.f;
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,m_fGravity,0.f,0.f });
-			if (XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)) <= 0)
 			{
-				m_bJump = false;
-				m_fGravity = 0.f;
-				Set_State(AIRCOMBOEND);
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f, XMVectorGetY(m_pTransformCom->Get_State(CTransform::STATE_POSITION)), 0.f });
+				m_pTransformCom->Set_Gravity(1.f);
+				m_pTransformCom->Set_Jump(true);
 			}
+		
+				if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
+				{
+					m_pTransformCom->Set_Jump(false);
+					m_pTransformCom->Set_Gravity(0.f);
+					Set_State(AIRCOMBOEND);
+					m_pTransformCom->Set_JumpEndPos(m_pNavigation);
+				}
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 			else
@@ -1453,14 +1469,6 @@ void CPlayer::Set_PlayerUseInfo()
 	m_fCamDistanceZ = fabs(PM->Get_CameraPlayerPos().z - m_vPlayerPos.z);
 }
 
-void CPlayer::Jump(_float fTimeDelta)
-{
-}
-
-void CPlayer::JumpMove(_float fTimeDelta)
-{
-	m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 15.f, m_pNavigation, fTimeDelta);
-}
 
 void CPlayer::Jump_KeyInput(_float fTimeDelta)
 {
@@ -1469,6 +1477,8 @@ void CPlayer::Jump_KeyInput(_float fTimeDelta)
 	if (GI->Mouse_Pressing(DIMK_LBUTTON))
 	{
 		Set_State(AIRCOMBO1);
+		m_pTransformCom->Set_Gravity(0.f);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		return;
 	}
 
@@ -2036,7 +2046,10 @@ void CPlayer::AirCombo1_KeyInput(_float fTimeDelta)
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1))
 	{
 		if (GI->Mouse_Pressing(DIMK_LBUTTON))
+		{
 			Set_State(AIRCOMBO2);
+		}
+
 	}
 }
 
