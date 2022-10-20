@@ -40,7 +40,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 	
 	CTrail::TRAILINFO TrailInfo;
 	TrailInfo._HighAndLow = TrailPos;
-	TrailInfo._Color = _float4{ 0.8f,0.8f,0.f,1.f };
+	TrailInfo._Color = _float4{ 1.f,0.5f,0.f,1.f };
 	
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"Prototype_Component_Trail", TEXT("SwordTrail"), (CComponent**)&m_pTrail,&TrailInfo)))
 		return E_FAIL;

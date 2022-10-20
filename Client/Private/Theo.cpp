@@ -469,8 +469,8 @@ void CTheo::Update(_float fTimeDelta)
 			m_fRunSpeed = 6.f;
 		else
 			m_fRunSpeed = 3.f;
-		Set_Dir();
-		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
+		Set_Dir(); 
+		//m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		if (Distance < 5.f)
 			Set_NextAttack();
@@ -551,7 +551,7 @@ void CTheo::Update(_float fTimeDelta)
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed * 4.f, fTimeDelta);
+			//m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed * 4.f, fTimeDelta);
 			m_bLHand = true;
 			m_bRHand = true;
 		}
@@ -595,7 +595,7 @@ void CTheo::Update(_float fTimeDelta)
 		if (Distance < 5.f)
 			Set_State(RUN);
 		else
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
+			//m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
 		break;
 	}
 	}

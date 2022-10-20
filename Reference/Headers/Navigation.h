@@ -25,7 +25,7 @@ public:
 public:
 	_bool isMove(_fvector vPosition);
 	void Load_Cell(const char* pFilePath);
-	
+	_float Set_PosY(_fvector vPos);
 
 
 #ifdef _DEBUG

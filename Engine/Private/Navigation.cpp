@@ -28,8 +28,13 @@ HRESULT CNavigation::Initialize_Prototype(const char* pFilePath)
 HRESULT CNavigation::Initialize(void * pArg)
 {
 
+	if (nullptr != pArg)
+		memcpy(&m_NavigationDesc, pArg, sizeof(NAVIGATIONDESC));
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;	
+
+
 
 	return S_OK;
 }
@@ -142,21 +147,41 @@ void CNavigation::Load_Cell(const char* pFileName)
 	CloseHandle(hFile);
 }
 
+_float CNavigation::Set_PosY(_fvector vPos)
+{
+	
+	_vector PointA = XMVectorSetW(XMLoadFloat3(&m_Cells[m_NavigationDesc.iCurrentIndex]->Get_Point(CCell::POINT_A)), 1);
+	_vector PointB = XMVectorSetW(XMLoadFloat3(&m_Cells[m_NavigationDesc.iCurrentIndex]->Get_Point(CCell::POINT_B)), 1);
+	_vector PointC = XMVectorSetW(XMLoadFloat3(&m_Cells[m_NavigationDesc.iCurrentIndex]->Get_Point(CCell::POINT_C)), 1);
+	
+	_vector Plane = XMPlaneFromPoints(PointA, PointB, PointC);
+
+	_float x = XMVectorGetX(vPos);
+	_float z = XMVectorGetZ(vPos);
+
+	_float a = XMVectorGetX(Plane);
+	_float b = XMVectorGetY(Plane);
+	_float c = XMVectorGetZ(Plane);
+	_float d = XMVectorGetW(Plane);
+
+	/* y = (-ax - cz - d) / b */
+
+	return (-a * x - c * z - d) / b;
+}
+
 
 
 #ifdef _DEBUG
 
 HRESULT CNavigation::Render()
 {
-	if (-1 == m_NavigationDesc.iCurrentIndex)
-	{
+	
 		for (auto& pCell : m_Cells)
 		{
 			if (nullptr != pCell)
 				pCell->Render_Cell();
 		}
-	}
-	else
+	
 		m_Cells[m_NavigationDesc.iCurrentIndex]->Render_Cell(0.05f, _float4(1.f, 0.f, 0.f, 1.f));
 	
 

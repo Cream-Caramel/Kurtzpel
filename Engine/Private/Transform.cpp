@@ -1,5 +1,5 @@
 #include "..\Public\Transform.h"
-
+#include "Navigation.h"
 CTransform::CTransform(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -181,14 +181,17 @@ void CTransform::Move_LD(_float fTimeDelta, _float fSpeed)
 }
 
 
-void CTransform::Go_Dir(_fvector vDir, _float fSpeed, _float fTimeDelta)
+void CTransform::Go_Dir(_fvector vDir, _float fSpeed, CNavigation* pNavigation, _float fTimeDelta)
 {
 	_vector vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector vDirN = XMVector3Normalize(vDir);
 
 	vPosition += vDir * fSpeed * fTimeDelta;
-
-	Set_State(CTransform::STATE_POSITION, vPosition);
+	if (pNavigation->isMove(vPosition) == true)
+	{	
+		vPosition = XMVectorSetY(vPosition, pNavigation->Set_PosY(vPosition));
+		Set_State(CTransform::STATE_POSITION, vPosition);
+	}
 }
 
 void CTransform::Set_Scale(_fvector vScaleInfo)

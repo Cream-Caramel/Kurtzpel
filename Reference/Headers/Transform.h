@@ -65,7 +65,7 @@ public:
 	void Move_RD(_float fTimeDelta, _float fSpeed);
 	void Move_LD(_float fTimeDelta, _float fSpeed);
 
-	void Go_Dir(_fvector vDir, _float fSpeed, _float fTimeDelta);
+	void Go_Dir(_fvector vDir, _float fSpeed, class CNavigation* pNavigation, _float fTimeDelta);
 
 	void Set_Scale(_fvector vScaleInfo);
 	_float3 Get_Scale();

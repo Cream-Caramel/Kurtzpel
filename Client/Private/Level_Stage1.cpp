@@ -27,8 +27,8 @@ HRESULT CLevel_Stage1::Initialize()
 	if (FAILED(Ready_Load_AnimModel("Level_Static")))
 		return E_FAIL;
 
-	if (FAILED(Ready_Load_AnimModel("Level_Stage1")))
-		return E_FAIL;
+	//if (FAILED(Ready_Load_AnimModel("Level_Stage1")))
+		//return E_FAIL;
 
 	if (FAILED(Ready_UI("Level_Stage1")))
 		return E_FAIL;
