@@ -94,9 +94,6 @@
     <Filter Include="03.UI\KeyIcon">
       <UniqueIdentifier>{4473948c-cad0-481e-a961-e5adb7b148e8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="96.Manager\Collider_Manager">
-      <UniqueIdentifier>{3f938abd-13ba-414d-940e-3cb77041e18a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\AnimMesh\Monster">
       <UniqueIdentifier>{53519431-2da2-491e-a388-a5117151871e}</UniqueIdentifier>
     </Filter>
@@ -132,6 +129,12 @@
     </Filter>
     <Filter Include="02.GameObjects\Mesh\Map\Stage1\TRSky">
       <UniqueIdentifier>{e6c663d1-2821-4c64-84d6-8ae3bceca704}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96.Manager\Cameramanager">
+      <UniqueIdentifier>{8a0e02fe-cfd5-4538-996e-97e0fd476f0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96.Manager\ColliderManager">
+      <UniqueIdentifier>{3f938abd-13ba-414d-940e-3cb77041e18a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -280,7 +283,7 @@
       <Filter>99.Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Collider_Manager.h">
-      <Filter>96.Manager\Collider_Manager</Filter>
+      <Filter>96.Manager\ColliderManager</Filter>
     </ClInclude>
     <ClInclude Include="..\Bin\ShaderFiles\Client_Shader_Defines.hpp">
       <Filter>97.ShaderFiles</Filter>
@@ -314,6 +317,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\TRStair.h">
       <Filter>02.GameObjects\Mesh\Map\Stage1\TRStair</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Manager.h">
+      <Filter>96.Manager\Cameramanager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -447,7 +453,7 @@
       <Filter>96.Manager\UIManager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Collider_Manager.cpp">
-      <Filter>96.Manager\Collider_Manager</Filter>
+      <Filter>96.Manager\ColliderManager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Theo.cpp">
       <Filter>02.GameObjects\AnimMesh\Monster\Theo</Filter>
@@ -478,6 +484,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TRStair.cpp">
       <Filter>02.GameObjects\Mesh\Map\Stage1\TRStair</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Manager.cpp">
+      <Filter>96.Manager\Cameramanager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -175,6 +175,7 @@
     <ClInclude Include="..\Public\BossMPBar.h" />
     <ClInclude Include="..\Public\BossMPBarFrame.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
+    <ClInclude Include="..\Public\Camera_Manager.h" />
     <ClInclude Include="..\Public\Camera_Player.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Collider_Manager.h" />
@@ -236,6 +237,7 @@
     <ClCompile Include="..\Private\BossMPBar.cpp" />
     <ClCompile Include="..\Private\BossMPBarFrame.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
+    <ClCompile Include="..\Private\Camera_Manager.cpp" />
     <ClCompile Include="..\Private\Camera_Player.cpp" />
     <ClCompile Include="..\Private\Collider_Manager.cpp" />
     <ClCompile Include="..\Private\ExGauge.cpp" />

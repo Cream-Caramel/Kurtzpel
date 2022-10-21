@@ -3,6 +3,8 @@
 #include "GameInstance.h"
 #include "Player.h"
 #include "Pointer_Manager.h"
+#include "Camera_Manager.h"
+
 
 
 CCamera_Player::CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -33,7 +35,8 @@ HRESULT CCamera_Player::Initialize(void * pArg)
 	Safe_AddRef(m_pPlayer);
 
 	PM->Add_CameraPlayer(this);
-
+	CRM->Add_Camera_Player(this);
+	
 	m_vDistance = { 0.f,0.f,-6.f };
 
 	m_pTransformCom->LookAt(m_pPlayer->Get_PlayerPos() + _vector{ 0.f,4.f,0.f,0.f });
@@ -43,56 +46,61 @@ HRESULT CCamera_Player::Initialize(void * pArg)
 
 void CCamera_Player::Tick(_float fTimeDelta)
 {
-
-	_long	MouseMove = 0;
-
-
-	if (MouseMove = GI->Get_DIMMoveState(DIMM_X))
+	if (!CRM->Get_bScene())
 	{
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), MouseMove * fTimeDelta * 0.05f);
-	}
+		_long	MouseMove = 0;
 
-	if (MouseMove = GI->Get_DIMMoveState(DIMM_Y))
-	{	
-		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), MouseMove * fTimeDelta * 0.05f);	
-		
+		if (MouseMove = GI->Get_DIMMoveState(DIMM_X))
+		{
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), MouseMove * fTimeDelta * 0.05f);
+		}
+
+		if (MouseMove = GI->Get_DIMMoveState(DIMM_Y))
+		{
+			m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), MouseMove * fTimeDelta * 0.05f);
+		}
 	}
 	
 }
 
 void CCamera_Player::LateTick(_float fTimeDelta)
 {
-	
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pPlayer->Get_PlayerPos());
-
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(XMLoadFloat3(&m_vDistance), m_pTransformCom->Get_WorldMatrix()));
-	
-	_float4 _vCurPos;
-	XMStoreFloat4(&_vCurPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-	if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] < 0.1f)
+	if (!CRM->Get_bScene())
 	{
-		_float4 Pos;
-		XMStoreFloat4(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ Pos.x,0.1f,Pos.z,1.f });
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pPlayer->Get_PlayerPos());
 
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(XMLoadFloat3(&m_vDistance), m_pTransformCom->Get_WorldMatrix()));
 
-	}
-	if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] <= 0.1f)
-	{
-		if (m_vDistance.z < -2.f)
+		_float4 _vCurPos;
+		XMStoreFloat4(&_vCurPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] < 0.1f)
 		{
-			m_vDistance.z += 0.1f;
+			_float4 Pos;
+			XMStoreFloat4(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ Pos.x,0.1f,Pos.z,1.f });
+
+
 		}
-	}
+		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] <= 0.1f)
+		{
+			if (m_vDistance.z < -2.f)
+			{
+				m_vDistance.z += 0.1f;
+			}
+		}
 
-	else if (m_vDistance.z > -6.f)
+		else if (m_vDistance.z > -6.f)
+		{
+			m_vDistance.z -= 0.1f;
+		}		
+		__super::Tick(fTimeDelta);
+	}	
+	else
 	{
-		m_vDistance.z -= 0.1f;
+		PlayScene(fTimeDelta);
+		__super::Tick(fTimeDelta);
 	}
-
-		
-	__super::Tick(fTimeDelta);
-
+	
 }
 
 HRESULT CCamera_Player::Render()
@@ -121,6 +129,12 @@ void CCamera_Player::LookAt(_float3 TargetPos)
 {
 	_vector temp = XMLoadFloat4(&_float4{ TargetPos.x,TargetPos.y,TargetPos.z,1.f });
 	m_pTransformCom->LookAt(temp);
+}
+
+void CCamera_Player::PlayScene(_float fTimeDelta)
+{
+
+
 }
 
 CCamera_Player * CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

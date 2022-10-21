@@ -25,9 +25,12 @@ public:
 	void Set_Pos(_float3 vPos);
 	_bool Move(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance = 0.1f);
 	void LookAt(_float3 TargetPos);
+	void PlayScene(_float fTimeDelta);
 	_float3 m_vDistance;
 private:
 	CPlayer* m_pPlayer = nullptr;
+	vector<POSINFO> m_PosInfo;
+	vector<LOOKINFO> m_LookInfo;
 public:
 	static CCamera_Player* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);
