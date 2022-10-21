@@ -45,6 +45,7 @@ protected:
 	ID3D11Device*			m_pDevice = nullptr;
 	ID3D11DeviceContext*	m_pContext = nullptr;
 	_bool m_bColliderRender = false; //콜라이더를 랜더할것인지
+	_bool m_bColliderRenderAll = false;
 protected: /* 객체에게 추가된 컴포넌트들을 키로 분류하여 보관한다. */
 	map<const _tchar*, class CComponent*>			m_Components;
 	typedef map<const _tchar*, class CComponent*>	COMPONENTS;
@@ -55,6 +56,7 @@ protected:
 	_float m_fColiisionTime; // 충돌 쿨타임
 	_bool				m_bDead = false;
 	_bool				m_bCollision = false;
+	
 	_bool				m_bMotionChange = true;
 	string m_sTag = "";
 	_float m_fMaxHp;

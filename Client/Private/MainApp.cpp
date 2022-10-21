@@ -51,7 +51,8 @@ void CMainApp::Tick(_float fTimeDelta)
 
 
 	m_pGameInstance->Tick_Engine(fTimeDelta);
-
+	if (GI->Key_Down(DIK_9))
+		CM->Set_ColliderRender();
 	CM->Check_Collision(CCollider_Manager::COLLIDER_PLAYER, CCollider_Manager::COLLIDER_MONSTERATTACK);
 	CM->Check_Collision(CCollider_Manager::COLLIDER_PLAYERSWORD, CCollider_Manager::COLLIDER_MONSTER);
 	/*RECT Clip;

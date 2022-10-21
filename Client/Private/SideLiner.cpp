@@ -39,7 +39,7 @@ void CSideLiner::Tick(_float fTimeDelta)
 void CSideLiner::LateTick(_float fTimeDelta)
 {
 
-
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
 HRESULT CSideLiner::Render()

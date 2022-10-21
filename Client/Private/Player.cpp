@@ -90,6 +90,9 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
 
+	if (GI->Key_Down(DIK_8))
+		m_pNavigation->Set_NaviRender();
+
 	m_bKeyInput = false;
 	m_bUseSkill = false;
 	Get_KeyInput(fTimeDelta);

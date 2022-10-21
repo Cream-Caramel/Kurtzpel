@@ -39,11 +39,14 @@ HRESULT CCollider_Manager::Add_OBBObject(COLLIDER_GROUP eGroup, CGameObject* pOb
 
 HRESULT CCollider_Manager::Collider_Render()
 {
-	for (int i = 0; i < COLLIDER_END; ++i)
+	if (m_bColliderRender)
 	{
-		for (auto& iter : m_Pairs[i])
+		for (int i = 0; i < COLLIDER_END; ++i)
 		{
-			iter.second->Render();
+			for (auto& iter : m_Pairs[i])
+			{
+				iter.second->Render();
+			}
 		}
 	}
 	return S_OK;

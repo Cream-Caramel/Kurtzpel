@@ -39,8 +39,7 @@ void CTRFloor::Tick(_float fTimeDelta)
 
 void CTRFloor::LateTick(_float fTimeDelta)
 {
-
-
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
 HRESULT CTRFloor::Render()

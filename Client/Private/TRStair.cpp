@@ -38,7 +38,7 @@ void CTRStair::Tick(_float fTimeDelta)
 
 void CTRStair::LateTick(_float fTimeDelta)
 {
-
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 
 }
 

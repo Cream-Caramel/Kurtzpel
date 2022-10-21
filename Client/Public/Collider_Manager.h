@@ -29,6 +29,11 @@ public:
 	HRESULT Collider_Render();
 	void End_Collision();
 
+	void Set_ColliderRender() { m_bColliderRender = !m_bColliderRender; }
+	_bool Get_ColliderRender() { return m_bColliderRender; }
+
+private:
+	_bool m_bColliderRender = false;
 private:
 	list<pair<CGameObject*, COBB*>> m_Pairs[COLLIDER_END];
 

@@ -26,7 +26,7 @@ public:
 	_bool isMove(_fvector vPosition);
 	void Load_Cell(const char* pFilePath);
 	_float Get_PosY(_fvector vPos);
-
+	void Set_NaviRender() { m_bNaviRender = !m_bNaviRender; }
 
 #ifdef _DEBUG
 public:
@@ -37,6 +37,7 @@ private:
 	vector<class CCell*>			m_Cells;
 	typedef vector<class CCell*>	CELLS;
 	NAVIGATIONDESC					m_NavigationDesc;
+	_bool m_bNaviRender = false;
 
 public:
 	static CNavigation* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const char* pFilePath);

@@ -175,15 +175,16 @@ _float CNavigation::Get_PosY(_fvector vPos)
 
 HRESULT CNavigation::Render()
 {
-	
+	if (m_bNaviRender)
+	{
 		for (auto& pCell : m_Cells)
 		{
 			if (nullptr != pCell)
 				pCell->Render_Cell();
 		}
-	
+
 		m_Cells[m_NavigationDesc.iCurrentIndex]->Render_Cell(0.05f, _float4(1.f, 0.f, 0.f, 1.f));
-	
+	}
 
 	return S_OK;
 }
