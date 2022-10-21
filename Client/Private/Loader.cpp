@@ -79,7 +79,7 @@ HRESULT CLoader::Loading_ForStatic()
 	LoadAnimModel("Level_Static");
 
 	LoadModel("Level_Static");
-
+	LoadModel("Level_Stage1");
 	
 	Loading_Shader();
 
@@ -143,6 +143,22 @@ HRESULT CLoader::Loading_ObjectProtoType()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerSword"),
 		CPlayerSword::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("TRSky"),
+		CTRSky::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("TRStair"),
+		CTRStair::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("TRFloor"),
+		CTRFloor::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("SideLiner"),
+		CSideLiner::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Theo"),
@@ -419,14 +435,28 @@ HRESULT CLoader::LoadModel(char * DatName)
 			break;
 		}
 
-		if (FAILED(GI->Add_Prototype(LEVEL_STATIC, ProtoName,
-			CModel::Create(m_pDevice, m_pContext, ModelName, DatName))))
+		if (!strcmp(DatName, "Level_Static"))
 		{
-			Safe_Delete(ProtoName);
-			return E_FAIL;
+			if (FAILED(GI->Add_Prototype(LEVEL_STATIC, ProtoName,
+				CModel::Create(m_pDevice, m_pContext, ModelName, DatName))))
+			{
+				Safe_Delete(ProtoName);
+				return E_FAIL;
+			}
+			RM->Pushtchar(ProtoName);
+			Safe_Delete(ModelName);
 		}
-		RM->Pushtchar(ProtoName);
-		Safe_Delete(ModelName);
+		else if (!strcmp(DatName, "Level_Stage1"))
+		{
+			if (FAILED(GI->Add_Prototype(LEVEL_STAGE1, ProtoName,
+				CModel::Create(m_pDevice, m_pContext, ModelName, DatName))))
+			{
+				Safe_Delete(ProtoName);
+				return E_FAIL;
+			}
+			RM->Pushtchar(ProtoName);
+			Safe_Delete(ModelName);
+		}
 	}
 
 	delete SavePath;

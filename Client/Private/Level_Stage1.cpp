@@ -30,6 +30,9 @@ HRESULT CLevel_Stage1::Initialize()
 	//if (FAILED(Ready_Load_AnimModel("Level_Stage1")))
 		//return E_FAIL;
 
+	if (FAILED(Ready_Load_Model("Level_Stage1")))
+		return E_FAIL;
+
 	if (FAILED(Ready_UI("Level_Stage1")))
 		return E_FAIL;
 
@@ -316,7 +319,7 @@ HRESULT CLevel_Stage1::Ready_Load_Model(char * DatName)
 
 	string temp = "../Data/ModelObject/";
 
-	FileSave = temp + FileSave + ".dat";
+	FileSave = temp  + FileSave + ".dat";
 
 	wchar_t FilePath[256] = { 0 };
 

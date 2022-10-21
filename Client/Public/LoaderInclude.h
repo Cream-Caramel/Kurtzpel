@@ -27,6 +27,10 @@
 #include "PlayerHairSide.h"
 #include "PlayerHairTail.h"
 #include "PlayerSword.h"
+#include "TRFloor.h"
+#include "TRSky.h"
+#include "TRStair.h"
+#include "SideLiner.h"
 #pragma endregion Model클래스
 
 #pragma region UI클래스

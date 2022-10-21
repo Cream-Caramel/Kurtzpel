@@ -115,6 +115,24 @@
     <Filter Include="95.Component\Trail">
       <UniqueIdentifier>{5987a23f-e07e-4926-868c-75688f616fe2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Mesh\Map">
+      <UniqueIdentifier>{bcb89a1c-3143-4ba7-9e56-680779295dd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Mesh\Map\Stage1">
+      <UniqueIdentifier>{988ed81a-b3eb-48ce-8d34-6006c0d8dd0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Mesh\Map\Stage1\TRStair">
+      <UniqueIdentifier>{5932f3f5-372c-4950-809a-9ceb98f1a185}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Mesh\Map\Stage1\SideLiner">
+      <UniqueIdentifier>{7af3597e-45a0-4ce6-8e94-33fc17037104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Mesh\Map\Stage1\TRFloor">
+      <UniqueIdentifier>{242bf7de-6694-4cb5-8263-c169cb2614a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Mesh\Map\Stage1\TRSky">
+      <UniqueIdentifier>{e6c663d1-2821-4c64-84d6-8ae3bceca704}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -285,6 +303,18 @@
     <ClInclude Include="..\Public\Trail.h">
       <Filter>95.Component\Trail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SideLiner.h">
+      <Filter>02.GameObjects\Mesh\Map\Stage1\SideLiner</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TRFloor.h">
+      <Filter>02.GameObjects\Mesh\Map\Stage1\TRFloor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TRSky.h">
+      <Filter>02.GameObjects\Mesh\Map\Stage1\TRSky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TRStair.h">
+      <Filter>02.GameObjects\Mesh\Map\Stage1\TRStair</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -436,6 +466,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Trail.cpp">
       <Filter>95.Component\Trail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SideLiner.cpp">
+      <Filter>02.GameObjects\Mesh\Map\Stage1\SideLiner</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TRFloor.cpp">
+      <Filter>02.GameObjects\Mesh\Map\Stage1\TRFloor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TRSky.cpp">
+      <Filter>02.GameObjects\Mesh\Map\Stage1\TRSky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TRStair.cpp">
+      <Filter>02.GameObjects\Mesh\Map\Stage1\TRStair</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

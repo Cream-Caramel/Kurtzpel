@@ -48,7 +48,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 
 	CNavigation::NAVIGATIONDESC NaviDesc;
-	NaviDesc.iCurrentIndex = 7;
+	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
@@ -1280,7 +1280,7 @@ void CPlayer::Update(_float fTimeDelta)
 				if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
 				{
 					m_pTransformCom->Set_Jump(false);
-					m_pTransformCom->Set_Gravity(0.f);
+					m_pTransformCom->Set_Gravity(0.f); 
 					Set_State(AIRCOMBOEND);
 					m_pTransformCom->Set_JumpEndPos(m_pNavigation);
 				}
