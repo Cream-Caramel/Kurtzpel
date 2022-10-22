@@ -196,7 +196,6 @@
     <ClInclude Include="..\Public\LoaderInclude.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\Mesh.h" />
-    <ClInclude Include="..\Public\MeshInstance.h" />
     <ClInclude Include="..\Public\MPBar.h" />
     <ClInclude Include="..\Public\MPBarFrame.h" />
     <ClInclude Include="..\Public\Player.h" />
@@ -257,7 +256,6 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
-    <ClCompile Include="..\Private\MeshInstance.cpp" />
     <ClCompile Include="..\Private\MPBar.cpp" />
     <ClCompile Include="..\Private\MPBarFrame.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
@@ -304,7 +302,6 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Cube.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModelInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_UI.hlsl" />
   </ItemGroup>

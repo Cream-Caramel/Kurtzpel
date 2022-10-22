@@ -33,30 +33,19 @@ public:
 
 public:
 	HRESULT Initialize(LEVEL eNextLevelID);
+#pragma region Static
+	HRESULT Loading_ForStatic();
 
-#pragma region Public
 	HRESULT Loading_ObjectProtoType();
 	HRESULT Loading_Shader();
 	HRESULT Loading_Component();
 	HRESULT LoadInstance(const char* FileName);
+#pragma endregion Static
 	HRESULT Loading_ForLogoLevel();
+	HRESULT Loading_ForStage1();
 	HRESULT LoadAnimModel(char* DatName);
 	HRESULT LoadModel(char* DatName);
 	HRESULT LoadTexture(char* DatName);
-
-#pragma endregion Public
-
-#pragma region Static
-	HRESULT Loading_ForStatic();
-
-	
-#pragma endregion Static
-
-	
-
-#pragma region Stage1
-	HRESULT Loading_ForStage1();
-#pragma endregion Stage1
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;
