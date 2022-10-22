@@ -21,6 +21,7 @@
 
 #pragma region Model≈¨∑°Ω∫
 #include "Model.h"
+#include "ModelInstance.h"
 #include "PlayerHead.h"
 #include "PlayerHairBack.h"
 #include "PlayerHairFront.h"

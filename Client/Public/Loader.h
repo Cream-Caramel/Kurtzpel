@@ -39,6 +39,7 @@ public:
 	HRESULT Loading_ObjectProtoType();
 	HRESULT Loading_Shader();
 	HRESULT Loading_Component();
+	HRESULT LoadInstance(const char* FileName);
 #pragma endregion Static
 	HRESULT Loading_ForLogoLevel();
 	HRESULT Loading_ForStage1();
@@ -54,6 +55,7 @@ private:
 	HANDLE				m_hThread = 0;
 	CRITICAL_SECTION	m_CriticalSection;
 	LEVEL				m_eNextLevelID = LEVEL_END;
+	map<const wstring, vector<_float3*>> m_InstanceInfo;
 
 private:
 	_tchar				m_szLoadingText[256] = TEXT("");

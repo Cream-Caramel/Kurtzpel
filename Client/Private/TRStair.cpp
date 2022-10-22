@@ -3,13 +3,13 @@
 #include "GameInstance.h"
 
 CTRStair::CTRStair(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	:CMesh(pDevice, pContext)
+	:CMeshInstance(pDevice, pContext)
 {
 	m_pModel = nullptr;
 }
 
 CTRStair::CTRStair(const CTRStair& rhs)
-	: CMesh(rhs)
+	: CMeshInstance(rhs)
 {
 }
 
@@ -52,8 +52,6 @@ HRESULT CTRStair::Render()
 
 	_float4x4		WorldMatrix;
 
-	XMStoreFloat4x4(&WorldMatrix, XMMatrixTranspose(m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix()));
-
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
@@ -83,7 +81,7 @@ HRESULT CTRStair::Render()
 	return S_OK;
 }
 
-CMesh * CTRStair::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMeshInstance * CTRStair::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CTRStair*		pInstance = new CTRStair(pDevice, pContext);
 

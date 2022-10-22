@@ -1,9 +1,9 @@
 #pragma once
 #include "Client_Defines.h"
-#include "Mesh.h"
+#include "MeshInstance.h"
 BEGIN(Client)
 
-class CTRFloor final : public CMesh
+class CTRFloor final : public CMeshInstance
 {
 
 private:
@@ -21,10 +21,10 @@ public:
 
 
 private:
-	CModel* m_pModel;
+	CModelInstance* m_pModel;
 
 public:
-	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CMeshInstance* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
 

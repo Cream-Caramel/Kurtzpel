@@ -11,6 +11,7 @@
 #include "Model.h"
 #include "AnimModel.h"
 #include "Navigation.h"
+#include "ModelInstance.h"
 
 BEGIN(Engine)
 
