@@ -21,7 +21,7 @@ public:
 
 
 private:
-	CModelInstance* m_pModel;
+	CModelsInstance* m_pModel = nullptr;
 
 public:
 	static CMeshInstance* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

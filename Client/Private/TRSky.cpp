@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\TRSky.h"
 #include "GameInstance.h"
-
+#include "ModelsInstance.h"
 CTRSky::CTRSky(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMeshInstance(pDevice, pContext)
 {
@@ -51,6 +51,7 @@ HRESULT CTRSky::Render()
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	_float4x4		WorldMatrix;
+	XMStoreFloat4x4(&WorldMatrix, XMMatrixIdentity());
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4))))
 		return E_FAIL;

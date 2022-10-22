@@ -325,7 +325,7 @@ HRESULT CLoader::LoadInstance(const char * FileName)
 {
 	string FileSave = FileName;
 
-	string temp = "../Data/ModelObject/";
+	string temp = "../Data/ModelInstance/";
 
 	FileSave = temp + FileSave + ".dat";
 
@@ -384,6 +384,7 @@ HRESULT CLoader::LoadInstance(const char * FileName)
 		if (Result == m_InstanceInfo.end())
 		{
 			vector<_float3*> MatrixVector;
+			MatrixVector.push_back(MatrixInfo);
 			m_InstanceInfo.emplace(Search, MatrixVector);
 		}
 		else
@@ -550,7 +551,7 @@ HRESULT CLoader::LoadModel(char * DatName)
 			if (iter != m_InstanceInfo.end())
 			{
 				if (FAILED(GI->Add_Prototype(LEVEL_STAGE1, ProtoName,
-					CModelInstance::Create(m_pDevice, m_pContext, ModelName, DatName, iter->second))))
+					CModelsInstance::Create(m_pDevice, m_pContext, ModelName, DatName, iter->second))))
 				{
 					Safe_Delete(ProtoName);
 					return E_FAIL;
@@ -657,7 +658,15 @@ void CLoader::Free()
 	DeleteCriticalSection(&m_CriticalSection);
 
 	CloseHandle(m_hThread);
-
+	for (auto& iter : m_InstanceInfo)
+	{
+		iter.first;
+		for (auto& Pointer : iter.second)
+		{
+			Safe_Delete(Pointer);
+		}
+	}
+	m_InstanceInfo.clear();
 	Safe_Release(m_pContext);
 	Safe_Release(m_pDevice);
 

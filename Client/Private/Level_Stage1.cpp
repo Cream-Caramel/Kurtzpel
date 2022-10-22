@@ -317,7 +317,7 @@ HRESULT CLevel_Stage1::Ready_Load_Model(char * DatName)
 {
 	string FileSave = DatName;
 
-	string temp = "../Data/ModelObject/";
+	string temp = "../Data/ModelInstanceObject/";
 
 	FileSave = temp  + FileSave + ".dat";
 
@@ -344,14 +344,6 @@ HRESULT CLevel_Stage1::Ready_Load_Model(char * DatName)
 
 	DWORD		dwByte = 0;
 
-	int ModelObjectSize;
-	ReadFile(hFile, &ModelObjectSize, sizeof(int), &dwByte, nullptr);
-
-	for (int i = 0; i < ModelObjectSize; ++i)
-	{
-		char Name[256];
-		ReadFile(hFile, Name, sizeof(char) * 256, &dwByte, nullptr);
-	}
 
 	while (true)
 	{

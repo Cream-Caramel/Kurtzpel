@@ -133,11 +133,11 @@
     <ClCompile Include="..\Private\Cell.cpp">
       <Filter>03.Components\08.Navigation\Cell</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\ModelInstance.cpp">
-      <Filter>03.Components\06.Model\Model\ModelInstance</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MeshInstanceContainer.cpp">
+    <ClCompile Include="..\Private\ModelInstanceContainer.cpp">
       <Filter>03.Components\06.Model\MeshContainer\ModelInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Public\ModelsInstance.cpp">
+      <Filter>03.Components\06.Model\Model\ModelInstance</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -288,14 +288,14 @@
     <ClInclude Include="..\Public\Cell.h">
       <Filter>03.Components\08.Navigation\Cell</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\ModelInstance.h">
-      <Filter>03.Components\06.Model\Model\ModelInstance</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MeshInstanceContainer.h">
-      <Filter>03.Components\06.Model\MeshContainer\ModelInstance</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\MeshContainer.h">
       <Filter>03.Components\06.Model\MeshContainer\NoneAnim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ModelInstanceContainer.h">
+      <Filter>03.Components\06.Model\MeshContainer\ModelInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ModelsInstance.h">
+      <Filter>03.Components\06.Model\Model\ModelInstance</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

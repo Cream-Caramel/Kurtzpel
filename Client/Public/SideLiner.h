@@ -21,7 +21,7 @@ public:
 
 
 private:
-	CModelInstance* m_pModel;
+	CModelsInstance* m_pModel = nullptr;
 
 
 public:
