@@ -9,12 +9,12 @@
 
 BEGIN(Engine)
 
-class CMeshInstanceContainer final : public CVIBuffer
+class CMeshContainer final : public CVIBuffer
 {
 private:
-	CMeshInstanceContainer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CMeshInstanceContainer(const CMeshInstanceContainer& rhs);
-	virtual ~CMeshInstanceContainer() = default;
+	CMeshContainer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMeshContainer(const CMeshContainer& rhs);
+	virtual ~CMeshContainer() = default;
 
 public:
 	_uint Get_MaterialIndex() const {
@@ -22,21 +22,15 @@ public:
 	}
 
 public:
-	virtual HRESULT Initialize_Prototype(_fmatrix PivotMatrix, CBinary* pBinary, vector<_float3*> MatrixInfo);
+	virtual HRESULT Initialize_Prototype(_fmatrix PivotMatrix, CBinary* pBinary);
 	virtual HRESULT Initialize(void* pArg);
-
-public:
-	virtual HRESULT Render();
 
 private:
 	_uint				m_iMaterialIndex = 0;
-	_uint				m_iInstanceStride = 0;
-	_uint				m_iNumInstance = 0;
-	ID3D11Buffer*			m_pVBInstance = nullptr;
 
 public:
-	static CMeshInstanceContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fmatrix PivotMatrix, CBinary* pBinary, vector<_float3*> MatrixInfo);
-	virtual CComponent* Clone(void* pArg);
+	static CMeshContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _fmatrix PivotMatrix, CBinary* pBinary);
+	virtual CComponent* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 };
 

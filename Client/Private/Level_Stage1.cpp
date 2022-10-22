@@ -356,12 +356,23 @@ HRESULT CLevel_Stage1::Ready_Load_Model(char * DatName)
 	while (true)
 	{
 		_tchar* ModelName = new _tchar[256];
-		ReadFile(hFile, ModelName, sizeof(_tchar) * 256, &dwByte, nullptr);		
+		ReadFile(hFile, ModelName, sizeof(_tchar) * 256, &dwByte, nullptr);
+
+		_float3 fScale;
+		ReadFile(hFile, &fScale, sizeof(_float3), &dwByte, nullptr);
+
+		_float4 fPos;
+		ReadFile(hFile, &fPos, sizeof(_float4), &dwByte, nullptr);
+
+		_float3 fAngle;
+		ReadFile(hFile, &fAngle, sizeof(_float3), &dwByte, nullptr);
 
 		CMesh::MESHINFO* MeshInfo;
 		MeshInfo = new CMesh::MESHINFO;
 		MeshInfo->sTag = ModelName;
-		
+		MeshInfo->fScale = fScale;
+		MeshInfo->fPos = fPos;
+		MeshInfo->fAngle = fAngle;
 
 		if (0 == dwByte)	// 더이상 읽을 데이터가 없을 경우
 		{

@@ -3,13 +3,13 @@
 #include "GameInstance.h"
 
 CTRFloor::CTRFloor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	:CMeshInstance(pDevice, pContext)
+	:CMesh(pDevice, pContext)
 {
 	m_pModel = nullptr;
 }
 
 CTRFloor::CTRFloor(const CTRFloor& rhs)
-	: CMeshInstance(rhs)
+	: CMesh(rhs)
 {
 }
 
@@ -52,6 +52,8 @@ HRESULT CTRFloor::Render()
 
 	_float4x4		WorldMatrix;
 
+	XMStoreFloat4x4(&WorldMatrix, XMMatrixTranspose(m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix()));
+
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
@@ -81,7 +83,7 @@ HRESULT CTRFloor::Render()
 	return S_OK;
 }
 
-CMeshInstance * CTRFloor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMesh * CTRFloor::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CTRFloor*		pInstance = new CTRFloor(pDevice, pContext);
 
@@ -111,4 +113,7 @@ void CTRFloor::Free()
 {
 	__super::Free();
 	Safe_Release(m_pModel);
+
+	
+
 }

@@ -257,13 +257,6 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CBossBarLine::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	char* a = new char[256];
-	char b[256] = "sad";
-	a[0] = b[0];
-
-	string c = a;
-
-	Safe_Delete_Array(a);
 
 
 
@@ -294,11 +287,6 @@ HRESULT CLoader::Loading_Shader()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMODEL_DECLARATION::Elements, VTXANIMMODEL_DECLARATION::iNumElements))))
 		return E_FAIL;
 
-	/* For.Prototype_Component_Shader_RectInstance*/
-	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_ModelInstance"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModelInstance.hlsl"), MODELINSTANCE_DECLARATION::Elements, MODELINSTANCE_DECLARATION::iNumElements))))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -317,86 +305,6 @@ HRESULT CLoader::Loading_Component()
 	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Collider_Sphere"),
 		CSphere::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
 		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CLoader::LoadInstance(const char * FileName)
-{
-	string FileSave = FileName;
-
-	string temp = "../Data/ModelObject/";
-
-	FileSave = temp + FileSave + ".dat";
-
-	wchar_t FilePath[256] = { 0 };
-
-	for (int i = 0; i < FileSave.size(); i++)
-	{
-		FilePath[i] = FileSave[i];
-	}
-
-	HANDLE		hFile = CreateFile(FilePath,			// 파일 경로와 이름 명시
-		GENERIC_READ,				// 파일 접근 모드 (GENERIC_WRITE 쓰기 전용, GENERIC_READ 읽기 전용)
-		NULL,						// 공유방식, 파일이 열려있는 상태에서 다른 프로세스가 오픈할 때 허용할 것인가, NULL인 경우 공유하지 않는다
-		NULL,						// 보안 속성, 기본값	
-		OPEN_EXISTING,				// 생성 방식, CREATE_ALWAYS는 파일이 없다면 생성, 있다면 덮어 쓰기, OPEN_EXISTING 파일이 있을 경우에면 열기
-		FILE_ATTRIBUTE_NORMAL,		// 파일 속성(읽기 전용, 숨기 등), FILE_ATTRIBUTE_NORMAL 아무런 속성이 없는 일반 파일 생성
-		NULL);						// 생성도리 파일의 속성을 제공할 템플릿 파일, 우리는 사용하지 않아서 NULL
-
-	if (INVALID_HANDLE_VALUE == hFile)
-	{
-
-		return E_FAIL;
-	}
-
-	DWORD		dwByte = 0;
-	
-
-	while (true)
-	{
-		_tchar* ModelName = new _tchar[256];
-		ReadFile(hFile, ModelName, sizeof(_tchar) * 256, &dwByte, nullptr);
-
-		_float3 Right;
-		ReadFile(hFile, &Right, sizeof(_float3), &dwByte, nullptr);
-		_float3 Up;
-		ReadFile(hFile, &Up, sizeof(_float3), &dwByte, nullptr);
-		_float3 Look;
-		ReadFile(hFile, &Look, sizeof(_float3), &dwByte, nullptr);
-		_float3 Pos;
-		ReadFile(hFile, &Pos, sizeof(_float3), &dwByte, nullptr);
-
-		if (0 == dwByte)	// 더이상 읽을 데이터가 없을 경우
-		{
-			Safe_Delete(ModelName);
-			break;
-		}
-
-		_float3* MatrixInfo = new _float3[4];
-		MatrixInfo[0] = Right;
-		MatrixInfo[1] = Up;
-		MatrixInfo[2] = Look;
-		MatrixInfo[3] = Pos;
-
-		wstring Search = ModelName;
-		auto& Result = m_InstanceInfo.find(Search);
-		if (Result == m_InstanceInfo.end())
-		{
-			vector<_float3*> MatrixVector;
-			m_InstanceInfo.emplace(Search, MatrixVector);
-		}
-		else
-			Result->second.push_back(MatrixInfo);
-
-
-		Safe_Delete_Array(ModelName);
-	}
-
-
-
-	// 3. 파일 소멸
-	CloseHandle(hFile);
 
 	return S_OK;
 }
@@ -507,9 +415,7 @@ HRESULT CLoader::LoadModel(char * DatName)
 		MessageBox(g_hWnd, _T("Load File"), _T("Fail"), MB_OK);
 		return E_FAIL;
 	}
-	if (strcmp(DatName, "Level_Static"))
-		LoadInstance(DatName);
-	
+
 	DWORD		dwByte = 0;
 
 	char* SavePath = new char[256];
@@ -542,18 +448,12 @@ HRESULT CLoader::LoadModel(char * DatName)
 		}
 		else if (!strcmp(DatName, "Level_Stage1"))
 		{
-			wstring Name = ProtoName;
-			auto& iter = m_InstanceInfo.find(Name);
-			if (iter != m_InstanceInfo.end())
+			if (FAILED(GI->Add_Prototype(LEVEL_STAGE1, ProtoName,
+				CModel::Create(m_pDevice, m_pContext, ModelName, DatName))))
 			{
-				if (FAILED(GI->Add_Prototype(LEVEL_STAGE1, ProtoName,
-					CModelInstance::Create(m_pDevice, m_pContext, ModelName, DatName, iter->second))))
-				{
-					Safe_Delete(ProtoName);
-					return E_FAIL;
-				}
+				Safe_Delete(ProtoName);
+				return E_FAIL;
 			}
-			
 			RM->Pushtchar(ProtoName);
 			Safe_Delete(ModelName);
 		}

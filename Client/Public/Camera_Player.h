@@ -29,10 +29,8 @@ public:
 	void Set_ScenePosInfo(vector<POSINFO> PosInfos);
 	void Set_SceneLookInfo(vector<LOOKINFO> LookInfos);
 private:
-	_bool m_bShake = false;
-
-	_uint m_iPosInfoIndex = 0; // ¾ÀÄ«¸Þ¶óÆ÷½ºÀÎµ¦½º
-	_uint m_iLookInfoIndex = 0; //¾À·èÆ÷½ºÀÎµ¦½º
+	_uint m_iPosInfoIndex = 0;
+	_uint m_iLookInfoIndex = 0;
 	_bool m_bPosPlay = false;
 	_bool m_bLookPlay = false;
 	_float m_fPosStopLimit = 0.f;

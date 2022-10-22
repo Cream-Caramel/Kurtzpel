@@ -3,13 +3,13 @@
 #include "GameInstance.h"
 
 CSideLiner::CSideLiner(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	:CMeshInstance(pDevice, pContext)
+	:CMesh(pDevice, pContext)
 {
 	m_pModel = nullptr;
 }
 
 CSideLiner::CSideLiner(const CSideLiner& rhs)
-	: CMeshInstance(rhs)
+	: CMesh(rhs)
 {
 }
 
@@ -52,6 +52,8 @@ HRESULT CSideLiner::Render()
 
 	_float4x4		WorldMatrix;
 
+	XMStoreFloat4x4(&WorldMatrix, XMMatrixTranspose(m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix()));
+
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
@@ -81,7 +83,7 @@ HRESULT CSideLiner::Render()
 	return S_OK;
 }
 
-CMeshInstance * CSideLiner::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMesh * CSideLiner::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CSideLiner*		pInstance = new CSideLiner(pDevice, pContext);
 
@@ -111,5 +113,7 @@ void CSideLiner::Free()
 {
 	__super::Free();
 	Safe_Release(m_pModel);
+
+	
 
 }

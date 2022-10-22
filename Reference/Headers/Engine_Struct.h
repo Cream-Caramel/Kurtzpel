@@ -152,22 +152,6 @@ namespace Engine
 		static const D3D11_INPUT_ELEMENT_DESC Elements[iNumElements];
 	}VTXCOL_DECLARATION;
 
-	typedef struct tagModelInstance
-	{
-		XMFLOAT4		vRight;
-		XMFLOAT4		vUp;
-		XMFLOAT4		vLook;
-		XMFLOAT4		vPosition;
-	}MODELINSTANCE;
-
-	typedef struct ENGINE_DLL tagModelInstance_Declaration
-	{
-		/* 내가 그릴려고 했던 정점(VTXTEX)과 해당 모델의 로컬 상탤르 ㄹ표현하는
-		VTXINSTANCE의 정보가 함께 셰이더로 전달되어야한다. */
-		static const unsigned int iNumElements = 8;
-		static const D3D11_INPUT_ELEMENT_DESC Elements[iNumElements];
-	}MODELINSTANCE_DECLARATION;
-
 	typedef struct tagGraphicDesc
 	{
 		enum WINMODE { MODE_FULL, MODE_WIN, MODE_END };
