@@ -8,6 +8,7 @@
 #include "OBB.h"
 #include "Collider_Manager.h"
 #include "Navigation.h"
+#include "Camera_Manager.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -89,6 +90,9 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
+
+	if (GI->Key_Down(DIK_5))
+		CRM->Start_Scene("Scene_Stage1");
 
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
@@ -1470,6 +1474,11 @@ void CPlayer::Set_PlayerUseInfo()
 	XMStoreFloat3(&m_vPlayerPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	m_fCamDistanceX = fabs(PM->Get_CameraPlayerPos().x - m_vPlayerPos.x);
 	m_fCamDistanceZ = fabs(PM->Get_CameraPlayerPos().z - m_vPlayerPos.z);
+}
+
+_float CPlayer::Get_NaviPosY()
+{
+	return m_pNavigation->Get_PosY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 }
 
 

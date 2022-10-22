@@ -38,7 +38,7 @@ public:
 
 public:
 	HRESULT Initialize(int iCellIndex, const _float3* pPoints, const _float3* pNormals, int* pNeighborIndex);
-	_bool isIn(_fvector vPosition, _int* pNeighborIndex);
+	_bool isIn(_fvector vPosition, _int* pNeighborIndex, _vector* vNormal);
 
 #ifdef _DEBUG
 public:

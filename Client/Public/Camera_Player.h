@@ -3,6 +3,7 @@
 #include "Client_Defines.h"
 #include "Camera.h"
 
+
 BEGIN(Client)
 class CPlayer;
 
@@ -23,14 +24,22 @@ public:
 public:
 	_float3 Get_Pos();
 	void Set_Pos(_float3 vPos);
-	_bool Move(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance = 0.1f);
 	void LookAt(_float3 TargetPos);
 	void PlayScene(_float fTimeDelta);
-	_float3 m_vDistance;
+	void Set_ScenePosInfo(vector<POSINFO> PosInfos);
+	void Set_SceneLookInfo(vector<LOOKINFO> LookInfos);
 private:
+	_uint m_iPosInfoIndex = 0;
+	_uint m_iLookInfoIndex = 0;
+	_bool m_bPosPlay = false;
+	_bool m_bLookPlay = false;
+	_float m_fPosStopLimit = 0.f;
+	_float m_fLookStopLimit = 0.f;
 	CPlayer* m_pPlayer = nullptr;
 	vector<POSINFO> m_PosInfo;
 	vector<LOOKINFO> m_LookInfo;
+	_float3 m_vDistance;
+	CTransform* m_pLookTransform = nullptr;
 public:
 	static CCamera_Player* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);

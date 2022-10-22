@@ -23,7 +23,7 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	_bool isMove(_fvector vPosition);
+	_bool isMove(_fvector vPosition, _vector* vNormal);
 	void Load_Cell(const char* pFilePath);
 	_float Get_PosY(_fvector vPos);
 	void Set_NaviRender() { m_bNaviRender = !m_bNaviRender; }

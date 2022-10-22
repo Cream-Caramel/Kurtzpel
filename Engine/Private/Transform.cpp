@@ -184,10 +184,12 @@ void CTransform::Move_LD(_float fTimeDelta, _float fSpeed)
 void CTransform::Go_Dir(_fvector vDir, _float fSpeed, CNavigation* pNavigation, _float fTimeDelta)
 {
 	_vector vPosition = Get_State(CTransform::STATE_POSITION);
-	_vector vDirN = XMVector3Normalize(vDir);
+	_vector vLook = XMVector3Normalize(vDir);
 
-	vPosition += vDir * fSpeed * fTimeDelta;
-	if (pNavigation->isMove(vPosition) == true)
+	vPosition += vLook * fSpeed * fTimeDelta;
+
+	_vector vNormal = { 0.f,0.f,0.f,0.f };
+	if (pNavigation->isMove(vPosition, &vNormal) == true)
 	{	
 		if (!m_bJump)
 		{
@@ -196,6 +198,17 @@ void CTransform::Go_Dir(_fvector vDir, _float fSpeed, CNavigation* pNavigation, 
 		}
 		else
 			Set_State(CTransform::STATE_POSITION, vPosition);
+	}
+	else
+	{
+		if(XMVectorGetX(XMVector3Length(vNormal)) == 0)
+			return;
+		_vector      vPosition = Get_State(CTransform::STATE_POSITION);
+		_vector vSlide = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vLook) * (-1.f), vNormal)) * vNormal;
+		vSlide += XMVector3Normalize(vLook);
+		vPosition += vSlide * m_TransformDesc.fSpeedPerSec * fTimeDelta;
+		vPosition = XMVectorSetY(vPosition, pNavigation->Get_PosY(vPosition));
+		Set_State(CTransform::STATE_POSITION, vPosition);
 	}
 }
 
@@ -283,7 +296,7 @@ void CTransform::LookAt_ForLandObject(_fvector vAt)
 
 }
 
-_bool  CTransform::Move(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance)
+_bool  CTransform::CameraMove(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector		vDirection = vTargetPos - vPosition;

@@ -16,6 +16,28 @@ void CCamera_Manager::Add_Camera_Player(CCamera_Player * pPlayerCam)
 	Safe_AddRef(m_pCamPlayer);
 }
 
+void CCamera_Manager::Start_Scene(const char * SceneName)
+{
+	m_bScene = true;
+
+	for (auto& iter : m_CamPosInfo)
+	{
+		if (!strcmp(SceneName, iter.first))
+			m_pCamPlayer->Set_ScenePosInfo(iter.second);
+	}
+
+	for (auto& iter : m_CamLookInfo)
+	{
+		if (!strcmp(SceneName, iter.first))
+			m_pCamPlayer->Set_SceneLookInfo(iter.second);
+	}
+}
+
+void CCamera_Manager::End_Scene()
+{
+	m_bScene = false;
+}
+
 void CCamera_Manager::Load_Scene(char * FileName)
 {
 	string FileSave = FileName;
@@ -52,6 +74,8 @@ void CCamera_Manager::Load_Scene(char * FileName)
 	int PosCubeSize;
 	ReadFile(hFile, &PosCubeSize, sizeof(int), &dwByte, nullptr);
 
+	vector<POSINFO> PosInfos;
+
 	for (int i = 0; i < PosCubeSize; ++i)
 	{
 		_float3 Pos;
@@ -75,14 +99,17 @@ void CCamera_Manager::Load_Scene(char * FileName)
 		PosInfo.fCamSpeed = CamSpeed;
 		PosInfo.fStopLimit = StopLimit;
 
-		if (!strcmp(FileName, "Scene_Stage1"))
-		{
-			m_Stage1Pos.push_back(PosInfo);
-		}
+		PosInfos.push_back(PosInfo);
+		
 	}
+
+	Push_CamPosInfo(FileName, PosInfos);
+
 
 	int LookCubeSize;
 	ReadFile(hFile, &LookCubeSize, sizeof(int), &dwByte, nullptr);
+
+	vector<LOOKINFO> LookInfos;
 
 	for (int i = 0; i < LookCubeSize; ++i)
 	{
@@ -107,15 +134,30 @@ void CCamera_Manager::Load_Scene(char * FileName)
 		LookInfo.fCamSpeed = CamSpeed;
 		LookInfo.fStopLimit = StopLimit;
 
-		if (!strcmp(FileName, "Scene_Stage1"))
-		{
-			m_Stage1Look.push_back(LookInfo);
-		}
+		LookInfos.push_back(LookInfo);
 	
 	}
 
+	Push_CamLookInfo(FileName, LookInfos);
+
 	// 3. ÆÄÀÏ ¼Ò¸ê
 	CloseHandle(hFile);
+}
+
+void CCamera_Manager::Push_CamPosInfo(const char* FileName, vector<POSINFO> PosInfos)
+{
+	if (!strcmp(FileName, "Scene_Stage1"))
+	{
+		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
+	}
+}
+
+void CCamera_Manager::Push_CamLookInfo(const char * FileName, vector<LOOKINFO> LookInfos)
+{
+	if (!strcmp(FileName, "Scene_Stage1"))
+	{
+		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
+	}
 }
 
 void CCamera_Manager::Free()

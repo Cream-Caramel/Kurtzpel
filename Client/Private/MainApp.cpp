@@ -5,6 +5,7 @@
 #include "Release_Manager.h"
 #include "Pointer_Manager.h"
 #include "Collider_Manager.h"
+#include "Camera_Manager.h"
 #include "UI_Manager.h"
 
 using namespace Client;
@@ -185,4 +186,5 @@ void CMainApp::Free()
 	CPointer_Manager::Destroy_Instance();
 	CUI_Manager::Destroy_Instance();
 	CCollider_Manager::Destroy_Instance();
+	CCamera_Manager::Destroy_Instance();
 }

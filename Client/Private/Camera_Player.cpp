@@ -31,6 +31,9 @@ HRESULT CCamera_Player::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Transform"), TEXT("Com_Transform"), (CComponent**)&m_pLookTransform)))
+		return E_FAIL;
+
 	m_pPlayer = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pPlayer);
 
@@ -73,15 +76,13 @@ void CCamera_Player::LateTick(_float fTimeDelta)
 
 		_float4 _vCurPos;
 		XMStoreFloat4(&_vCurPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] < 0.1f)
+		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] < m_pPlayer->Get_NaviPosY())
 		{
 			_float4 Pos;
 			XMStoreFloat4(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ Pos.x,0.1f,Pos.z,1.f });
-
-
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ Pos.x,m_pPlayer->Get_NaviPosY() + 0.1f,Pos.z,1.f });
 		}
-		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] <= 0.1f)
+		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] <= m_pPlayer->Get_NaviPosY() + 0.1f)
 		{
 			if (m_vDistance.z < -2.f)
 			{
@@ -120,10 +121,6 @@ void CCamera_Player::Set_Pos(_float3 vPos)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, temp);
 }
 
-_bool CCamera_Player::Move(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance)
-{
-	return m_pTransformCom->Move(vTargetPos, fSpeed, fTimeDelta, fLimitDistance);
-}
 
 void CCamera_Player::LookAt(_float3 TargetPos)
 {
@@ -133,8 +130,97 @@ void CCamera_Player::LookAt(_float3 TargetPos)
 
 void CCamera_Player::PlayScene(_float fTimeDelta)
 {
+	if (m_bPosPlay)
+	{		
+		m_pTransformCom->LookAt(m_pLookTransform->Get_State(CTransform::STATE_POSITION));
+		if (m_PosInfo[m_iPosInfoIndex].fStopLimit > 0)
+		{
+			m_fPosStopLimit += 1.f * fTimeDelta;
+			if (m_fPosStopLimit >= m_PosInfo[m_iPosInfoIndex].fStopLimit)
+				m_PosInfo[m_iPosInfoIndex].fStopLimit = 0.f;
+		}
+		else
+		{
+			_vector vTempPos = XMLoadFloat3(&m_PosInfo[m_iPosInfoIndex].vPos);
+			vTempPos = XMVectorSetW(vTempPos, 1.f);
+			if (m_pTransformCom->CameraMove(vTempPos, m_PosInfo[m_iPosInfoIndex].fCamSpeed, fTimeDelta, m_PosInfo[m_iPosInfoIndex].fCamSpeed * 0.02f))
+			{
+				++m_iPosInfoIndex;
+				if (m_iPosInfoIndex == m_PosInfo.size())
+				{
+					m_bPosPlay = false;
+				}
+			}
+		}
+	}
 
 
+	if (m_bLookPlay)
+	{
+		if (m_LookInfo[m_iLookInfoIndex].fStopLimit > 0)
+		{
+			m_fLookStopLimit += 1.f * fTimeDelta;
+			if (m_fLookStopLimit >= m_LookInfo[m_iLookInfoIndex].fStopLimit)
+				m_LookInfo[m_iLookInfoIndex].fStopLimit = 0.f;
+		}
+		else
+		{
+			_vector vTempPos = XMLoadFloat3(&m_LookInfo[m_iLookInfoIndex].vPos);
+			vTempPos = XMVectorSetW(vTempPos, 1.f);
+			if (m_pLookTransform->CameraMove(vTempPos, m_LookInfo[m_iLookInfoIndex].fCamSpeed, fTimeDelta, m_LookInfo[m_iLookInfoIndex].fCamSpeed * 0.02f))
+			{
+				++m_iLookInfoIndex;
+				if (m_iLookInfoIndex == m_LookInfo.size())
+				{
+					m_bLookPlay = false;
+				}
+			}
+		}
+	}
+
+	if (!m_bPosPlay && !m_bLookPlay)
+	{
+		CRM->End_Scene();
+		m_pTransformCom->LookAt(m_pPlayer->Get_PlayerPos() + _vector{ 0.f,4.f,0.f,0.f });
+	}
+
+}
+
+void CCamera_Player::Set_ScenePosInfo(vector<POSINFO> PosInfos)
+{
+	m_PosInfo.clear();
+
+	m_PosInfo = PosInfos;
+
+	POSINFO StartInfo;
+	XMStoreFloat3(&StartInfo.vPos,m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	StartInfo.fCamSpeed = 20.f;
+	StartInfo.fStopLimit = 0.f;
+	m_PosInfo.insert(m_PosInfo.begin(), StartInfo);
+
+	POSINFO EndInfo;
+	XMStoreFloat3(&EndInfo.vPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	EndInfo.fCamSpeed = 20.f;
+	EndInfo.fStopLimit = 0.f;
+	m_PosInfo.push_back(EndInfo);
+
+	m_bPosPlay = true;
+
+	
+	
+}
+
+void CCamera_Player::Set_SceneLookInfo(vector<LOOKINFO> LookInfos)
+{
+	m_LookInfo.clear();
+	
+	m_LookInfo = LookInfos;
+
+	m_bLookPlay = true;
+
+	_vector LookPos = XMLoadFloat3(&m_LookInfo[m_iLookInfoIndex].vPos);
+	LookPos = XMVectorSetW(LookPos, 1.f);
+	m_pLookTransform->Set_State(CTransform::STATE_POSITION, LookPos);
 }
 
 CCamera_Player * CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -169,5 +255,6 @@ void CCamera_Player::Free()
 {
 	__super::Free();
 	Safe_Release(m_pPlayer);
+	Safe_Release(m_pLookTransform);
 
 }

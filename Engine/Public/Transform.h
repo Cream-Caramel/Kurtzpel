@@ -76,7 +76,7 @@ public:
 
 	void LookAt(_fvector vAt);
 	void LookAt_ForLandObject(_fvector vAt);
-	_bool Move(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance = 0.1f);
+	_bool CameraMove(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance = 0.1f);
 
 	_float Get_Speed() { return m_TransformDesc.fSpeedPerSec; }
 	void Set_Speed(_float fSpeed) { m_TransformDesc.fSpeedPerSec = fSpeed; }

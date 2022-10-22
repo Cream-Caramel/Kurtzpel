@@ -97,9 +97,9 @@ void CCamera_Free::Set_Pos(_float3 vPos)
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, temp);
 }
 
-_bool CCamera_Free::Move(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance)
+_bool CCamera_Free::CameraMove(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance)
 {
-	return m_pTransformCom->Move(vTargetPos,fSpeed,fTimeDelta,fLimitDistance);
+	return m_pTransformCom->CameraMove(vTargetPos,fSpeed,fTimeDelta,fLimitDistance);
 }
 
 void CCamera_Free::LookAt(_float3 TargetPos)

@@ -23,7 +23,7 @@ public:
 public:
 	_float3 Get_Pos();
 	void Set_Pos(_float3 vPos);
-	_bool Move(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance = 0.1f);
+	_bool CameraMove(_fvector vTargetPos, _float fSpeed, _float fTimeDelta, _float fLimitDistance = 0.1f);
 	void LookAt(_float3 TargetPos);
 
 public:

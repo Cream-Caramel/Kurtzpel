@@ -15,11 +15,15 @@ public:
 public:
 	void Add_Camera_Player(CCamera_Player* pPlayerCam);
 	_bool Get_bScene() { return m_bScene; }
+	void Start_Scene(const char* SceneName);
+	void End_Scene();
 	void Load_Scene(char* FileName);
+	void Push_CamPosInfo(const char* FileName, vector<POSINFO> PosInfos);
+	void Push_CamLookInfo(const char* FileName, vector<LOOKINFO> LookInfos);
 private:
 	_bool m_bScene = false;
-	vector<POSINFO> m_Stage1Pos;
-	vector<LOOKINFO> m_Stage1Look;
+	list<pair<const char*,vector<POSINFO>>> m_CamPosInfo;
+	list<pair<const char*,vector<LOOKINFO>>> m_CamLookInfo;
 
 private:
 	CCamera_Player* m_pCamPlayer = nullptr;
