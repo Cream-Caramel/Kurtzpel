@@ -411,6 +411,9 @@ HRESULT CLoader::Loading_ForStage1()
 	if (FAILED(GI->Add_Prototype(LEVEL_STAGE1, TEXT("NavigationStage1"),
 		CNavigation::Create(m_pDevice, m_pContext, "Level_Stage1"))))
 		return E_FAIL;
+
+	LoadInstance("Level_Stage1");
+
 	m_isFinished = true;
 	return S_OK;
 }
