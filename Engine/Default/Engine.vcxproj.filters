@@ -133,6 +133,12 @@
     <ClCompile Include="..\Private\Cell.cpp">
       <Filter>03.Components\08.Navigation\Cell</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\ModelInstance.cpp">
+      <Filter>03.Components\06.Model\Model\ModelInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeshInstanceContainer.cpp">
+      <Filter>03.Components\06.Model\MeshContainer\ModelInstance</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -240,9 +246,6 @@
     <ClInclude Include="..\Public\Model.h">
       <Filter>03.Components\06.Model\Model\NoneAnimModel</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MeshContainer.h">
-      <Filter>03.Components\06.Model\MeshContainer\NoneAnim</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\AnimMeshContainer.h">
       <Filter>03.Components\06.Model\MeshContainer\Anim</Filter>
     </ClInclude>
@@ -284,6 +287,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Cell.h">
       <Filter>03.Components\08.Navigation\Cell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ModelInstance.h">
+      <Filter>03.Components\06.Model\Model\ModelInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshInstanceContainer.h">
+      <Filter>03.Components\06.Model\MeshContainer\ModelInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshContainer.h">
+      <Filter>03.Components\06.Model\MeshContainer\NoneAnim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -436,6 +448,12 @@
     </Filter>
     <Filter Include="03.Components\08.Navigation\Shader">
       <UniqueIdentifier>{f4ce42a3-bb38-41c0-80f6-a5b730191ed2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.Components\06.Model\Model\ModelInstance">
+      <UniqueIdentifier>{c5f1650a-ac7a-4f4e-9597-208d5347fdff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.Components\06.Model\MeshContainer\ModelInstance">
+      <UniqueIdentifier>{fcd4a18d-dcbb-4b4b-9815-dc4b03bb1c4d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
