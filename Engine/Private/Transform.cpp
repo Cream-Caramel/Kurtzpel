@@ -1,5 +1,6 @@
 #include "..\Public\Transform.h"
 #include "Navigation.h"
+#include "GameInstance.h"
 CTransform::CTransform(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -286,6 +287,8 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 void CTransform::LookAt(_fvector vAt)
 {
 	_vector		vLook = vAt - Get_State(CTransform::STATE_POSITION);
+	if (FLT_MIN >= XMVectorGetX(XMVector3Length(vLook)))
+		return;
 
 	_vector		vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook);
 
@@ -317,7 +320,6 @@ _bool  CTransform::CameraMove(_fvector vTargetPos, _float fSpeed, _float fTimeDe
 {
 	_vector		vPosition = Get_State(CTransform::STATE_POSITION);
 	_vector		vDirection = vTargetPos - vPosition;
-
 	_float		fDistance = XMVectorGetX(XMVector3Length(vDirection));
 
 	if (fDistance > fLimitDistance)

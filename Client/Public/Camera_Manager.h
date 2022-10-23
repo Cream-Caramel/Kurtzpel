@@ -17,7 +17,7 @@ public:
 	_bool Get_bScene() { return m_bScene; }
 	_bool Get_bPlayerScene() { return m_bPlayerScene; }
 	void Start_Scene(const char* SceneName);
-	void Set_PlayerScene() { m_bPlayerScene = true; }
+	void Set_PlayerScene(_bool bPlayerScene) { m_bPlayerScene = bPlayerScene; }
 	void End_Scene();
 	void Load_Scene(char* FileName);
 	void Push_CamPosInfo(const char* FileName, vector<POSINFO> PosInfos);

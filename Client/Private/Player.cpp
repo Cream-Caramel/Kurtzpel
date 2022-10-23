@@ -93,7 +93,7 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_4))
 	{
-		CRM->Set_PlayerScene();
+		CRM->Set_PlayerScene(true);
 		CRM->Start_Scene("Test");
 		
 	}
@@ -158,7 +158,7 @@ void CPlayer::LateTick(_float fTimeDelta)
 	
 	if(m_bCollision)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYER, this, m_pOBB[OBB_BODY]);
-
+	
 	Set_PlayerUseInfo();
 }
 
@@ -199,6 +199,8 @@ HRESULT CPlayer::Render()
 	}
 
 	m_pNavigation->Render();
+
+	
 	return S_OK;
 }
 

@@ -34,6 +34,9 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Prototype_Component()))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Fonts(m_pDevice, m_pContext, TEXT("Font_Nexon"), TEXT("../Bin/Resources/Fonts/129ex.spritefont"))))
+		return E_FAIL;
+
 	if (FAILED(Open_Level(LEVEL_STATIC)))
 		return E_FAIL;
 	
@@ -75,11 +78,11 @@ HRESULT CMainApp::Render()
 
 	m_pGameInstance->Clear_BackBuffer_View(BackColor);
 	m_pGameInstance->Clear_DepthStencil_View();
-	
 	m_pRenderer->Draw();
 	m_pGameInstance->Render_Level();
 	CM->Collider_Render();
 	CM->End_Collision();
+	
 	m_pGameInstance->Present();
 
 	
@@ -92,6 +95,8 @@ HRESULT CMainApp::Render()
 		m_iNumDraw = 0;
 		m_fTimeAcc = 0.f;
 		SetWindowText(g_hWnd, m_szFPS);
+		
+	
 	}
 	
 

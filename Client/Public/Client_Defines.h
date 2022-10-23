@@ -30,6 +30,7 @@ namespace Client
 #define UM CUI_Manager::Get_Instance()
 #define CM CCollider_Manager::Get_Instance()
 #define CRM CCamera_Manager::Get_Instance()
+#define FONT GI->Render_Fonts(TEXT("Font_Nexon"),
 }
 
 

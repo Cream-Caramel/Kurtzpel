@@ -190,6 +190,7 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 			{
 
 				CRM->End_Scene();
+				CRM->Set_PlayerScene(false);
 			
 			}
 			else
@@ -209,28 +210,30 @@ void CCamera_Player::Set_ScenePosInfo(vector<POSINFO> PosInfos)
 	m_PosInfo.clear();
 
 	m_PosInfo = PosInfos;
-	_vector FixPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
-
+	
 	if (CRM->Get_bPlayerScene())
 	{
+		_vector PlayerPos = XMLoadFloat3(&PM->Get_PlayerPointer()->Get_Pos());
 		for (auto& iter : m_PosInfo)
-			XMStoreFloat3(&iter.vPos, XMLoadFloat3(&iter.vPos) + FixPos);
+			XMStoreFloat3(&iter.vPos, XMLoadFloat3(&iter.vPos) + PlayerPos);
 	}
-	POSINFO StartInfo;
-	XMStoreFloat3(&StartInfo.vPos, _vector{ FixPos.m128_f32[0], FixPos.m128_f32[1] , FixPos.m128_f32[2] });
-	StartInfo.fCamSpeed = 20.f;
-	StartInfo.fStopLimit = 0.f;
-	m_PosInfo.insert(m_PosInfo.begin(), StartInfo);
-
-	POSINFO EndInfo;
-	XMStoreFloat3(&EndInfo.vPos, _vector{ FixPos.m128_f32[0], FixPos.m128_f32[1] , FixPos.m128_f32[2] });
-	EndInfo.fCamSpeed = 20.f;
-	EndInfo.fStopLimit = 0.f;
-	m_PosInfo.push_back(EndInfo);
+	_vector FixPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		POSINFO StartInfo;
+		XMStoreFloat3(&StartInfo.vPos, _vector{ FixPos.m128_f32[0], FixPos.m128_f32[1] , FixPos.m128_f32[2] });
+		StartInfo.fCamSpeed = 20.f;
+		StartInfo.fStopLimit = 0.f;
+		m_PosInfo.insert(m_PosInfo.begin(), StartInfo);
+	
+	
+		POSINFO EndInfo;
+		XMStoreFloat3(&EndInfo.vPos, _vector{ FixPos.m128_f32[0], FixPos.m128_f32[1] , FixPos.m128_f32[2] });
+		EndInfo.fCamSpeed = 20.f;
+		EndInfo.fStopLimit = 0.f;
+		m_PosInfo.push_back(EndInfo);
+	
 
 	m_bPosPlay = true;
 
-	
 	
 }
 
@@ -239,11 +242,12 @@ void CCamera_Player::Set_SceneLookInfo(vector<LOOKINFO> LookInfos)
 	m_LookInfo.clear();
 	
 	m_LookInfo = LookInfos;
-	_vector FixPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	
 	if (CRM->Get_bPlayerScene())
 	{
+		_vector PlayerPos = XMLoadFloat3(&PM->Get_PlayerPointer()->Get_Pos());
 		for (auto& iter : m_LookInfo)
-			XMStoreFloat3(&iter.vPos, XMLoadFloat3(&iter.vPos) + FixPos);
+			XMStoreFloat3(&iter.vPos, XMLoadFloat3(&iter.vPos) + PlayerPos);
 	}
 
 	m_bLookPlay = true;

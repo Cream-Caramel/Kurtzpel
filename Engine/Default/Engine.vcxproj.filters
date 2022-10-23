@@ -83,7 +83,7 @@
       <Filter>03.Components\02.VIBuffer\Tile</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Picking.cpp">
-      <Filter>04.Utility\Picking</Filter>
+      <Filter>04.Utility\03.Picking</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\AnimModel.cpp">
       <Filter>03.Components\06.Model\Model\AnimModel</Filter>
@@ -138,6 +138,12 @@
     </ClCompile>
     <ClCompile Include="..\Public\ModelsInstance.cpp">
       <Filter>03.Components\06.Model\Model\ModelInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CustomFont.cpp">
+      <Filter>04.Utility\04.Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Font_Manager.cpp">
+      <Filter>04.Utility\04.Font\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -238,7 +244,7 @@
       <Filter>03.Components\02.VIBuffer\Tile</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Picking.h">
-      <Filter>04.Utility\Picking</Filter>
+      <Filter>04.Utility\03.Picking</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\AnimModel.h">
       <Filter>03.Components\06.Model\Model\AnimModel</Filter>
@@ -296,6 +302,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\ModelsInstance.h">
       <Filter>03.Components\06.Model\Model\ModelInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CustomFont.h">
+      <Filter>04.Utility\04.Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Font_Manager.h">
+      <Filter>04.Utility\04.Font\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -380,9 +392,6 @@
     <Filter Include="03.Components\02.VIBuffer\Tile">
       <UniqueIdentifier>{ebefc473-a1d6-4014-bfd4-347d9ff28ebb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04.Utility\Picking">
-      <UniqueIdentifier>{afeadb11-5b5e-4d12-93ba-27d0cfc124a0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03.Components\06.Model">
       <UniqueIdentifier>{0459306f-2061-412b-aa5b-bdb8d8eff2c3}</UniqueIdentifier>
     </Filter>
@@ -454,6 +463,15 @@
     </Filter>
     <Filter Include="03.Components\06.Model\MeshContainer\ModelInstance">
       <UniqueIdentifier>{fcd4a18d-dcbb-4b4b-9815-dc4b03bb1c4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Utility\03.Picking">
+      <UniqueIdentifier>{afeadb11-5b5e-4d12-93ba-27d0cfc124a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Utility\04.Font">
+      <UniqueIdentifier>{e8dbc5b8-28e7-4cbb-bd04-9ad19e795891}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Utility\04.Font\Manager">
+      <UniqueIdentifier>{ffcb4ad3-d899-440f-a3a1-f12772df5f70}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
