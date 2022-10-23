@@ -171,6 +171,11 @@ void CCamera_Manager::Push_CamLookInfo(const char * FileName, vector<LOOKINFO> L
 	}
 }
 
+void CCamera_Manager::Start_Shake(_float fShakeTime, _float fShakePower, _float fShakeSpeed)
+{
+	m_pCamPlayer->Start_Shake(fShakeTime, fShakePower, fShakeSpeed);
+}
+
 void CCamera_Manager::Free()
 {
 	Safe_Release(m_pCamPlayer);

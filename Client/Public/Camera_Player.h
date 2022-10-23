@@ -28,9 +28,23 @@ public:
 	void PlayScene(_float fTimeDelta);
 	void Set_ScenePosInfo(vector<POSINFO> PosInfos);
 	void Set_SceneLookInfo(vector<LOOKINFO> LookInfos);
-	
+	void Start_Shake(_float fShakeTime, _float fShakePower, _float fShakeSpeed);
+	void Shake(_float fTimeDelta);
+	void End_Shake();
+
+
 private:
 	_bool m_bShake = false;
+	_bool m_bDir = false;
+	_float m_fShakeTime = 0.f;
+	_float m_fShakePower = 0.f;
+	_float m_fShakePowerAcc = 0.f;
+	_float m_fShakeTimeAcc = 0.f;
+	_float m_fShakeSpeed = 0.f;
+	_float m_fShakeSpeedAcc = 0.f;
+	_vector m_vRightPos = { 0.f,0.f,0.f,1.f };
+	_vector m_vLeftPos = { 0.f,0.f,0.f,1.f };
+	_float3 m_vOriginPos = { 0.f,0.f,0.f};
 	_vector m_vStartLook = { 0.f,0.f,0.f };
 	_uint m_iPosInfoIndex = 0; // ¾ÀÄ«¸Þ¶óÆ÷½ºÀÎµ¦½º
 	_uint m_iLookInfoIndex = 0; //¾À·èÆ÷½ºÀÎµ¦½º

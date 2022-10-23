@@ -91,6 +91,11 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
 
+	if (GI->Key_Down(DIK_3))
+	{
+		CRM->Start_Shake(0.3f, 1.f, 0.02f);
+	}
+
 	if (GI->Key_Down(DIK_4))
 	{
 		CRM->Set_PlayerScene(true);

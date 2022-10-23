@@ -195,10 +195,10 @@ void CTransform::Go_Dir(_fvector vDir, _float fSpeed, CNavigation* pNavigation, 
 		if (!m_bJump)
 		{
 			vPosition = XMVectorSetY(vPosition, pNavigation->Get_PosY(vPosition));
-			Set_State(CTransform::STATE_POSITION, vPosition);
 		}
-		else
-			Set_State(CTransform::STATE_POSITION, vPosition);
+		Set_State(CTransform::STATE_POSITION, vPosition);
+
+		
 	}
 	else
 	{
@@ -208,7 +208,10 @@ void CTransform::Go_Dir(_fvector vDir, _float fSpeed, CNavigation* pNavigation, 
 		_vector vSlide = XMVectorGetX(XMVector3Dot(XMVector3Normalize(vLook) * (-1.f), vNormal)) * vNormal;
 		vSlide += XMVector3Normalize(vLook);
 		vPosition += vSlide * m_TransformDesc.fSpeedPerSec * fTimeDelta;
-		vPosition = XMVectorSetY(vPosition, pNavigation->Get_PosY(vPosition));
+		if (!m_bJump)
+		{
+			vPosition = XMVectorSetY(vPosition, pNavigation->Get_PosY(vPosition));
+		}
 		Set_State(CTransform::STATE_POSITION, vPosition);
 	}
 }

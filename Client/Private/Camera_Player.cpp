@@ -94,6 +94,10 @@ void CCamera_Player::LateTick(_float fTimeDelta)
 		{
 			m_vDistance.z -= 0.1f;
 		}		
+
+		if (m_bShake)
+			Shake(fTimeDelta);
+
 		__super::Tick(fTimeDelta);
 	}	
 	else
@@ -257,6 +261,60 @@ void CCamera_Player::Set_SceneLookInfo(vector<LOOKINFO> LookInfos)
 	_vector LookPos = XMLoadFloat3(&m_LookInfo[m_iLookInfoIndex].vPos);
 	LookPos = XMVectorSetW(LookPos, 1.f);
 	m_pLookTransform->Set_State(CTransform::STATE_POSITION, LookPos);
+}
+
+void CCamera_Player::Start_Shake(_float fShakeTime, _float fShakePower, _float fShakeSpeed)
+{
+	m_bShake = true;
+	m_fShakeTime = fShakeTime;
+	m_fShakePower = fShakePower;
+	m_fShakeSpeed = fShakeSpeed;
+
+	XMStoreFloat3(&m_vOriginPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+	m_vRightPos = { m_vOriginPos.x + m_fShakeSpeed, m_vOriginPos.y + m_fShakeSpeed, m_vOriginPos.z + m_fShakeSpeed, 1.f };
+	m_vLeftPos = { m_vOriginPos.x - m_fShakeSpeed, m_vOriginPos.y - m_fShakeSpeed, m_vOriginPos.z - m_fShakeSpeed, 1.f };
+	
+}
+
+void CCamera_Player::Shake(_float fTimeDelta)
+{
+	m_fShakeTimeAcc += 1.f * fTimeDelta;
+	if (m_fShakeTimeAcc >= m_fShakeTime)
+	{
+		End_Shake();
+	}
+
+	m_fShakeSpeedAcc += 1.f * fTimeDelta;
+	if (m_fShakeSpeedAcc >= m_fShakeSpeed)
+	{
+		m_bDir = !m_bDir;
+		m_fShakeSpeedAcc = 0.f;
+		m_fShakePowerAcc = 0.f;
+	}
+
+	m_fShakePowerAcc += m_fShakePower * fTimeDelta;
+	if (m_bDir)
+	{		
+		_vector RightPos = { m_vOriginPos.x + m_fShakePowerAcc, m_vOriginPos.y + m_fShakePowerAcc, m_vOriginPos.z + m_fShakePowerAcc, 1.f };
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, RightPos);
+	}
+	else
+	{		
+		_vector vLeftPos = { m_vOriginPos.x - m_fShakePowerAcc, m_vOriginPos.y - m_fShakePowerAcc, m_vOriginPos.z - m_fShakePowerAcc, 1.f };
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vLeftPos);
+	}
+
+
+}
+
+void CCamera_Player::End_Shake()
+{
+	m_bShake = false;
+	m_fShakeSpeedAcc = 0.f;
+	m_fShakeTimeAcc = 0.f;
+	m_fShakePowerAcc = 0.f;
+	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vOriginPos);
 }
 
 CCamera_Player * CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

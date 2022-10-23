@@ -22,6 +22,7 @@ public:
 	void Load_Scene(char* FileName);
 	void Push_CamPosInfo(const char* FileName, vector<POSINFO> PosInfos);
 	void Push_CamLookInfo(const char* FileName, vector<LOOKINFO> LookInfos);
+	void Start_Shake(_float fShakeTime, _float fShakePower, _float fShakeSpeed);
 private:
 	_bool m_bScene = false;
 	_bool m_bPlayerScene = false;
