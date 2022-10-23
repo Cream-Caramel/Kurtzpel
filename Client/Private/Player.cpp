@@ -91,6 +91,12 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
 
+	if (GI->Key_Down(DIK_4))
+	{
+		CRM->Set_PlayerScene();
+		CRM->Start_Scene("Test");
+		
+	}
 	if (GI->Key_Down(DIK_5))
 		CRM->Start_Scene("Scene_Stage1");
 

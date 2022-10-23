@@ -8,6 +8,7 @@ IMPLEMENT_SINGLETON(CCamera_Manager)
 CCamera_Manager::CCamera_Manager()
 {
 	Load_Scene("Scene_Stage1");
+	Load_Scene("Test");
 }
 
 void CCamera_Manager::Add_Camera_Player(CCamera_Player * pPlayerCam)
@@ -150,11 +151,21 @@ void CCamera_Manager::Push_CamPosInfo(const char* FileName, vector<POSINFO> PosI
 	{
 		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
 	}
+
+	if (!strcmp(FileName, "Test"))
+	{
+		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
+	}
 }
 
 void CCamera_Manager::Push_CamLookInfo(const char * FileName, vector<LOOKINFO> LookInfos)
 {
 	if (!strcmp(FileName, "Scene_Stage1"))
+	{
+		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
+	}
+
+	if (!strcmp(FileName, "Test"))
 	{
 		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
 	}

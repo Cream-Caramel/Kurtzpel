@@ -28,9 +28,10 @@ public:
 	void PlayScene(_float fTimeDelta);
 	void Set_ScenePosInfo(vector<POSINFO> PosInfos);
 	void Set_SceneLookInfo(vector<LOOKINFO> LookInfos);
+	
 private:
 	_bool m_bShake = false;
-
+	_vector m_vStartLook = { 0.f,0.f,0.f };
 	_uint m_iPosInfoIndex = 0; // ¾ÀÄ«¸Þ¶óÆ÷½ºÀÎµ¦½º
 	_uint m_iLookInfoIndex = 0; //¾À·èÆ÷½ºÀÎµ¦½º
 	_bool m_bPosPlay = false;

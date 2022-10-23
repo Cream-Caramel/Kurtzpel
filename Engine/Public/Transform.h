@@ -72,6 +72,7 @@ public:
 
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Turn(_fvector StartLook, _fvector EndLook, _float _fRatio);
+	void TurnY(_fvector StartLook, _fvector EndLook, _float _fRatio);
 	void Rotation(_fvector vAxis, _float fRadian);
 
 	void LookAt(_fvector vAt);

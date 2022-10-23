@@ -254,6 +254,23 @@ void CTransform::Turn(_fvector StartLook, _fvector EndLook, _float _fRatio)
 
 }
 
+void CTransform::TurnY(_fvector StartLook, _fvector EndLook, _float _fRatio)
+{
+	_vector vLook, vRight, vUp;
+	vLook = (XMVector3Normalize(StartLook) * (1.f - _fRatio)) + (XMVector3Normalize(EndLook)*_fRatio);
+
+	vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
+	vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
+
+	_float3      vScale = Get_Scale();
+
+	Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScale.x);
+	Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook) * vScale.z);
+	Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScale.y);
+}
+
+
+
 void CTransform::Rotation(_fvector vAxis, _float fRadian)
 {
 	// Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(60.0f));
