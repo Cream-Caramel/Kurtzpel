@@ -51,6 +51,7 @@ void CCamera_Player::Tick(_float fTimeDelta)
 {
 	if (!CRM->Get_bScene())
 	{
+	
 		_long	MouseMove = 0;
 
 		if (MouseMove = GI->Get_DIMMoveState(DIMM_X))
@@ -62,6 +63,7 @@ void CCamera_Player::Tick(_float fTimeDelta)
 		{
 			m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), MouseMove * fTimeDelta * 0.05f);
 		}
+
 	}
 	
 }
@@ -70,10 +72,15 @@ void CCamera_Player::LateTick(_float fTimeDelta)
 {
 	if (!CRM->Get_bScene())
 	{
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pPlayer->Get_PlayerPos());
+		
+		if (m_bShake)
+			Shake(fTimeDelta);
+		else
+		{
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pPlayer->Get_PlayerPos());
 
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(XMLoadFloat3(&m_vDistance), m_pTransformCom->Get_WorldMatrix()));
-
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(XMLoadFloat3(&m_vDistance), m_pTransformCom->Get_WorldMatrix()));
+		}
 		_float4 _vCurPos;
 		XMStoreFloat4(&_vCurPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] < m_pPlayer->Get_NaviPosY())
@@ -95,9 +102,8 @@ void CCamera_Player::LateTick(_float fTimeDelta)
 			m_vDistance.z -= 0.1f;
 		}		
 
-		if (m_bShake)
-			Shake(fTimeDelta);
-
+	
+		
 		__super::Tick(fTimeDelta);
 	}	
 	else
@@ -296,13 +302,27 @@ void CCamera_Player::Shake(_float fTimeDelta)
 	m_fShakePowerAcc += m_fShakePower * fTimeDelta;
 	if (m_bDir)
 	{		
-		_vector RightPos = { m_vOriginPos.x + m_fShakePowerAcc, m_vOriginPos.y + m_fShakePowerAcc, m_vOriginPos.z + m_fShakePowerAcc, 1.f };
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, RightPos);
+		/*_vector RightPos = { m_vOriginPos.x + m_fShakePowerAcc, m_vOriginPos.y + m_fShakePowerAcc, m_vOriginPos.z + m_fShakePowerAcc, 1.f };
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, RightPos);*/
+
+		m_vDistance.x += m_fShakePowerAcc;
+		m_vDistance.y += m_fShakePowerAcc;
+		m_vDistance.z += m_fShakePowerAcc;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pPlayer->Get_PlayerPos());
+
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(XMLoadFloat3(&m_vDistance), m_pTransformCom->Get_WorldMatrix()));
 	}
 	else
 	{		
-		_vector vLeftPos = { m_vOriginPos.x - m_fShakePowerAcc, m_vOriginPos.y - m_fShakePowerAcc, m_vOriginPos.z - m_fShakePowerAcc, 1.f };
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vLeftPos);
+		/*_vector vLeftPos = { m_vOriginPos.x - m_fShakePowerAcc, m_vOriginPos.y - m_fShakePowerAcc, m_vOriginPos.z - m_fShakePowerAcc, 1.f };
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vLeftPos);*/
+
+		m_vDistance.x -= m_fShakePowerAcc;
+		m_vDistance.y -= m_fShakePowerAcc;
+		m_vDistance.z -= m_fShakePowerAcc;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pPlayer->Get_PlayerPos());
+
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMVector3TransformCoord(XMLoadFloat3(&m_vDistance), m_pTransformCom->Get_WorldMatrix()));
 	}
 
 
@@ -314,6 +334,7 @@ void CCamera_Player::End_Shake()
 	m_fShakeSpeedAcc = 0.f;
 	m_fShakeTimeAcc = 0.f;
 	m_fShakePowerAcc = 0.f;
+	m_vDistance = { 0.f,0.f,-6.f };
 	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vOriginPos);
 }
 
