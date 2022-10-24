@@ -5,6 +5,7 @@
 #include "Level_Logo.h"
 #include "Level_Stage1.h"
 #include "Level_Static.h"
+#include "Level_Stage4.h"
 #include "Loader.h"
 
 
@@ -50,6 +51,10 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			case LEVEL_STAGE1:
 				pNewLevel = CLevel_Stage1::Create(m_pDevice, m_pContext);
 				break;
+
+			case LEVEL_STAGE4:
+				pNewLevel = CLevel_Stage4::Create(m_pDevice, m_pContext);
+				break;
 			}
 
 			if (nullptr == pNewLevel)
@@ -60,9 +65,6 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 
 			except:
 			Safe_Release(pGameInstance);
-			if (GetKeyState(VK_RETURN) & 0x8000)
-			{
-		}
 	}
 }
 

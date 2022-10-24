@@ -67,6 +67,7 @@ public:
 	_bool Get_UseSkill() { return m_bUseSkill; } //스킬을 사용할수있는상태인지 체크
 	STATE Get_State() { return m_eCurState; } // 다른곳에서 사용하기위한 플레이어 상태를 넘겨줌
 	_float Get_NaviPosY();
+	HRESULT Create_Navigation(char* FileName);
 #pragma endregion MainFunction
 
 #pragma region UtilFunction

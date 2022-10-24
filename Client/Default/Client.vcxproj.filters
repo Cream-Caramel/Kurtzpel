@@ -136,6 +136,9 @@
     <Filter Include="96.Manager\ColliderManager">
       <UniqueIdentifier>{3f938abd-13ba-414d-940e-3cb77041e18a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\Stage4">
+      <UniqueIdentifier>{bde64363-ed65-415e-8e04-b013ce72b4fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -324,6 +327,12 @@
     <ClInclude Include="..\Public\MeshInstance.h">
       <Filter>02.GameObjects\Mesh</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_Stage4.h">
+      <Filter>01.Levels\Stage4</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InstanceModel.h">
+      <Filter>02.GameObjects\Mesh\Map</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -493,6 +502,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\MeshInstance.cpp">
       <Filter>02.GameObjects\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Stage4.cpp">
+      <Filter>01.Levels\Stage4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InstanceModel.cpp">
+      <Filter>02.GameObjects\Mesh\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

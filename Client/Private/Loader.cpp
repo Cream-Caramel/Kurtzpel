@@ -29,6 +29,10 @@ _uint APIENTRY LoadingMain(void* pArg)
 	case LEVEL_STAGE1:
 		pLoader->Loading_ForStage1();
 		break;
+
+	case LEVEL_STAGE4:
+		pLoader->Loading_ForStage4();
+		break;
 	}
 	
 	LeaveCriticalSection(&pLoader->Get_CS());
@@ -74,12 +78,17 @@ HRESULT CLoader::Loading_ForStatic()
 		CTrail::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("InstanceModel"),
+		CInstanceModel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	lstrcpy(m_szLoadingText, TEXT("¸ðµ¨ ·ÎµùÁß "));
 
 	LoadAnimModel("Level_Static");
 
 	LoadModel("Level_Static");
 	LoadModel("Level_Stage1");
+	LoadModel("Level_Stage4");
 	
 	Loading_Shader();
 
@@ -419,6 +428,18 @@ HRESULT CLoader::Loading_ForStage1()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_ForStage4()
+{
+	if (FAILED(GI->Add_Prototype(LEVEL_STAGE4, TEXT("NavigationStage4"),
+		CNavigation::Create(m_pDevice, m_pContext, "Level_Stage4"))))
+		return E_FAIL;
+
+	LoadInstance("Level_Stage4");
+
+	m_isFinished = true;
+	return S_OK;
+}
+
 HRESULT CLoader::LoadAnimModel(char * DatName)
 {
 	string FileSave = DatName;
@@ -544,6 +565,7 @@ HRESULT CLoader::LoadModel(char * DatName)
 			RM->Pushtchar(ProtoName);
 			Safe_Delete(ModelName);
 		}
+
 		else if (!strcmp(DatName, "Level_Stage1"))
 		{
 			wstring Name = ProtoName;
@@ -561,6 +583,25 @@ HRESULT CLoader::LoadModel(char * DatName)
 			RM->Pushtchar(ProtoName);
 			Safe_Delete(ModelName);
 		}
+
+		else if (!strcmp(DatName, "Level_Stage4"))
+		{
+			wstring Name = ProtoName;
+			auto& iter = m_InstanceInfo.find(Name);
+			if (iter != m_InstanceInfo.end())
+			{
+				if (FAILED(GI->Add_Prototype(LEVEL_STAGE4, ProtoName,
+					CModelsInstance::Create(m_pDevice, m_pContext, ModelName, DatName, iter->second))))
+				{
+					Safe_Delete(ProtoName);
+					return E_FAIL;
+				}
+			}
+
+			RM->Pushtchar(ProtoName);
+			Safe_Delete(ModelName);
+		}
+		
 	}
 
 	delete SavePath;

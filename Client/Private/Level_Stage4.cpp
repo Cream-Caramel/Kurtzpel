@@ -1,20 +1,20 @@
 #include "stdafx.h"
-#include "..\Public\Level_Stage1.h"
+#include "..\Public\Level_Stage4.h"
 #include "GameInstance.h"
 #include "Camera_Free.h"
 #include "AnimMesh.h"
 #include "Mesh.h"
 #include "Pointer_Manager.h"
 #include "UI.h"
-#include "Level_Loading.h"
+#include "InstanceModel.h"
 
 
-CLevel_Stage1::CLevel_Stage1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CLevel_Stage4::CLevel_Stage4(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
 {
 }
 
-HRESULT CLevel_Stage1::Initialize()
+HRESULT CLevel_Stage4::Initialize()
 {
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
@@ -22,35 +22,28 @@ HRESULT CLevel_Stage1::Initialize()
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
 
+	/*if (FAILED(Ready_Load_AnimModel("Level_Stage4")))
+		return E_FAIL;*/
 
-	if (FAILED(Ready_Load_AnimModel("Level_Static")))
+
+	if (FAILED(Ready_Load_Model("Level_Stage4")))
 		return E_FAIL;
 
-	if (FAILED(Ready_Load_Model("Level_Stage1")))
-		return E_FAIL;
+	PM->Get_PlayerPointer()->Create_Navigation("Level_Stage4");
 
-	if (FAILED(Ready_UI("Level_Stage1")))
-		return E_FAIL;
+	/*if (FAILED(Ready_UI("Level_Stage4")))
+		return E_FAIL;*/
 
-	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
-		return E_FAIL;
-
-	PM->Get_PlayerPointer()->Create_Navigation("Level_Stage1");
 
 	return S_OK;
 }
 
-void CLevel_Stage1::Tick(_float fTimeDelta)
+void CLevel_Stage4::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-
-	if (GI->Key_Down(DIK_L))
-	{
-		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE4));
-	}
 }
 
-HRESULT CLevel_Stage1::Render()
+HRESULT CLevel_Stage4::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
@@ -58,7 +51,7 @@ HRESULT CLevel_Stage1::Render()
 	return S_OK;
 }
 
-HRESULT CLevel_Stage1::Ready_Lights()
+HRESULT CLevel_Stage4::Ready_Lights()
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
@@ -79,52 +72,7 @@ HRESULT CLevel_Stage1::Ready_Lights()
 	return S_OK;
 }
 
-HRESULT CLevel_Stage1::Ready_Layer_Camera(const _tchar * pLayerTag)
-{
-	CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
-	Safe_AddRef(pGameInstance);
-
-	CCamera::CAMERADESC			CameraDesc;
-
-	CameraDesc.vEye = _float4(0.f, 10.f, -10.f, 1.f);
-	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.fFovy = XMConvertToRadians(60.0f);
-	CameraDesc.fAspect = (_float)g_iWinSizeX / g_iWinSizeY;
-	CameraDesc.fNear = 0.2f;
-	CameraDesc.fFar = 300.0f;
-
-	CameraDesc.TransformDesc.fSpeedPerSec = 25.f;
-	CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-
-
-	/*if (FAILED(pGameInstance->Add_GameObjectToLayer(TEXT("Prototype_GameObject_Camera_Free"), LEVEL_STATIC, pLayerTag, &CameraDesc)))
-		return E_FAIL;*/
-
-	if (FAILED(pGameInstance->Add_GameObjectToLayer(TEXT("Prototype_GameObject_Camera_Player"), LEVEL_STATIC, pLayerTag, &CameraDesc)))
-		return E_FAIL;
-
-
-
-	Safe_Release(pGameInstance);
-
-	return S_OK;
-}
-
-
-HRESULT CLevel_Stage1::Ready_Layer_BackGround(const _tchar * pLayerTag)
-{
-	CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
-	Safe_AddRef(pGameInstance);
-
-	if (FAILED(pGameInstance->Add_GameObjectToLayer(TEXT("Prototype_GameObject_Terrain"), LEVEL_STAGE1, pLayerTag)))
-		return E_FAIL;
-	Safe_Release(pGameInstance);
-
-	return S_OK;
-}
-
-
-HRESULT CLevel_Stage1::Ready_Load_AnimModel(char * DatName)
+HRESULT CLevel_Stage4::Ready_Load_AnimModel(char * DatName)
 {
 
 	string FileSave = DatName;
@@ -215,7 +163,7 @@ HRESULT CLevel_Stage1::Ready_Load_AnimModel(char * DatName)
 	return S_OK;
 }
 
-HRESULT CLevel_Stage1::Ready_UI(char * DatName)
+HRESULT CLevel_Stage4::Ready_UI(char * DatName)
 {
 	string FileSave = DatName;
 
@@ -315,8 +263,7 @@ HRESULT CLevel_Stage1::Ready_UI(char * DatName)
 }
 
 
-
-HRESULT CLevel_Stage1::Ready_Load_Model(char * DatName)
+HRESULT CLevel_Stage4::Ready_Load_Model(char * DatName)
 {
 	string FileSave = DatName;
 
@@ -353,18 +300,19 @@ HRESULT CLevel_Stage1::Ready_Load_Model(char * DatName)
 		_tchar* ModelName = new _tchar[256];
 		ReadFile(hFile, ModelName, sizeof(_tchar) * 256, &dwByte, nullptr);		
 
-		CMesh::MESHINFO* MeshInfo;
-		MeshInfo = new CMesh::MESHINFO;
-		MeshInfo->sTag = ModelName;
+		CInstanceModel::INSTANCEINFO* InstanceInfo;
+		InstanceInfo = new CInstanceModel::INSTANCEINFO;
+		InstanceInfo->sTag = ModelName;
+		InstanceInfo->eLevel = LEVEL_STAGE4;
 		
 
 		if (0 == dwByte)	// 더이상 읽을 데이터가 없을 경우
 		{
 			Safe_Delete_Array(ModelName);
-			Safe_Delete(MeshInfo);
+			Safe_Delete(InstanceInfo);
 			break;
 		}
-		if (FAILED(GI->Add_GameObjectToLayer(ModelName, LEVEL_STAGE1, L"Layer_ModelObject", MeshInfo)))
+		if (FAILED(GI->Add_GameObjectToLayer(TEXT("InstanceModel"), LEVEL_STAGE4, L"Layer_ModelObject", InstanceInfo)))
 		{
 			wstring a = L"Please Load ProtoType";
 			wstring b = a + ModelName;
@@ -372,12 +320,12 @@ HRESULT CLevel_Stage1::Ready_Load_Model(char * DatName)
 			MSG_BOX(c);
 
 			Safe_Delete_Array(ModelName);
-			Safe_Delete(MeshInfo);
+			Safe_Delete(InstanceInfo);
 			return E_FAIL;
 		}
 
 		Safe_Delete_Array(ModelName);
-		Safe_Delete(MeshInfo);
+		Safe_Delete(InstanceInfo);
 	}
 	// 3. 파일 소멸
 	CloseHandle(hFile);
@@ -386,9 +334,9 @@ HRESULT CLevel_Stage1::Ready_Load_Model(char * DatName)
 }
 
 
-CLevel_Stage1 * CLevel_Stage1::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CLevel_Stage4 * CLevel_Stage4::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CLevel_Stage1*		pInstance = new CLevel_Stage1(pDevice, pContext);
+	CLevel_Stage4*		pInstance = new CLevel_Stage4(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize()))
 	{
@@ -399,7 +347,7 @@ CLevel_Stage1 * CLevel_Stage1::Create(ID3D11Device* pDevice, ID3D11DeviceContext
 	return pInstance;
 }
 
-void CLevel_Stage1::Free()
+void CLevel_Stage4::Free()
 {
 	__super::Free();
 

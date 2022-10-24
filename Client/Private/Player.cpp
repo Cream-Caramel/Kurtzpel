@@ -46,13 +46,9 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerBottom", TEXT("Bottom"), (CComponent**)&m_pAnimModel[MODEL_BOTTOM])))
 		return E_FAIL;
-
-
-	CNavigation::NAVIGATIONDESC NaviDesc;
-	NaviDesc.iCurrentIndex = 1;
-	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;
-
+	
+	/*if (FAILED(Create_Navigation("Level_Stage1")))
+		return E_FAIL;*/
 	
 	m_eCurState = IDLE;
 	m_eNextState = IDLE;
@@ -1492,6 +1488,34 @@ void CPlayer::Set_PlayerUseInfo()
 _float CPlayer::Get_NaviPosY()
 {
 	return m_pNavigation->Get_PosY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+}
+
+HRESULT CPlayer::Create_Navigation(char * FileName)
+{
+	if (m_pNavigation != nullptr)
+		Safe_Release(m_pNavigation);
+
+	if (!strcmp(FileName, "Level_Stage1"))
+	{
+		CNavigation::NAVIGATIONDESC NaviDesc;
+		NaviDesc.iCurrentIndex = 1;
+		if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
+			return E_FAIL;
+		_vector vPos = { 90.f, 0.6f, 103.f, 1.f };
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+	}
+
+	else if (!strcmp(FileName, "Level_Stage4"))
+	{
+		CNavigation::NAVIGATIONDESC NaviDesc;
+		NaviDesc.iCurrentIndex = 8;
+		if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
+			return E_FAIL;
+		_vector vPos = { 60.f, 0.5f, 0.f, 1.f };
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+	}
+
+	return S_OK;
 }
 
 

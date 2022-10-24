@@ -57,6 +57,10 @@ public:
 #pragma region Stage1
 	HRESULT Loading_ForStage1();
 #pragma endregion Stage1
+	
+#pragma region Stage4
+	HRESULT Loading_ForStage4();
+#pragma endregion Stage4
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;

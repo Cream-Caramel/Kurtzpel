@@ -32,6 +32,7 @@
 #include "TRSky.h"
 #include "TRStair.h"
 #include "SideLiner.h"
+#include "InstanceModel.h"
 #pragma endregion Model클래스
 
 #pragma region UI클래스
