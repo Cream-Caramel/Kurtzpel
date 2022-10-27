@@ -181,6 +181,7 @@
     <ClInclude Include="..\Public\Collider_Manager.h" />
     <ClInclude Include="..\Public\ExGauge.h" />
     <ClInclude Include="..\Public\ExSkillFrame.h" />
+    <ClInclude Include="..\Public\Golem.h" />
     <ClInclude Include="..\Public\HPBarFrame.h" />
     <ClInclude Include="..\Public\InstanceModel.h" />
     <ClInclude Include="..\Public\KeyE.h" />
@@ -192,6 +193,8 @@
     <ClInclude Include="..\Public\Level_Stage1.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
+    <ClInclude Include="..\Public\Level_Stage2.h" />
+    <ClInclude Include="..\Public\Level_Stage3.h" />
     <ClInclude Include="..\Public\Level_Stage4.h" />
     <ClInclude Include="..\Public\Level_Static.h" />
     <ClInclude Include="..\Public\Loader.h" />
@@ -245,6 +248,7 @@
     <ClCompile Include="..\Private\Collider_Manager.cpp" />
     <ClCompile Include="..\Private\ExGauge.cpp" />
     <ClCompile Include="..\Private\ExSkillFrame.cpp" />
+    <ClCompile Include="..\Private\Golem.cpp" />
     <ClCompile Include="..\Private\HPBarFrame.cpp" />
     <ClCompile Include="..\Private\InstanceModel.cpp" />
     <ClCompile Include="..\Private\KeyE.cpp" />
@@ -256,6 +260,8 @@
     <ClCompile Include="..\Private\Level_Stage1.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
+    <ClCompile Include="..\Private\Level_Stage2.cpp" />
+    <ClCompile Include="..\Private\Level_Stage3.cpp" />
     <ClCompile Include="..\Private\Level_Stage4.cpp" />
     <ClCompile Include="..\Private\Level_Static.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />

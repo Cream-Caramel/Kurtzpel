@@ -19,7 +19,7 @@ public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 
-	void Render();
+	HRESULT Render();
 
 	HRESULT CreateTile();
 	HRESULT Map(D3D11_MAPPED_SUBRESOURCE* pSubResource);

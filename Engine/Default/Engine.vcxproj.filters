@@ -25,9 +25,6 @@
     <ClCompile Include="..\Private\Component_Manager.cpp">
       <Filter>03.Components\00.Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Renderer.cpp">
-      <Filter>03.Components\01.Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Object_Manager.cpp">
       <Filter>02.GameObjects\00.Manager</Filter>
     </ClCompile>
@@ -72,12 +69,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_Cube.cpp">
       <Filter>03.Components\02.VIBuffer\Cube</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Light.cpp">
-      <Filter>04.Utility\02.Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Light_Manager.cpp">
-      <Filter>04.Utility\02.Lights\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_Tile.cpp">
       <Filter>03.Components\02.VIBuffer\Tile</Filter>
@@ -145,6 +136,21 @@
     <ClCompile Include="..\Private\Font_Manager.cpp">
       <Filter>04.Utility\04.Font\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Renderer.cpp">
+      <Filter>03.Components\01.Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Light.cpp">
+      <Filter>04.Utility\02.Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Light_Manager.cpp">
+      <Filter>04.Utility\02.Lights\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RenderTarget.cpp">
+      <Filter>04.Utility\05.RenderTarget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Target_Manager.cpp">
+      <Filter>04.Utility\05.RenderTarget\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -189,9 +195,6 @@
     <ClInclude Include="..\Public\Component_Manager.h">
       <Filter>03.Components\00.Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Renderer.h">
-      <Filter>03.Components\01.Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Object_Manager.h">
       <Filter>02.GameObjects\00.Manager</Filter>
     </ClInclude>
@@ -233,12 +236,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\VIBuffer_Cube.h">
       <Filter>03.Components\02.VIBuffer\Cube</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Light.h">
-      <Filter>04.Utility\02.Lights</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Light_Manager.h">
-      <Filter>04.Utility\02.Lights\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\VIBuffer_Tile.h">
       <Filter>03.Components\02.VIBuffer\Tile</Filter>
@@ -308,6 +305,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\Font_Manager.h">
       <Filter>04.Utility\04.Font\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Renderer.h">
+      <Filter>03.Components\01.Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Light.h">
+      <Filter>04.Utility\02.Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Light_Manager.h">
+      <Filter>04.Utility\02.Lights\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RenderTarget.h">
+      <Filter>04.Utility\05.RenderTarget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Target_Manager.h">
+      <Filter>04.Utility\05.RenderTarget\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -473,10 +485,22 @@
     <Filter Include="04.Utility\04.Font\Manager">
       <UniqueIdentifier>{ffcb4ad3-d899-440f-a3a1-f12772df5f70}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.Components\01.Renderer\Shader">
+      <UniqueIdentifier>{8141aadf-e304-4a57-bd4a-2446ce9a7318}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Utility\05.RenderTarget">
+      <UniqueIdentifier>{1dde14af-7beb-4ab5-be28-9f8b52d732d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Utility\05.RenderTarget\Manager">
+      <UniqueIdentifier>{12685258-0f8c-4305-b9cd-dd02e16545a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Cell.hlsl">
       <Filter>03.Components\08.Navigation\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Deferred.hlsl">
+      <Filter>03.Components\01.Renderer\Shader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

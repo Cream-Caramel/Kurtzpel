@@ -52,13 +52,16 @@ void CMainApp::Tick(_float fTimeDelta)
 	m_fTimeAcc += fTimeDelta;
 #endif // _DEBUG
 
-
+	
 
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 	if (GI->Key_Down(DIK_9))
 		CM->Set_ColliderRender();
 	CM->Check_Collision(CCollider_Manager::COLLIDER_PLAYER, CCollider_Manager::COLLIDER_MONSTERATTACK);
 	CM->Check_Collision(CCollider_Manager::COLLIDER_PLAYERSWORD, CCollider_Manager::COLLIDER_MONSTER);
+
+	if (GI->Key_Down(DIK_F3))
+		m_pRenderer->Set_bRenderTarget();
 	/*RECT Clip;
 	GetClientRect(g_hWnd, &Clip);
 	ClientToScreen(g_hWnd, (LPPOINT)&Clip);

@@ -41,10 +41,12 @@ HRESULT CVIBuffer_Tile::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CVIBuffer_Tile::Render()
+HRESULT CVIBuffer_Tile::Render()
 {
 	if (m_pVB != nullptr)
 		__super::Render();
+
+	return S_OK;
 
 }
 

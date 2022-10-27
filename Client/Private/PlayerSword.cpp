@@ -75,9 +75,6 @@ void CPlayerSword::Tick(_float fTimeDelta)
 {
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
-	
-	
-
 }
 
 void CPlayerSword::LateTick(_float fTimeDelta)

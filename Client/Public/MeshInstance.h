@@ -2,7 +2,6 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
-
 BEGIN(Engine)
 class CShader;
 class CRenderer;
@@ -18,6 +17,7 @@ public:
 	typedef struct tagMeshInfo
 	{
 		_tchar* sTag;
+		
 	}MESHINFO;
 
 protected:

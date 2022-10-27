@@ -29,7 +29,12 @@ _uint APIENTRY LoadingMain(void* pArg)
 	case LEVEL_STAGE1:
 		pLoader->Loading_ForStage1();
 		break;
-
+	case LEVEL_STAGE2:
+		pLoader->Loading_ForStage2();
+		break;
+	case LEVEL_STAGE3:
+		pLoader->Loading_ForStage3();
+		break;
 	case LEVEL_STAGE4:
 		pLoader->Loading_ForStage4();
 		break;
@@ -88,6 +93,8 @@ HRESULT CLoader::Loading_ForStatic()
 
 	LoadModel("Level_Static");
 	LoadModel("Level_Stage1");
+	LoadModel("Level_Stage2");
+	LoadModel("Level_Stage3");
 	LoadModel("Level_Stage4");
 	
 	Loading_Shader();
@@ -172,6 +179,10 @@ HRESULT CLoader::Loading_ObjectProtoType()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Theo"),
 		CTheo::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Golem"),
+		CGolem::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("SkillFrame"),
@@ -428,6 +439,30 @@ HRESULT CLoader::Loading_ForStage1()
 	return S_OK;
 }
 
+HRESULT CLoader::Loading_ForStage2()
+{
+	if (FAILED(GI->Add_Prototype(LEVEL_STAGE2, TEXT("NavigationStage2"),
+		CNavigation::Create(m_pDevice, m_pContext, "Level_Stage2"))))
+		return E_FAIL;
+
+	LoadInstance("Level_Stage2");
+
+	m_isFinished = true;
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_ForStage3()
+{
+	if (FAILED(GI->Add_Prototype(LEVEL_STAGE3, TEXT("NavigationStage3"),
+		CNavigation::Create(m_pDevice, m_pContext, "Level_Stage3"))))
+		return E_FAIL;
+
+	LoadInstance("Level_Stage3");
+
+	m_isFinished = true;
+	return S_OK;
+}
+
 HRESULT CLoader::Loading_ForStage4()
 {
 	if (FAILED(GI->Add_Prototype(LEVEL_STAGE4, TEXT("NavigationStage4"),
@@ -580,6 +615,42 @@ HRESULT CLoader::LoadModel(char * DatName)
 				}
 			}
 			
+			RM->Pushtchar(ProtoName);
+			Safe_Delete(ModelName);
+		}
+
+		else if (!strcmp(DatName, "Level_Stage2"))
+		{
+			wstring Name = ProtoName;
+			auto& iter = m_InstanceInfo.find(Name);
+			if (iter != m_InstanceInfo.end())
+			{
+				if (FAILED(GI->Add_Prototype(LEVEL_STAGE2, ProtoName,
+					CModelsInstance::Create(m_pDevice, m_pContext, ModelName, DatName, iter->second))))
+				{
+					Safe_Delete(ProtoName);
+					return E_FAIL;
+				}
+			}
+
+			RM->Pushtchar(ProtoName);
+			Safe_Delete(ModelName);
+		}
+
+		else if (!strcmp(DatName, "Level_Stage3"))
+		{
+			wstring Name = ProtoName;
+			auto& iter = m_InstanceInfo.find(Name);
+			if (iter != m_InstanceInfo.end())
+			{
+				if (FAILED(GI->Add_Prototype(LEVEL_STAGE3, ProtoName,
+					CModelsInstance::Create(m_pDevice, m_pContext, ModelName, DatName, iter->second))))
+				{
+					Safe_Delete(ProtoName);
+					return E_FAIL;
+				}
+			}
+
 			RM->Pushtchar(ProtoName);
 			Safe_Delete(ModelName);
 		}

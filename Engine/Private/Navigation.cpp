@@ -41,17 +41,21 @@ HRESULT CNavigation::Initialize(void * pArg)
 
 _bool CNavigation::isMove(_fvector vPosition, _vector* vNormal)
 {
+	
 	_int	iNeighborIndex = -1;
 
 	/* 현재 쎌 안에서 움직였다. */
 	/* 나간방향에 이웃이 있다면. 이웃의 인ㄷ게스를 받아오고. 
 	이웃이 없다면 안채워온다. */
 	if (true == m_Cells[m_NavigationDesc.iCurrentIndex]->isIn(vPosition, &iNeighborIndex, vNormal))
-		return true;
-
+	{
+			return true;
+	}
 	/* 현재 셀을 나갔다. */
 	else
 	{
+		if (iNeighborIndex < m_iBattleIndex)
+			return false;
 		/* 나간방향에 이웃이 있었다면. */
 		if (0 <= iNeighborIndex)
 		{

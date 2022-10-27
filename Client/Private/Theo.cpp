@@ -49,13 +49,13 @@ HRESULT CTheo::Initialize(void * pArg)
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 300;
+	m_fMaxHp = 400;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 10.f;
 	m_fDamage = 10.f;
 
-	m_fColiisionTime = 0.5f;
+	m_fColiisionTime = 0.1f;
 
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
@@ -211,20 +211,23 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 	if (sTag == "Player_Sword")
 	{
 		
-		if (m_bPattern && pOther->Get_Damage() == 1.f)
+		if (pOther->Can_Hit())
 		{
-			m_bPattern = false;
-			m_bLHand = false;
-			m_bRHand = false;
-			Set_State(HITSTART);
-			m_fNowMp -= 10.f;
+			if (m_bPattern && pOther->Get_Damage() == 1.f)
+			{
+				m_bPattern = false;
+				m_bLHand = false;
+				m_bRHand = false;
+				Set_State(HITSTART);
+				m_fNowMp -= 10.f;
+			}
+			m_bCollision = false;
+			m_bHit = true;
+			if (m_eCurState == HITSTART || m_eCurState == HITLOOF)
+				m_fNowHp -= pOther->Get_Damage() * 2;
+			else
+				m_fNowHp -= pOther->Get_Damage();
 		}
-		m_bCollision = false;
-		m_bHit = true;
-		if (m_eCurState == HITSTART || m_eCurState == HITLOOF)
-			m_fNowHp -= pOther->Get_Damage() * 2;
-		else
-			m_fNowHp -= pOther->Get_Damage();
 	}
 }
 
@@ -470,7 +473,6 @@ void CTheo::Update(_float fTimeDelta)
 		else
 			m_fRunSpeed = 3.f;
 		Set_Dir(); 
-		//m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		if (Distance < 5.f)
 			Set_NextAttack();

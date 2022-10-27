@@ -57,6 +57,14 @@ public:
 #pragma region Stage1
 	HRESULT Loading_ForStage1();
 #pragma endregion Stage1
+
+#pragma region Stage2
+	HRESULT Loading_ForStage2();
+#pragma endregion Stage1
+
+#pragma region Stage3
+	HRESULT Loading_ForStage3();
+#pragma endregion Stage1
 	
 #pragma region Stage4
 	HRESULT Loading_ForStage4();

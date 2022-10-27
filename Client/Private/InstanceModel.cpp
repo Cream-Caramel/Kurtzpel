@@ -24,7 +24,7 @@ HRESULT CInstanceModel::Initialize(void * pArg)
 	__super::Initialize(pArg);
 
 	m_InstanceInfo = ((INSTANCEINFO*)pArg);
-
+	m_eRenderGroup = m_InstanceInfo->eRenderGroup;
 	/* For.Com_Model */
 	if (FAILED(__super::Add_Component(m_InstanceInfo->eLevel, m_InstanceInfo->sTag, m_InstanceInfo->sTag, (CComponent**)&m_pModel)))
 		return E_FAIL;
@@ -39,7 +39,7 @@ void CInstanceModel::Tick(_float fTimeDelta)
 
 void CInstanceModel::LateTick(_float fTimeDelta)
 {
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	m_pRendererCom->Add_RenderGroup(m_eRenderGroup, this);
 }
 
 HRESULT CInstanceModel::Render()

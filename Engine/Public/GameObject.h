@@ -40,6 +40,10 @@ public:
 	_float Get_Damage() { return m_fDamage; }
 	void Set_Damage(_float fDamage) { m_fDamage = fDamage; }
 	void Set_Collision(_bool bCollision) { m_bCollision = bCollision; }
+	void Set_MaxHit(_uint iMaxHit) { m_iMaxHit = iMaxHit; m_iNumHit = 0; }
+	_bool Can_Hit();
+	_bool Get_bCollision() { return m_bCollision; }
+	
 
 protected:
 	ID3D11Device*			m_pDevice = nullptr;
@@ -64,6 +68,8 @@ protected:
 	_float m_fMaxMp;
 	_float m_fNowMp;
 	_float m_fDamage;
+	_uint m_iMaxHit = 0;
+	_uint m_iNumHit = 0;
 	
 
 protected:

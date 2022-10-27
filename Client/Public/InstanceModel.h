@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "MeshInstance.h"
+#include "Renderer.h"
 BEGIN(Client)
 
 class CInstanceModel final : public CMeshInstance
@@ -10,6 +11,7 @@ public:
 	{
 		_tchar* sTag;
 		LEVEL eLevel;
+		CRenderer::RENDERGROUP eRenderGroup = CRenderer::RENDER_NONALPHABLEND;
 	}INSTANCEINFO;
 private:
 	CInstanceModel(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
@@ -28,6 +30,7 @@ public:
 private:
 	CModelsInstance* m_pModel = nullptr;
 	INSTANCEINFO* m_InstanceInfo;
+	CRenderer::RENDERGROUP m_eRenderGroup;
 public:
 	static CMeshInstance* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);

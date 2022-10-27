@@ -12,6 +12,7 @@
 #include <random>
 #include "Picking.h"
 #include "Font_Manager.h"
+#include "Target_Manager.h"
 
 /* 클라이언트로 보여주기위한 가장 대표적인 클래스이다. */
 /* 각종 매니져클래스들의 주요함수를 클라로 보여준다.  */
@@ -99,7 +100,7 @@ private:
 	CLight_Manager*					m_pLight_Manager = nullptr;
 	CPicking*						m_pPicking = nullptr;
 	CFont_Manager*					m_pFont_Manager = nullptr;
-
+	CTarget_Manager*				m_pTarget_Manager = nullptr;
 
 public:
 	static void Release_Engine();

@@ -52,6 +52,17 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
+_bool CGameObject::Can_Hit()
+{
+	if (m_iNumHit < m_iMaxHit)
+	{
+		++m_iNumHit;
+		return true;
+	}
+	else
+		return false;
+}
+
 HRESULT CGameObject::Add_Component(_uint iLevelIndex, const _tchar * pPrototypeTag, const _tchar * pComponentTag, CComponent** ppOut, void* pArg)
 {
 	if (nullptr != Find_Component(pComponentTag))

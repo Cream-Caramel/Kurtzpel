@@ -139,6 +139,15 @@
     <Filter Include="01.Levels\Stage4">
       <UniqueIdentifier>{bde64363-ed65-415e-8e04-b013ce72b4fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\Stage2">
+      <UniqueIdentifier>{acd44721-fc6d-4ded-bdbd-58058be483ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Stage3">
+      <UniqueIdentifier>{4d4207fd-91ad-465a-b7e4-a91307a0ae03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\AnimMesh\Monster\Golem">
+      <UniqueIdentifier>{0369a330-c15d-4cae-aa2d-9be6128dc679}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -333,6 +342,15 @@
     <ClInclude Include="..\Public\InstanceModel.h">
       <Filter>02.GameObjects\Mesh\Map</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_Stage2.h">
+      <Filter>01.Levels\Stage2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Stage3.h">
+      <Filter>01.Levels\Stage3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Golem.h">
+      <Filter>02.GameObjects\AnimMesh\Monster\Golem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -508,6 +526,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\InstanceModel.cpp">
       <Filter>02.GameObjects\Mesh\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Stage2.cpp">
+      <Filter>01.Levels\Stage2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Stage3.cpp">
+      <Filter>01.Levels\Stage3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Golem.cpp">
+      <Filter>02.GameObjects\AnimMesh\Monster\Golem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

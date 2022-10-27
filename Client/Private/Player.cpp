@@ -150,7 +150,7 @@ void CPlayer::LateTick(_float fTimeDelta)
 	End_Animation();
 
 	for (auto& pPart : m_Parts)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, pPart);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, pPart);
 
 	for (int i = 0; i < OBB_END; ++i)
 		m_pOBB[i]->Update(m_pTransformCom->Get_WorldMatrix());
@@ -160,6 +160,8 @@ void CPlayer::LateTick(_float fTimeDelta)
 	if(m_bCollision)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYER, this, m_pOBB[OBB_BODY]);
 	
+	Check_Battle();
+
 	Set_PlayerUseInfo();
 }
 
@@ -314,24 +316,29 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::SPINCOMBOSTART:
 		m_fNowMp -= 15.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(2.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(999);
 		break;
 	case Client::CPlayer::FASTCOMBOEND:
-		
+		m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::FASTCOMBOSTART:
 		m_fNowMp -= 10.f;
 		m_fFastComboStartSpeed = 5.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(2.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(30);
+		m_fFastComboAcc = 0.f;
 		break;
 	case Client::CPlayer::ROCKBREAK:
 		m_fNowMp -= 5.f;
 		m_fRockBreakSpeed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(1.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::CHARGECRASH:
 		m_fChargeCrashSpeed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(40.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		
 		break;
 	case Client::CPlayer::CHARGEREADY:
@@ -341,18 +348,22 @@ void CPlayer::Set_State(STATE eState)
 		m_fNowMp -= 3.f;
 		m_pTransformCom->Set_JumpPower(0.f);
 		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBO2:
 		m_fNowMp -= 3.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBO3:
 		m_fNowMp -= 3.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBO4:
 		m_fNowMp -= 3.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(14.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
 		m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -373,31 +384,37 @@ void CPlayer::Set_State(STATE eState)
 		m_fNomalCombo1Acc = 0.f;
 		m_fNowMp -= 2.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
 		m_fNowMp -= 3.f;
 		m_fNC2Speed = 5.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
 		m_fNowMp -= 5.f;
 		m_fNC3Speed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(14.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
 		m_fNowMp -= 5.f;
 		m_fNC4Speed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(14.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
 		m_fNowMp -= 3.f;
 		m_fNC5Speed = 5.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
 		m_fNowMp -= 5.f;
 		m_fNC6Speed = 8.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(20.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::GROUNDCRASH:
 		
@@ -428,11 +445,13 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::BLADEATTACK:
 		m_fNowMp -= 20.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(15.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(10);
 		break;
 	case Client::CPlayer::SLASHATTACK:
 		m_fNowMp -= 30.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(20.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(5.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(30);
 		break;
 	case Client::CPlayer::ROCKSHOT:
 		
@@ -581,12 +600,14 @@ void CPlayer::End_Animation()
 			m_bSpinComboEnd = false;
 			m_fSpinComboEndSpeed = 6.f;
 			}
+			m_Parts[PARTS_SWORD]->Set_Damage(5.f);
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::SPINCOMBOSTART:
 			for (int i = 0; i < MODEL_END; ++i)
 				m_pAnimModel[i]->Set_AnimIndex(SPINCOMBOLOOF);			
 			m_eNextState = SPINCOMBOLOOF;
+			m_Parts[PARTS_SWORD]->Set_Damage(2.f);
 			m_fSpinComboSpeed = 2.f;
 			m_fSpinComboStartSpeed = 5.f;
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -599,8 +620,11 @@ void CPlayer::End_Animation()
 			for (int i = 0; i < MODEL_END; ++i)
 				m_pAnimModel[i]->Set_AnimIndex(FASTCOMBOEND);
 			m_eNextState = FASTCOMBOEND;
-			m_fFastComboEndSpeed = 8.f;
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
+			m_Parts[PARTS_SWORD]->Set_Damage(10.f);
+			m_Parts[PARTS_SWORD]->Set_MaxHit(1);
+			m_fFastComboAcc = 0.f;
+			m_Parts[PARTS_SWORD]->Set_Collision(false);		
+			m_fFastComboEndSpeed = 8.f;		
 			break;
 		case Client::CPlayer::ROCKBREAK:
 			Set_State(IDLE);
@@ -834,6 +858,88 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 	case Client::CPlayer::EX2READY:
 		Ex2Ready_KeyInput(fTimeDelta);
 		break;
+	}
+}
+
+void CPlayer::Set_FastComboTime(_float fTimeDelta)
+{
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
+	{
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		return;
+	}
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+	{
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		return;
+	}
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(5) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(6))
+	{
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		return;
+	}
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(7) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(8))
+	{
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		return;
+	}
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(9) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(10))
+	{
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		return;
+	}
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(10))
+	{
+		m_fFastComboAcc += 1.f * fTimeDelta;
+		if (m_fFastComboAcc >= 0.9f)
+		{
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			m_fFastComboAcc = 0.f;
+		}
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
+	}
+
+	else
+		m_Parts[PARTS_SWORD]->Set_Collision(false);
+
+}	
+
+void CPlayer::Check_Battle()
+{
+	if (!m_bBattle)
+	{
+		switch (PM->Get_NowLevel())
+		{
+		case LEVEL_STAGE2:
+		if (m_pNavigation->Get_CurrentIndex() == 41)
+		{
+			m_bBattle = true;
+			m_pNavigation->Set_BattleIndex(41);
+			PM->Add_Monster("Level_Stage2");
+		}
+		break;
+		case LEVEL_STAGE3:
+		if (m_pNavigation->Get_CurrentIndex() == 473)
+		{
+			m_bBattle = true;
+			m_pNavigation->Set_BattleIndex(473);
+			PM->Add_Monster("Level_Stage3");
+		}
+		break;
+		case LEVEL_STAGE4:
+		if (m_pNavigation->Get_CurrentIndex() == 145)
+		{
+			m_bBattle = true;
+			m_pNavigation->Set_BattleIndex(145);
+		}
+		break;
+		}
 	}
 }
 
@@ -1151,7 +1257,14 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::SPINCOMBOLOOF:
 		m_bMotionChange = false;
-		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		m_fSpinComboAcc += 1.f * fTimeDelta;
+		if (m_fSpinComboAcc >= 0.3f)
+		{
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			m_fSpinComboAcc = 0.f;
+		}
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::SPINCOMBOSTART:
 		m_bMotionChange = false;
@@ -1161,7 +1274,13 @@ void CPlayer::Update(_float fTimeDelta)
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fSpinComboStartSpeed, m_pNavigation, fTimeDelta);
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2))
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			if (m_fSpinComboAcc >= 0.3f)
+			{
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				m_fSpinComboAcc = 0.f;
+			}
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
@@ -1173,7 +1292,12 @@ void CPlayer::Update(_float fTimeDelta)
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fFastComboEndSpeed, m_pNavigation, fTimeDelta);
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		{
+			_bool a = m_Parts[PARTS_SWORD]->Get_bCollision();
+			int c = 2;
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+
+		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
@@ -1184,7 +1308,7 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fFastComboStartSpeed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fFastComboStartSpeed, m_pNavigation, fTimeDelta);
 		}
-		m_Parts[PARTS_SWORD]->Set_Collision(true);
+			Set_FastComboTime(fTimeDelta);	
 		break;
 	case Client::CPlayer::ROCKBREAK:
 		m_bMotionChange = false;
@@ -1505,6 +1629,28 @@ HRESULT CPlayer::Create_Navigation(char * FileName)
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
 	}
 
+	else if (!strcmp(FileName, "Level_Stage2"))
+	{
+		CNavigation::NAVIGATIONDESC NaviDesc;
+		NaviDesc.iCurrentIndex = 13;
+		if (FAILED(__super::Add_Component(LEVEL_STAGE2, L"NavigationStage2", TEXT("NavigationStage2"), (CComponent**)&m_pNavigation, &NaviDesc)))
+			return E_FAIL;
+		_vector vPos = { 100.2f, 0.147f, -1.5f, 1.f };
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+		Set_Dir(DIR_UP);
+	}
+
+	else if (!strcmp(FileName, "Level_Stage3"))
+	{
+		CNavigation::NAVIGATIONDESC NaviDesc;
+		NaviDesc.iCurrentIndex = 13;
+		if (FAILED(__super::Add_Component(LEVEL_STAGE3, L"NavigationStage3", TEXT("NavigationStage3"), (CComponent**)&m_pNavigation, &NaviDesc)))
+			return E_FAIL;
+		_vector vPos = { 77.43f, 0.06f, 52.49f, 1.f };
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+		Set_Dir(DIR_RIGHT);
+	}
+
 	else if (!strcmp(FileName, "Level_Stage4"))
 	{
 		CNavigation::NAVIGATIONDESC NaviDesc;
@@ -1513,9 +1659,15 @@ HRESULT CPlayer::Create_Navigation(char * FileName)
 			return E_FAIL;
 		_vector vPos = { 60.f, 0.5f, 0.f, 1.f };
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vPos);
+		Set_Dir(DIR_UP);
 	}
 
 	return S_OK;
+}
+
+void CPlayer::Reset_BattleIndex()
+{
+	m_pNavigation->Set_BattleIndex(-1);
 }
 
 

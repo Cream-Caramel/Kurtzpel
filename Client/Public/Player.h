@@ -68,6 +68,8 @@ public:
 	STATE Get_State() { return m_eCurState; } // 다른곳에서 사용하기위한 플레이어 상태를 넘겨줌
 	_float Get_NaviPosY();
 	HRESULT Create_Navigation(char* FileName);
+	void Set_bBattle(_bool bBattle) { m_bBattle = bBattle; }
+	void Reset_BattleIndex();
 #pragma endregion MainFunction
 
 #pragma region UtilFunction
@@ -78,8 +80,14 @@ public:
 	_bool Get_Respawn() { return m_bRespawn; }
 #pragma endregion UtilFunction
 	
+#pragma region PrivateFunction
+private:
+	void Set_FastComboTime(_float fTimeDelta);
+#pragma region PrivateFunction
+
 #pragma region KeyInput
 private:
+	void Check_Battle();
 	bool Input_Direction(); // 키입력에 따라 방향갱신
 	void Jump_KeyInput(_float fTimeDelta);
 	void JumpUp_KeyInput(_float fTimeDelta);
@@ -118,7 +126,7 @@ private:
 
 #pragma region Variable
 	_bool m_bUseSkill = true; //스킬을 사용할수있는지 대기 or 달리기 도중에 가능
-	
+	_bool m_bBattle = false; //전투를 했는지 안했는지
 	_bool m_bKeyInput = false; //방향키가 눌렸는지
 	_bool m_bSpinComboEnd = false; // 스핀콤보가 끝났는지
 	_bool m_bRespawn = false; 
@@ -144,6 +152,8 @@ private:
 	_float m_fFastComboEndSpeed = 8.f; // FAST콤보 마무리 전진속도
 	_float m_fRockBreakSpeed = 6.f; // RockBreak 전진속도
 	_float m_fChargeCrashSpeed = 6.f; //ChargeCrash 전진속도
+	_float m_fSpinComboAcc = 0.f; //스핀콤보 히트간격
+	_float m_fFastComboAcc = 0.f; //패스트콤보 히트간격
 	_bool m_bSpinCombo = false;
 #pragma endregion Variable
 

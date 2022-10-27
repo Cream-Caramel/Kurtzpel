@@ -30,7 +30,7 @@ HRESULT CLevel_Stage4::Initialize()
 		return E_FAIL;
 
 	PM->Get_PlayerPointer()->Create_Navigation("Level_Stage4");
-
+	PM->Set_Level(LEVEL_STAGE4);
 	/*if (FAILED(Ready_UI("Level_Stage4")))
 		return E_FAIL;*/
 
@@ -59,10 +59,10 @@ HRESULT CLevel_Stage4::Ready_Lights()
 	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
 	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(-1.f, -1.f, -1.f, 0.f);
+	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(0.5f, 0.5f, 0.5f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 0.f, 0.f, 1.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
@@ -304,6 +304,9 @@ HRESULT CLevel_Stage4::Ready_Load_Model(char * DatName)
 		InstanceInfo = new CInstanceModel::INSTANCEINFO;
 		InstanceInfo->sTag = ModelName;
 		InstanceInfo->eLevel = LEVEL_STAGE4;
+		wstring Sky = ModelName;
+		if (Sky == L"S4Sky")
+			InstanceInfo->eRenderGroup = CRenderer::RENDER_PRIORITY;
 		
 
 		if (0 == dwByte)	// 더이상 읽을 데이터가 없을 경우

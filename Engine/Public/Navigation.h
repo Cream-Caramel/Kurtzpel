@@ -27,16 +27,19 @@ public:
 	void Load_Cell(const char* pFilePath);
 	_float Get_PosY(_fvector vPos);
 	void Set_NaviRender() { m_bNaviRender = !m_bNaviRender; }
+	void Set_BattleIndex(_uint iBattleIndex) { m_iBattleIndex = iBattleIndex; }
+	int Get_CurrentIndex() { return m_NavigationDesc.iCurrentIndex; }
 
 #ifdef _DEBUG
 public:
-	HRESULT Render();
+	virtual HRESULT Render() override;
 #endif // _DEBUG
 
 private:
 	vector<class CCell*>			m_Cells;
 	typedef vector<class CCell*>	CELLS;
 	NAVIGATIONDESC					m_NavigationDesc;
+	int							m_iBattleIndex = -1;
 	_bool m_bNaviRender = false;
 
 public:

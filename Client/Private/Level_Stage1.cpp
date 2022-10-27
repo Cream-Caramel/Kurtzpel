@@ -23,7 +23,7 @@ HRESULT CLevel_Stage1::Initialize()
 		return E_FAIL;
 
 
-	if (FAILED(Ready_Load_AnimModel("Level_Static")))
+	if (FAILED(Ready_Load_AnimModel("Level_Stage1")))
 		return E_FAIL;
 
 	if (FAILED(Ready_Load_Model("Level_Stage1")))
@@ -34,6 +34,14 @@ HRESULT CLevel_Stage1::Initialize()
 
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
+
+	CAnimMesh::MESHINFO* MeshInfo;
+	MeshInfo = new CAnimMesh::MESHINFO;
+	MeshInfo->sTag = L"Golem";
+	MeshInfo->fScale = _float3{ 1.f, 1.f, 1.f };
+	MeshInfo->fPos = _float4{ 90.f,0.6f,100.f,1.f};
+	MeshInfo->fAngle = _float3{ 0.f,0.f,0.f };
+	GI->Add_GameObjectToLayer(L"Golem", LEVEL_STATIC, L"Layer_AnimModelObject", MeshInfo);
 
 	PM->Get_PlayerPointer()->Create_Navigation("Level_Stage1");
 
@@ -47,6 +55,16 @@ void CLevel_Stage1::Tick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_L))
 	{
 		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE4));
+	}
+
+	if (GI->Key_Down(DIK_K))
+	{
+		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE3));
+	}
+
+	if (GI->Key_Down(DIK_J))
+	{
+		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE2));
 	}
 }
 
@@ -66,10 +84,10 @@ HRESULT CLevel_Stage1::Ready_Lights()
 	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
 	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
-	LightDesc.vDirection = _float4(-1.f, -1.f, -1.f, 0.f);
+	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(0.5f, 0.5f, 0.5f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 0.f, 0.f, 1.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
@@ -355,8 +373,7 @@ HRESULT CLevel_Stage1::Ready_Load_Model(char * DatName)
 
 		CMesh::MESHINFO* MeshInfo;
 		MeshInfo = new CMesh::MESHINFO;
-		MeshInfo->sTag = ModelName;
-		
+		MeshInfo->sTag = ModelName;	
 
 		if (0 == dwByte)	// 더이상 읽을 데이터가 없을 경우
 		{

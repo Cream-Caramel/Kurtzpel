@@ -13,9 +13,8 @@ texture2D	g_DiffuseTexture;
 sampler DefaultSampler = sampler_state {
 
 	filter = min_mag_mip_linear;
-	/*minfilter = linear;
-	magfilter = linear;
-	mipfilter = linear;*/
+	AddressU = WRAP;
+	AddressV = WRAP;
 };
 
 struct VS_IN
@@ -31,6 +30,7 @@ struct VS_IN
 struct VS_OUT
 {
 	float4		vPosition : SV_POSITION;
+	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
 };
 
@@ -52,8 +52,11 @@ VS_OUT VS_MAIN(VS_IN In)
 		g_BoneMatrices.BoneMatrix[In.vBlendIndex.w] * fWeightW;
 
 	vector		vPosition = mul(vector(In.vPosition, 1.f), BoneMatrix);
+	vector		vNormal = mul(vector(In.vNormal, 0.f), BoneMatrix);
 
 	Out.vPosition = mul(vPosition, matWVP);
+	Out.vNormal = normalize(mul(vNormal, g_WorldMatrix));
+
 	Out.vTexUV = In.vTexUV;
 
 	return Out;
@@ -62,23 +65,26 @@ VS_OUT VS_MAIN(VS_IN In)
 struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
+	float4		vNormal : NORMAL;
 	float2		vTexUV : TEXCOORD0;
 };
 
 struct PS_OUT
 {
-	float4		vColor : SV_TARGET0;
+	float4		vDiffuse : SV_TARGET0;
+	float4		vNormal : SV_TARGET1;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
-	Out.vColor = (vector)1.f;
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
-	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 
-	if (0 == Out.vColor.a)
+
+	if (0 == Out.vDiffuse.a)
 		discard;
 
 	return Out;
@@ -88,13 +94,13 @@ PS_OUT Pattern_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
-	Out.vColor = (vector)1.f;
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
-	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 
-	Out.vColor.b = 1.f;
+	Out.vDiffuse.b = 1.f;
 
-	if (0 == Out.vColor.a)
+	if (0 == Out.vDiffuse.a)
 		discard;
 
 	return Out;
@@ -104,13 +110,13 @@ PS_OUT Hit_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
-	Out.vColor = (vector)1.f;
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
-	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 
-	Out.vColor.r = 1.f;
+	Out.vDiffuse.r = 1.f;
 
-	if (0 == Out.vColor.a)
+	if (0 == Out.vDiffuse.a)
 		discard;
 
 	return Out;
