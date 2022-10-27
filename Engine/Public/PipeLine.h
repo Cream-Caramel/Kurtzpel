@@ -20,6 +20,11 @@ public:
 	_matrix Get_TransformMatrix(TRANSFORMSTATE eTransformState) const {
 		return XMLoadFloat4x4(&m_TransformMatrix[eTransformState]);
 	}
+
+	_matrix Get_TransformMatrixInverse(TRANSFORMSTATE eTransformState) const {
+		return XMLoadFloat4x4(&m_TransformInverseMatrix[eTransformState]);
+	}
+
 	_float4x4 Get_TransformFloat4x4(TRANSFORMSTATE eTransformState) const {
 		return m_TransformMatrix[eTransformState];
 	}

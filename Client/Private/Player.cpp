@@ -896,7 +896,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(10))
 	{
 		m_fFastComboAcc += 1.f * fTimeDelta;
-		if (m_fFastComboAcc >= 0.9f)
+		if (m_fFastComboAcc >= 0.4f)
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			m_fFastComboAcc = 0.f;

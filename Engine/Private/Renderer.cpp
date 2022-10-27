@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "VIBuffer_Rect.h"
 #include "Light_Manager.h"
+#include "PipeLine.h"
 
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent(pDevice, pContext)
@@ -29,11 +30,19 @@ HRESULT CRenderer::Initialize_Prototype()
 		return E_FAIL;
 
 	/* For.Target_Normal */
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Normal"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, &_float4(0.0f, 0.f, 0.f, 1.f))))
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Normal"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, &_float4(0.f, 0.f, 0.f, 0.f))))
+		return E_FAIL;
+
+	/* For.Target_Depth */
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Depth"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, &_float4(0.0f, 0.f, 0.f, 1.f))))
 		return E_FAIL;
 
 	/* For.Target_Shader */
 	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Shade"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, &_float4(0.0f, 0.f, 0.f, 1.f))))
+		return E_FAIL;
+
+	/* For.Target_Specular */
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Specular"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
 	/* For.MRT_Deferred */
@@ -41,19 +50,27 @@ HRESULT CRenderer::Initialize_Prototype()
 		return E_FAIL;
 	if (FAILED(m_pTarget_Manager->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Normal"))))
 		return E_FAIL;
+	if (FAILED(m_pTarget_Manager->Add_MRT(TEXT("MRT_Deferred"), TEXT("Target_Depth"))))
+		return E_FAIL;
 
 	/* For.MRT_LightAcc */
 	if (FAILED(m_pTarget_Manager->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
+		return E_FAIL;
+	if (FAILED(m_pTarget_Manager->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
 		return E_FAIL;
 
 
 #ifdef _DEBUG
 
-	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Diffuse"), 75.f, 150.f, 150.f, 150.f)))
+	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Diffuse"), 75.f, 200.f, 150.f, 150.f)))
 		return E_FAIL;
-	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Normal"), 75.f, 300.f, 150.f, 150.f)))
+	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Normal"), 75.f, 350.f, 150.f, 150.f)))
 		return E_FAIL;
-	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Shade"), 75.f, 450.f, 150.f, 150.f)))
+	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Depth"), 75.f, 500.f, 150.f, 150.f)))
+		return E_FAIL;
+	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Shade"), ViewportDesc.Width - 75, 100.f, 150.f, 150.f)))
+		return E_FAIL;
+	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Specular"), ViewportDesc.Width - 75, 300.f, 150.f, 150.f)))
 		return E_FAIL;
 
 	m_pShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_Deferred.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements);
@@ -94,7 +111,7 @@ HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject * pGame
 HRESULT CRenderer::Draw()
 {
 	if (FAILED(Render_Priority()))
-		return E_FAIL;		
+		return E_FAIL;
 
 	if (FAILED(Render_NonAlphaBlend()))
 		return E_FAIL;
@@ -123,7 +140,7 @@ HRESULT CRenderer::Draw()
 
 
 #endif
-	
+
 
 	return S_OK;
 }
@@ -200,11 +217,30 @@ HRESULT CRenderer::Render_Lights()
 	if (FAILED(m_pShader->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4))))
 		return E_FAIL;
 
+	CPipeLine*			pPipeLine = GET_INSTANCE(CPipeLine);
+
+	_float4x4			ViewMatrixInv;
+	_float4x4			ProjMatrixInv;
+
+	XMStoreFloat4x4(&ViewMatrixInv, XMMatrixTranspose(pPipeLine->Get_TransformMatrixInverse(CPipeLine::D3DTS_VIEW)));
+	XMStoreFloat4x4(&ProjMatrixInv, XMMatrixTranspose(pPipeLine->Get_TransformMatrixInverse(CPipeLine::D3DTS_PROJ)));
+
+	if (FAILED(m_pShader->Set_RawValue("g_ViewMatrixInv", &ViewMatrixInv, sizeof(_float4x4))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Set_RawValue("g_ProjMatrixInv", &ProjMatrixInv, sizeof(_float4x4))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Set_RawValue("g_vCamPosition", &pPipeLine->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+
+	RELEASE_INSTANCE(CPipeLine);
+
 	if (FAILED(m_pTarget_Manager->Bind_SRV(TEXT("Target_Normal"), m_pShader, "g_NormalTexture")))
+		return E_FAIL;
+	if (FAILED(m_pTarget_Manager->Bind_SRV(TEXT("Target_Depth"), m_pShader, "g_DepthTexture")))
 		return E_FAIL;
 
 	m_pLight_Manager->Render(m_pShader, m_pVIBuffer);
-	
+
 	if (FAILED(m_pTarget_Manager->End_MRT(m_pContext)))
 		return E_FAIL;
 
@@ -234,6 +270,12 @@ HRESULT CRenderer::Render_Blend()
 		return E_FAIL;
 
 	if (FAILED(m_pTarget_Manager->Bind_SRV(TEXT("Target_Shade"), m_pShader, "g_ShadeTexture")))
+		return E_FAIL;
+
+	if (FAILED(m_pTarget_Manager->Bind_SRV(TEXT("Target_Depth"), m_pShader, "g_DepthTexture")))
+		return E_FAIL;
+
+	if (FAILED(m_pTarget_Manager->Bind_SRV(TEXT("Target_Specular"), m_pShader, "g_SpecularTexture")))
 		return E_FAIL;
 
 	m_pShader->Begin(3);
@@ -316,7 +358,7 @@ HRESULT CRenderer::Render_Debug()
 
 CRenderer * CRenderer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CRenderer*			pInstance = new CRenderer(pDevice, pContext);	
+	CRenderer*			pInstance = new CRenderer(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
@@ -345,7 +387,7 @@ void CRenderer::Free()
 			Safe_Release(pGameObject);
 		}
 		List.clear();
-	}	
+	}
 
 #ifdef _DEBUG
 	Safe_Release(m_pShader);
