@@ -139,6 +139,7 @@ void CGolem::LateTick(_float fTimeDelta)
 		m_bCollision = false;
 		m_bRHand = false;
 		m_bLHand = false;
+		m_bAttack = false;
 	}
 
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
@@ -550,7 +551,7 @@ void CGolem::Update(_float fTimeDelta)
 	{
 		Set_Dir();
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
-		if (Distance > 2.f)
+		if (Distance > 4.f)
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRunSpeed, m_pNavigation, fTimeDelta);
 		else
 			Set_NextAttack();

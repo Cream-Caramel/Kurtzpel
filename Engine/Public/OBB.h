@@ -29,6 +29,7 @@ public:
 	virtual void Update(_fmatrix TransformMatrix);
 	virtual _bool Collision(CCollider* pTargetCollider);
 	void ChangeExtents(_float3 vExtents);
+	void ChangeCenter(_float3 vCenter);
 	
 #ifdef _DEBUG
 public:

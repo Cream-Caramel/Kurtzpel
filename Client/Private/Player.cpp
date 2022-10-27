@@ -347,17 +347,17 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::AIRCOMBO1:
 		m_fNowMp -= 3.f;
 		m_pTransformCom->Set_JumpPower(0.f);
-		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBO2:
 		m_fNowMp -= 3.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBO3:
 		m_fNowMp -= 3.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBO4:
@@ -383,25 +383,25 @@ void CPlayer::Set_State(STATE eState)
 		m_fNC1Speed = 5.f;
 		m_fNomalCombo1Acc = 0.f;
 		m_fNowMp -= 2.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(6.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
 		m_fNowMp -= 3.f;
 		m_fNC2Speed = 5.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(7.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
 		m_fNowMp -= 5.f;
 		m_fNC3Speed = 6.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(14.f);
-		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
+		m_Parts[PARTS_SWORD]->Set_Damage(8.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
 		m_fNowMp -= 5.f;
 		m_fNC4Speed = 6.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(14.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
@@ -1482,9 +1482,17 @@ void CPlayer::Update(_float fTimeDelta)
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC3Speed, m_pNavigation, fTimeDelta);
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
-		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+			return;
+		}
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			return;
+		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
@@ -1496,9 +1504,17 @@ void CPlayer::Update(_float fTimeDelta)
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC4Speed, m_pNavigation, fTimeDelta);
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
-		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+			return;
+		}
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			return;
+		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;

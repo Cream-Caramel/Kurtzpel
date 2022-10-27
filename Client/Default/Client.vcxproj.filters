@@ -148,6 +148,9 @@
     <Filter Include="02.GameObjects\AnimMesh\Monster\Golem">
       <UniqueIdentifier>{0369a330-c15d-4cae-aa2d-9be6128dc679}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\AnimMesh\Monster\Dragon">
+      <UniqueIdentifier>{883d4084-4160-43a1-becd-8e68aa09018b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -351,6 +354,9 @@
     <ClInclude Include="..\Public\Golem.h">
       <Filter>02.GameObjects\AnimMesh\Monster\Golem</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Dragon.h">
+      <Filter>02.GameObjects\AnimMesh\Monster\Dragon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -535,6 +541,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Golem.cpp">
       <Filter>02.GameObjects\AnimMesh\Monster\Golem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Dragon.cpp">
+      <Filter>02.GameObjects\AnimMesh\Monster\Dragon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

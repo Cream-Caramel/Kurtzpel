@@ -185,6 +185,10 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CGolem::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Dragon"),
+		CDragon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("SkillFrame"),
 		CSkillFrame::Create(m_pDevice, m_pContext))))
 		return E_FAIL;

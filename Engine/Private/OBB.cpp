@@ -81,6 +81,12 @@ void COBB::ChangeExtents(_float3 vExtents)
 	m_pOriginal_OBB->Extents = Extents;
 }
 
+void COBB::ChangeCenter(_float3 vCenter)
+{
+	_float3 Center = vCenter;
+	m_pOriginal_OBB->Center = vCenter;
+}
+
 
 HRESULT COBB::Render()
 {
