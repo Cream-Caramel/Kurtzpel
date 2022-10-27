@@ -43,8 +43,8 @@ HRESULT CGolem::Initialize(void * pArg)
 
 	m_bColliderRender = true;
 
-	m_eCurState = SKILL4_2;
-	m_eNextState = SKILL4_2;
+	m_eCurState = RUN;
+	m_eNextState = RUN;
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
@@ -391,6 +391,8 @@ void CGolem::Set_State(STATE eState)
 	case Client::CGolem::RTDOWN:
 		break;
 	case Client::CGolem::RUN:
+		m_fRunTempo = 1.7f;
+		m_fRunTempoAcc = 0.f;
 		break;
 	case Client::CGolem::SKILL1:
 		if (m_fNowMp >= 100.f)
@@ -549,6 +551,13 @@ void CGolem::Update(_float fTimeDelta)
 		break;
 	case Client::CGolem::RUN:
 	{
+		m_fRunTempoAcc += 1.f * fTimeDelta;
+		if (m_fRunTempoAcc >= m_fRunTempo)
+		{
+			m_fRunTempoAcc = 0.f;
+			CRM->Start_Shake(0.2f, 2.5f, 0.03f);
+		}
+
 		Set_Dir();
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		if (Distance > 4.f)
@@ -567,12 +576,18 @@ void CGolem::Update(_float fTimeDelta)
 			m_bPattern = false;
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+		{
 			m_bLHand = true;
+			CRM->Start_Shake(0.2f, 2.f, 0.02f);
+		}
 		else
 			m_bLHand = false;
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+		{
 			m_bRHand = true;
+			CRM->Start_Shake(0.2f, 3.f, 0.03f);
+		}
 		else
 			m_bRHand = false;	
 		break;
@@ -593,6 +608,7 @@ void CGolem::Update(_float fTimeDelta)
 		{
 			m_bLHand = true;
 			m_bRHand = true;
+			CRM->Start_Shake(0.3f, 3.f, 0.03f);
 		}
 		else
 		{
@@ -621,6 +637,11 @@ void CGolem::Update(_float fTimeDelta)
 			m_bLHand = false;
 			m_bRHand = false;
 		}
+
+		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3))
+			CRM->Start_Shake(0.4f, 5.f, 0.05f);
+			
+		
 		break;
 	case Client::CGolem::SKILL4_3:
 		break;
@@ -633,7 +654,7 @@ void CGolem::Update(_float fTimeDelta)
 			m_bPattern = false;
 		break;
 	case Client::CGolem::SKILL5_2:
-			m_fNowHp += 0.5f;
+			m_fNowHp += 0.2f;
 			m_fNowMp += 0.1f;
 		break;
 	case Client::CGolem::SKILL5_3:
@@ -641,6 +662,16 @@ void CGolem::Update(_float fTimeDelta)
 			Set_Dir();
 		break;
 	case Client::CGolem::SKILL8:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			CRM->Start_Shake(0.3f, 3.f, 0.03f);
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+			CRM->Start_Shake(0.3f, 3.f, 0.03f);
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(4) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
+			CRM->Start_Shake(0.3f, 3.f, 0.03f);
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(6) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(7))
+			CRM->Start_Shake(0.3f, 3.f, 0.03f);
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(8) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(9))
+			CRM->Start_Shake(0.4f, 5.f, 0.05f);
 		break;
 	case Client::CGolem::SKILL9:
 		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))

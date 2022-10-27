@@ -43,8 +43,8 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_bColliderRender = true;
 
-	m_eCurState = IDLE;
-	m_eNextState = IDLE;
+	m_eCurState = WALK;
+	m_eNextState = WALK;
 
 	m_vTargetLook = { 0.f,0.f,1.f };
 
@@ -213,12 +213,12 @@ HRESULT CDragon::Render()
 		}
 	}
 
-	/*for (int i = 0; i < OBB_END; ++i)
+	for (int i = 0; i < OBB_END; ++i)
 	{
 		if(m_bColliderRender)
 			m_pOBB[i]->Render();
-	}*/
-	m_pOBB[OBB_ATTACK]->Render();
+	}
+	
 	return S_OK;
 }
 
@@ -240,6 +240,8 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 				m_bRHand = false;
 				Set_State(GROGGYSTART);
 				m_fNowMp -= 10.f;
+				CRM->Start_Fov(40.f, 120.f);
+				CRM->Set_FovDir(true);
 			}		
 			if (m_eCurState == GROGGYSTART || m_eCurState == GROGGYLOOF)
 				m_fNowHp -= pOther->Get_Damage() * 2.f;
@@ -473,6 +475,9 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::IDLE:
 		break;
 	case Client::CDragon::WALK:
+		m_fWalkTempo = 1.3f;
+		m_fWalkShakeAcc = 0.f;
+		m_iWalkCount = 0;
 		break;
 	case Client::CDragon::STATE_END:
 		break;
@@ -512,7 +517,7 @@ void CDragon::End_Animation()
 		case Client::CDragon::SKILL1:
 			Set_NextMotion();
 			break;
-		case Client::CDragon::SKILL3:
+		case Client::CDragon::SKILL3:		
 			Set_NextMotion();		
 			break;
 		case Client::CDragon::SKILL4:	
@@ -588,10 +593,14 @@ void CDragon::End_Animation()
 			Set_State(WALK);
 			break;
 		case Client::CDragon::IDLE:
-			Set_State(IDLE);
+			Set_NextMotion();
 			break;
 		case Client::CDragon::WALK:
-			Set_NextAttack();
+			if (m_iWalkCount < 2)
+				m_iWalkCount += 1;
+			
+			if(m_iWalkCount >= 2)
+				Set_NextAttack();
 			break;
 		}
 	}
@@ -607,6 +616,10 @@ void CDragon::Update(_float fTimeDelta)
 			XMStoreFloat3(&m_vTargetLook, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - XMLoadFloat3(&m_pTarget->Get_Pos()));
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fBackStepSpeed, m_pNavigation, fTimeDelta);
 			Set_Dir();
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
+			CRM->Start_Shake(0.2f, 2.5f, 0.03f);
 		}
 		break;
 	case Client::CDragon::DIE:
@@ -737,6 +750,10 @@ void CDragon::Update(_float fTimeDelta)
 				m_fFlyAttackSpeed -= 0.2f;
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fFlyAttackSpeed, m_pNavigation, fTimeDelta);
 		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+		{
+			CRM->Start_Shake(0.3f, 3.f, 0.04f);
+		}
 		else
 			m_bAttack = false;
 		break;
@@ -746,7 +763,10 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 4.f, m_pNavigation, fTimeDelta);
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+		{
 			m_bRHand = true;
+			CRM->Start_Shake(0.3f, 3.f, 0.04f);
+		}
 		else
 			m_bRHand = false;
 		break;
@@ -757,6 +777,8 @@ void CDragon::Update(_float fTimeDelta)
 			m_bPattern = false;
 		break;
 	case Client::CDragon::SKILL14_2:
+		m_fNowHp += 0.5f;
+		m_fNowMp += 0.1f;
 		break;
 	case Client::CDragon::SKILL14_3:
 		break;
@@ -764,7 +786,10 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 1.f, m_pNavigation, fTimeDelta);
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
 			m_bAttack = true;
+			CRM->Start_Shake(0.4f, 6.f, 0.05f);
+		}
 		else
 			m_bAttack = false;
 		break;
@@ -775,12 +800,18 @@ void CDragon::Update(_float fTimeDelta)
 		break;
 	case Client::CDragon::WALK:
 	{
+		m_fWalkShakeAcc += 1.f * fTimeDelta;
+		if (m_fWalkShakeAcc >= m_fWalkTempo)
+		{
+			m_fWalkShakeAcc = 0.f;
+			CRM->Start_Shake(0.2f, 2.5f, 0.03f);
+		}
 		Set_Dir();
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		if (Distance > 8.f)
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRunSpeed, m_pNavigation, fTimeDelta);
 		else
-			CDragon::Set_NextAttack();
+			Close_Attack();
 		break;
 	}
 		break;

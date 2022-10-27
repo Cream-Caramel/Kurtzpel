@@ -9,6 +9,8 @@ class CPlayer;
 
 class CCamera_Player final : public CCamera
 {
+public:
+	enum FOVDIR {FOVUP, FOVDOWN, FOVEND};
 private:
 	CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCamera_Player(const CCamera_Player& rhs, CTransform::TRANSFORMDESC* pArg);
@@ -31,9 +33,20 @@ public:
 	void Start_Shake(_float fShakeTime, _float fShakePower, _float fShakeSpeed);
 	void Shake(_float fTimeDelta);
 	void End_Shake();
+	void Start_Fov(_float fFov, _float fFovSpeed);
+	void Fov(_float fTimeDelta);
+	void End_Fov();
+	void Set_FovSpeed(_float fFovSpeed) { m_fFovSpeed = fFovSpeed; }
 
 
 private:
+	_float m_fOriginFOV = 60.f;
+	_float m_fTargetFOV = 0.f;
+	_float m_fNowFOV = 60.f;
+	_float m_fFovSpeed = 0.f;
+	_float m_fPreTargetFOV = 0.f;
+	FOVDIR m_eFovDir = FOVEND;
+	_uint m_iFovCount = 0;
 	_bool m_bShake = false;
 	_bool m_bDir = false;
 	_float m_fShakeTime = 0.f;

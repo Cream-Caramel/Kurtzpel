@@ -5,6 +5,7 @@
 BEGIN(Engine)
 class CHierarchyNode;
 class COBB;
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -54,6 +55,7 @@ private:
 	
 	CAnimModel* m_pAnimModel = nullptr;
 	COBB* m_pOBB[OBB_END]{ nullptr };
+	CNavigation* m_pNavigation = nullptr;
 	CPlayer* m_pTarget = nullptr;
 	vector<class CHierarchyNode*>		m_Sockets;
 	

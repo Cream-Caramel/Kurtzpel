@@ -71,6 +71,9 @@ private:
 	_uint m_iRushCount = 0;
 	_bool m_bRush = false;
 	_float m_fFlyAttackSpeed = 20.f;
+	_float m_fWalkShakeAcc = 0.f;
+	_float m_fWalkTempo = 0.f;
+	_uint m_iWalkCount = 0;
 private:
 	_bool m_bLHand = false;
 	_bool m_bRHand = false;

@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
+#include "Camera_Manager.h"
 
 BEGIN(Engine)
 class CShader;

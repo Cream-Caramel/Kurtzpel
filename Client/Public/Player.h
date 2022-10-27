@@ -83,6 +83,7 @@ public:
 #pragma region PrivateFunction
 private:
 	void Set_FastComboTime(_float fTimeDelta);
+	void Hit_Shake();
 #pragma region PrivateFunction
 
 #pragma region KeyInput
@@ -130,6 +131,7 @@ private:
 	_bool m_bKeyInput = false; //방향키가 눌렸는지
 	_bool m_bSpinComboEnd = false; // 스핀콤보가 끝났는지
 	_bool m_bRespawn = false; 
+	
 	_float m_fJumpSpeed = 15.f; // 점프중 스피드
 	_float m_fRunSpeed = 8.f; // 달리기이동스피드
 	_float m_fRunEndSpeed = 8.f; //달리기엔드스피드

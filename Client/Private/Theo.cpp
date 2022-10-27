@@ -8,6 +8,7 @@
 #include "UI_Manager.h"
 #include "Pointer_Manager.h"
 #include "Player.h"
+#include "Navigation.h"
 
 CTheo::CTheo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -56,6 +57,11 @@ HRESULT CTheo::Initialize(void * pArg)
 	m_fDamage = 10.f;
 
 	m_fColiisionTime = 0.1f;
+
+	CNavigation::NAVIGATIONDESC NaviDesc;
+	NaviDesc.iCurrentIndex = 1;
+	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
+		return E_FAIL;
 
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
@@ -255,8 +261,7 @@ HRESULT CTheo::Ready_Collider()
 
 	_float4x4 RHand = m_Sockets[SOCKET_RHAND]->Get_Transformation();
 
-	//ColliderDesc.vSize = _float3(2.f, 1.f, 1.f);
-	ColliderDesc.vSize = _float3(4.f, 4.f, 4.f);
+	ColliderDesc.vSize = _float3(6.f, 6.f, 6.f);
 	ColliderDesc.vCenter = _float3(RHand._41, RHand._42, RHand._43);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.sTag = "Monster_Attack";
@@ -468,6 +473,8 @@ void CTheo::Update(_float fTimeDelta)
 		break;
 	case Client::CTheo::RUN:
 	{
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0))
+			CRM->Start_Shake(0.3f, 2.f, 0.02f);
 		if (m_fNowMp >= 100.f)
 			m_fRunSpeed = 6.f;
 		else
@@ -485,6 +492,7 @@ void CTheo::Update(_float fTimeDelta)
 		{
 			m_bLHand = true;
 			m_bRHand = true;
+			CRM->Start_Shake(0.3f, 3.f, 0.04f);
 		}
 		else
 		{
@@ -502,7 +510,10 @@ void CTheo::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+		{
 			m_bRHand = true;
+			CRM->Start_Shake(0.3f, 4.f, 0.04f);
+		}
 		else
 			m_bRHand = false;
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
@@ -514,13 +525,17 @@ void CTheo::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0))
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
 			m_bRHand = true;
+			CRM->Start_Shake(0.2f, 2.f, 0.02f);
+		}
 		else
 			m_bRHand = false;
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
 			m_bRHand = true;
 			m_bLHand = true;
+			CRM->Start_Shake(0.3f, 5.f, 0.04f);
 		}
 		else
 		{
@@ -543,6 +558,8 @@ void CTheo::Update(_float fTimeDelta)
 			m_bPattern = true;
 		else
 			m_bPattern = false;
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+			CRM->Start_Shake(0.5f, 4.f, 0.03f);
 		break;
 	case Client::CTheo::SKILL5:
 		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
@@ -578,6 +595,8 @@ void CTheo::Update(_float fTimeDelta)
 				m_fNowMp += 0.1f;
 			}
 		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+			CRM->Start_Shake(0.5f, 4.f, 0.03f);
 		break;
 	case Client::CTheo::APPEAR:
 		Set_Dir();
@@ -749,6 +768,7 @@ void CTheo::Free()
 	Safe_Release(m_pAnimModel);
 
 	Safe_Release(m_pTarget);
+	Safe_Release(m_pNavigation);
 
 	for(auto& iter : m_pOBB)
 	Safe_Release(iter);

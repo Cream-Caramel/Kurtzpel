@@ -64,6 +64,8 @@ private:
 	_float3 m_vTargetLook; // 바라봐야할 방향
 	_float m_fRushSpeed = 0.f;
 	_float m_fRunSpeed = 3.f;
+	_float m_fRunTempo = 0.f;
+	_float m_fRunTempoAcc = 0.f;
 private:
 	_bool m_bLHand = false;
 	_bool m_bRHand = false;

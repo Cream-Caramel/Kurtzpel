@@ -176,6 +176,23 @@ void CCamera_Manager::Start_Shake(_float fShakeTime, _float fShakePower, _float 
 	m_pCamPlayer->Start_Shake(fShakeTime, fShakePower, fShakeSpeed);
 }
 
+void CCamera_Manager::Start_Fov(_float fFov, _float fFovSpeed)
+{
+	m_pCamPlayer->Start_Fov(fFov, fFovSpeed);
+	m_bFov = true;
+	m_bFovDIr = false;
+}
+
+void CCamera_Manager::EndFov()
+{
+	m_bFov = false;
+}
+
+void CCamera_Manager::Set_FovSpeed(_float fFovSpeed)
+{
+	m_pCamPlayer->Set_FovSpeed(fFovSpeed);
+}
+
 void CCamera_Manager::Free()
 {
 	Safe_Release(m_pCamPlayer);

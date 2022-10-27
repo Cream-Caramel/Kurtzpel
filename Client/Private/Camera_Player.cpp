@@ -108,7 +108,11 @@ void CCamera_Player::LateTick(_float fTimeDelta)
 		PlayScene(fTimeDelta);	
 		__super::Tick(fTimeDelta);
 	}
-	
+
+	if(CRM->Get_bFov())
+		Fov(fTimeDelta);
+
+	m_CameraDesc.fFovy = XMConvertToRadians(m_fNowFOV);
 }
 
 HRESULT CCamera_Player::Render()
@@ -137,6 +141,7 @@ void CCamera_Player::LookAt(_float3 TargetPos)
 
 void CCamera_Player::PlayScene(_float fTimeDelta)
 {
+	
 	if (m_bPosPlay)
 	{		
 		m_pTransformCom->LookAt(m_pLookTransform->Get_State(CTransform::STATE_POSITION));
@@ -268,6 +273,10 @@ void CCamera_Player::Set_SceneLookInfo(vector<LOOKINFO> LookInfos)
 
 void CCamera_Player::Start_Shake(_float fShakeTime, _float fShakePower, _float fShakeSpeed)
 {
+
+	if (m_bShake && m_fShakePower > fShakePower)
+		return;
+
 	m_bShake = true;
 	m_fShakeTime = fShakeTime;
 	m_fShakePower = fShakePower;
@@ -295,7 +304,7 @@ void CCamera_Player::Shake(_float fTimeDelta)
 		m_fShakeSpeedAcc = 0.f;
 		m_fShakePowerAcc = 0.f;
 	}
-
+	
 	m_fShakePowerAcc += m_fShakePower * fTimeDelta;
 	if (m_bDir)
 	{		
@@ -331,8 +340,80 @@ void CCamera_Player::End_Shake()
 	m_fShakeSpeedAcc = 0.f;
 	m_fShakeTimeAcc = 0.f;
 	m_fShakePowerAcc = 0.f;
-	m_vDistance = { 0.f,1.f,-6.f };
+	m_vDistance = { 0.f,1.f,-7.f };
 	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vOriginPos);
+}
+
+void CCamera_Player::Start_Fov(_float fFov, _float fFovSpeed)
+{
+	if (m_fTargetFOV == m_fOriginFOV)
+		return;
+
+	m_fTargetFOV = fFov;
+	m_fFovSpeed = fFovSpeed;
+	
+
+	if (m_fTargetFOV > m_fOriginFOV)
+		m_eFovDir = FOVUP;
+	else
+		m_eFovDir = FOVDOWN;
+}
+
+void CCamera_Player::Fov(_float fTimeDelta)
+{
+	if (m_iFovCount >= 2)
+		End_Fov();
+
+	if (m_eFovDir == FOVUP)
+	{
+		if (m_iFovCount == 0)
+		{
+			m_fNowFOV += m_fFovSpeed * fTimeDelta;
+			if (m_fNowFOV >= m_fTargetFOV)
+			{
+				m_iFovCount += 1;
+				m_fNowFOV = m_fTargetFOV;
+			}
+		}
+		else if(CRM->Get_bFovDir())
+		{
+			m_fNowFOV -= m_fFovSpeed * fTimeDelta;
+			if (m_fNowFOV <= m_fOriginFOV)
+			{
+				m_iFovCount += 1;
+				m_fNowFOV = m_fOriginFOV;
+			}
+		}
+	}
+
+	if (m_eFovDir == FOVDOWN)
+	{
+		if (m_iFovCount == 0)
+		{
+			m_fNowFOV -= m_fFovSpeed * fTimeDelta;
+			if (m_fNowFOV <= m_fTargetFOV)
+			{
+				m_iFovCount += 1;
+				m_fNowFOV = m_fTargetFOV;
+			}
+		}
+		else if (CRM->Get_bFovDir())
+		{
+			m_fNowFOV += m_fFovSpeed * fTimeDelta;
+			if (m_fNowFOV >= m_fOriginFOV)
+			{
+				m_iFovCount += 1;
+				m_fNowFOV = m_fOriginFOV;
+			}
+		}
+	}
+}
+
+void CCamera_Player::End_Fov()
+{
+	m_eFovDir = FOVEND;
+	m_iFovCount = 0;
+	CRM->EndFov();
 }
 
 CCamera_Player * CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
