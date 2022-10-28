@@ -43,8 +43,8 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_bColliderRender = true;
 
-	m_eCurState = WALK;
-	m_eNextState = WALK;
+	m_eCurState = START;
+	m_eNextState = START;
 
 	m_vTargetLook = { 0.f,0.f,1.f };
 
@@ -61,17 +61,15 @@ HRESULT CDragon::Initialize(void * pArg)
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
-	NaviDesc.iCurrentIndex = 1;
-	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-	return E_FAIL;
+	Set_Dir();
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
-	NaviDesc.iCurrentIndex = 478;
+	CNavigation::NAVIGATIONDESC NaviDesc;
+	NaviDesc.iCurrentIndex = 172;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
-	m_pNavigation->Set_BattleIndex(473);*/
+	m_pNavigation->Set_BattleIndex(145);
+	CRM->Start_Scene("Scene_Stage4Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -240,6 +238,7 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 				m_bRHand = false;
 				Set_State(GROGGYSTART);
 				m_fNowMp -= 10.f;
+				CRM->Start_Shake(0.5f, 5.f, 0.06f);
 				CRM->Start_Fov(40.f, 120.f);
 				CRM->Set_FovDir(true);
 			}		
@@ -250,6 +249,7 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 
 			m_bCollision = false;
 			m_bHit = true;
+			UM->Set_ExGaugeTex(1);
 		}
 	}
 }
@@ -471,6 +471,8 @@ void CDragon::Set_State(STATE eState)
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,5.f,0.f });
 		break;
 	case Client::CDragon::START:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			CRM->Start_Shake(0.5f, 6.f, 0.07f);
 		break;
 	case Client::CDragon::IDLE:
 		break;
@@ -547,13 +549,13 @@ void CDragon::End_Animation()
 			m_bRush = false;
 			break;
 		case Client::CDragon::SKILL9_2:
-			if (!m_bRush && m_iRushCount < 3)
+			if (!m_bRush && m_iRushCount < 1)
 			{
 				m_iRushCount += 1;
 				m_pAnimModel->Set_AnimIndex(SKILL9_2);
 				m_eNextState = SKILL9_2;
 			}
-			else if (m_iRushCount >= 3)
+			else if (m_iRushCount >= 1)
 			{
 				m_bRush = true;
 				m_iRushCount = 0;
@@ -777,8 +779,8 @@ void CDragon::Update(_float fTimeDelta)
 			m_bPattern = false;
 		break;
 	case Client::CDragon::SKILL14_2:
-		m_fNowHp += 0.5f;
-		m_fNowMp += 0.1f;
+		m_fNowHp += 1.f;
+		m_fNowMp += 0.15f;
 		break;
 	case Client::CDragon::SKILL14_3:
 		break;
@@ -794,6 +796,8 @@ void CDragon::Update(_float fTimeDelta)
 			m_bAttack = false;
 		break;
 	case Client::CDragon::START:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			CRM->Start_Shake(0.4f, 3.f, 0.03f);
 		break;
 	case Client::CDragon::IDLE:
 		Set_Dir();
@@ -812,7 +816,6 @@ void CDragon::Update(_float fTimeDelta)
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRunSpeed, m_pNavigation, fTimeDelta);
 		else
 			Close_Attack();
-		break;
 	}
 		break;
 	}

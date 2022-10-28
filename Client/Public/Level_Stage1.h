@@ -23,6 +23,7 @@ private:
 	HRESULT Ready_Load_Model(char* DatName);
 	HRESULT Ready_Load_AnimModel(char* DatName);
 	HRESULT Ready_UI(char* DatName);
+	_bool m_bScene = false;
 
 public:
 	static CLevel_Stage1* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

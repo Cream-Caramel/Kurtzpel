@@ -9,6 +9,7 @@
 #include "Pointer_Manager.h"
 #include "Player.h"
 #include "Navigation.h"
+#include "Level_Loading.h"
 
 CTheo::CTheo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -58,13 +59,17 @@ HRESULT CTheo::Initialize(void * pArg)
 
 	m_fColiisionTime = 0.1f;
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
-	NaviDesc.iCurrentIndex = 1;
-	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;
-
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
+
+	CNavigation::NAVIGATIONDESC NaviDesc;
+	NaviDesc.iCurrentIndex = 42;
+	if (FAILED(__super::Add_Component(LEVEL_STAGE2, L"NavigationStage2", TEXT("NavigationStage2"), (CComponent**)&m_pNavigation, &NaviDesc)))
+		return E_FAIL;
+
+	m_pNavigation->Set_BattleIndex(41);
+
+	CRM->Start_Scene("Scene_Stage2Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -226,6 +231,9 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 				m_bRHand = false;
 				Set_State(HITSTART);
 				m_fNowMp -= 10.f;
+				CRM->Start_Shake(0.5f, 5.f, 0.06f);
+				CRM->Start_Fov(40.f, 120.f);
+				CRM->Set_FovDir(true);
 			}
 			m_bCollision = false;
 			m_bHit = true;
@@ -233,6 +241,7 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 				m_fNowHp -= pOther->Get_Damage() * 2;
 			else
 				m_fNowHp -= pOther->Get_Damage();
+			UM->Set_ExGaugeTex(1);
 		}
 	}
 }
@@ -407,6 +416,7 @@ void CTheo::End_Animation()
 		{
 		case Client::CTheo::DOWN:
 			Set_Dead();
+			GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE3));
 			break;
 		case Client::CTheo::HITEND:
 			Set_State(IDLE);
@@ -476,13 +486,15 @@ void CTheo::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0))
 			CRM->Start_Shake(0.3f, 2.f, 0.02f);
 		if (m_fNowMp >= 100.f)
-			m_fRunSpeed = 6.f;
+			m_fRunSpeed = 12.f;
 		else
-			m_fRunSpeed = 3.f;
+			m_fRunSpeed = 6.f;
 		Set_Dir(); 
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		if (Distance < 5.f)
 			Set_NextAttack();
+		else
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRunSpeed, m_pNavigation, fTimeDelta);
 		break;
 	}
 	case Client::CTheo::SKILL1:
@@ -570,7 +582,7 @@ void CTheo::Update(_float fTimeDelta)
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
-			//m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed * 4.f, fTimeDelta);
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed * 4.f, m_pNavigation, fTimeDelta);
 			m_bLHand = true;
 			m_bRHand = true;
 		}
@@ -616,7 +628,7 @@ void CTheo::Update(_float fTimeDelta)
 		if (Distance < 5.f)
 			Set_State(RUN);
 		else
-			//m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, fTimeDelta);
+			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, m_pNavigation, fTimeDelta);
 		break;
 	}
 	}

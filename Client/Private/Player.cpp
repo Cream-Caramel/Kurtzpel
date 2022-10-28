@@ -47,8 +47,6 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerBottom", TEXT("Bottom"), (CComponent**)&m_pAnimModel[MODEL_BOTTOM])))
 		return E_FAIL;
 	
-	/*if (FAILED(Create_Navigation("Level_Stage1")))
-		return E_FAIL;*/
 	
 	m_eCurState = IDLE;
 	m_eNextState = IDLE;
@@ -74,7 +72,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_bColliderRender = true;
 	
 	m_pTransformCom->Set_Gravity(0.f);
-	m_pTransformCom->Set_JumpPower(0.6f);
+	m_pTransformCom->Set_JumpPower(0.4f);
 
 	return S_OK;
 }
@@ -91,13 +89,10 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_bColliderRender = !m_bColliderRender;
 
 	if (GI->Key_Down(DIK_3))
-		CRM->Start_Fov(90.f, 120.f);
-
-	if (GI->Key_Down(DIK_4))
-		CRM->Set_FovDir(true);
+		CRM->Start_Scene("Scene_Stage1");
 
 	if (GI->Key_Down(DIK_5))
-		CRM->Start_Scene("Scene_Stage1");
+		CRM->Start_Scene("Scene_Stage2");
 
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
@@ -283,13 +278,11 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::JUMP:		
 		break;
 	case Client::CPlayer::JUMPEND:
-		CRM->Set_FovDir(true);
 		break;
 	case Client::CPlayer::JUMPUP:
 		
 		break;
-	case Client::CPlayer::JUMPSTART:
-		CRM->Start_Fov(80.f, 100.f);
+	case Client::CPlayer::JUMPSTART:	
 		m_pTransformCom->Set_Jump(true);
 		m_pTransformCom->Set_Gravity(0.f);
 		m_pTransformCom->Set_JumpPower(0.6f);
@@ -467,6 +460,9 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(10);
 		break;
 	case Client::CPlayer::SLASHATTACK:
+		CRM->Set_PlayerScene(true);
+		CRM->Start_Scene("PlayerDoubleSlash");	
+		
 		m_fNowMp -= 30.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(5.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(30);
@@ -985,6 +981,7 @@ void CPlayer::Check_Battle()
 		{
 			m_bBattle = true;
 			m_pNavigation->Set_BattleIndex(145);
+			PM->Add_Monster("Level_Stage4");
 		}
 		break;
 		}
@@ -1582,7 +1579,7 @@ void CPlayer::Update(_float fTimeDelta)
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			CRM->Start_Shake(0.02f, 1.5f, 0.02f);
+			CRM->Start_Shake(0.2f, 2.f, 0.02f);
 		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -1607,7 +1604,7 @@ void CPlayer::Update(_float fTimeDelta)
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			CRM->Start_Fov(70.f, 100.f);
 			CRM->Set_FovDir(true);
-			CRM->Start_Shake(0.03f, 2.f, 0.02f);
+			CRM->Start_Shake(0.3f, 3.f, 0.02f);
 		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -1757,7 +1754,6 @@ void CPlayer::Reset_BattleIndex()
 	m_pNavigation->Set_BattleIndex(-1);
 }
 
-
 void CPlayer::Jump_KeyInput(_float fTimeDelta)
 {
 	Input_Direction();
@@ -1871,11 +1867,12 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 	}
 
 	if (GI->Key_Pressing(DIK_R))
-	{
+	{	
 		if (m_fNowMp >= 30.f && UM->Get_ExGaugeTex() >= 43)
 		{
 			Set_State(SLASHATTACK);
 			UM->Reset_ExGaugeTex();
+			
 		}
 		return;
 	}

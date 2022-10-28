@@ -60,7 +60,7 @@ void CHPBarFrame::Tick(_float fTimeDelta)
 		{
 			if (m_fNowPlayerHp < 100.f)
 			{
-				m_fNowPlayerHp += 1.f * fTimeDelta;
+				m_fNowPlayerHp += 0.5f * fTimeDelta;
 				m_fPrePlayerHp = m_fNowPlayerHp;
 				if (m_fNowPlayerHp >= 100.f)
 				{

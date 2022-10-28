@@ -34,6 +34,8 @@ HRESULT CLevel_Stage4::Initialize()
 	/*if (FAILED(Ready_UI("Level_Stage4")))
 		return E_FAIL;*/
 
+	m_bScene = false;
+
 
 	return S_OK;
 }
@@ -41,6 +43,12 @@ HRESULT CLevel_Stage4::Initialize()
 void CLevel_Stage4::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
+
+	if (!m_bScene)
+	{
+		CRM->Start_Scene("Scene_Stage4");
+		m_bScene = true;
+	}
 }
 
 HRESULT CLevel_Stage4::Render()
@@ -62,7 +70,7 @@ HRESULT CLevel_Stage4::Ready_Lights()
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(0.5f, 0.5f, 0.5f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 0.f, 0.f, 1.f);
+	LightDesc.vSpecular = _float4(0.9f, 0.5f, 0.f, 1.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;

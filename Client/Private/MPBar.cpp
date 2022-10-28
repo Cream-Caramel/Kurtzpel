@@ -29,6 +29,8 @@ HRESULT CMPBar::Initialize(void * pArg)
 void CMPBar::Tick(_float fTimeDelta)
 {
 	m_fPlayerMp = (_float)UM->Get_PlayerMp();
+	if (m_fPlayerMp <= 0.f)
+		m_fPlayerMp = 0.f;
 	if (m_fPlayerMp < 100.f)
 	{
 		if (UM->Get_PlayerState() == CPlayer::IDLE || UM->Get_PlayerState() == CPlayer::RUN)

@@ -35,32 +35,10 @@ HRESULT CLevel_Stage1::Initialize()
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
-	CAnimMesh::MESHINFO* MeshInfo;
-	MeshInfo = new CAnimMesh::MESHINFO;
-	MeshInfo->sTag = L"Theo";
-	MeshInfo->fScale = _float3{ 1.f, 1.f, 1.f };
-	MeshInfo->fPos = _float4{ 90.f,0.6f,100.f,1.f };
-	MeshInfo->fAngle = _float3{ 0.f,0.f,0.f };
-	GI->Add_GameObjectToLayer(L"Theo", LEVEL_STATIC, L"Layer_AnimModelObject", MeshInfo);
-
-	/*CAnimMesh::MESHINFO* MeshInfo;
-	MeshInfo = new CAnimMesh::MESHINFO;
-	MeshInfo->sTag = L"Golem";
-	MeshInfo->fScale = _float3{ 1.f, 1.f, 1.f };
-	MeshInfo->fPos = _float4{ 90.f,0.6f,100.f,1.f};
-	MeshInfo->fAngle = _float3{ 0.f,0.f,0.f };
-	GI->Add_GameObjectToLayer(L"Golem", LEVEL_STATIC, L"Layer_AnimModelObject", MeshInfo);*/
-	
-
-	/*CAnimMesh::MESHINFO* MeshInfo;
-	MeshInfo = new CAnimMesh::MESHINFO;
-	MeshInfo->sTag = L"Dragon";
-	MeshInfo->fScale = _float3{ 1.f, 1.f, 1.f };
-	MeshInfo->fPos = _float4{ 90.f,0.6f,100.f,1.f};
-	MeshInfo->fAngle = _float3{ 0.f,0.f,0.f };
-	GI->Add_GameObjectToLayer(L"Dragon", LEVEL_STATIC, L"Layer_AnimModelObject", MeshInfo);*/
-
 	PM->Get_PlayerPointer()->Create_Navigation("Level_Stage1");
+
+
+	m_bScene = false;
 
 	return S_OK;
 }
@@ -69,6 +47,11 @@ void CLevel_Stage1::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
+	/*if (!m_bScene)
+	{
+		CRM->Start_Scene("Scene_Stage1");
+		m_bScene = true;
+	}*/
 	if (GI->Key_Down(DIK_L))
 	{
 		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE4));
@@ -104,7 +87,7 @@ HRESULT CLevel_Stage1::Ready_Lights()
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(0.5f, 0.5f, 0.5f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 0.f, 0.f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 1.f, 0.f, 1.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;

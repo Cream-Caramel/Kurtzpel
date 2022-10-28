@@ -7,8 +7,15 @@ IMPLEMENT_SINGLETON(CCamera_Manager)
 
 CCamera_Manager::CCamera_Manager()
 {
+	Load_Scene("PlayerDoubleSlash");
 	Load_Scene("Scene_Stage1");
-	Load_Scene("Test");
+	Load_Scene("Scene_Stage2");
+	Load_Scene("Scene_Stage2Boss");
+	Load_Scene("Scene_Stage3");
+	Load_Scene("Scene_Stage3Boss");
+	Load_Scene("Scene_Stage4");
+	Load_Scene("Scene_Stage4Boss");
+
 }
 
 void CCamera_Manager::Add_Camera_Player(CCamera_Player * pPlayerCam)
@@ -147,28 +154,78 @@ void CCamera_Manager::Load_Scene(char * FileName)
 
 void CCamera_Manager::Push_CamPosInfo(const char* FileName, vector<POSINFO> PosInfos)
 {
-	if (!strcmp(FileName, "Scene_Stage1"))
+	if (!strcmp(FileName, "PlayerDoubleSlash"))
 	{
 		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
 	}
 
-	if (!strcmp(FileName, "Test"))
+	if (!strcmp(FileName, "Scene_Stage1"))
 	{
 		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
 	}
+	if (!strcmp(FileName, "Scene_Stage2"))
+	{
+		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
+	}
+	if (!strcmp(FileName, "Scene_Stage2Boss"))
+	{
+		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
+	}
+	if (!strcmp(FileName, "Scene_Stage3"))
+	{
+		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
+	}
+	if (!strcmp(FileName, "Scene_Stage3Boss"))
+	{
+		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
+	}
+	if (!strcmp(FileName, "Scene_Stage4"))
+	{
+		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
+	}
+	if (!strcmp(FileName, "Scene_Stage4Boss"))
+	{
+		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
+	}
+
 }
 
 void CCamera_Manager::Push_CamLookInfo(const char * FileName, vector<LOOKINFO> LookInfos)
 {
-	if (!strcmp(FileName, "Scene_Stage1"))
+	if (!strcmp(FileName, "PlayerDoubleSlash"))
 	{
 		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
 	}
 
-	if (!strcmp(FileName, "Test"))
+	if (!strcmp(FileName, "Scene_Stage1"))
 	{
 		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
 	}
+	if (!strcmp(FileName, "Scene_Stage2"))
+	{
+		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
+	}
+	if (!strcmp(FileName, "Scene_Stage2Boss"))
+	{
+		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
+	}
+	if (!strcmp(FileName, "Scene_Stage3"))
+	{
+		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
+	}
+	if (!strcmp(FileName, "Scene_Stage3Boss"))
+	{
+		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
+	}
+	if (!strcmp(FileName, "Scene_Stage4"))
+	{
+		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
+	}
+	if (!strcmp(FileName, "Scene_Stage4Boss"))
+	{
+		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
+	}
+
 }
 
 void CCamera_Manager::Start_Shake(_float fShakeTime, _float fShakePower, _float fShakeSpeed)

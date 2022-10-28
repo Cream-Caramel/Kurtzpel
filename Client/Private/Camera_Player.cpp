@@ -141,7 +141,8 @@ void CCamera_Player::LookAt(_float3 TargetPos)
 
 void CCamera_Player::PlayScene(_float fTimeDelta)
 {
-	
+
+
 	if (m_bPosPlay)
 	{		
 		m_pTransformCom->LookAt(m_pLookTransform->Get_State(CTransform::STATE_POSITION));
@@ -200,19 +201,53 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 		
 			if(fabs(XMVectorGetX(m_vStartLook - test)) < 0.05f)
 			{
-
 				CRM->End_Scene();
 				CRM->Set_PlayerScene(false);
-			
+				m_pTransformCom->LookAt(m_pPlayer->Get_PlayerPos() + _vector{ 0.f,4.f,0.f,0.f });
 			}
 			else
 			{
 				m_pTransformCom->TurnY(m_vStartLook, test, 0.9f);
 				
 			}
+		}	
+	}
+	if (m_bShake)
+	{
+		m_fShakeTimeAcc += 1.f * fTimeDelta;
+		if (m_fShakeTimeAcc >= m_fShakeTime)
+		{
+			End_Shake();
 		}
-		
-		
+
+		m_fShakeSpeedAcc += 1.f * fTimeDelta;
+		if (m_fShakeSpeedAcc >= m_fShakeSpeed)
+		{
+			m_bDir = !m_bDir;
+			m_fShakeSpeedAcc = 0.f;
+			m_fShakePowerAcc = 0.f;
+		}
+
+		m_fShakePowerAcc += m_fShakePower * fTimeDelta;
+		if (m_bDir)
+		{
+			_float3 Pos;
+			XMStoreFloat3(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			Pos.x += m_fShakePowerAcc;
+			Pos.y += m_fShakePowerAcc;
+			Pos.z += m_fShakePowerAcc;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ Pos.x, Pos.y, Pos.z, 1.f });
+			
+		}
+		else
+		{
+			_float3 Pos;
+			XMStoreFloat3(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			Pos.x -= m_fShakePowerAcc;
+			Pos.y -= m_fShakePowerAcc;
+			Pos.z -= m_fShakePowerAcc;
+			m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ Pos.x, Pos.y, Pos.z, 1.f });
+		}
 	}
 
 }
@@ -228,6 +263,15 @@ void CCamera_Player::Set_ScenePosInfo(vector<POSINFO> PosInfos)
 		_vector PlayerPos = XMLoadFloat3(&PM->Get_PlayerPointer()->Get_Pos());
 		for (auto& iter : m_PosInfo)
 			XMStoreFloat3(&iter.vPos, XMLoadFloat3(&iter.vPos) + PlayerPos);
+		_vector FixPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		POSINFO EndInfo;
+		XMStoreFloat3(&EndInfo.vPos, _vector{ FixPos.m128_f32[0], FixPos.m128_f32[1] , FixPos.m128_f32[2] });
+		EndInfo.fCamSpeed = 10.f;
+		EndInfo.fStopLimit = 0.f;
+		m_PosInfo.push_back(EndInfo);
+		m_bPosPlay = true;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ m_PosInfo.front().vPos.x, m_PosInfo.front().vPos.y, m_PosInfo.front().vPos.z, 1.f });
+		return;
 	}
 	_vector FixPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		POSINFO StartInfo;
@@ -239,7 +283,7 @@ void CCamera_Player::Set_ScenePosInfo(vector<POSINFO> PosInfos)
 	
 		POSINFO EndInfo;
 		XMStoreFloat3(&EndInfo.vPos, _vector{ FixPos.m128_f32[0], FixPos.m128_f32[1] , FixPos.m128_f32[2] });
-		EndInfo.fCamSpeed = 20.f;
+		EndInfo.fCamSpeed = 100.f;
 		EndInfo.fStopLimit = 0.f;
 		m_PosInfo.push_back(EndInfo);
 	

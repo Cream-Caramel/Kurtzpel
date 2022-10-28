@@ -43,8 +43,8 @@ HRESULT CGolem::Initialize(void * pArg)
 
 	m_bColliderRender = true;
 
-	m_eCurState = RUN;
-	m_eNextState = RUN;
+	m_eCurState = START;
+	m_eNextState = START;
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
@@ -60,22 +60,17 @@ HRESULT CGolem::Initialize(void * pArg)
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
 
+	
 	CNavigation::NAVIGATIONDESC NaviDesc;
-	NaviDesc.iCurrentIndex = 1;
-	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-	return E_FAIL;
-
-	
-
-	
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 478;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE3, L"NavigationStage3", TEXT("NavigationStage3"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
-	m_pNavigation->Set_BattleIndex(473);*/
+	m_pNavigation->Set_BattleIndex(473);
 
-	
+	Set_Dir();
+
+	CRM->Start_Scene("Scene_Stage3Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -242,6 +237,9 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 				m_bRHand = false;
 				Set_State(RTDOWN);
 				m_fNowMp -= 10.f;
+				CRM->Start_Shake(0.5f, 5.f, 0.06f);
+				CRM->Start_Fov(40.f, 120.f);
+				CRM->Set_FovDir(true);
 			}		
 			if (m_eCurState == RTDOWN || m_eCurState == DOWN)
 				m_fNowHp -= pOther->Get_Damage() * 2.f;
@@ -253,6 +251,7 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 
 			m_bCollision = false;
 			m_bHit = true;
+			UM->Set_ExGaugeTex(1);
 		}
 	}
 }
@@ -715,6 +714,8 @@ void CGolem::Update(_float fTimeDelta)
 	case Client::CGolem::STANDUP:
 		break;
 	case Client::CGolem::START:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			CRM->Start_Shake(0.6f, 4.f, 0.04f);
 		break;
 	case Client::CGolem::IDLE:
 		Set_Dir();
