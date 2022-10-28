@@ -8,6 +8,7 @@
 #include "UI_Manager.h"
 #include "Pointer_Manager.h"
 #include "Player.h"
+#include "Level_Loading.h"
 
 CGolem::CGolem(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -135,6 +136,7 @@ void CGolem::LateTick(_float fTimeDelta)
 		m_bRHand = false;
 		m_bLHand = false;
 		m_bAttack = false;
+		
 	}
 
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
@@ -472,6 +474,8 @@ void CGolem::End_Animation()
 			Set_State(STANDUP);
 			break;
 		case Client::CGolem::DIE:
+			Set_Dead();
+			GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE4));
 			break;
 		case Client::CGolem::RTDOWN:
 			Set_State(DOWN);
@@ -715,7 +719,7 @@ void CGolem::Update(_float fTimeDelta)
 		break;
 	case Client::CGolem::START:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-			CRM->Start_Shake(0.6f, 4.f, 0.04f);
+			CRM->Start_Shake(0.4f, 3.f, 0.03f);
 		break;
 	case Client::CGolem::IDLE:
 		Set_Dir();

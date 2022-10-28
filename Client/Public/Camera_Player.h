@@ -63,6 +63,8 @@ private:
 	_uint m_iLookInfoIndex = 0; //¾À·èÆ÷½ºÀÎµ¦½º
 	_bool m_bPosPlay = false;
 	_bool m_bLookPlay = false;
+	_bool m_bPosStop = false;
+	_bool m_bLookStop = false;
 	_float m_fPosStopLimit = 0.f;
 	_float m_fLookStopLimit = 0.f;
 	CPlayer* m_pPlayer = nullptr;

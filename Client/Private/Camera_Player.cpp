@@ -146,11 +146,15 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 	if (m_bPosPlay)
 	{		
 		m_pTransformCom->LookAt(m_pLookTransform->Get_State(CTransform::STATE_POSITION));
-		if (m_PosInfo[m_iPosInfoIndex].fStopLimit > 0)
+		if (m_PosInfo[m_iPosInfoIndex].fStopLimit > 0 && !m_bPosStop)
 		{
 			m_fPosStopLimit += 1.f * fTimeDelta;
 			if (m_fPosStopLimit >= m_PosInfo[m_iPosInfoIndex].fStopLimit)
-				m_PosInfo[m_iPosInfoIndex].fStopLimit = 0.f;
+			{
+				m_bPosStop = true;
+				m_fPosStopLimit = 0.f;
+			}
+			
 		}
 		else
 		{
@@ -162,6 +166,7 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 				if (m_iPosInfoIndex == m_PosInfo.size())
 				{
 					m_bPosPlay = false;
+					m_bPosStop = false;
 					m_iPosInfoIndex = 0;
 				}
 			}
@@ -171,11 +176,14 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 
 	if (m_bLookPlay)
 	{
-		if (m_LookInfo[m_iLookInfoIndex].fStopLimit > 0)
-		{
+		if (m_LookInfo[m_iLookInfoIndex].fStopLimit > 0 && !m_bLookStop)
+		{		
 			m_fLookStopLimit += 1.f * fTimeDelta;
 			if (m_fLookStopLimit >= m_LookInfo[m_iLookInfoIndex].fStopLimit)
-				m_LookInfo[m_iLookInfoIndex].fStopLimit = 0.f;
+			{
+				m_bLookStop = true;
+				m_fLookStopLimit = 0.f;
+			}
 		}
 		else
 		{
@@ -187,6 +195,7 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 				if (m_iLookInfoIndex == m_LookInfo.size())
 				{
 					m_bLookPlay = false;
+					m_bLookStop = false;
 					m_iLookInfoIndex = 0;
 				}
 			}

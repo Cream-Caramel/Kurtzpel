@@ -414,6 +414,7 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::BACKSTEP:
 		break;
 	case Client::CDragon::DIE:
+		Set_Dead();
 		break;
 	case Client::CDragon::GROGGYEND:
 		break;
@@ -424,12 +425,24 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::SKILL1:
 		break;
 	case Client::CDragon::SKILL3:
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 20.f;
+		else
+			m_fDamage = 10.f;
 		break;
 	case Client::CDragon::SKILL4:
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 8.f, 6.f, 10.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,3.f });
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 50.f;
+		else
+			m_fDamage = 30.f;
 		break;
 	case Client::CDragon::SKILL5:
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 40.f;
+		else
+			m_fDamage = 20.f;
 		break;
 	case Client::CDragon::SKILL6:
 		break;
@@ -442,10 +455,18 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::SKILL8:
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 12.f, 6.f, 14.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,6.f });
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 30.f;
+		else
+			m_fDamage = 20.f;
 		break;
 	case Client::CDragon::SKILL9_1:
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 8.f, 6.f, 10.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,3.f });
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 30.f;
+		else
+			m_fDamage = 15.f;
 		break;
 	case Client::CDragon::SKILL9_2:
 		break;
@@ -455,10 +476,18 @@ void CDragon::Set_State(STATE eState)
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 5.f, 6.f, 6.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,2.f });
 		m_fFlyAttackSpeed = 20.f;
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 40.f;
+		else
+			m_fDamage = 20.f;
 		break;
 	case Client::CDragon::SKILL10_2:
 		break;
 	case Client::CDragon::SKILL13:
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 40.f;
+		else
+			m_fDamage = 30.f;
 		break;
 	case Client::CDragon::SKILL14_1:
 		break;
@@ -469,6 +498,10 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::SKILL15:
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 24.f, 10.f, 24.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,5.f,0.f });
+		if (m_fNowMp >= 100.f)
+			m_fDamage = 100.f;
+		else
+			m_fDamage = 60.f;
 		break;
 	case Client::CDragon::START:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
