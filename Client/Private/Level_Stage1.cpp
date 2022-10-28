@@ -37,6 +37,8 @@ HRESULT CLevel_Stage1::Initialize()
 
 	PM->Get_PlayerPointer()->Create_Navigation("Level_Stage1");
 
+	GI->StopAll();
+	GI->PlayBGM(L"Stage1.ogg", 0.6f);
 
 	m_bScene = false;
 
@@ -47,6 +49,8 @@ void CLevel_Stage1::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
+	
+
 	/*if (!m_bScene)
 	{
 		CRM->Start_Scene("Scene_Stage1");
@@ -54,16 +58,19 @@ void CLevel_Stage1::Tick(_float fTimeDelta)
 	}*/
 	if (GI->Key_Down(DIK_L))
 	{
+		GI->StopAll();
 		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE4));
 	}
 
 	if (GI->Key_Down(DIK_K))
 	{
+		GI->StopAll();
 		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE3));
 	}
 
 	if (GI->Key_Down(DIK_J))
 	{
+		GI->StopAll();
 		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE2));
 	}
 }

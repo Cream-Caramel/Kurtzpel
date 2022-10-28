@@ -13,6 +13,7 @@
 #include "Picking.h"
 #include "Font_Manager.h"
 #include "Target_Manager.h"
+#include "Sound_Manager.h"
 
 /* 클라이언트로 보여주기위한 가장 대표적인 클래스이다. */
 /* 각종 매니져클래스들의 주요함수를 클라로 보여준다.  */
@@ -89,9 +90,16 @@ public: /* For.Font_Manager */
 	HRESULT Render_Fonts(const _tchar* pFontTag, const _tchar* pTextm, _float2 vPosition, _fvector vColor = XMVectorSet(0.f, 1.f, 0.f, 1.f),
 		_float fAngle = 0.f, _float2 vOrigin = _float2(0.f, 0.f), _float2 vScale = _float2(1.f, 1.f));
 
+public:/*For. Sound_Manager*/
+	HRESULT PlaySound(TCHAR* pSoundKey, const _uint& eID, const float& fVolume);
+	HRESULT PlayBGM(TCHAR * pSoundKey, const float& fVolume);
+	HRESULT StopSound(const _uint& eID);
+	HRESULT StopAll();
+
 private:
 	CGraphic_Device*				m_pGraphic_Device = nullptr;
 	CInput_Device*					m_pInput_Device = nullptr;
+	CSound_Manager*					m_pSound_Manager = nullptr;
 	CLevel_Manager*					m_pLevel_Manager = nullptr;
 	CObject_Manager*				m_pObject_Manager = nullptr;
 	CComponent_Manager*				m_pComponent_Manager = nullptr;

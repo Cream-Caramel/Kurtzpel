@@ -35,6 +35,9 @@ HRESULT CLevel_Stage2::Initialize()
 	/*if (FAILED(Ready_UI("Level_Stage4")))
 		return E_FAIL;*/
 
+	GI->StopAll();
+	GI->PlayBGM(L"Stage2.ogg", 0.6f);
+
 	m_bScene = false;
 
 	return S_OK;

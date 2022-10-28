@@ -36,6 +36,8 @@ HRESULT CLevel_Stage4::Initialize()
 
 	m_bScene = false;
 
+	GI->StopAll();
+	GI->PlayBGM(L"Stage4.ogg", 0.6f);
 
 	return S_OK;
 }

@@ -437,7 +437,7 @@ void CGolem::Set_State(STATE eState)
 		if (m_fNowMp >= 100.f)
 			m_fDamage = 100.f;
 		else
-			m_fDamage = 50.f;
+			m_fDamage = 60.f;
 		break;
 	case Client::CGolem::SKILL10_2:
 		break;
@@ -475,6 +475,7 @@ void CGolem::End_Animation()
 			break;
 		case Client::CGolem::DIE:
 			Set_Dead();
+			GI->StopAll();
 			GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE4));
 			break;
 		case Client::CGolem::RTDOWN:

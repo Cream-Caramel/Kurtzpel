@@ -38,6 +38,19 @@ using namespace DirectX;
 #include "Engine_Functor.h"
 #include "Engine_Function.h"
 
+#include <io.h>
+#include <Vfw.h>
+
+#pragma comment(lib, "vfw32.lib")
+
+#ifdef ENGINE_EXPORTS
+#pragma comment(lib, "../Bin/fmod_vc.lib")
+#else
+#pragma comment(lib, "fmod_vc.lib")
+#endif
+
+#pragma comment(lib, "msimg32.lib")
+
 
 #ifdef _DEBUG
 

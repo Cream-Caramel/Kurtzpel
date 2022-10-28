@@ -14,6 +14,7 @@ CGameInstance::CGameInstance()
 	, m_pPicking(CPicking::Get_Instance())
 	, m_pFont_Manager(CFont_Manager::Get_Instance())
 	, m_pTarget_Manager(CTarget_Manager::Get_Instance())
+	, m_pSound_Manager(CSound_Manager::Get_Instance())
 {	
 	Safe_AddRef(m_pTarget_Manager);
 	Safe_AddRef(m_pFont_Manager);
@@ -25,7 +26,9 @@ CGameInstance::CGameInstance()
 	Safe_AddRef(m_pObject_Manager);
 	Safe_AddRef(m_pLevel_Manager);
 	Safe_AddRef(m_pInput_Device);
+	Safe_AddRef(m_pSound_Manager);
 	Safe_AddRef(m_pGraphic_Device);
+
 }
 
 
@@ -51,6 +54,9 @@ HRESULT CGameInstance::Initialize_Engine(_uint iNumLevels, HINSTANCE hInst, cons
 		return E_FAIL;
 
 	if (FAILED(m_pComponent_Manager->Reserve_Container(iNumLevels)))
+		return E_FAIL;
+
+	if (FAILED(m_pSound_Manager->Initialize()))
 		return E_FAIL;
 
 	return S_OK;
@@ -349,6 +355,42 @@ HRESULT CGameInstance::Render_Fonts(const _tchar * pFontTag, const _tchar * pTex
 	return m_pFont_Manager->Render_Fonts(pFontTag, pTextm, vPosition, vColor, fAngle, vOrigin, vScale);
 }
 
+HRESULT CGameInstance::PlaySound(TCHAR * pSoundKey, const _uint & eID, const float & fVolume)
+{
+	if (m_pSound_Manager == nullptr)
+		return E_FAIL;
+
+	m_pSound_Manager->PlaySound(pSoundKey, eID, fVolume);
+	return S_OK;
+}
+
+HRESULT CGameInstance::PlayBGM(TCHAR * pSoundKey, const float & fVolume)
+{
+	if (m_pSound_Manager == nullptr)
+		return E_FAIL;
+
+	m_pSound_Manager->PlayBGM(pSoundKey, fVolume);
+	return S_OK;
+}
+
+HRESULT CGameInstance::StopSound(const _uint & eID)
+{
+	if (m_pSound_Manager == nullptr)
+		return E_FAIL;
+
+	m_pSound_Manager->StopSound(eID);
+	return S_OK;
+}
+
+HRESULT CGameInstance::StopAll()
+{
+	if (m_pSound_Manager == nullptr)
+		return E_FAIL;
+
+	m_pSound_Manager->StopAll();
+	return S_OK;
+}
+
 void CGameInstance::Release_Engine()
 {
 	CLight_Manager::Get_Instance()->Destroy_Instance();
@@ -371,6 +413,8 @@ void CGameInstance::Release_Engine()
 
 	CTarget_Manager::Get_Instance()->Destroy_Instance();
 
+	CSound_Manager::Get_Instance()->Destroy_Instance();
+
 	CInput_Device::Get_Instance()->Destroy_Instance();	
 	
 	CGraphic_Device::Get_Instance()->Destroy_Instance();
@@ -380,6 +424,7 @@ void CGameInstance::Free()
 {
 	Safe_Release(m_pTarget_Manager);
 	Safe_Release(m_pFont_Manager);
+	Safe_Release(m_pSound_Manager);
 	Safe_Release(m_pPicking);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPipeLine);

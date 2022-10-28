@@ -416,6 +416,7 @@ void CTheo::End_Animation()
 		{
 		case Client::CTheo::DOWN:
 			Set_Dead();
+			GI->StopAll();
 			GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE3));
 			break;
 		case Client::CTheo::HITEND:

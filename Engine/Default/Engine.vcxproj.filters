@@ -151,6 +151,9 @@
     <ClCompile Include="..\Private\Target_Manager.cpp">
       <Filter>04.Utility\05.RenderTarget\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Sound_Manager.cpp">
+      <Filter>05.System\02.Sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -320,6 +323,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Target_Manager.h">
       <Filter>04.Utility\05.RenderTarget\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sound_Manager.h">
+      <Filter>05.System\02.Sound</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -493,6 +499,9 @@
     </Filter>
     <Filter Include="04.Utility\05.RenderTarget\Manager">
       <UniqueIdentifier>{12685258-0f8c-4305-b9cd-dd02e16545a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05.System\02.Sound">
+      <UniqueIdentifier>{67425453-75f5-4ca0-a9ec-c0ed4cde209f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

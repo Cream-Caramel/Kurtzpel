@@ -89,7 +89,7 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_bColliderRender = !m_bColliderRender;
 
 	if (GI->Key_Down(DIK_3))
-		CRM->Start_Scene("Scene_Stage1");
+		GI->PlaySoundW(L"NomalCombo1.ogg", SD_PLAYER1, 0.6f);
 
 	if (GI->Key_Down(DIK_5))
 		CRM->Start_Scene("Scene_Stage2");
@@ -309,6 +309,7 @@ void CPlayer::Set_State(STATE eState)
 		m_fRunSpeed = 8.f;
 		break;
 	case Client::CPlayer::RUNEND:
+		GI->PlaySoundW(L"RunEnd.ogg", SD_PLAYER1, 0.6f);
 		m_fRunEndSpeed = 8.f;
 		break;
 	case Client::CPlayer::SPINCOMBOEND:
@@ -350,27 +351,32 @@ void CPlayer::Set_State(STATE eState)
 		m_fNowMp -= 20.f;
 		break;
 	case Client::CPlayer::AIRCOMBO1:
+		GI->PlaySoundW(L"AirCombo1.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
 		m_pTransformCom->Set_JumpPower(0.f);
 		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBO2:
+		GI->PlaySoundW(L"AirCombo2.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBO3:
+		GI->PlaySoundW(L"AirCombo3.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBO4:
+		GI->PlaySoundW(L"AirCombo4.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(14.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
+		GI->PlaySoundW(L"AirComboEnd.ogg", SD_PLAYER1, 0.6f);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		CRM->Set_FovDir(true);
 		m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -391,6 +397,7 @@ void CPlayer::Set_State(STATE eState)
 		m_fNowMp -= 10.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
+		GI->PlaySoundW(L"NomalCombo1.ogg", SD_PLAYER1, 0.6f);
 		m_fNC1Speed = 5.f;
 		m_fNomalCombo1Acc = 0.f;
 		m_fNowMp -= 2.f;
@@ -398,18 +405,21 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
+		GI->PlaySoundW(L"NomalCombo2.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
 		m_fNC2Speed = 5.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(7.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
+		GI->PlaySoundW(L"NomalCombo3.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 5.f;
 		m_fNC3Speed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(8.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
+		GI->PlaySoundW(L"NomalCombo4.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 5.f;
 		m_fNC4Speed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
@@ -1273,6 +1283,7 @@ void CPlayer::Update(_float fTimeDelta)
 		m_bCollision = false;
 		break;
 	case Client::CPlayer::RUN:
+		//GI->PlaySoundW(L"Run.ogg", SD_PLAYER1, 0.6f);
 		m_bMotionChange = true;
 		m_bUseSkill = true;
 		for (int i = 0; i < OBB_END; ++i)
@@ -1280,6 +1291,7 @@ void CPlayer::Update(_float fTimeDelta)
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, m_pNavigation, fTimeDelta);
 		break;
 	case Client::CPlayer::RUNEND:
+		
 		m_bMotionChange = true;
 		if (m_fRunEndSpeed > 0.15f)
 		{
