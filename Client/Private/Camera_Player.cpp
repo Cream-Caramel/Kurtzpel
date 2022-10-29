@@ -307,7 +307,7 @@ void CCamera_Player::Set_SceneLookInfo(vector<LOOKINFO> LookInfos)
 	m_LookInfo.clear();
 	
 	m_LookInfo = LookInfos;
-	
+
 	if (CRM->Get_bPlayerScene())
 	{
 		_vector PlayerPos = XMLoadFloat3(&PM->Get_PlayerPointer()->Get_Pos());

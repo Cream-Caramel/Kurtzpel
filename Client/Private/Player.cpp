@@ -130,7 +130,7 @@ void CPlayer::LateTick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_U))
 		UM->Set_ExGaugeTex(1);
 	if(!m_bSpinCombo)
-	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
+		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
 
 	for(int i = 0; i < MODEL_END; ++i)
 	{
@@ -267,6 +267,8 @@ void CPlayer::Set_State(STATE eState)
 	if (m_eNextState == eState)
 		return;
 
+	m_Parts[PARTS_SWORD]->Set_Collision(false);
+
 	m_eNextState = eState;
 
 	switch (m_eNextState)
@@ -304,6 +306,7 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::RESPAWN:
 		CRM->Set_FovSpeed(60.f);
 		CRM->Set_FovDir(true);
+		m_bSpinCombo = false;
 		break;
 	case Client::CPlayer::RUN:	
 		m_fRunSpeed = 8.f;
@@ -470,9 +473,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(10);
 		break;
 	case Client::CPlayer::SLASHATTACK:
-		CRM->Set_PlayerScene(true);
-		CRM->Start_Scene("PlayerDoubleSlash");	
-		
+		m_bDoubleSlash = true;
 		m_fNowMp -= 30.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(5.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(30);
@@ -1656,6 +1657,12 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::SLASHATTACK:
+		if (m_bDoubleSlash)
+		{
+			CRM->Set_PlayerScene(true);
+			CRM->Start_Scene("PlayerDoubleSlash");
+			m_bDoubleSlash = false;
+		}
 		m_bCollision = false;
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -1932,11 +1939,6 @@ void CPlayer::Dash_KeyInput(_float fTimeDelta)
 
 void CPlayer::Run_KeyInput(_float fTimeDelta)
 {
-	if (!Input_Direction())
-	{
-		Set_State(RUNEND);
-		return;
-	}
 	if (GI->Key_Pressing(DIK_LSHIFT))
 	{
 		Set_State(DASH);
@@ -2029,10 +2031,46 @@ void CPlayer::Run_KeyInput(_float fTimeDelta)
 		return;
 	}
 
+	if (!Input_Direction())
+	{
+		Set_State(RUNEND);
+		return;
+	}
+
 }
 
 void CPlayer::RunEnd_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
+		return;
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() > 15.f)
 	{
 		if (GI->Key_Pressing(DIK_W) || GI->Key_Pressing(DIK_A) || GI->Key_Pressing(DIK_S) || GI->Key_Pressing(DIK_D))
@@ -2050,26 +2088,6 @@ void CPlayer::RunEnd_KeyInput(_float fTimeDelta)
 		if (GI->Mouse_Down(DIMK_LBUTTON))
 		{
 			Set_State(NOMALCOMBO1);
-			return;
-		}
-
-		if (GI->Key_Pressing(DIK_C))
-		{
-			if (!UM->Get_CoolTime(4))
-			{
-				UM->Set_CoolTime(4);
-				Set_State(VOIDFRONT);
-			}
-			return;
-		}
-
-		if (GI->Key_Pressing(DIK_V))
-		{
-			if (!UM->Get_CoolTime(4))
-			{
-				UM->Set_CoolTime(4);
-				Set_State(VOIDBACK);
-			}
 			return;
 		}
 
@@ -2109,16 +2127,6 @@ void CPlayer::RunEnd_KeyInput(_float fTimeDelta)
 			return;
 		}
 
-		if (GI->Key_Pressing(DIK_E))
-		{
-			if (!UM->Get_CoolTime(1))
-			{
-				UM->Set_CoolTime(1);
-				Set_State(ROCKBREAK);
-			}
-			return;
-		}
-
 		if (GI->Key_Pressing(DIK_2))
 		{
 			Set_State(CHARGEREADY);
@@ -2149,6 +2157,46 @@ void CPlayer::VoidBackEnd_KeyInput(_float fTimeDelta)
 
 void CPlayer::SpinComboEnd_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
+		return;
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();
@@ -2166,6 +2214,39 @@ void CPlayer::SpinComboEnd_KeyInput(_float fTimeDelta)
 
 void CPlayer::SpinComboLoof_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+			m_bSpinCombo = false;
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+			m_bSpinCombo = false;
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+			m_bSpinCombo = false;
+		}
+		return;
+	}
+
 	m_fSpinComboSpeed = 2.f;
 	if (GI->Mouse_Up(DIMK_LBUTTON))
 	{
@@ -2227,6 +2308,26 @@ void CPlayer::SpinComboLoof_KeyInput(_float fTimeDelta)
 
 void CPlayer::SpinComboStart_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 		Input_Direction();
 
@@ -2280,6 +2381,36 @@ void CPlayer::SpinComboStart_KeyInput(_float fTimeDelta)
 
 void CPlayer::FastComboEnd_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
+		return;
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 		Input_Direction();
 
@@ -2295,12 +2426,62 @@ void CPlayer::FastComboEnd_KeyInput(_float fTimeDelta)
 
 void CPlayer::FastComboStart_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
+		return;
+	}
+
 	if(m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 		Input_Direction();
 }
 
 void CPlayer::RockBreak_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();
@@ -2318,6 +2499,9 @@ void CPlayer::RockBreak_KeyInput(_float fTimeDelta)
 
 void CPlayer::ChargeCrash_KeyInput(_float fTimeDelta)
 {
+	
+
+
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 		Input_Direction();
 
@@ -2338,6 +2522,8 @@ void CPlayer::ChargeCrash_KeyInput(_float fTimeDelta)
 
 void CPlayer::ChargeReady_KeyInput(_float fTimeDelta)
 {
+
+
 	Input_Direction();
 
 	if (GI->Mouse_Pressing(DIMK_LBUTTON))
@@ -2417,6 +2603,35 @@ void CPlayer::AirComboEnd_KeyInput(_float fTimeDelta)
 
 void CPlayer::NomalCombo1_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
+		return;
+	}
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();
@@ -2458,6 +2673,35 @@ void CPlayer::NomalCombo1_KeyInput(_float fTimeDelta)
 
 void CPlayer::NomalCombo2_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
+		return;
+	}
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();
@@ -2487,7 +2731,35 @@ void CPlayer::NomalCombo2_KeyInput(_float fTimeDelta)
 
 void CPlayer::NomalCombo3_KeyInput(_float fTimeDelta)
 {
-	
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
+		return;
+	}
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();
@@ -2506,6 +2778,35 @@ void CPlayer::NomalCombo3_KeyInput(_float fTimeDelta)
 
 void CPlayer::NomalCombo4_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(ROCKBREAK);
+		}
+		return;
+	}
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();

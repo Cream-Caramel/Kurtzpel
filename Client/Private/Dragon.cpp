@@ -833,7 +833,6 @@ void CDragon::Update(_float fTimeDelta)
 			CRM->Start_Shake(0.4f, 3.f, 0.03f);
 		break;
 	case Client::CDragon::IDLE:
-		Set_Dir();
 		break;
 	case Client::CDragon::WALK:
 	{

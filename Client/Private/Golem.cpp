@@ -698,9 +698,6 @@ void CGolem::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CGolem::SKILL10_1:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			Set_Dir();
-
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			m_bPattern = true;
 		else
@@ -723,7 +720,6 @@ void CGolem::Update(_float fTimeDelta)
 			CRM->Start_Shake(0.4f, 3.f, 0.03f);
 		break;
 	case Client::CGolem::IDLE:
-		Set_Dir();
 		break;
 	case Client::CGolem::STATE_END:
 		break;

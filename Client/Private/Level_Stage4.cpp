@@ -39,6 +39,8 @@ HRESULT CLevel_Stage4::Initialize()
 	GI->StopAll();
 	GI->PlayBGM(L"Stage4.ogg", 0.6f);
 
+	PM->Get_PlayerPointer()->Set_bBattle(false);
+
 	return S_OK;
 }
 
@@ -46,11 +48,11 @@ void CLevel_Stage4::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	if (!m_bScene)
+	/*if (!m_bScene)
 	{
 		CRM->Start_Scene("Scene_Stage4");
 		m_bScene = true;
-	}
+	}*/
 }
 
 HRESULT CLevel_Stage4::Render()
