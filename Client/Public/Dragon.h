@@ -31,6 +31,7 @@ class CDragon final : public CAnimMesh
 		START,
 		IDLE,
 		WALK,
+		FINISH,
 		STATE_END};
 
 	enum OBB {OBB_BODY, OBB_LHAND, OBB_RHAND, OBB_ATTACK, OBB_END};
@@ -65,21 +66,30 @@ private:
 	STATE m_eCurState; // 현재 상태
 	STATE m_eNextState; // 바꿔야할 상태
 	_float3 m_vTargetLook; // 바라봐야할 방향
-	_float m_fRushSpeed = 0.f;
+	_float m_fRushSpeed = 12.f;
 	_float m_fRunSpeed = 3.f;
 	_float m_fBackStepSpeed = 8.f;
-	_uint m_iRushCount = 0;
-	_bool m_bRush = false;
 	_float m_fFlyAttackSpeed = 20.f;
 	_float m_fWalkShakeAcc = 0.f;
-	_float m_fWalkTempo = 0.f;
+	_float m_fWalkTempo = 1.3f;
+	_float m_fRushShakeAcc = 0.f;
+	_float m_fRushTempo = 0.65f;
 	_uint m_iWalkCount = 0;
+	_float m_fSkill3Speed = 5.f;
+	_float m_fSkill4Speed = 40.f;
 private:
+	_bool m_bFinish = false;
 	_bool m_bLHand = false;
 	_bool m_bRHand = false;
 	_bool m_bPattern = false;
 	_bool m_bAttack = false;
-	
+	_uint m_iPreMotion = 0;
+	_uint m_iNextMotion = 1;
+	_uint m_iPreRangeAttack = 0;
+	_uint m_iNextRangeAttack = 1;
+	_uint m_iPreCloseAttack = 0;
+	_uint m_iNextCloseAttack = 1;
+
 	CNavigation* m_pNavigation = nullptr;
 	CAnimModel* m_pAnimModel = nullptr;
 	COBB* m_pOBB[OBB_END]{ nullptr };

@@ -141,8 +141,6 @@ void CCamera_Player::LookAt(_float3 TargetPos)
 
 void CCamera_Player::PlayScene(_float fTimeDelta)
 {
-
-
 	if (m_bPosPlay)
 	{		
 		m_pTransformCom->LookAt(m_pLookTransform->Get_State(CTransform::STATE_POSITION));
@@ -153,8 +151,7 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 			{
 				m_bPosStop = true;
 				m_fPosStopLimit = 0.f;
-			}
-			
+			}			
 		}
 		else
 		{
@@ -172,7 +169,6 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 			}
 		}
 	}
-
 
 	if (m_bLookPlay)
 	{
@@ -275,7 +271,7 @@ void CCamera_Player::Set_ScenePosInfo(vector<POSINFO> PosInfos)
 		_vector FixPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		POSINFO EndInfo;
 		XMStoreFloat3(&EndInfo.vPos, _vector{ FixPos.m128_f32[0], FixPos.m128_f32[1] , FixPos.m128_f32[2] });
-		EndInfo.fCamSpeed = 10.f;
+		EndInfo.fCamSpeed = 20.f;
 		EndInfo.fStopLimit = 0.f;
 		m_PosInfo.push_back(EndInfo);
 		m_bPosPlay = true;
@@ -361,9 +357,7 @@ void CCamera_Player::Shake(_float fTimeDelta)
 	m_fShakePowerAcc += m_fShakePower * fTimeDelta;
 	if (m_bDir)
 	{		
-		/*_vector RightPos = { m_vOriginPos.x + m_fShakePowerAcc, m_vOriginPos.y + m_fShakePowerAcc, m_vOriginPos.z + m_fShakePowerAcc, 1.f };
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, RightPos);*/
-
+	         
 		m_vDistance.x += m_fShakePowerAcc;
 		m_vDistance.y += m_fShakePowerAcc;
 		m_vDistance.z += m_fShakePowerAcc;
@@ -373,9 +367,6 @@ void CCamera_Player::Shake(_float fTimeDelta)
 	}
 	else
 	{		
-		/*_vector vLeftPos = { m_vOriginPos.x - m_fShakePowerAcc, m_vOriginPos.y - m_fShakePowerAcc, m_vOriginPos.z - m_fShakePowerAcc, 1.f };
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, vLeftPos);*/
-
 		m_vDistance.x -= m_fShakePowerAcc;
 		m_vDistance.y -= m_fShakePowerAcc;
 		m_vDistance.z -= m_fShakePowerAcc;
@@ -394,7 +385,6 @@ void CCamera_Player::End_Shake()
 	m_fShakeTimeAcc = 0.f;
 	m_fShakePowerAcc = 0.f;
 	m_vDistance = { 0.f,1.f,-7.f };
-	//m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_vOriginPos);
 }
 
 void CCamera_Player::Start_Fov(_float fFov, _float fFovSpeed)
@@ -459,6 +449,27 @@ void CCamera_Player::Fov(_float fTimeDelta)
 				m_fNowFOV = m_fOriginFOV;
 			}
 		}
+	}
+}
+
+void CCamera_Player::FixFov(_float fFov, _float fFovSpeed)
+{
+	if (fFov == m_fTargetFOV)
+		return;
+
+	if (fFov > m_fTargetFOV)
+	{
+		m_eFovDir = FOVUP;
+		m_iFovCount = 0;
+		m_fTargetFOV = fFov;
+		m_fFovSpeed = fFovSpeed;
+	}
+	else
+	{
+		m_eFovDir = FOVDOWN;
+		m_iFovCount = 0;
+		m_fTargetFOV = fFov;
+		m_fFovSpeed = fFovSpeed;
 	}
 }
 

@@ -240,6 +240,11 @@ void CCamera_Manager::Start_Fov(_float fFov, _float fFovSpeed)
 	m_bFovDIr = false;
 }
 
+void CCamera_Manager::Fix_Fov(_float fFov, _float fFovSpeed)
+{
+	m_pCamPlayer->FixFov(fFov, fFovSpeed);
+}
+
 void CCamera_Manager::EndFov()
 {
 	m_bFov = false;

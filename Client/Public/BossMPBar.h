@@ -20,6 +20,7 @@ public:
 
 private:
 	_float m_fBossMp;
+	_float m_fPreBossMp;
 	_float m_fShaderMp;
 	_bool m_bDie = false;
 	_float m_fDieAcc = 0.f;

@@ -297,8 +297,15 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::DASH:
 		m_fNowMp -= 5.f;
 		m_fDashSpeed = 20.f;
-		CRM->Start_Fov(80.f, 100.f);
-		CRM->Set_FovDir(true);
+		if (!CRM->Get_bFov())
+		{
+			CRM->Start_Fov(80.f, 100.f);
+			CRM->Set_FovDir(true);
+		}
+		else
+		{
+			CRM->Fix_Fov(80.f, 100.f);
+		}
 		break;
 	case Client::CPlayer::DIE:
 		CRM->Start_Fov(30.f, 30.f);
@@ -319,7 +326,7 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::SPINCOMBOSTART:
-		
+		CRM->Start_Fov(80.f, 100.f);
 		m_fNowMp -= 15.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(2.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(999);
@@ -342,15 +349,14 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::CHARGECRASH:
-		CRM->Set_FovSpeed(150.f);
-		CRM->Set_FovDir(true);
 		m_fChargeCrashSpeed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(100.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		
 		break;
 	case Client::CPlayer::CHARGEREADY:
-		CRM->Start_Fov(100.f, 20.f);
+		m_bMotionChange = false;
+		CRM->Start_Fov(30.f, 20.f);
 		m_fNowMp -= 20.f;
 		break;
 	case Client::CPlayer::AIRCOMBO1:
@@ -379,6 +385,8 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
+		CRM->Start_Fov(50.f, 140.f);
+		CRM->Set_FovDir(true);
 		GI->PlaySoundW(L"AirComboEnd.ogg", SD_PLAYER1, 0.6f);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		CRM->Set_FovDir(true);
@@ -401,6 +409,7 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
 		GI->PlaySoundW(L"NomalCombo1.ogg", SD_PLAYER1, 0.6f);
+		CRM->Start_Fov(55.f, 40.f);
 		m_fNC1Speed = 5.f;
 		m_fNomalCombo1Acc = 0.f;
 		m_fNowMp -= 2.f;
@@ -408,6 +417,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
+		CRM->Fix_Fov(50.f, 40.f);
 		GI->PlaySoundW(L"NomalCombo2.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
 		m_fNC2Speed = 5.f;
@@ -415,6 +425,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
+		CRM->Fix_Fov(43.f, 80.f);
 		GI->PlaySoundW(L"NomalCombo3.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 5.f;
 		m_fNC3Speed = 6.f;
@@ -422,6 +433,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
+		CRM->Fix_Fov(43.f, 80.f);
 		GI->PlaySoundW(L"NomalCombo4.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 5.f;
 		m_fNC4Speed = 6.f;
@@ -429,12 +441,14 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
+		CRM->Fix_Fov(50.f, 40.f);
 		m_fNowMp -= 3.f;
 		m_fNC5Speed = 5.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
+		CRM->Fix_Fov(43.f, 80.f);
 		m_fNowMp -= 5.f;
 		m_fNC6Speed = 8.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(20.f);
@@ -624,6 +638,8 @@ void CPlayer::End_Animation()
 			m_eNextState = SPINCOMBOEND;
 			m_bSpinComboEnd = false;
 			m_fSpinComboEndSpeed = 6.f;
+			CRM->Fix_Fov(30.f, 160.f);
+			CRM->Set_FovDir(true);
 			}
 			m_Parts[PARTS_SWORD]->Set_Damage(5.f);
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -650,6 +666,7 @@ void CPlayer::End_Animation()
 			m_fFastComboAcc = 0.f;
 			m_Parts[PARTS_SWORD]->Set_Collision(false);		
 			m_fFastComboEndSpeed = 8.f;		
+			CRM->Fix_Fov(40.f, 160.f);
 			CRM->Set_FovDir(true);
 			break;
 		case Client::CPlayer::ROCKBREAK:
@@ -1395,12 +1412,13 @@ void CPlayer::Update(_float fTimeDelta)
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			CRM->Start_Shake(0.4f, 6.f, 0.05f);
+			CRM->Set_FovSpeed(150.f);
+			CRM->Set_FovDir(true);
 		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::CHARGEREADY:
-		m_bMotionChange = false;
 		break;
 	case Client::CPlayer::AIRCOMBO1:
 		m_bMotionChange = false;
@@ -1642,6 +1660,8 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::BLADEATTACK:
 		m_bCollision = false;
+		if (m_bDoubleSlashFov)
+			CRM->Start_Fov(30.f, 20.f);
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -1657,17 +1677,39 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::SLASHATTACK:
+		m_bCollision = false;
 		if (m_bDoubleSlash)
-		{
+		{		
 			CRM->Set_PlayerScene(true);
 			CRM->Start_Scene("PlayerDoubleSlash");
 			m_bDoubleSlash = false;
+			return;
+		}	
+		if (m_bDoubleSlashFov)
+		{
+			CRM->Start_Fov(30.f, 40.f);
+			
 		}
-		m_bCollision = false;
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
+		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
-		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+			return;
+		}
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(5))
+		{
+			CRM->Set_FovSpeed(200.f);
+			CRM->Set_FovDir(true);
+			m_bDoubleSlashFov = false;
+		}
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			if (!m_bDoubleSlashFov && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+				m_bDoubleSlashFov = true;
+		}		
+		
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;

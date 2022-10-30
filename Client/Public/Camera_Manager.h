@@ -26,6 +26,7 @@ public:
 	void Push_CamLookInfo(const char* FileName, vector<LOOKINFO> LookInfos);
 	void Start_Shake(_float fShakeTime, _float fShakePower, _float fShakeSpeed);
 	void Start_Fov(_float fFov, _float fFovSpeed);
+	void Fix_Fov(_float fFov, _float fFovSpeed);
 	void EndFov();
 	void Set_FovDir(_bool bFovDir) { m_bFovDIr = bFovDir; }
 	void Set_FovSpeed(_float fFovSpeed);

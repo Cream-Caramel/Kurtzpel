@@ -62,11 +62,12 @@ void CMainApp::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_F3))
 		m_pRenderer->Set_bRenderTarget();
-	/*RECT Clip;
+
+	RECT Clip;
 	GetClientRect(g_hWnd, &Clip);
 	ClientToScreen(g_hWnd, (LPPOINT)&Clip);
 	ClientToScreen(g_hWnd, (LPPOINT)(&Clip.right));
-	ClipCursor(&Clip);*/
+	ClipCursor(&Clip);
 
 
 }

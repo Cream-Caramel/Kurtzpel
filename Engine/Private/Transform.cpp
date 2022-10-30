@@ -216,6 +216,33 @@ void CTransform::Go_Dir(_fvector vDir, _float fSpeed, CNavigation* pNavigation, 
 	}
 }
 
+_bool CTransform::Go_NoSlide(_fvector vDir, _float fSpeed, CNavigation * pNavigation, _float fTimeDelta)
+{
+	_vector vPosition = Get_State(CTransform::STATE_POSITION);
+	_vector vLook = XMVector3Normalize(vDir);
+
+	vPosition += vLook * fSpeed * fTimeDelta;
+
+	_vector vNormal = { 0.f,0.f,0.f,0.f };
+	if (pNavigation->isMove(vPosition, &vNormal) == true)
+	{
+		if (!m_bJump)
+		{
+			vPosition = XMVectorSetY(vPosition, pNavigation->Get_PosY(vPosition));
+		}
+		Set_State(CTransform::STATE_POSITION, vPosition);
+
+		return false;
+	}
+	else
+	{
+		if (XMVectorGetX(XMVector3Length(vNormal)) == 0)
+			return false;
+
+		return true;
+	}
+}
+
 void CTransform::Set_Scale(_fvector vScaleInfo)
 {
 	Set_State(CTransform::STATE_RIGHT, 

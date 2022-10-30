@@ -43,17 +43,17 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_bColliderRender = true;
 
-	m_eCurState = START;
-	m_eNextState = START;
+	m_eCurState = SKILL1;
+	m_eNextState = SKILL1;
 
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 600;
+	m_fMaxHp = 400;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
-	m_fNowMp = 10.f;
+	m_fNowMp = 100.f;
 	m_fDamage = 10.f;
 
 	m_fColiisionTime = 0.1f;
@@ -64,12 +64,17 @@ HRESULT CDragon::Initialize(void * pArg)
 	Set_Dir();
 
 	CNavigation::NAVIGATIONDESC NaviDesc;
-	NaviDesc.iCurrentIndex = 172;
-	if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;
+	NaviDesc.iCurrentIndex = 1;
+	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
+	return E_FAIL;
 
-	m_pNavigation->Set_BattleIndex(145);
-	CRM->Start_Scene("Scene_Stage4Boss");
+	//CNavigation::NAVIGATIONDESC NaviDesc;
+	//NaviDesc.iCurrentIndex = 172;
+	//if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
+	//	return E_FAIL;
+
+	//m_pNavigation->Set_BattleIndex(145);
+	//CRM->Start_Scene("Scene_Stage4Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -80,6 +85,11 @@ HRESULT CDragon::Initialize(void * pArg)
 
 void CDragon::Tick(_float fTimeDelta)
 {
+	if (m_fNowMp >= 100.f)
+		m_bFinish = true;
+	else
+		m_bFinish = false;
+
 	if (m_fNowHp <= 0)
 		m_fNowHp = 0;
 
@@ -137,7 +147,7 @@ void CDragon::LateTick(_float fTimeDelta)
 	}
 
 	
-	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.1f);
 
 	m_pAnimModel->Play_Animation(fTimeDelta, m_pAnimModel);
 
@@ -204,6 +214,12 @@ HRESULT CDragon::Render()
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
 				return E_FAIL;
 		}
+
+		else if (m_bFinish)
+		{
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
+				return E_FAIL;
+		}
 		else
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
@@ -224,7 +240,7 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 {
 	if (sTag == "Player_Body")
 	{
-		m_fNowMp += 10.f;	
+		m_fNowMp += m_fDamage / 2.f;	
 	}
 
 	if (sTag == "Player_Sword")
@@ -237,7 +253,7 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 				m_bLHand = false;
 				m_bRHand = false;
 				Set_State(GROGGYSTART);
-				m_fNowMp -= 10.f;
+				m_fNowMp -= 20.f;
 				CRM->Start_Shake(0.5f, 5.f, 0.06f);
 				CRM->Start_Fov(40.f, 120.f);
 				CRM->Set_FovDir(true);
@@ -294,20 +310,31 @@ HRESULT CDragon::Ready_Collider()
 
 void CDragon::Set_NextMotion()
 {
-	int random = GI->Get_Random(1, 3);
-	if (random == 1)
+	m_iPreMotion = m_iNextMotion;
+	m_iNextMotion = GI->Get_Random(1, 3);
+
+	while (m_iNextMotion == m_iPreMotion)
+	{
+		m_iNextMotion = GI->Get_Random(1, 3);
+		if (m_iNextMotion != m_iPreMotion)
+			break;
+	}
+
+	if (m_iNextMotion == 1)
 	{
 		Set_State(IDLE);
 		return;
 	}
-	if (random == 2)
+	if (m_iNextMotion == 2)
 	{
 		Set_State(WALK);
+		m_iWalkCount = 0;
 		return;
 	}
-	if (random == 3)
+	if (m_iNextMotion == 3)
 	{
 		Set_State(WALK);
+		m_iWalkCount = 1;
 		return;
 	}
 }
@@ -323,80 +350,106 @@ void CDragon::Set_NextAttack()
 
 void CDragon::Range_Attack()
 {
-	int random = GI->Get_Random(1, 6);
-	if (random == 1)
+	m_iPreRangeAttack = m_iNextRangeAttack;
+	m_iNextRangeAttack = GI->Get_Random(1, 6);
+
+	while (m_iNextRangeAttack == m_iPreRangeAttack)
+	{
+		m_iNextRangeAttack = GI->Get_Random(1, 6);
+		if (m_iNextRangeAttack != m_iPreRangeAttack)
+			break;
+	}
+
+	if (m_iNextRangeAttack == 1)
 	{
 		Set_State(SKILL1);
 		return;
 	}
-	if (random == 2)
+	if (m_iNextRangeAttack == 2)
 	{
 		Set_State(SKILL6);
 		return;
 	}
-	if (random == 3)
-	{
-		Set_State(SKILL7_1);
-		return;
-	}
-	if (random == 4)
-	{
-		Set_State(SKILL7_1);
-		return;
-	}
-	if (random == 5)
+	if (m_iNextRangeAttack == 3)
 	{
 		Set_State(SKILL9_1);
 		return;
 	}
-	if (random == 6)
-	{
-		Set_State(SKILL14_1);
-		return;
-	}
-}
-
-void CDragon::Close_Attack()
-{
-	int random = GI->Get_Random(1, 8);
-	if (random == 1)
-	{
-		Set_State(SKILL3);
-		return;
-	}
-	if (random == 2)
+	if (m_iNextRangeAttack == 4)
 	{
 		Set_State(SKILL4);
 		return;
 	}
-	if (random == 3)
-	{
-		Set_State(SKILL5);
-		return;
-	}
-	if (random == 4)
-	{
-		Set_State(SKILL8);
-		return;
-	}
-	if (random == 5)
+
+	if (m_iNextRangeAttack == 5)
 	{
 		Set_State(SKILL10_1);
 		return;
 	}
-	if (random == 6)
+
+	if (m_iNextRangeAttack == 6)
+	{
+		Set_State(SKILL8);
+		return;
+	}
+
+}
+
+void CDragon::Close_Attack()
+{
+	
+	m_iPreCloseAttack = m_iNextCloseAttack;
+	m_iNextCloseAttack = GI->Get_Random(1, 8);
+
+	while (m_iNextCloseAttack == m_iPreCloseAttack)
+	{
+		m_iNextCloseAttack = GI->Get_Random(1, 8);
+		if (m_iNextCloseAttack != m_iPreCloseAttack)
+			break;
+	}
+
+	if (m_iNextCloseAttack == 1)
+	{
+		Set_State(SKILL3);
+		return;
+	}
+	if (m_iNextCloseAttack == 2)
+	{
+		Set_State(SKILL4);
+		return;
+	}
+	if (m_iNextCloseAttack == 3)
+	{
+		Set_State(SKILL5);
+		return;
+	}
+	if (m_iNextCloseAttack == 4)
+	{
+		Set_State(SKILL10_1);
+		return;
+	}
+
+	if (m_iNextCloseAttack == 5)
+	{
+		Set_State(SKILL8);
+		return;
+	}
+
+	if (m_iNextCloseAttack == 6)
 	{
 		Set_State(SKILL13);
 		return;
 	}
-	if (random == 7)
+
+	if (m_iNextCloseAttack == 7)
 	{
-		Set_State(SKILL15);
+		Set_State(SKILL14_1);
 		return;
 	}
-	if (random == 8)
+
+	if (m_iNextCloseAttack == 8)
 	{
-		Set_State(BACKSTEP);
+		Set_State(SKILL15);
 		return;
 	}
 
@@ -425,24 +478,16 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::SKILL1:
 		break;
 	case Client::CDragon::SKILL3:
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 20.f;
-		else
-			m_fDamage = 10.f;
+		m_fDamage = 10.f;
 		break;
 	case Client::CDragon::SKILL4:
+		m_fSkill4Speed = 40.f;
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 8.f, 6.f, 10.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,3.f });
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 50.f;
-		else
-			m_fDamage = 30.f;
+		m_fDamage = 30.f;
 		break;
 	case Client::CDragon::SKILL5:
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 40.f;
-		else
-			m_fDamage = 20.f;
+		m_fDamage = 20.f;
 		break;
 	case Client::CDragon::SKILL6:
 		break;
@@ -455,18 +500,13 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::SKILL8:
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 12.f, 6.f, 14.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,6.f });
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 30.f;
-		else
-			m_fDamage = 20.f;
+		m_fDamage = 20.f;
 		break;
 	case Client::CDragon::SKILL9_1:
+		m_fRushShakeAcc = 0.6f;
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 8.f, 6.f, 10.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,3.f });
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 30.f;
-		else
-			m_fDamage = 15.f;
+		m_fDamage = 20.f;
 		break;
 	case Client::CDragon::SKILL9_2:
 		break;
@@ -475,19 +515,14 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::SKILL10_1:
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 5.f, 6.f, 6.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,2.f });
-		m_fFlyAttackSpeed = 20.f;
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 40.f;
-		else
-			m_fDamage = 20.f;
+		m_fFlyAttackSpeed = 20.f;	
+		m_fDamage = 20.f;
 		break;
 	case Client::CDragon::SKILL10_2:
 		break;
 	case Client::CDragon::SKILL13:
 		if (m_fNowMp >= 100.f)
-			m_fDamage = 40.f;
-		else
-			m_fDamage = 30.f;
+		m_fDamage = 30.f;
 		break;
 	case Client::CDragon::SKILL14_1:
 		break;
@@ -498,10 +533,7 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::SKILL15:
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 24.f, 10.f, 24.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,5.f,0.f });
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 100.f;
-		else
-			m_fDamage = 60.f;
+		m_fDamage = 60.f;
 		break;
 	case Client::CDragon::START:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
@@ -510,16 +542,12 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::IDLE:
 		break;
 	case Client::CDragon::WALK:
-		m_fWalkTempo = 1.3f;
 		m_fWalkShakeAcc = 0.f;
-		m_iWalkCount = 0;
 		break;
-	case Client::CDragon::STATE_END:
+	case Client::CDragon::FINISH:
 		break;
-	default:
-		break;
+	
 	}
-
 	m_pAnimModel->SetNextIndex(m_eNextState);
 	m_pAnimModel->SetChangeBool(true);
 }
@@ -536,7 +564,7 @@ void CDragon::End_Animation()
 		switch (m_eCurState)
 		{
 		case Client::CDragon::BACKSTEP:
-			Set_NextMotion();
+			Set_State(SKILL6);
 			break;
 		case Client::CDragon::DIE:
 			break;
@@ -579,26 +607,14 @@ void CDragon::End_Animation()
 		case Client::CDragon::SKILL9_1:
 			m_pAnimModel->Set_AnimIndex(SKILL9_2);
 			m_eNextState = SKILL9_2;
-			m_bRush = false;
 			break;
-		case Client::CDragon::SKILL9_2:
-			if (!m_bRush && m_iRushCount < 1)
-			{
-				m_iRushCount += 1;
-				m_pAnimModel->Set_AnimIndex(SKILL9_2);
-				m_eNextState = SKILL9_2;
-			}
-			else if (m_iRushCount >= 1)
-			{
-				m_bRush = true;
-				m_iRushCount = 0;
-				m_pAnimModel->Set_AnimIndex(SKILL9_3);
-				m_eNextState = SKILL9_3;
-			}
+		case Client::CDragon::SKILL9_2:			
+			m_pAnimModel->Set_AnimIndex(SKILL9_3);
+			m_eNextState = SKILL9_3;
 			break;
 		case Client::CDragon::SKILL9_3:
-			Set_NextMotion();
 			m_bAttack = false;
+			Set_NextMotion();		
 			break;
 		case Client::CDragon::SKILL10_1:
 			m_pAnimModel->Set_AnimIndex(SKILL10_2);
@@ -654,7 +670,7 @@ void CDragon::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
-			CRM->Start_Shake(0.2f, 2.5f, 0.03f);
+			CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		}
 		break;
 	case Client::CDragon::DIE:
@@ -666,56 +682,105 @@ void CDragon::Update(_float fTimeDelta)
 	case Client::CDragon::GROGGYSTART:
 		break;
 	case Client::CDragon::SKILL1:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
+			CRM->Start_Shake(0.3f, 5.f, 0.04f);
+		}
 		break;
 	case Client::CDragon::SKILL3:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			Set_Dir();
-
+		m_bRHand = false;
+		m_bLHand = false;
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				Set_Dir();
+				return;
+			}
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+		{
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fSkill3Speed, m_pNavigation, fTimeDelta);
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+		{
 			m_bRHand = true;
-		else
-			m_bRHand = false;
+			return;
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(7) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(8))
+		{
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fSkill3Speed, m_pNavigation, fTimeDelta);
+		}
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
-			m_bLHand = true;	
-		else
-			m_bLHand = false;		
+		{
+			m_bLHand = true;
+			return;
+		}
+		
 		break;
 	case Client::CDragon::SKILL4:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			Set_Dir();
+		m_bPattern = false;
+		m_bAttack = false;
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				Set_Dir();
+				return;
+			}
+		}
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
 			m_bPattern = true;
-		else
-			m_bPattern = false;
-
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+			return;
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 			m_bAttack = true;
-		else
-			m_bAttack = false;
+		
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+		{
+			if (m_fSkill4Speed >= 1.f)
+				m_fSkill4Speed -= 1.f;
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fSkill4Speed, m_pNavigation, fTimeDelta);	
+		}
+		
 		break;
 	case Client::CDragon::SKILL5:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			Set_Dir();
-
+		m_bPattern = false;
+		m_bLHand = false;
+		m_bRHand = false;
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				Set_Dir();
+				return;
+			}
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+		{
 			m_bPattern = true;
-		else
-			m_bPattern = false;
+			return;
+		}
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 		{
 			m_bLHand = true;
 			m_bRHand = true;
 		}
-		else
-		{
-			m_bLHand = false;
-			m_bRHand = false;
-		}
 		break;
 	case Client::CDragon::SKILL6:
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				Set_Dir();
+				return;
+			}
+		}
 		break;
 	case Client::CDragon::SKILL7_1:
 		break;
@@ -724,51 +789,93 @@ void CDragon::Update(_float fTimeDelta)
 	case Client::CDragon::SKILL7_3:
 		break;
 	case Client::CDragon::SKILL8:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			Set_Dir();
+		m_bPattern = false;
+		m_bAttack = false;
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				Set_Dir();
+				return;
+			}
+			
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+			{
+				m_bPattern = true;
+				return;
+			}
 
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
-			m_bPattern = true;
-		else
-			m_bPattern = false;
-
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
-			m_bAttack = true;
-		else
-			m_bAttack = false;
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+			{
+				m_bAttack = true;
+				return;
+			}
+		}
 		break;
 	case Client::CDragon::SKILL9_1:
+	{
+		m_bAttack = false;
 		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+		{
 			Set_Dir();
+			return;
+		}
+
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1))
 		{
-			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 8.f, m_pNavigation, fTimeDelta);
+			m_fRushShakeAcc += 1.f * fTimeDelta;
+			if (m_fRushShakeAcc >= m_fRushTempo)
+			{
+				m_fRushShakeAcc = 0.f;
+				CRM->Start_Shake(0.3f, 3.f, 0.04f);
+			}
+			if (m_pTransformCom->Go_NoSlide(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta))
+				Set_Dir();
 			m_bAttack = true;
-		}
-		else
-		{
-			m_bAttack = false;
+			return;
 		}
 		break;
+	}
 	case Client::CDragon::SKILL9_2:
-		m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 8.f, m_pNavigation, fTimeDelta);
+	{
+		m_fRushShakeAcc += 1.f * fTimeDelta;
+		if (m_fRushShakeAcc >= m_fRushTempo)
+		{
+			m_fRushShakeAcc = 0.f;
+			CRM->Start_Shake(0.3f, 3.f, 0.04f);
+		}
+		if (m_pTransformCom->Go_NoSlide(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta))
+			Set_Dir();
 		m_bAttack = true;
 		break;
+	}
 	case Client::CDragon::SKILL9_3:
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-		{
-			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 8.f, m_pNavigation, fTimeDelta);
-			m_bAttack = true;
-		}
-		else
-		{
-			m_bAttack = false;
-		}
+	{
 		m_bAttack = false;
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			{
+				m_fRushShakeAcc += 1.f * fTimeDelta;
+				if (m_fRushShakeAcc >= m_fRushTempo)
+				{
+					m_fRushShakeAcc = 0.f;
+					CRM->Start_Shake(0.3f, 3.f, 0.04f);
+				}
+				if (m_pTransformCom->Go_NoSlide(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta))
+					Set_Dir();
+				m_bAttack = true;
+			}
+		}
 		break;
-	case Client::CDragon::SKILL10_1:
+	}
+	case Client::CDragon::SKILL10_1:	
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
 			Set_Dir();
+			return;
+		}
+		
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1))
 		{
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fFlyAttackSpeed, m_pNavigation, fTimeDelta);
@@ -778,38 +885,69 @@ void CDragon::Update(_float fTimeDelta)
 			m_bAttack = false;
 		break;
 	case Client::CDragon::SKILL10_2:
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		m_bPattern = true;
+		if (!m_pAnimModel->GetChangeBool())
 		{
-			m_bAttack = true;
-			if (m_fFlyAttackSpeed >= 0.2f)
-				m_fFlyAttackSpeed -= 0.2f;
-			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fFlyAttackSpeed, m_pNavigation, fTimeDelta);
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			{
+				m_bAttack = true;
+				if (m_fFlyAttackSpeed >= 0.2f)
+					m_fFlyAttackSpeed -= 0.2f;
+				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fFlyAttackSpeed, m_pNavigation, fTimeDelta);
+			}
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+			{
+				CRM->Start_Shake(0.3f, 4.f, 0.04f);
+			}
+			else
+				m_bAttack = false;
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+			{
+				m_bPattern = true;
+			}
 		}
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
-		{
-			CRM->Start_Shake(0.3f, 3.f, 0.04f);
-		}
-		else
-			m_bAttack = false;
 		break;
 	case Client::CDragon::SKILL13:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			Set_Dir();
+		m_bRHand = false;
+		m_bPattern = false;
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+				Set_Dir();
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 4.f, m_pNavigation, fTimeDelta);
+		{
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 6.f, m_pNavigation, fTimeDelta);
+			return;
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+		{
+			CRM->Start_Shake(0.4f, 4.f, 0.04f);
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+		{
+			m_bPattern = true;
+		}
+
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
 			m_bRHand = true;
-			CRM->Start_Shake(0.3f, 3.f, 0.04f);
+			return;		
 		}
-		else
-			m_bRHand = false;
+
+		
 		break;
 	case Client::CDragon::SKILL14_1:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			m_bPattern = true;
-		else
-			m_bPattern = false;
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+				m_bPattern = true;
+			else
+				m_bPattern = false;
+		}
 		break;
 	case Client::CDragon::SKILL14_2:
 		m_fNowHp += 1.f;
@@ -818,15 +956,28 @@ void CDragon::Update(_float fTimeDelta)
 	case Client::CDragon::SKILL14_3:
 		break;
 	case Client::CDragon::SKILL15:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 1.f, m_pNavigation, fTimeDelta);
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		m_bPattern = false;
+		m_bAttack = false;
+		if (!m_pAnimModel->GetChangeBool())
 		{
-			m_bAttack = true;
-			CRM->Start_Shake(0.4f, 6.f, 0.05f);
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 3.f, m_pNavigation, fTimeDelta);
+				return;
+			}
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			{
+				m_bAttack = true;
+				CRM->Start_Shake(0.4f, 6.f, 0.05f);
+				return;
+			}
+			
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+			{
+				m_bPattern = true;
+			}
 		}
-		else
-			m_bAttack = false;
 		break;
 	case Client::CDragon::START:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
@@ -840,9 +991,10 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_fWalkShakeAcc >= m_fWalkTempo)
 		{
 			m_fWalkShakeAcc = 0.f;
-			CRM->Start_Shake(0.2f, 2.5f, 0.03f);
+			CRM->Start_Shake(0.3f, 3.f, 0.04f);
 		}
-		Set_Dir();
+		if(!m_pAnimModel->GetChangeBool())
+			Set_Dir();
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		if (Distance > 8.f)
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRunSpeed, m_pNavigation, fTimeDelta);

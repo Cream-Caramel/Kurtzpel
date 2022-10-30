@@ -50,7 +50,7 @@ HRESULT CGolem::Initialize(void * pArg)
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 500;
+	m_fMaxHp = 350;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 10.f;

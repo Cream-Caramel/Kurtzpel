@@ -21,6 +21,7 @@ HRESULT CBossMPBar::Initialize(void * pArg)
 {
 	__super::Initialize(pArg);
 	m_fBossMp = UM->Get_BossMp();
+	m_fPreBossMp = UM->Get_BossMp();
 	m_fShaderMp = 0.f;
 
 	return S_OK;
@@ -42,14 +43,27 @@ void CBossMPBar::Tick(_float fTimeDelta)
 		}
 	}
 	m_fBossMp = UM->Get_BossMp();
+	
 }
 
 void CBossMPBar::LateTick(_float fTimeDelta)
 {
 	if (nullptr == m_pRendererCom)
 		return;
-	
-	m_fShaderMp = m_fBossMp / 100.f;
+	if (m_fBossMp > m_fPreBossMp)
+	{
+		m_fPreBossMp += 0.2f;
+		if (m_fPreBossMp >= m_fBossMp)
+			m_fPreBossMp = m_fBossMp;
+	}
+	else
+	{
+		m_fPreBossMp -= 0.2f;
+		if (m_fPreBossMp <= m_fBossMp)
+			m_fPreBossMp = m_fBossMp;
+	}
+
+	m_fShaderMp = m_fPreBossMp / 100.f;
 
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
 

@@ -132,6 +132,7 @@ private:
 	_bool m_bSpinComboEnd = false; // 스핀콤보가 끝났는지
 	_bool m_bRespawn = false; 
 	_bool m_bDoubleSlash = false;
+	_bool m_bDoubleSlashFov = false;
 	
 	_float m_fJumpSpeed = 15.f; // 점프중 스피드
 	_float m_fRunSpeed = 8.f; // 달리기이동스피드

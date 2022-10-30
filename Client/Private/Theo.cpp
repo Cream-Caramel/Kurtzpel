@@ -51,7 +51,7 @@ HRESULT CTheo::Initialize(void * pArg)
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 400;
+	m_fMaxHp = 300;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 10.f;
@@ -62,19 +62,19 @@ HRESULT CTheo::Initialize(void * pArg)
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;
-
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
-	NaviDesc.iCurrentIndex = 42;
-	if (FAILED(__super::Add_Component(LEVEL_STAGE2, L"NavigationStage2", TEXT("NavigationStage2"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;*/
 
-	//m_pNavigation->Set_BattleIndex(41);
+	CNavigation::NAVIGATIONDESC NaviDesc;
+	NaviDesc.iCurrentIndex = 42;
+	if (FAILED(__super::Add_Component(LEVEL_STAGE2, L"NavigationStage2", TEXT("NavigationStage2"), (CComponent**)&m_pNavigation, &NaviDesc)))
+		return E_FAIL;
 
-//	CRM->Start_Scene("Scene_Stage2Boss");
+	m_pNavigation->Set_BattleIndex(41);
+
+	CRM->Start_Scene("Scene_Stage2Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -622,7 +622,8 @@ void CTheo::Update(_float fTimeDelta)
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed * 3.f, m_pNavigation, fTimeDelta);
+			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed * 3.f, m_pNavigation, fTimeDelta))
+				Set_Dir();
 			m_bLHand = true;
 			m_bRHand = true;
 			return;

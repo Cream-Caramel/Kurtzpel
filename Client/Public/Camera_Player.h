@@ -35,6 +35,7 @@ public:
 	void End_Shake();
 	void Start_Fov(_float fFov, _float fFovSpeed);
 	void Fov(_float fTimeDelta);
+	void FixFov(_float fFov, _float fFovSpeed);
 	void End_Fov();
 	void Set_FovSpeed(_float fFovSpeed) { m_fFovSpeed = fFovSpeed; }
 
