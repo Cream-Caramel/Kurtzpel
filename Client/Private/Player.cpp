@@ -156,6 +156,7 @@ void CPlayer::LateTick(_float fTimeDelta)
 	Check_Battle();
 
 	Set_PlayerUseInfo();
+
 }
 
 HRESULT CPlayer::Render()
@@ -206,14 +207,51 @@ void CPlayer::Collision(CGameObject * pOther, string sTag)
 	{
 		if (m_bMotionChange)
 		{
-			int random = GI->Get_Random(1, 2);
-			if (random == 1)
-			{		
+			if (m_eCurState == HITBACK)
+			{
 				Hit_Shake();
 				for (int i = 0; i < MODEL_END; ++i)
 				{
-					m_pAnimModel[i]->Set_AnimIndex(HITBACK);
-					m_eNextState = HITBACK;
+					Set_State(HITFRONT);
+				}
+				if (m_fNowHp <= 0.f)
+				{
+					m_fNowHp = 0.f;
+					m_bDie = true;
+					Set_State(DIE);
+				}
+
+				m_bCollision = false;
+				Minus_Hp(pOther->Get_Damage());
+				return;
+			}
+
+			if (m_eCurState == HITFRONT)
+			{
+				Hit_Shake();
+				for (int i = 0; i < MODEL_END; ++i)
+				{
+					Set_State(HITBACK);
+				}
+				if (m_fNowHp <= 0.f)
+				{
+					m_fNowHp = 0.f;
+					m_bDie = true;
+					Set_State(DIE);
+				}
+
+				m_bCollision = false;
+				Minus_Hp(pOther->Get_Damage());
+				return;
+			}
+
+			int random = GI->Get_Random(1, 2);
+			if (random == 1)
+			{
+				Hit_Shake();
+				for (int i = 0; i < MODEL_END; ++i)
+				{
+					Set_State(HITBACK);
 				}
 			}
 			else
@@ -221,8 +259,7 @@ void CPlayer::Collision(CGameObject * pOther, string sTag)
 				Hit_Shake();
 				for (int i = 0; i < MODEL_END; ++i)
 				{
-					m_pAnimModel[i]->Set_AnimIndex(HITBACK);
-					m_eNextState = HITFRONT;
+					Set_State(HITFRONT);
 				}
 			}
 
@@ -236,10 +273,10 @@ void CPlayer::Collision(CGameObject * pOther, string sTag)
 			m_bDie = true;
 			Set_State(DIE);
 		}
-		
-		m_bCollision = false;
 
+		m_bCollision = false;
 	}
+	
 }
 
 _vector CPlayer::Get_PlayerPos()
@@ -1301,20 +1338,19 @@ void CPlayer::Update(_float fTimeDelta)
 		m_bCollision = false;
 		break;
 	case Client::CPlayer::RUN:
+		m_bMotionChange = true;
 		//GI->PlaySoundW(L"Run.ogg", SD_PLAYER1, 0.6f);
 		if (!m_pAnimModel[0]->GetChangeBool())
 		{
 			CRM->Set_FovSpeed(100.f);
 			CRM->Set_FovDir(true);
-		}
-		m_bMotionChange = true;
+		}	
 		m_bUseSkill = true;
 		for (int i = 0; i < OBB_END; ++i)
 			m_pOBB[i]->ChangeExtents(_float3(0.7f, 1.5f, 1.2f));	
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, m_pNavigation, fTimeDelta);
 		break;
-	case Client::CPlayer::RUNEND:
-		
+	case Client::CPlayer::RUNEND:	
 		m_bMotionChange = true;
 		if (m_fRunEndSpeed > 0.15f)
 		{
@@ -1424,6 +1460,7 @@ void CPlayer::Update(_float fTimeDelta)
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::CHARGEREADY:
+		m_bMotionChange = false;
 		break;
 	case Client::CPlayer::AIRCOMBO1:
 		m_bMotionChange = false;
@@ -1667,6 +1704,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::BLADEATTACK:
 		m_bCollision = false;
+		m_bMotionChange = false;
 		if (m_bDoubleSlashFov)
 			CRM->Start_Fov(30.f, 20.f);
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
@@ -1685,6 +1723,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::SLASHATTACK:
 		m_bCollision = false;
+		m_bMotionChange = false;
 		if (m_bDoubleSlash)
 		{		
 			CRM->Set_PlayerScene(true);
@@ -2039,8 +2078,11 @@ void CPlayer::Run_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_R))
 	{
-		Set_State(SLASHATTACK);
-		UM->Reset_ExGaugeTex();
+		if (m_fNowMp >= 30.f && UM->Get_ExGaugeTex() >= 43)
+		{
+			Set_State(SLASHATTACK);
+			UM->Reset_ExGaugeTex();
+		}
 		return;
 	}
 

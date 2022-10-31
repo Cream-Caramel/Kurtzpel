@@ -57,7 +57,7 @@ void CBossHPBarFrame::Tick(_float fTimeDelta)
 		m_fPreBossHp = m_fNowBossHp;
 		if (UM->Get_BossMp() >= 100.f)
 		{
-			m_fNowBossHp += 3.f * fTimeDelta;
+			m_fNowBossHp += 1.f * fTimeDelta;
 			m_fPreBossHp = m_fNowBossHp;
 			if (m_fNowBossHp >= UM->Get_BossMaxHp())
 			{

@@ -44,8 +44,8 @@ HRESULT CGolem::Initialize(void * pArg)
 
 	m_bColliderRender = true;
 
-	m_eCurState = START;
-	m_eNextState = START;
+	m_eCurState = SKILL9;
+	m_eNextState = SKILL9;
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
@@ -60,18 +60,23 @@ HRESULT CGolem::Initialize(void * pArg)
 
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
+	PM->Add_Boss(this);
 
-	
 	CNavigation::NAVIGATIONDESC NaviDesc;
+	NaviDesc.iCurrentIndex = 1;
+	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
+		return E_FAIL;
+	
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 478;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE3, L"NavigationStage3", TEXT("NavigationStage3"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
-	m_pNavigation->Set_BattleIndex(473);
+	m_pNavigation->Set_BattleIndex(473);*/
 
 	Set_Dir();
 
-	CRM->Start_Scene("Scene_Stage3Boss");
+	//CRM->Start_Scene("Scene_Stage3Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -84,9 +89,6 @@ void CGolem::Tick(_float fTimeDelta)
 {
 	if (m_fNowHp <= 0)
 		m_fNowHp = 0;
-
-	if (m_fNowMp <= 0)
-		m_fNowMp = 0;
 
 	if (m_fNowMp >= 100.f)
 		m_fNowMp = 100.f;
@@ -139,7 +141,7 @@ void CGolem::LateTick(_float fTimeDelta)
 		
 	}
 
-	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.1f);
 
 	m_pAnimModel->Play_Animation(fTimeDelta, m_pAnimModel);
 
@@ -269,7 +271,7 @@ HRESULT CGolem::Ready_Collider()
 		return E_FAIL;
 
 	_float4x4 LHand = m_Sockets[SOCKET_LHAND]->Get_Transformation();
-	ColliderDesc.vSize = _float3(4.f, 4.f, 4.f);
+	ColliderDesc.vSize = _float3(6.f, 6.f, 6.f);
 	ColliderDesc.vCenter = _float3(LHand._41, LHand._42, LHand._43);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.sTag = "Monster_Attack";
@@ -278,7 +280,7 @@ HRESULT CGolem::Ready_Collider()
 
 
 	_float4x4 RHand = m_Sockets[SOCKET_RHAND]->Get_Transformation();	
-	ColliderDesc.vSize = _float3(4.f, 4.f, 4.f);
+	ColliderDesc.vSize = _float3(6.f, 6.f, 6.f);
 	ColliderDesc.vCenter = _float3(RHand._41, RHand._42, RHand._43);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.sTag = "Monster_Attack";
@@ -298,28 +300,40 @@ HRESULT CGolem::Ready_Collider()
 
 void CGolem::Set_NextMotion()
 {
-	int random = GI->Get_Random(1, 3);
-	if (random == 1)
+	if (!m_pAnimModel->GetChangeBool())
 	{
-		Set_State(IDLE);
-		return;
-	}
-	if (random == 2)
-	{
-		Set_State(RUN);
-		return;
-	}
-	if (random == 3)
-	{
-		Set_State(RUN);
-		return;
+		m_iPreMotion = m_iNextMotion;
+		m_iNextMotion = GI->Get_Random(1, 3);
+
+		while (m_iNextMotion == m_iPreMotion)
+		{
+			m_iNextMotion = GI->Get_Random(1, 3);
+			if (m_iNextMotion != m_iPreMotion)
+				break;
+		}
+
+		if (m_iNextMotion == 1)
+		{
+			Set_State(IDLE);
+			return;
+		}
+		if (m_iNextMotion == 2)
+		{
+			Set_State(RUN);		
+			return;
+		}
+		if (m_iNextMotion == 3)
+		{
+			Set_State(RUN);		
+			return;
+		}
 	}
 }
 
 void CGolem::Set_NextAttack()
 {
 	_float fDistance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
-	if (fDistance >= 4.f)
+	if (fDistance >= 6.f)
 		Range_Attack();	
 	else
 		Close_Attack();
@@ -327,53 +341,74 @@ void CGolem::Set_NextAttack()
 
 void CGolem::Range_Attack()
 {
-	int random = GI->Get_Random(1, 3);
-	if (random == 1)
+	Set_State(SKILL2);
+	/*if (!m_pAnimModel->GetChangeBool())
 	{
-		Set_State(SKILL4_1);
-		return;
-	}
-	if (random == 2)
-	{
-		Set_State(SKILL8);
-		return;
-	}
-	if (random == 3)
-	{
-		Set_State(SKILL2);
-		return;
-	}
+		m_iPreRangeAttack = m_iNextRangeAttack;
+		m_iNextRangeAttack = GI->Get_Random(1, 3);
+
+		while (m_iNextRangeAttack == m_iPreRangeAttack)
+		{
+			m_iNextRangeAttack = GI->Get_Random(1, 3);
+			if (m_iNextRangeAttack != m_iPreRangeAttack)
+				break;
+		}
+
+		if (m_iNextRangeAttack == 1)
+		{
+			Set_State(SKILL4_1);
+			return;
+		}
+		if (m_iNextRangeAttack == 2)
+		{
+			Set_State(SKILL8);
+			return;
+		}
+		if (m_iNextRangeAttack == 3)
+		{
+			Set_State(SKILL2);
+			return;
+		}
+	}*/
 }
 
 void CGolem::Close_Attack()
 {
-	int random = GI->Get_Random(1, 5);
-	if (random == 1)
+	Set_State(SKILL9);
+	/*if (!m_pAnimModel->GetChangeBool())
 	{
-		Set_State(SKILL1);
-		return;
-	}
-	if (random == 2)
-	{
-		Set_State(SKILL3);
-		return;
-	}
-	if (random == 3)
-	{
-		Set_State(SKILL9);
-		return;
-	}
-	if (random == 4)
-	{
-		Set_State(SKILL10_1);
-		return;
-	}
-	if (random == 5)
-	{
-		Set_State(SKILL5_1);
-		return;
-	}
+		m_iPreCloseAttack = m_iNextCloseAttack;
+		m_iNextCloseAttack = GI->Get_Random(1, 4);
 
+		while (m_iNextCloseAttack == m_iPreCloseAttack)
+		{
+			m_iNextCloseAttack = GI->Get_Random(1, 4);
+			if (m_iNextCloseAttack != m_iPreCloseAttack)
+				break;
+		}
+
+		if (m_iNextCloseAttack == 1)
+		{
+			Set_State(SKILL1);
+			return;
+		}
+		if (m_iNextCloseAttack == 2)
+		{
+			Set_State(SKILL3);
+			return;
+		}
+		if (m_iNextCloseAttack == 3)
+		{
+			Set_State(SKILL9);
+			return;
+		}
+
+		if (m_iNextCloseAttack == 4)
+		{
+			Set_State(SKILL5_1);
+			return;
+		}
+	}*/
 }
 
 void CGolem::Set_State(STATE eState)
@@ -396,25 +431,20 @@ void CGolem::Set_State(STATE eState)
 		m_fRunTempoAcc = 0.f;
 		break;
 	case Client::CGolem::SKILL1:
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 20.f;
-		else
 			m_fDamage = 10.f;
 		break;
 	case Client::CGolem::SKILL2:
 		break;
 	case Client::CGolem::SKILL3:
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 30.f;
-		else
+		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 12.f, 1.f, 12.f });
+		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,1.f,6.f });
 			m_fDamage = 15.f;
 		break;
 	case Client::CGolem::SKILL4_1:
 		break;
 	case Client::CGolem::SKILL4_2:
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 50.f;
-		else
+		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 10.f, 8.f, 10.f });
+		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,4.f,0.f });
 			m_fDamage = 25.f;
 		break;
 	case Client::CGolem::SKILL4_3:
@@ -474,6 +504,7 @@ void CGolem::End_Animation()
 			Set_State(STANDUP);
 			break;
 		case Client::CGolem::DIE:
+			PM->Delete_Boss();
 			Set_Dead();
 			GI->StopAll();
 			GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE4));
@@ -497,9 +528,11 @@ void CGolem::End_Animation()
 			Set_State(SKILL4_2);
 			break;
 		case Client::CGolem::SKILL4_2:
+			m_bAttack = false;
 			Set_State(SKILL4_3);
 			break;
 		case Client::CGolem::SKILL4_3:
+			m_bPattern = false;
 			Set_NextMotion();
 			break;
 		case Client::CGolem::SKILL5_1:
@@ -515,6 +548,7 @@ void CGolem::End_Animation()
 			Set_NextMotion();
 			break;
 		case Client::CGolem::SKILL9:
+			m_bLHand = false;
 			Set_NextMotion();
 			break;
 		case Client::CGolem::SKILL10_1:
@@ -559,7 +593,7 @@ void CGolem::Update(_float fTimeDelta)
 		if (m_fRunTempoAcc >= m_fRunTempo)
 		{
 			m_fRunTempoAcc = 0.f;
-			CRM->Start_Shake(0.2f, 2.5f, 0.03f);
+			CRM->Start_Shake(0.3f, 3.5f, 0.04f);
 		}
 
 		Set_Dir();
@@ -571,87 +605,97 @@ void CGolem::Update(_float fTimeDelta)
 		break;
 	}
 	case Client::CGolem::SKILL1:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-			Set_Dir();		
-
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-			m_bPattern = true;
-		else
-			m_bPattern = false;
-
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+		m_bPattern = false;
+		m_bLHand = false;
+		m_bRHand = false;
+		if (!m_pAnimModel->GetChangeBool())
 		{
-			m_bLHand = true;
-			CRM->Start_Shake(0.2f, 2.f, 0.02f);
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				Set_Dir();
+				return;
+			}
 		}
-		else
-			m_bLHand = false;
-
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
+			m_bPattern = true;
+			return;
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
 			m_bRHand = true;
 			CRM->Start_Shake(0.2f, 3.f, 0.03f);
+			return;
 		}
-		else
-			m_bRHand = false;	
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+		{
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 5.f, m_pNavigation, fTimeDelta);
+			return;
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+		{
+			m_fDamage = 15.f;
+			m_bLHand = true;
+			CRM->Start_Shake(0.2f, 4.f, 0.04f);
+		}
 		break;
 	case Client::CGolem::SKILL2:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			Set_Dir();
 		break;
 	case Client::CGolem::SKILL3:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))			
+		m_bPattern = false;
+		m_bAttack = false;
+		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+		{
 			Set_Dir();
-
+			return;
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
 			m_bPattern = true;
-		else
-			m_bPattern = false;
+			return;
+		}
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
-			m_bLHand = true;
-			m_bRHand = true;
-			CRM->Start_Shake(0.3f, 3.f, 0.03f);
-		}
-		else
-		{
-			m_bLHand = false;
-			m_bRHand = false;
+			m_bAttack = true;
+			CRM->Start_Shake(0.3f, 5.f, 0.04f);
 		}
 		break;
 	case Client::CGolem::SKILL4_1:
 		Set_Dir();
 		break;
 	case Client::CGolem::SKILL4_2:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+		m_bAttack = false;
+		if (!m_pAnimModel->GetChangeBool())
 		{
-			m_fRushSpeed = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION))) * 0.65f;
-			Set_Dir();
-		}
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				m_fRushSpeed = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION))) * 0.65f;
+				Set_Dir();
+				return;
+			}
 
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
-		{
-			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta);
-			m_bLHand = true;
-			m_bRHand = true;
-		}
-		else
-		{
-			m_bLHand = false;
-			m_bRHand = false;
-		}
 
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3))
-			CRM->Start_Shake(0.4f, 5.f, 0.05f);
-			
-		
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+			{
+				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta);
+				m_bAttack = true;
+				return;
+			}
+
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3))
+				CRM->Start_Shake(0.4f, 5.f, 0.05f);
+		}
 		break;
 	case Client::CGolem::SKILL4_3:
+		if(!m_pAnimModel->GetChangeBool())
+			m_bPattern = true;
 		break;
 	case Client::CGolem::SKILL5_1:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			m_bPattern = true;
 		else
@@ -662,56 +706,66 @@ void CGolem::Update(_float fTimeDelta)
 			m_fNowMp += 0.1f;
 		break;
 	case Client::CGolem::SKILL5_3:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			Set_Dir();
 		break;
 	case Client::CGolem::SKILL8:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-			CRM->Start_Shake(0.3f, 3.f, 0.03f);
+			CRM->Start_Shake(0.3f, 4.f, 0.04f);
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
-			CRM->Start_Shake(0.3f, 3.f, 0.03f);
+			CRM->Start_Shake(0.3f, 4.f, 0.04f);
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(4) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
-			CRM->Start_Shake(0.3f, 3.f, 0.03f);
+			CRM->Start_Shake(0.3f, 4.f, 0.04f);
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(6) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(7))
-			CRM->Start_Shake(0.3f, 3.f, 0.03f);
+			CRM->Start_Shake(0.3f, 4.f, 0.04f);
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(8) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(9))
-			CRM->Start_Shake(0.4f, 5.f, 0.05f);
+			CRM->Start_Shake(0.4f, 6.f, 0.06f);
 		break;
 	case Client::CGolem::SKILL9:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			Set_Dir();
-
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-			m_bPattern = true;
-		else
-			m_bPattern = false;
-
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+		m_bPattern = false;
+		m_bLHand = false;
+		if (!m_pAnimModel->GetChangeBool())
 		{
-			m_bLHand = true;
-			m_bRHand = true;
-		}
-		else
-		{
-			m_bLHand = false;
-			m_bRHand = false;
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				Set_Dir();
+				return;
+			}
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			{
+				m_bPattern = true;
+				return;
+			}
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+			{
+				m_bLHand = true;
+			}
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+			{
+				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 10.f, m_pNavigation, fTimeDelta);
+			}
 		}
 		break;
 	case Client::CGolem::SKILL10_1:
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-			m_bPattern = true;
-		else
-			m_bPattern = false;
-
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
-			m_bAttack = true;
-		else
-			m_bAttack = false;
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
+				if (Distance < 2.f)
+					m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 10.f, m_pNavigation, fTimeDelta);
+			}
+				if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+					m_bAttack = true;
+				else
+					m_bAttack = false;
+		}
 		break;
 	case Client::CGolem::SKILL10_2:
 		m_bCollision = false;
 		break;
 	case Client::CGolem::SKILL10_3:
+		m_bCollision = false;
 		break;
 	case Client::CGolem::STANDUP:
 		break;

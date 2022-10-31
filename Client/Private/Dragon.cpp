@@ -53,7 +53,7 @@ HRESULT CDragon::Initialize(void * pArg)
 	m_fMaxHp = 400;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
-	m_fNowMp = 0.f;
+	m_fNowMp = 30.f;
 	m_fDamage = 10.f;
 
 	m_fColiisionTime = 0.1f;
@@ -86,13 +86,6 @@ HRESULT CDragon::Initialize(void * pArg)
 
 void CDragon::Tick(_float fTimeDelta)
 {
-	if (!m_bFinishPattern)
-	{
-		if (m_fNowMp >= 100.f)
-			m_bFinish = true;
-		else
-			m_bFinish = false;
-	}
 	if (m_fNowHp <= 0)
 		m_fNowHp = 0;
 
@@ -107,6 +100,9 @@ void CDragon::Tick(_float fTimeDelta)
 
 	if (!m_pAnimModel->GetChangeBool())
 		m_eCurState = m_eNextState;
+
+	if (GI->Key_Down(DIK_7))
+		Set_State(SKILL7_1);
 
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
@@ -258,16 +254,12 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 		else if (m_eCurState != SKILL7_2)
 			m_fNowMp += m_fDamage / 2.f;	
 
-		if (m_fNowMp >= 100.f)
-		{
-			m_bFinishPattern = true;
+		if (m_fNowMp >= 100.f)		
 			m_bFinish = true;
-		}
-		else
-		{
-			m_bFinishPattern = false;
+		
+		else		
 			m_bFinish = false;
-		}
+		
 	
 	}
 
@@ -616,7 +608,6 @@ void CDragon::End_Animation()
 			Set_State(FINISH);
 			m_fNowMp = 0.f;
 			m_bFinishStart = false;
-			m_bFinishPattern = false;
 			return;
 		}
 		switch (m_eCurState)
@@ -657,6 +648,7 @@ void CDragon::End_Animation()
 			m_bFinish = false;
 			m_pAnimModel->Set_AnimIndex(SKILL7_2);
 			m_eNextState = SKILL7_2;
+			CRM->Start_Shake(0.5f, 8.f, 0.04f);
 			break;
 		case Client::CDragon::SKILL7_2:	
 			m_pAnimModel->Set_AnimIndex(SKILL7_3);
@@ -1040,6 +1032,8 @@ void CDragon::Update(_float fTimeDelta)
 	case Client::CDragon::SKILL14_2:
 		m_fNowHp += 1.f;
 		m_fNowMp += 0.15f;
+		if (m_fNowMp >= 100.f)
+			m_bFinish = true;
 		break;
 	case Client::CDragon::SKILL14_3:
 		break;

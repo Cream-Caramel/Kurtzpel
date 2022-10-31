@@ -45,8 +45,8 @@ HRESULT CTheo::Initialize(void * pArg)
 
 	m_bColliderRender = true;
 
-	m_eCurState = SKILL2;
-	m_eNextState = SKILL2;
+	m_eCurState = APPEAR;
+	m_eNextState = APPEAR;
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
@@ -61,20 +61,21 @@ HRESULT CTheo::Initialize(void * pArg)
 
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
-
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
-	NaviDesc.iCurrentIndex = 1;
-	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;*/
+	PM->Add_Boss(this);
 
 	CNavigation::NAVIGATIONDESC NaviDesc;
+	NaviDesc.iCurrentIndex = 1;
+	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
+		return E_FAIL;
+
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 42;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE2, L"NavigationStage2", TEXT("NavigationStage2"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
-	m_pNavigation->Set_BattleIndex(41);
+	m_pNavigation->Set_BattleIndex(41);*/
 
-	CRM->Start_Scene("Scene_Stage2Boss");
+	//CRM->Start_Scene("Scene_Stage2Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -87,9 +88,6 @@ void CTheo::Tick(_float fTimeDelta)
 {
 	if (m_fNowHp <= 0)
 		m_fNowHp = 0;
-
-	if (m_fNowMp <= 0)
-		m_fNowMp = 0;
 
 	if (m_fNowMp >= 100.f)
 		m_fNowMp = 100.f;
@@ -138,7 +136,7 @@ void CTheo::LateTick(_float fTimeDelta)
 		m_bLHand = false;
 	}
 
-	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.3f);
+	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.1f);
 
 	m_pAnimModel->Play_Animation(fTimeDelta, m_pAnimModel);
 
@@ -200,6 +198,13 @@ HRESULT CTheo::Render()
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
 				return E_FAIL;
 		}
+
+		else if (m_bFinish)
+		{
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
+				return E_FAIL;
+		}
+
 		else
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
@@ -219,7 +224,28 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 {
 	if (sTag == "Player_Body")
 	{
-		m_fNowMp += 10.f;	
+		if (m_bFinish)
+		{
+			if (UM->Get_Count() > 0)
+				UM->Set_Count(-1);
+			else
+			{
+				m_bFinishStart = true;
+				m_fNowMp = 0.f;
+			}
+		}
+
+		else if(m_eCurState != SKILL3)
+			m_fNowMp += m_fDamage / 2.f;
+
+		if (m_fNowMp >= 100.f)
+		{
+			m_bFinish = true;
+		}
+		else
+		{
+			m_bFinish = false;
+		}
 	}
 
 	if (sTag == "Player_Sword")
@@ -229,6 +255,9 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 		{
 			if (m_bPattern && pOther->Get_Damage() == 1.f)
 			{
+				m_bFinish = false;
+				if (!m_bFinish)
+					UM->Set_Count(2);
 				m_bPattern = false;
 				m_bLHand = false;
 				m_bRHand = false;
@@ -286,63 +315,75 @@ HRESULT CTheo::Ready_Collider()
 
 void CTheo::Set_NextMotion()
 {
-	int random = GI->Get_Random(1, 4);
-	if (random == 1)
+	if (!m_pAnimModel->GetChangeBool())
 	{
-		Set_State(IDLE);
-		return;
-	}
-	if (random == 2)
-	{
-		Set_State(WALK);
-		return;
-	}
-	if (random == 3)
-	{
-		Set_State(RUN);
-		return;
-	}
+		m_iPreMotion = m_iNextMotion;
+		m_iNextMotion = GI->Get_Random(1, 3);
 
-	if (random == 4)
-	{
-		Set_State(RUN);
-		return;
+		while (m_iNextMotion == m_iPreMotion)
+		{
+			m_iNextMotion = GI->Get_Random(1, 3);
+			if (m_iNextMotion != m_iPreMotion)
+				break;
+		}
+		if (m_iNextMotion == 1)
+		{
+			Set_State(IDLE);
+			return;
+		}
+		if (m_iNextMotion == 2)
+		{
+			Set_State(WALK);
+			return;
+		}
+		if (m_iNextMotion == 3)
+		{
+			Set_State(RUN);
+			return;
+		}
+		
 	}
 }
 
 void CTheo::Set_NextAttack()
 {
-	Set_State(SKILL2);
-	int random = GI->Get_Random(1, 6);
-	/*if (random == 1)
+	Set_State(SKILL1);
+	/*if (!m_pAnimModel->GetChangeBool())
 	{
-		Set_State(SKILL1);
-		return;	
-	}
-	if (random == 2)
-	{
-		Set_State(SKILL2);
-		return;
-	}
-	if (random == 3)
-	{
-		Set_State(SKILL3);
-		return;
-	}
-	if (random == 4)
-	{
-		Set_State(SKILL4);
-		return;
-	}
-	if (random == 5)
-	{
-		Set_State(SKILL5);
-		return;
-	}
-	if (random == 6)
-	{
-		Set_State(SKILL6);
-		return;
+		m_iPreAttack = m_iNextAttack;
+		m_iNextAttack = GI->Get_Random(1, 5);
+
+		while (m_iNextAttack == m_iPreAttack)
+		{
+			m_iNextAttack = GI->Get_Random(1, 5);
+			if (m_iNextAttack != m_iPreAttack)
+				break;
+		}
+		if (m_iNextAttack == 1)
+		{
+			Set_State(SKILL1);
+			return;
+		}
+		if (m_iNextAttack == 2)
+		{
+			Set_State(SKILL2);
+			return;
+		}
+		if (m_iNextAttack == 3)
+		{
+			Set_State(SKILL4);
+			return;
+		}
+		if (m_iNextAttack == 4)
+		{
+			Set_State(SKILL5);
+			return;
+		}
+		if (m_iNextAttack == 5)
+		{
+			Set_State(SKILL6);
+			return;
+		}
 	}*/
 }
 
@@ -368,35 +409,19 @@ void CTheo::Set_State(STATE eState)
 	case Client::CTheo::RUN:
 		break;
 	case Client::CTheo::SKILL1:
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 20.f;
-		else
-			m_fDamage = 10.f;
-		
+		m_fDamage = 20.f;	
 		break;
 	case Client::CTheo::SKILL2:
-		if (m_fNowMp >= 100.f)
 			m_fDamage = 30.f;
-		else
-			m_fDamage = 15.f;
 		break;
 	case Client::CTheo::SKILL3:
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 10.f;
-		else
-			m_fDamage = 5.f;
+		m_pOBB[OBB_RHAND]->ChangeExtents(_float3{ 300.f, 300.f, 300.f });
 		break;
 	case Client::CTheo::SKILL4:
-		if (m_fNowMp >= 100.f)
 			m_fDamage = 40.f;
-		else
-			m_fDamage = 20.f;
 		break;
 	case Client::CTheo::SKILL5:
-		if (m_fNowMp >= 100.f)
 			m_fDamage = 20.f;
-		else
-			m_fDamage = 10.f;
 		break;
 	case Client::CTheo::SKILL6:
 		break;
@@ -407,6 +432,11 @@ void CTheo::Set_State(STATE eState)
 	case Client::CTheo::WALKBACK:
 		break;
 	case Client::CTheo::WALK:		
+		break;
+	case Client::CTheo::FINISH:
+		m_eNextState = SKILL6;
+		m_fDamage = 110.f;
+		Set_Dir();
 		break;
 	}
 
@@ -423,9 +453,15 @@ void CTheo::End_Animation()
 {
 	if (m_pAnimModel->GetAniEnd())
 	{
+		if (m_bFinishStart)
+		{			
+			Set_State(FINISH);
+			return;
+		}
 		switch (m_eCurState)
 		{
 		case Client::CTheo::DOWN:
+			PM->Delete_Boss();
 			Set_Dead();
 			GI->StopAll();
 			GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE3));
@@ -437,7 +473,7 @@ void CTheo::End_Animation()
 			if (m_bDie)
 				Set_State(DOWN);
 			else
-			Set_State(HITEND);
+				Set_State(HITEND);
 			break;
 		case Client::CTheo::HITSTART:
 			Set_State(HITLOOF);
@@ -451,6 +487,9 @@ void CTheo::End_Animation()
 			Set_NextMotion();
 			break;
 		case Client::CTheo::SKILL3:
+			m_fDamage = 10.f;
+			m_bRHand = false;
+			m_pOBB[OBB_RHAND]->ChangeExtents(_float3{ 6.f, 6.f, 6.f });
 			Set_NextMotion();
 			break;
 		case Client::CTheo::SKILL4:
@@ -458,9 +497,12 @@ void CTheo::End_Animation()
 			break;
 		case Client::CTheo::SKILL5:
 			Set_NextMotion();
+			m_fRushShakeAcc = 0.25f;
 			break;
 		case Client::CTheo::SKILL6:
 			Set_NextMotion();
+			if (!m_bFinish)
+				UM->Set_Count(2);
 			break;
 		case Client::CTheo::APPEAR:
 			Set_State(RUN);
@@ -476,11 +518,11 @@ void CTheo::End_Animation()
 			break;
 		}
 	}
+	
 }
 
 void CTheo::Update(_float fTimeDelta)
 {
-	
 	switch (m_eCurState)
 	{
 	case Client::CTheo::DOWN:
@@ -495,7 +537,7 @@ void CTheo::Update(_float fTimeDelta)
 	case Client::CTheo::RUN:
 	{
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0))
-			CRM->Start_Shake(0.3f, 2.f, 0.02f);	
+			CRM->Start_Shake(0.3f, 2.5f, 0.03f);	
 		m_fRunSpeed = 6.f;
 		Set_Dir(); 
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
@@ -506,19 +548,20 @@ void CTheo::Update(_float fTimeDelta)
 		break;
 	}
 	case Client::CTheo::SKILL1:
-		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
-			Set_Dir();
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+		m_bLHand = false;
+		if (!m_pAnimModel->GetChangeBool())
 		{
-			m_bLHand = true;
-			m_bRHand = true;
-			CRM->Start_Shake(0.3f, 3.f, 0.04f);
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 8.f, m_pNavigation, fTimeDelta);
+			
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+			{
+				m_bLHand = true;
+				CRM->Start_Shake(0.3f, 3.f, 0.04f);
+				return;
+			}
 		}
-		else
-		{
-			m_bLHand = false;
-			m_bRHand = false;
-		}
+
 		if (!m_pAnimModel->GetChangeBool())
 		{
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
@@ -552,6 +595,7 @@ void CTheo::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CTheo::SKILL3:
+		m_bCollision = false;
 		m_bRHand = false;
 		m_bLHand = false;
 		m_bPattern = false;
@@ -559,26 +603,23 @@ void CTheo::Update(_float fTimeDelta)
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
-			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 4.f, m_pNavigation, fTimeDelta);
+			m_fDamage = 30.f;
 			m_bRHand = true;
-			CRM->Start_Shake(0.2f, 2.f, 0.02f);
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 4.f, m_pNavigation, fTimeDelta);
+			CRM->Start_Shake(0.3f, 3.f, 0.03f);
+			m_fRushSpeed = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION))) * 0.65f;
 			return;
 		}		
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
-		{
-			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 4.f, m_pNavigation, fTimeDelta);
+		{		
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta);
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
+			m_fDamage = 110.f;
 			m_bRHand = true;
-			m_bLHand = true;
-			CRM->Start_Shake(0.3f, 5.f, 0.04f);
+			CRM->Start_Shake(0.4f, 6.f, 0.05f);
 			return;
-		}
-		if (!m_pAnimModel->GetChangeBool())
-		{
-			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
-				m_bPattern = true;
 		}
 		break;
 	case Client::CTheo::SKILL4:
@@ -622,11 +663,24 @@ void CTheo::Update(_float fTimeDelta)
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
-			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed * 3.f, m_pNavigation, fTimeDelta))
+			m_fRushShakeAcc += 1.f * fTimeDelta;
+			if (m_fRushShakeAcc >= m_fRushTempo)
+			{
+				m_fRushShakeAcc = 0.f;
+				CRM->Start_Shake(0.3f, 3.f, 0.04f);
+			}
+			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed, m_pNavigation, fTimeDelta))
 				Set_Dir();
 			m_bLHand = true;
 			m_bRHand = true;
-			return;
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(4) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
+		{
+			CRM->Start_Shake(0.3f, 3.f, 0.04f);
+			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed, m_pNavigation, fTimeDelta))
+				Set_Dir();
+			m_bLHand = true;
+			m_bRHand = true;
 		}
 		break;
 	case Client::CTheo::SKILL6:
@@ -635,23 +689,29 @@ void CTheo::Update(_float fTimeDelta)
 		{
 			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
 			{
-				m_bPattern = true;
+				if(!m_bFinishStart)
+					m_bPattern = true;
 				return;
 			}
 			
 		}
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0))
+		if (!m_bFinishStart)
 		{
-			if (m_fNowMp >= 100.f)
-				m_fNowHp += 1.f;
-			else
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
-				m_fNowHp += 0.5f;
-				m_fNowMp += 0.1f;
+				m_fNowHp += 10.f;
+				m_fNowMp += 3.f;
+				if (m_fNowMp >= 100.f)
+					m_bFinish = true;
+				CRM->Start_Shake(0.5f, 4.f, 0.03f);
 			}
 		}
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
-			CRM->Start_Shake(0.5f, 4.f, 0.03f);
+
+		if (m_bFinishStart && m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3))
+		{
+			m_bFinishStart = false;
+			Set_State(SKILL3);
+		}
 		break;
 	case Client::CTheo::APPEAR:
 		Set_Dir();

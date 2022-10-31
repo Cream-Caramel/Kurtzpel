@@ -80,7 +80,6 @@ private:
 	_float m_fFinishSpeed = 30.f;
 private:
 	_bool m_bFinishStart = false;
-	_bool m_bFinishPattern = false;
 	_bool m_bFinishUpdate = false;
 	_bool m_bLHand = false;
 	_bool m_bRHand = false;

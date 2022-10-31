@@ -71,6 +71,12 @@ private:
 	_bool m_bRHand = false;
 	_bool m_bPattern = false;
 	_bool m_bAttack = false;
+	_uint m_iPreMotion = 0;
+	_uint m_iNextMotion = 1;
+	_uint m_iPreRangeAttack = 0;
+	_uint m_iNextRangeAttack = 1;
+	_uint m_iPreCloseAttack = 0;
+	_uint m_iNextCloseAttack = 1;
 	
 	CNavigation* m_pNavigation = nullptr;
 	CAnimModel* m_pAnimModel = nullptr;
