@@ -151,6 +151,9 @@
     <Filter Include="02.GameObjects\AnimMesh\Monster\Dragon">
       <UniqueIdentifier>{883d4084-4160-43a1-becd-8e68aa09018b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.UI\Count">
+      <UniqueIdentifier>{f94d12dd-b5f5-4d95-aff0-2fbe5e1afd5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -357,6 +360,9 @@
     <ClInclude Include="..\Public\Dragon.h">
       <Filter>02.GameObjects\AnimMesh\Monster\Dragon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Count.h">
+      <Filter>03.UI\Count</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -544,6 +550,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Dragon.cpp">
       <Filter>02.GameObjects\AnimMesh\Monster\Dragon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Count.cpp">
+      <Filter>03.UI\Count</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

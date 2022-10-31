@@ -17,3 +17,4 @@
 #include "BossHPBarFrame.h"
 #include "BossMPBar.h"
 #include "BossMPBarFrame.h"
+#include "Count.h"

@@ -4,6 +4,7 @@
 BEGIN(Client)
 class CPlayer;
 class CCamera_Player;
+class CAnimMesh;
 
 class CPointer_Manager final : public CBase
 {
@@ -22,9 +23,14 @@ public:
 	LEVEL Get_NowLevel() { return m_eLevel; }
 	void Set_Level(LEVEL eLevel) { m_eLevel = eLevel; }
 	HRESULT Add_Monster(const char* Level);
+	HRESULT Add_Boss(CAnimMesh* pBoss);
+	HRESULT Delete_Boss();
+	_bool Get_BossFinish();
+
 private:
 	LEVEL m_eLevel;
 	CPlayer* m_pPlayer;
+	CAnimMesh* m_pBoss = nullptr;
 	CCamera_Player* m_pCameraPlayer;
 public:
 	virtual void Free() override;

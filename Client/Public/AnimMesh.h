@@ -50,13 +50,14 @@ public:
 	void SaveBinary();
 	void ChangeAni(int iAniIndex);
 	_bool Get_Die() { return m_bDie; }
-
+	_bool Get_Finish() { return m_bFinish; }
 protected:
 	wstring sTag;
 	MESHINFO*				m_MeshInfo;
 	_bool m_bHit = false;
 	_float m_fHitAcc = 0.f;
 	_bool m_bDie = false;
+	_bool m_bFinish = false;
 protected:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;

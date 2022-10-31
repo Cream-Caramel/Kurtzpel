@@ -160,6 +160,7 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 			if (m_pTransformCom->CameraMove(vTempPos, m_PosInfo[m_iPosInfoIndex].fCamSpeed, fTimeDelta, m_PosInfo[m_iPosInfoIndex].fCamSpeed * 0.02f))
 			{
 				++m_iPosInfoIndex;
+				m_bPosStop = false;
 				if (m_iPosInfoIndex == m_PosInfo.size())
 				{
 					m_bPosPlay = false;
@@ -188,6 +189,7 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 			if (m_pLookTransform->CameraMove(vTempPos, m_LookInfo[m_iLookInfoIndex].fCamSpeed, fTimeDelta, m_LookInfo[m_iLookInfoIndex].fCamSpeed * 0.02f))
 			{
 				++m_iLookInfoIndex;
+				m_bLookStop = false;
 				if (m_iLookInfoIndex == m_LookInfo.size())
 				{
 					m_bLookPlay = false;

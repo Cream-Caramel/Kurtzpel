@@ -27,6 +27,22 @@ void CUI_Manager::Add_ExGauge(CExGauge * pGauge)
 	Safe_AddRef(m_pExGauge);
 }
 
+void CUI_Manager::Add_Count(CCount * pCount)
+{
+	m_pCount = pCount;
+	Safe_AddRef(m_pCount);
+}
+
+_uint CUI_Manager::Get_Count()
+{
+	return m_pCount->Get_Count();
+}
+
+void CUI_Manager::Set_Count(_uint iCount)
+{
+	m_pCount->Set_Count(iCount);
+}
+
 _bool CUI_Manager::Get_UseSkill()
 {
 	 return m_pPlayer->Get_UseSkill(); 
@@ -209,6 +225,7 @@ void CUI_Manager::Free()
 	Safe_Release(m_pKeyR);
 	Safe_Release(m_pKeyShift);
 	Safe_Release(m_pBoss);
+	Safe_Release(m_pCount);
 	for (auto& iter : m_SkillFrame)
 	{
 		Safe_Release(iter);

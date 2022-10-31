@@ -179,6 +179,7 @@
     <ClInclude Include="..\Public\Camera_Player.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Collider_Manager.h" />
+    <ClInclude Include="..\Public\Count.h" />
     <ClInclude Include="..\Public\Dragon.h" />
     <ClInclude Include="..\Public\ExGauge.h" />
     <ClInclude Include="..\Public\ExSkillFrame.h" />
@@ -247,6 +248,7 @@
     <ClCompile Include="..\Private\Camera_Manager.cpp" />
     <ClCompile Include="..\Private\Camera_Player.cpp" />
     <ClCompile Include="..\Private\Collider_Manager.cpp" />
+    <ClCompile Include="..\Private\Count.cpp" />
     <ClCompile Include="..\Private\Dragon.cpp" />
     <ClCompile Include="..\Private\ExGauge.cpp" />
     <ClCompile Include="..\Private\ExSkillFrame.cpp" />

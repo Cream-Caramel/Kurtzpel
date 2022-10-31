@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Camera_Player.h"
 #include "GameInstance.h"
+#include "AnimMesh.h"
 
 IMPLEMENT_SINGLETON(CPointer_Manager)
 
@@ -118,8 +119,30 @@ HRESULT CPointer_Manager::Add_Monster(const char * Level)
 	return S_OK;
 }
 
+HRESULT CPointer_Manager::Add_Boss(CAnimMesh * pBoss)
+{
+	m_pBoss = pBoss;
+	Safe_AddRef(m_pBoss);
+	return S_OK;
+}
+
+HRESULT CPointer_Manager::Delete_Boss()
+{
+	Safe_Release(m_pBoss);
+	return S_OK;
+}
+
+_bool CPointer_Manager::Get_BossFinish()
+{
+	if (m_pBoss == nullptr)
+		return false;
+	return m_pBoss->Get_Finish();
+}
+
 void CPointer_Manager::Free()
 {
+	if (m_pBoss != nullptr)
+		Safe_Release(m_pBoss);
 	Safe_Release(m_pPlayer);
 	Safe_Release(m_pCameraPlayer);
 }

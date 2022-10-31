@@ -43,8 +43,8 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_bColliderRender = true;
 
-	m_eCurState = SKILL1;
-	m_eNextState = SKILL1;
+	m_eCurState = START;
+	m_eNextState = START;
 
 	m_vTargetLook = { 0.f,0.f,1.f };
 
@@ -53,28 +53,29 @@ HRESULT CDragon::Initialize(void * pArg)
 	m_fMaxHp = 400;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
-	m_fNowMp = 100.f;
+	m_fNowMp = 0.f;
 	m_fDamage = 10.f;
 
 	m_fColiisionTime = 0.1f;
 
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
+	PM->Add_Boss(this);
 
 	Set_Dir();
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
-	NaviDesc.iCurrentIndex = 1;
-	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-	return E_FAIL;
-
 	//CNavigation::NAVIGATIONDESC NaviDesc;
-	//NaviDesc.iCurrentIndex = 172;
-	//if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
-	//	return E_FAIL;
+	//NaviDesc.iCurrentIndex = 1;
+	//if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
+	//return E_FAIL;
 
-	//m_pNavigation->Set_BattleIndex(145);
-	//CRM->Start_Scene("Scene_Stage4Boss");
+	CNavigation::NAVIGATIONDESC NaviDesc;
+	NaviDesc.iCurrentIndex = 172;
+	if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
+		return E_FAIL;
+
+	m_pNavigation->Set_BattleIndex(145);
+	CRM->Start_Scene("Scene_Stage4Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -85,18 +86,20 @@ HRESULT CDragon::Initialize(void * pArg)
 
 void CDragon::Tick(_float fTimeDelta)
 {
-	if (m_fNowMp >= 100.f)
-		m_bFinish = true;
-	else
-		m_bFinish = false;
-
+	if (!m_bFinishPattern)
+	{
+		if (m_fNowMp >= 100.f)
+			m_bFinish = true;
+		else
+			m_bFinish = false;
+	}
 	if (m_fNowHp <= 0)
 		m_fNowHp = 0;
 
 	if (m_fNowMp <= 0)
 		m_fNowMp = 0;
 
-	if (m_fNowMp >= 100.f)
+	if (m_fNowMp > 100.f)
 		m_fNowMp = 100.f;
 
 	if (m_fNowHp >= m_fMaxHp)
@@ -240,7 +243,32 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 {
 	if (sTag == "Player_Body")
 	{
-		m_fNowMp += m_fDamage / 2.f;	
+		if (m_bFinish)
+		{
+			if (UM->Get_Count() > 0)
+				UM->Set_Count(-1);
+			else
+			{
+				m_bFinishUpdate = true;
+				m_bFinishStart = true;
+				m_bFinish = false;
+				m_fNowMp = 0.f;
+			}
+		}
+		else if (m_eCurState != SKILL7_2)
+			m_fNowMp += m_fDamage / 2.f;	
+
+		if (m_fNowMp >= 100.f)
+		{
+			m_bFinishPattern = true;
+			m_bFinish = true;
+		}
+		else
+		{
+			m_bFinishPattern = false;
+			m_bFinish = false;
+		}
+	
 	}
 
 	if (sTag == "Player_Sword")
@@ -249,6 +277,9 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 		{
 			if (m_bPattern && pOther->Get_Damage() == 1.f)
 			{
+				m_bFinish = false;
+				if(!m_bFinish)
+					UM->Set_Count(2);
 				m_bPattern = false;
 				m_bLHand = false;
 				m_bRHand = false;
@@ -310,32 +341,35 @@ HRESULT CDragon::Ready_Collider()
 
 void CDragon::Set_NextMotion()
 {
-	m_iPreMotion = m_iNextMotion;
-	m_iNextMotion = GI->Get_Random(1, 3);
-
-	while (m_iNextMotion == m_iPreMotion)
+	if (!m_pAnimModel->GetChangeBool())
 	{
+		m_iPreMotion = m_iNextMotion;
 		m_iNextMotion = GI->Get_Random(1, 3);
-		if (m_iNextMotion != m_iPreMotion)
-			break;
-	}
 
-	if (m_iNextMotion == 1)
-	{
-		Set_State(IDLE);
-		return;
-	}
-	if (m_iNextMotion == 2)
-	{
-		Set_State(WALK);
-		m_iWalkCount = 0;
-		return;
-	}
-	if (m_iNextMotion == 3)
-	{
-		Set_State(WALK);
-		m_iWalkCount = 1;
-		return;
+		while (m_iNextMotion == m_iPreMotion)
+		{
+			m_iNextMotion = GI->Get_Random(1, 3);
+			if (m_iNextMotion != m_iPreMotion)
+				break;
+		}
+
+		if (m_iNextMotion == 1)
+		{
+			Set_State(IDLE);
+			return;
+		}
+		if (m_iNextMotion == 2)
+		{
+			Set_State(WALK);
+			m_iWalkCount = 0;
+			return;
+		}
+		if (m_iNextMotion == 3)
+		{
+			Set_State(WALK);
+			m_iWalkCount = 1;
+			return;
+		}
 	}
 }
 
@@ -343,114 +377,122 @@ void CDragon::Set_NextAttack()
 {
 	_float fDistance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 	if (fDistance > 8.f)
-		Range_Attack();	
+		Range_Attack();
 	else
 		Close_Attack();
+	
 }
 
 void CDragon::Range_Attack()
 {
-	m_iPreRangeAttack = m_iNextRangeAttack;
-	m_iNextRangeAttack = GI->Get_Random(1, 6);
-
-	while (m_iNextRangeAttack == m_iPreRangeAttack)
+	if (!m_pAnimModel->GetChangeBool())
 	{
+		m_iPreRangeAttack = m_iNextRangeAttack;
 		m_iNextRangeAttack = GI->Get_Random(1, 6);
-		if (m_iNextRangeAttack != m_iPreRangeAttack)
-			break;
-	}
 
-	if (m_iNextRangeAttack == 1)
-	{
-		Set_State(SKILL1);
-		return;
-	}
-	if (m_iNextRangeAttack == 2)
-	{
-		Set_State(SKILL6);
-		return;
-	}
-	if (m_iNextRangeAttack == 3)
-	{
-		Set_State(SKILL9_1);
-		return;
-	}
-	if (m_iNextRangeAttack == 4)
-	{
-		Set_State(SKILL4);
-		return;
-	}
+		while (m_iNextRangeAttack == m_iPreRangeAttack)
+		{
+			m_iNextRangeAttack = GI->Get_Random(1, 6);
+			if (m_iNextRangeAttack != m_iPreRangeAttack)
+				break;
+		}
 
-	if (m_iNextRangeAttack == 5)
-	{
-		Set_State(SKILL10_1);
-		return;
-	}
+		if (m_iNextRangeAttack == 1)
+		{
+			Set_State(SKILL6);
+			return;
+		}
+		if (m_iNextRangeAttack == 2)
+		{
+			Set_State(SKILL9_1);
+			return;
+		}
+		if (m_iNextRangeAttack == 3)
+		{
+			Set_State(SKILL4);
+			return;
+		}
 
-	if (m_iNextRangeAttack == 6)
-	{
-		Set_State(SKILL8);
-		return;
+		if (m_iNextRangeAttack == 4)
+		{
+			Set_State(SKILL10_1);
+			return;
+		}
+
+		if (m_iNextRangeAttack == 5)
+		{
+			Set_State(SKILL8);
+			return;
+		}
 	}
 
 }
 
 void CDragon::Close_Attack()
 {
-	
-	m_iPreCloseAttack = m_iNextCloseAttack;
-	m_iNextCloseAttack = GI->Get_Random(1, 8);
+	if (!m_pAnimModel->GetChangeBool())
+	{
+		m_iPreCloseAttack = m_iNextCloseAttack;
+		m_iNextCloseAttack = GI->Get_Random(1, 9);
 
-	while (m_iNextCloseAttack == m_iPreCloseAttack)
-	{
-		m_iNextCloseAttack = GI->Get_Random(1, 8);
-		if (m_iNextCloseAttack != m_iPreCloseAttack)
-			break;
-	}
+		while (m_iNextCloseAttack == m_iPreCloseAttack)
+		{
+			m_iNextCloseAttack = GI->Get_Random(1, 9);
+			if (m_iNextCloseAttack != m_iPreCloseAttack)
+				break;
+		}
 
-	if (m_iNextCloseAttack == 1)
-	{
-		Set_State(SKILL3);
-		return;
-	}
-	if (m_iNextCloseAttack == 2)
-	{
-		Set_State(SKILL4);
-		return;
-	}
-	if (m_iNextCloseAttack == 3)
-	{
-		Set_State(SKILL5);
-		return;
-	}
-	if (m_iNextCloseAttack == 4)
-	{
-		Set_State(SKILL10_1);
-		return;
-	}
+		if (m_iNextCloseAttack == 1)
+		{
+			Set_State(SKILL3);
+			return;
+		}
+		if (m_iNextCloseAttack == 2)
+		{
+			Set_State(SKILL4);
+			return;
+		}
+		if (m_iNextCloseAttack == 3)
+		{
+			Set_State(SKILL5);
+			return;
+		}
 
-	if (m_iNextCloseAttack == 5)
-	{
-		Set_State(SKILL8);
-		return;
-	}
+		if (m_iNextCloseAttack == 4)
+		{
+			Set_State(SKILL10_1);
+			return;
+		}
 
-	if (m_iNextCloseAttack == 6)
-	{
-		Set_State(SKILL13);
-		return;
-	}
+		if (m_iNextCloseAttack == 5)
+		{
+			Set_State(SKILL8);
+			return;
+		}
 
-	if (m_iNextCloseAttack == 7)
-	{
-		Set_State(SKILL14_1);
-		return;
-	}
+		if (m_iNextCloseAttack == 6)
+		{
+			Set_State(SKILL13);
+			return;
+		}
 
-	if (m_iNextCloseAttack == 8)
-	{
-		Set_State(SKILL15);
-		return;
+		if (m_iNextCloseAttack == 7)
+		{
+			Set_State(SKILL14_1);
+			return;
+		}
+
+		if (m_iNextCloseAttack == 8)
+		{
+			Set_State(SKILL15);
+			return;
+		}
+
+		if (m_iNextCloseAttack == 9)
+		{
+			Set_State(BACKSTEP);
+			return;
+		}
 	}
 
 }
@@ -465,8 +507,10 @@ void CDragon::Set_State(STATE eState)
 	switch (m_eNextState)
 	{
 	case Client::CDragon::BACKSTEP:
+		XMStoreFloat3(&m_vBackStepLook, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - XMLoadFloat3(&PM->Get_PlayerPointer()->Get_Pos()));
 		break;
 	case Client::CDragon::DIE:
+		PM->Delete_Boss();
 		Set_Dead();
 		break;
 	case Client::CDragon::GROGGYEND:
@@ -492,6 +536,8 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::SKILL6:
 		break;
 	case Client::CDragon::SKILL7_1:
+		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 300.f, 300.f, 300.f });
+		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,6.f });
 		break;
 	case Client::CDragon::SKILL7_2:
 		break;
@@ -545,8 +591,11 @@ void CDragon::Set_State(STATE eState)
 		m_fWalkShakeAcc = 0.f;
 		break;
 	case Client::CDragon::FINISH:
+		m_eNextState = SKILL1;
+		CRM->Start_Scene("Scene_DragonFinish");
+		m_fDamage = 110.f;
+		XMStoreFloat3(&m_vTargetLook, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - XMLoadFloat3(&m_pTarget->Get_Pos()));
 		break;
-	
 	}
 	m_pAnimModel->SetNextIndex(m_eNextState);
 	m_pAnimModel->SetChangeBool(true);
@@ -561,10 +610,19 @@ void CDragon::End_Animation()
 {
 	if (m_pAnimModel->GetAniEnd())
 	{
+		if (m_bFinishStart)
+		{
+			if(m_eCurState != SKILL9_1 && m_eCurState != SKILL9_2 && m_eCurState != SKILL10_1)
+			Set_State(FINISH);
+			m_fNowMp = 0.f;
+			m_bFinishStart = false;
+			m_bFinishPattern = false;
+			return;
+		}
 		switch (m_eCurState)
 		{
 		case Client::CDragon::BACKSTEP:
-			Set_State(SKILL6);
+			Set_NextAttack();
 			break;
 		case Client::CDragon::DIE:
 			break;
@@ -578,7 +636,10 @@ void CDragon::End_Animation()
 			Set_State(GROGGYLOOF);
 			break;
 		case Client::CDragon::SKILL1:
-			Set_NextMotion();
+			if (m_bFinishUpdate)
+				Set_State(SKILL7_1);
+			else	
+				Set_NextMotion();
 			break;
 		case Client::CDragon::SKILL3:		
 			Set_NextMotion();		
@@ -593,12 +654,22 @@ void CDragon::End_Animation()
 			Set_NextMotion();
 			break;
 		case Client::CDragon::SKILL7_1:
-			Set_State(SKILL7_2);
+			m_bFinish = false;
+			m_pAnimModel->Set_AnimIndex(SKILL7_2);
+			m_eNextState = SKILL7_2;
 			break;
-		case Client::CDragon::SKILL7_2:
-			Set_State(SKILL7_3);
+		case Client::CDragon::SKILL7_2:	
+			m_pAnimModel->Set_AnimIndex(SKILL7_3);
+			m_eNextState = SKILL7_3;
 			break;
 		case Client::CDragon::SKILL7_3:
+			UM->Set_Count(2);
+			m_fDamage = 20.f;
+			m_bFinishUpdate = false;
+			m_bAttack = false;
+			m_bFinishStart = false;
+			m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 6.f, 6.f, 6.f });
+			m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,0.f });
 			Set_NextMotion();
 			break;
 		case Client::CDragon::SKILL8:
@@ -630,6 +701,8 @@ void CDragon::End_Animation()
 			break;
 		case Client::CDragon::SKILL14_1:
 			Set_State(SKILL14_2);
+			if (!m_bFinish)
+				UM->Set_Count(2);
 			break;
 		case Client::CDragon::SKILL14_2:
 			Set_State(SKILL14_3);
@@ -664,8 +737,7 @@ void CDragon::Update(_float fTimeDelta)
 	case Client::CDragon::BACKSTEP:
 		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
 		{
-			XMStoreFloat3(&m_vTargetLook, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - XMLoadFloat3(&m_pTarget->Get_Pos()));
-			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fBackStepSpeed, m_pNavigation, fTimeDelta);
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vBackStepLook), m_fBackStepSpeed, m_pNavigation, fTimeDelta);
 			Set_Dir();
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
@@ -682,6 +754,21 @@ void CDragon::Update(_float fTimeDelta)
 	case Client::CDragon::GROGGYSTART:
 		break;
 	case Client::CDragon::SKILL1:
+		if (m_bFinishUpdate)
+		{
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				XMStoreFloat3(&m_vTargetLook, _vector{ 60.f, 2.f, 65.f } -m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				_float3 vDir;
+				XMStoreFloat3(&vDir, _vector{ 60.f, 2.5f, 123.f } -m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				m_pTransformCom->Go_Dir(XMLoadFloat3(&vDir), m_fFinishSpeed, m_pNavigation, fTimeDelta);
+			}
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			{
+				CRM->Start_Shake(0.3f, 5.f, 0.04f);
+			}
+			return;
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
 			CRM->Start_Shake(0.3f, 5.f, 0.04f);
@@ -751,7 +838,6 @@ void CDragon::Update(_float fTimeDelta)
 	case Client::CDragon::SKILL5:
 		m_bPattern = false;
 		m_bLHand = false;
-		m_bRHand = false;
 		if (!m_pAnimModel->GetChangeBool())
 		{
 			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
@@ -769,7 +855,6 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 		{
 			m_bLHand = true;
-			m_bRHand = true;
 		}
 		break;
 	case Client::CDragon::SKILL6:
@@ -785,8 +870,11 @@ void CDragon::Update(_float fTimeDelta)
 	case Client::CDragon::SKILL7_1:
 		break;
 	case Client::CDragon::SKILL7_2:
+		if(!m_pAnimModel->GetChangeBool())
+			m_bAttack = true;
 		break;
 	case Client::CDragon::SKILL7_3:
+			m_bAttack = false;
 		break;
 	case Client::CDragon::SKILL8:
 		m_bPattern = false;
@@ -1003,6 +1091,7 @@ void CDragon::Update(_float fTimeDelta)
 	}
 		break;
 	}
+	
 }
 
 HRESULT CDragon::Ready_Sockets()

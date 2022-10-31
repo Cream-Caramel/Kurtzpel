@@ -281,6 +281,10 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CBossBarLine::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Count"),
+		CCount::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	char* a = new char[256];
 	char b[256] = "sad";
 	a[0] = b[0];

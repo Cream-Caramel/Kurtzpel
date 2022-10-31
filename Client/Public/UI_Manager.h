@@ -13,6 +13,7 @@ class CKeyShift;
 class CKeyTab;
 class CExGauge;
 class CAnimMesh;
+class CCount;
 class CUI_Manager final : public CBase
 {
 	DECLARE_SINGLETON(CUI_Manager)
@@ -24,6 +25,9 @@ public:
 	void Add_Player(CPlayer* pPlayer); //플레이어 포인터추가
 	void Add_Boss(CAnimMesh* pBoss);
 	void Add_ExGauge(CExGauge* pGauge);
+	void Add_Count(CCount* pCount);
+	_uint Get_Count();
+	void Set_Count(_uint iCount);
 	_bool Get_UseSkill(); // 플레이어의 상태가 스킬사용가능한상태인지 판단
 	_float Get_PlayerHp();
 	_float Get_PlayerMaxHp();
@@ -60,6 +64,7 @@ private:
 	CKeyE* m_pKeyE = nullptr;
 	CKeyQ* m_pKeyQ = nullptr;
 	CKeyF* m_pKeyF = nullptr;
+	CCount* m_pCount = nullptr;
 	CKeyShift* m_pKeyShift = nullptr;
 	CKeyTab* m_pKeyTab = nullptr;	
 	vector<CSkillFrame*> m_SkillFrame;

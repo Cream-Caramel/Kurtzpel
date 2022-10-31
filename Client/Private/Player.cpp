@@ -1302,6 +1302,11 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::RUN:
 		//GI->PlaySoundW(L"Run.ogg", SD_PLAYER1, 0.6f);
+		if (!m_pAnimModel[0]->GetChangeBool())
+		{
+			CRM->Set_FovSpeed(100.f);
+			CRM->Set_FovDir(true);
+		}
 		m_bMotionChange = true;
 		m_bUseSkill = true;
 		for (int i = 0; i < OBB_END; ++i)
@@ -1520,14 +1525,16 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::VOIDBACKEND:
 		break;
-	case Client::CPlayer::VOIDFRONT:
-		m_bCollision = false;
+	case Client::CPlayer::VOIDFRONT:	
+		if(UM->Get_Count() > 0)
+			m_bCollision = false;
 		if (m_fVoidFront > 0.5f)
 			m_fVoidFront -= 0.5f;		
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fVoidFront, m_pNavigation, fTimeDelta);
 		break;
 	case Client::CPlayer::VOIDBACK:
-		m_bCollision = false;
+		if (UM->Get_Count() > 0)
+			m_bCollision = false;
 		if (m_fVoidBack > 0.5f)
 			m_fVoidBack += 0.2f;	
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), -m_fVoidBack, m_pNavigation, fTimeDelta);
