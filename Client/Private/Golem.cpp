@@ -44,8 +44,8 @@ HRESULT CGolem::Initialize(void * pArg)
 
 	m_bColliderRender = true;
 
-	m_eCurState = SKILL9;
-	m_eNextState = SKILL9;
+	m_eCurState = START;
+	m_eNextState = START;
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
@@ -53,7 +53,7 @@ HRESULT CGolem::Initialize(void * pArg)
 	m_fMaxHp = 350;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
-	m_fNowMp = 10.f;
+	m_fNowMp = 90.f;
 	m_fDamage = 10.f;
 
 	m_fColiisionTime = 0.1f;
@@ -208,6 +208,13 @@ HRESULT CGolem::Render()
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
 				return E_FAIL;
 		}
+
+		else if (m_bFinish)
+		{
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
+				return E_FAIL;
+		}
+
 		else
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
@@ -227,7 +234,28 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 {
 	if (sTag == "Player_Body")
 	{
-		m_fNowMp += 10.f;	
+		if (m_bFinish)
+		{
+			if (UM->Get_Count() > 0)
+				UM->Set_Count(-1);
+			else
+			{
+				m_bFinishStart = true;
+				m_fNowMp = 0.f;
+			}
+		}
+
+		else if (m_eCurState != SKILL10_1)
+			m_fNowMp += m_fDamage / 2.f;
+
+		if (m_fNowMp >= 100.f)
+		{
+			m_bFinish = true;
+		}
+		else
+		{
+			m_bFinish = false;
+		}
 	}
 
 	if (sTag == "Player_Sword")
@@ -236,6 +264,9 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 		{
 			if (m_bPattern && pOther->Get_Damage() == 1.f)
 			{
+				m_bFinish = false;
+				if (!m_bFinish)
+					UM->Set_Count(2);
 				m_bPattern = false;
 				m_bLHand = false;
 				m_bRHand = false;
@@ -341,8 +372,7 @@ void CGolem::Set_NextAttack()
 
 void CGolem::Range_Attack()
 {
-	Set_State(SKILL2);
-	/*if (!m_pAnimModel->GetChangeBool())
+	if (!m_pAnimModel->GetChangeBool())
 	{
 		m_iPreRangeAttack = m_iNextRangeAttack;
 		m_iNextRangeAttack = GI->Get_Random(1, 3);
@@ -369,13 +399,12 @@ void CGolem::Range_Attack()
 			Set_State(SKILL2);
 			return;
 		}
-	}*/
+	}
 }
 
 void CGolem::Close_Attack()
 {
-	Set_State(SKILL9);
-	/*if (!m_pAnimModel->GetChangeBool())
+	if (!m_pAnimModel->GetChangeBool())
 	{
 		m_iPreCloseAttack = m_iNextCloseAttack;
 		m_iNextCloseAttack = GI->Get_Random(1, 4);
@@ -408,7 +437,7 @@ void CGolem::Close_Attack()
 			Set_State(SKILL5_1);
 			return;
 		}
-	}*/
+	}
 }
 
 void CGolem::Set_State(STATE eState)
@@ -464,10 +493,9 @@ void CGolem::Set_State(STATE eState)
 			m_fDamage = 10.f;
 		break;
 	case Client::CGolem::SKILL10_1:
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 100.f;
-		else
-			m_fDamage = 60.f;
+		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 300.f, 300.f, 300.f });
+		m_fDamage = 110.f;
+		m_bFinishStart = false;
 		break;
 	case Client::CGolem::SKILL10_2:
 		break;
@@ -498,6 +526,11 @@ void CGolem::End_Animation()
 {
 	if (m_pAnimModel->GetAniEnd())
 	{
+		if (m_bFinishStart)
+		{
+			Set_State(SKILL10_1);
+			return;
+		}
 		switch (m_eCurState)
 		{
 		case Client::CGolem::DOWN:
@@ -536,9 +569,12 @@ void CGolem::End_Animation()
 			Set_NextMotion();
 			break;
 		case Client::CGolem::SKILL5_1:
+			if (!m_bFinish)
+				UM->Set_Count(2);
 			Set_State(SKILL5_2);
 			break;
 		case Client::CGolem::SKILL5_2:
+			Set_NextMotion();		
 			Set_State(SKILL5_3);
 			break;
 		case Client::CGolem::SKILL5_3:
@@ -696,14 +732,19 @@ void CGolem::Update(_float fTimeDelta)
 			m_bPattern = true;
 		break;
 	case Client::CGolem::SKILL5_1:
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-			m_bPattern = true;
-		else
-			m_bPattern = false;
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+				m_bPattern = true;
+			else
+				m_bPattern = false;
+		}
 		break;
 	case Client::CGolem::SKILL5_2:
 			m_fNowHp += 0.2f;
 			m_fNowMp += 0.1f;
+			if (m_fNowMp >= 100.f)
+				m_bFinish = true;
 		break;
 	case Client::CGolem::SKILL5_3:
 		break;
@@ -747,18 +788,29 @@ void CGolem::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CGolem::SKILL10_1:
+		m_bAttack = false;
 		if (!m_pAnimModel->GetChangeBool())
 		{
 			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
 			{
+				Set_Dir();
 				_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
-				if (Distance < 2.f)
-					m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 10.f, m_pNavigation, fTimeDelta);
+				if (Distance < 6.f)
+					m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 3.f, m_pNavigation, fTimeDelta);
+				return;
 			}
-				if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
-					m_bAttack = true;
-				else
-					m_bAttack = false;
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+			{
+				GI->Set_Speed(L"Timer_Main", 0.2f);
+				return;
+			}
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+			{
+				GI->Set_Speed(L"Timer_Main", 1.f);
+				m_bAttack = true;
+			}
+					
 		}
 		break;
 	case Client::CGolem::SKILL10_2:

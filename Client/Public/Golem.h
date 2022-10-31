@@ -67,6 +67,7 @@ private:
 	_float m_fRunTempo = 0.f;
 	_float m_fRunTempoAcc = 0.f;
 private:
+	_bool m_bFinishStart = false;
 	_bool m_bLHand = false;
 	_bool m_bRHand = false;
 	_bool m_bPattern = false;

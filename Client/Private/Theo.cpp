@@ -347,8 +347,7 @@ void CTheo::Set_NextMotion()
 
 void CTheo::Set_NextAttack()
 {
-	Set_State(SKILL1);
-	/*if (!m_pAnimModel->GetChangeBool())
+	if (!m_pAnimModel->GetChangeBool())
 	{
 		m_iPreAttack = m_iNextAttack;
 		m_iNextAttack = GI->Get_Random(1, 5);
@@ -384,7 +383,7 @@ void CTheo::Set_NextAttack()
 			Set_State(SKILL6);
 			return;
 		}
-	}*/
+	}
 }
 
 void CTheo::Set_State(STATE eState)
