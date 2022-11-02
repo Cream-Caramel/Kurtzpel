@@ -197,6 +197,18 @@ HRESULT CGolem::Render()
 	{
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
+
+		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
+		{
+			m_bNomalTex = false;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+		}
+		else
+		{
+			m_bNomalTex = true;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+		}
+
 		if (m_bPattern)
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
@@ -262,7 +274,7 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 	{
 		if (pOther->Can_Hit())
 		{
-			if (m_bPattern && pOther->Get_Damage() == 1.f)
+			if (m_bPattern && pOther->Get_Damage() == 1.f || m_bPattern && pOther->Get_Damage() == 100.f)
 			{
 				m_bFinish = false;
 				if (!m_bFinish)
@@ -407,11 +419,11 @@ void CGolem::Close_Attack()
 	if (!m_pAnimModel->GetChangeBool())
 	{
 		m_iPreCloseAttack = m_iNextCloseAttack;
-		m_iNextCloseAttack = GI->Get_Random(1, 4);
+		m_iNextCloseAttack = GI->Get_Random(1, 7);
 
 		while (m_iNextCloseAttack == m_iPreCloseAttack)
 		{
-			m_iNextCloseAttack = GI->Get_Random(1, 4);
+			m_iNextCloseAttack = GI->Get_Random(1, 7);
 			if (m_iNextCloseAttack != m_iPreCloseAttack)
 				break;
 		}
@@ -433,6 +445,22 @@ void CGolem::Close_Attack()
 		}
 
 		if (m_iNextCloseAttack == 4)
+		{
+			Set_State(SKILL1);
+			return;
+		}
+		if (m_iNextCloseAttack == 5)
+		{
+			Set_State(SKILL3);
+			return;
+		}
+		if (m_iNextCloseAttack == 6)
+		{
+			Set_State(SKILL9);
+			return;
+		}
+
+		if (m_iNextCloseAttack == 7)
 		{
 			Set_State(SKILL5_1);
 			return;
@@ -795,7 +823,7 @@ void CGolem::Update(_float fTimeDelta)
 			{
 				Set_Dir();
 				_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
-				if (Distance < 6.f)
+				if (Distance > 6.f)
 					m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 3.f, m_pNavigation, fTimeDelta);
 				return;
 			}

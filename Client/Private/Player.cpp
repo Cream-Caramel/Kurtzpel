@@ -9,6 +9,7 @@
 #include "Collider_Manager.h"
 #include "Navigation.h"
 #include "Camera_Manager.h"
+#include "PlayerSword.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -47,7 +48,6 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerBottom", TEXT("Bottom"), (CComponent**)&m_pAnimModel[MODEL_BOTTOM])))
 		return E_FAIL;
 	
-	
 	m_eCurState = IDLE;
 	m_eNextState = IDLE;
 	m_vTargetLook = { 0.f,0.f,1.f};
@@ -73,12 +73,13 @@ HRESULT CPlayer::Initialize(void * pArg)
 	
 	m_pTransformCom->Set_Gravity(0.f);
 	m_pTransformCom->Set_JumpPower(0.4f);
-
+	m_bAction = false;
 	return S_OK;
 }
 
 void CPlayer::Tick(_float fTimeDelta)
 {
+
 	if (!m_pAnimModel[0]->GetChangeBool())
 		m_eCurState = m_eNextState;
 
@@ -87,9 +88,6 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
-
-	if (GI->Key_Down(DIK_3))
-		GI->PlaySoundW(L"NomalCombo1.ogg", SD_PLAYER1, 0.6f);
 
 	if (GI->Key_Down(DIK_5))
 		CRM->Start_Scene("Scene_Stage2");
@@ -101,8 +99,8 @@ void CPlayer::Tick(_float fTimeDelta)
 	m_bUseSkill = false;
 	Get_KeyInput(fTimeDelta);
 
-	
 
+	
 	if (!m_bCollision)
 	{
 		m_fCollisionAcc += 1.f * fTimeDelta;
@@ -174,7 +172,7 @@ HRESULT CPlayer::Render()
 	for (int i = 0; i < MODEL_END; ++i)
 	{
 		if (m_pAnimModel[i] != nullptr)
-		{
+		{		
 			_uint		iNumMeshes = m_pAnimModel[i]->Get_NumMeshes();
 			for (_uint j = 0; j < iNumMeshes; ++j)
 			{
@@ -183,7 +181,7 @@ HRESULT CPlayer::Render()
 
 				if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j)))
 					return E_FAIL;
-			}
+			}	
 		}
 	}
 
@@ -310,28 +308,76 @@ void CPlayer::Set_State(STATE eState)
 
 	switch (m_eNextState)
 	{
-	case Client::CPlayer::HITBACK:		
+	case Client::CPlayer::HITBACK:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
 		break;
 	case Client::CPlayer::HITFRONT:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
 		break;
-	case Client::CPlayer::JUMP:		
+	case Client::CPlayer::JUMP:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
 		break;
 	case Client::CPlayer::JUMPEND:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
 		break;
 	case Client::CPlayer::JUMPUP:
-		
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
 		break;
 	case Client::CPlayer::JUMPSTART:	
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
 		m_pTransformCom->Set_Jump(true);
 		m_pTransformCom->Set_Gravity(0.f);
 		m_pTransformCom->Set_JumpPower(0.6f);
 		m_fJumpSpeed = 10.f;
 		break;
 	case Client::CPlayer::IDLE:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
+		CRM->Set_FovSpeed(150.f);
 		CRM->Set_FovDir(true);
 		m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::DASH:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
 		m_fNowMp -= 5.f;
 		m_fDashSpeed = 20.f;
 		if (!CRM->Get_bFov())
@@ -345,17 +391,40 @@ void CPlayer::Set_State(STATE eState)
 		}
 		break;
 	case Client::CPlayer::DIE:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
 		CRM->Start_Fov(30.f, 30.f);
 		break;
 	case Client::CPlayer::RESPAWN:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
 		CRM->Set_FovSpeed(60.f);
 		CRM->Set_FovDir(true);
 		m_bSpinCombo = false;
 		break;
 	case Client::CPlayer::RUN:	
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
 		m_fRunSpeed = 8.f;
 		break;
 	case Client::CPlayer::RUNEND:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
+		m_bAction = false;
 		GI->PlaySoundW(L"RunEnd.ogg", SD_PLAYER1, 0.6f);
 		m_fRunEndSpeed = 8.f;
 		break;
@@ -363,7 +432,12 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::SPINCOMBOSTART:
-		CRM->Start_Fov(80.f, 100.f);
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
+		CRM->Start_Fov(50.f, 100.f);
 		m_fNowMp -= 15.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(2.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(999);
@@ -372,7 +446,12 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::FASTCOMBOSTART:
-		CRM->Start_Fov(80.f, 100.f);
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
+		CRM->Start_Fov(50.f, 100.f);
 		m_fNowMp -= 10.f;
 		m_fFastComboStartSpeed = 5.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(2.f);
@@ -380,6 +459,12 @@ void CPlayer::Set_State(STATE eState)
 		m_fFastComboAcc = 0.f;
 		break;
 	case Client::CPlayer::ROCKBREAK:
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
+		m_bAction = true;
 		m_fNowMp -= 5.f;
 		m_fRockBreakSpeed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(1.f);
@@ -392,11 +477,21 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::CHARGEREADY:
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
 		m_bMotionChange = false;
 		CRM->Start_Fov(30.f, 20.f);
 		m_fNowMp -= 20.f;
 		break;
 	case Client::CPlayer::AIRCOMBO1:
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
 		GI->PlaySoundW(L"AirCombo1.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
 		m_pTransformCom->Set_JumpPower(0.f);
@@ -433,6 +528,11 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::VOIDFRONT:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
 		CRM->Start_Fov(40.f, 100.f);
 		CRM->Set_FovDir(true);
 		m_fNowMp -= 10.f;
@@ -440,13 +540,23 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::VOIDBACKEND:
 		break;
 	case Client::CPlayer::VOIDBACK:
+		if (m_bAction)
+		{
+			m_bAction = false;
+			Change_WeaponPos();
+		}
 		CRM->Start_Fov(40.f, 70.f);
 		CRM->Set_FovDir(true);
 		m_fNowMp -= 10.f;
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
 		GI->PlaySoundW(L"NomalCombo1.ogg", SD_PLAYER1, 0.6f);
-		CRM->Start_Fov(55.f, 40.f);
+		CRM->Start_Fov(50.f, 90.f);
 		m_fNC1Speed = 5.f;
 		m_fNomalCombo1Acc = 0.f;
 		m_fNowMp -= 2.f;
@@ -454,7 +564,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
-		CRM->Fix_Fov(50.f, 40.f);
+		CRM->Fix_Fov(40.f, 90.f);
 		GI->PlaySoundW(L"NomalCombo2.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
 		m_fNC2Speed = 5.f;
@@ -462,7 +572,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
-		CRM->Fix_Fov(43.f, 80.f);
+		CRM->Fix_Fov(30.f, 90.f);
 		GI->PlaySoundW(L"NomalCombo3.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 5.f;
 		m_fNC3Speed = 6.f;
@@ -470,7 +580,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
-		CRM->Fix_Fov(43.f, 80.f);
+		CRM->Fix_Fov(30.f, 90.f);
 		GI->PlaySoundW(L"NomalCombo4.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 5.f;
 		m_fNC4Speed = 6.f;
@@ -478,14 +588,14 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
-		CRM->Fix_Fov(50.f, 40.f);
+		CRM->Fix_Fov(40.f, 90.f);
 		m_fNowMp -= 3.f;
 		m_fNC5Speed = 5.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
-		CRM->Fix_Fov(43.f, 80.f);
+		CRM->Fix_Fov(30.f, 90.f);
 		m_fNowMp -= 5.f;
 		m_fNC6Speed = 8.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(20.f);
@@ -519,11 +629,21 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::BLADEATTACK:
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
 		m_fNowMp -= 20.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(10);
 		break;
 	case Client::CPlayer::SLASHATTACK:
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
 		m_bDoubleSlash = true;
 		m_fNowMp -= 30.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(5.f);
@@ -703,7 +823,7 @@ void CPlayer::End_Animation()
 			m_fFastComboAcc = 0.f;
 			m_Parts[PARTS_SWORD]->Set_Collision(false);		
 			m_fFastComboEndSpeed = 8.f;		
-			CRM->Fix_Fov(40.f, 160.f);
+			CRM->Fix_Fov(30.f, 160.f);
 			CRM->Set_FovDir(true);
 			break;
 		case Client::CPlayer::ROCKBREAK:
@@ -1017,6 +1137,14 @@ void CPlayer::Hit_Shake()
 	CRM->Start_Fov(70.f, 100.f);
 	CRM->Set_FovDir(true);
 	CRM->Start_Shake(0.3f, 2.f, 0.02f);
+}
+
+void CPlayer::Change_WeaponPos()
+{
+	if (m_bAction)
+		((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_RHand();
+	else
+		((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Spine();
 }
 
 void CPlayer::Check_Battle()
@@ -1342,7 +1470,7 @@ void CPlayer::Update(_float fTimeDelta)
 		//GI->PlaySoundW(L"Run.ogg", SD_PLAYER1, 0.6f);
 		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			CRM->Set_FovSpeed(100.f);
+			CRM->Set_FovSpeed(150.f);
 			CRM->Set_FovDir(true);
 		}	
 		m_bUseSkill = true;
@@ -1367,7 +1495,10 @@ void CPlayer::Update(_float fTimeDelta)
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fSpinComboEndSpeed, m_pNavigation, fTimeDelta);
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			CRM->Start_Shake(0.4f, 0.5f, 0.04f);
+		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
@@ -1409,9 +1540,8 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
-			_bool a = m_Parts[PARTS_SWORD]->Get_bCollision();
-			int c = 2;
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			CRM->Start_Shake(0.4f, 0.5f, 0.04f);
 
 		}
 		else
@@ -1744,7 +1874,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(5))
 		{
-			CRM->Set_FovSpeed(200.f);
+			CRM->Set_FovSpeed(300.f);
 			CRM->Set_FovDir(true);
 			m_bDoubleSlashFov = false;
 		}
@@ -2973,7 +3103,6 @@ void CPlayer::Ex2Ready_KeyInput(_float fTimeDelta)
 
 HRESULT CPlayer::Ready_Sockets()
 {
-
 	CHierarchyNode*		pHead = m_pAnimModel[MODEL_PLAYER]->Get_HierarchyNode("Head");
 	if (nullptr == pHead)
 		return E_FAIL;
@@ -2983,6 +3112,11 @@ HRESULT CPlayer::Ready_Sockets()
 	if (nullptr == pWeaponHandR)
 		return E_FAIL;
 	m_Sockets.push_back(pWeaponHandR);
+
+	CHierarchyNode*		pWeaponSpineR = m_pAnimModel[MODEL_PLAYER]->Get_HierarchyNode("Weapon_Spine_R");
+	if (nullptr == pWeaponSpineR)
+		return E_FAIL;
+	m_Sockets.push_back(pWeaponSpineR);
 	
 	return S_OK;
 }
@@ -3034,14 +3168,23 @@ HRESULT CPlayer::Update_Parts()
 {
 	
 	_matrix HeadMatxrix = m_Sockets[SOCKET_HEAD]->Get_CombinedTransformation()* m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
-	_matrix WeaponHandRMatrix = m_Sockets[SOCKET_WEAPONHANDR]->Get_CombinedTransformation()* m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+	
 	m_Parts[PARTS_HEAD]->SetUp_State(HeadMatxrix);
 	m_Parts[PARTS_HAIRBACK]->SetUp_State(HeadMatxrix);
 	m_Parts[PARTS_HAIRFRONT]->SetUp_State(HeadMatxrix);
 	m_Parts[PARTS_HAIRSIDE]->SetUp_State(HeadMatxrix);
 	m_Parts[PARTS_HAIRTAIL]->SetUp_State(HeadMatxrix);
-	m_Parts[PARTS_SWORD]->SetUp_State(WeaponHandRMatrix);
-	
+
+	if (m_bAction)
+	{
+		_matrix WeaponHandRMatrix = m_Sockets[SOCKET_WEAPONHANDR]->Get_CombinedTransformation()* m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+		m_Parts[PARTS_SWORD]->SetUp_State(WeaponHandRMatrix);
+	}
+	else
+	{
+		_matrix WeaponSpineRMatrix = m_Sockets[SOCKET_WEAPON_SPINE_R]->Get_CombinedTransformation()* m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+		m_Parts[PARTS_SWORD]->SetUp_State(WeaponSpineRMatrix);
+	}
 	return S_OK;
 }
 

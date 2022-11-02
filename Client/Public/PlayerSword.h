@@ -23,6 +23,10 @@ public:
 	virtual void Tick(_float fTimeDelta) override;
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual void Collision(CGameObject* pOther, string sTag);
+
+	void Set_RHand();
+	void Set_Spine();
 
 private:
 	CModel* m_pModel = nullptr;

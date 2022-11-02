@@ -29,6 +29,7 @@ HRESULT CTRStair::Initialize(void * pArg)
 	/* For.Com_Model */
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, m_MeshInfo->sTag, m_MeshInfo->sTag, (CComponent**)&m_pModel)))
 		return E_FAIL;
+	
 
 	return S_OK;
 }
@@ -72,8 +73,16 @@ HRESULT CTRStair::Render()
 	{
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
-		/*if (FAILED(m_pModelCom->SetUp_OnShader(m_pShaderCom, m_pModelCom->Get_MaterialIndex(i), aiTextureType_NORMALS, "g_NormalTexture")))
-		return E_FAIL;*/
+		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
+		{
+			m_bNomalTex = false;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+		}
+		else
+		{
+			m_bNomalTex = true;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+		}
 
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;

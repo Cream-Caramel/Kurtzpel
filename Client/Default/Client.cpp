@@ -79,7 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			if (msg.message == WM_QUIT)
 				done = true;
 		}
-		if (done)
+		if (done) 
 			break;
 
 		pGameInstance->Update_Timer(TEXT("Timer_Default"));

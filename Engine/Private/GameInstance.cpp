@@ -80,6 +80,8 @@ void CGameInstance::Tick_Engine(_float fTimeDelta)
 	m_pObject_Manager->LateTick(fTimeDelta);
 
 	m_pLevel_Manager->Tick(fTimeDelta);
+
+	m_pLight_Manager->Tick(fTimeDelta);
 }
 
 void CGameInstance::Clear(_uint iLevelIndex)
@@ -331,12 +333,44 @@ const LIGHTDESC * CGameInstance::Get_LightDesc(_uint iIndex)
 	return m_pLight_Manager->Get_LightDesc(iIndex);
 }
 
+const LIGHTDESC * CGameInstance::Get_StaticLightDesc(_uint iIndex)
+{
+	if (nullptr == m_pLight_Manager)
+		return nullptr;
+
+	return m_pLight_Manager->Get_StaticLightDesc(iIndex);
+}
+
+HRESULT CGameInstance::Set_StaticLight(_float fTimeLimit, _float fRange, _float4 vPos, _uint iIndex)
+{
+	if (nullptr == m_pLight_Manager)
+		return E_FAIL;
+
+	return m_pLight_Manager->Set_StaticLight(fTimeLimit, fRange, vPos, iIndex);
+}
+
 HRESULT CGameInstance::Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const LIGHTDESC & LightDesc)
 {
 	if (nullptr == m_pLight_Manager)
 		return E_FAIL;
 
 	return m_pLight_Manager->Add_Light(pDevice, pContext, LightDesc);
+}
+
+HRESULT CGameInstance::Add_StaticLight(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const LIGHTDESC & LightDesc)
+{
+	if (nullptr == m_pLight_Manager)
+		return E_FAIL;
+
+	return m_pLight_Manager->Add_StaticLight(pDevice, pContext, LightDesc);
+}
+
+HRESULT CGameInstance::Reset_Lights()
+{
+	if (nullptr == m_pLight_Manager)
+		return E_FAIL;
+
+	return m_pLight_Manager->Reset_Lights();
 }
 
 HRESULT CGameInstance::Add_Fonts(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _tchar * pFontTag, const _tchar * pFontFilePath)

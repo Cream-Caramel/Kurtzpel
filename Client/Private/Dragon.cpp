@@ -202,6 +202,18 @@ HRESULT CDragon::Render()
 	{
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
+
+		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
+		{
+			m_bNomalTex = false;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+		}
+		else
+		{
+			m_bNomalTex = true;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+		}
+
 		if (m_bPattern)
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
@@ -267,7 +279,7 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 	{
 		if (pOther->Can_Hit())
 		{
-			if (m_bPattern && pOther->Get_Damage() == 1.f)
+			if (m_bPattern && pOther->Get_Damage() == 1.f || m_bPattern && pOther->Get_Damage() == 100.f)
 			{
 				m_bFinish = false;
 				if(!m_bFinish)

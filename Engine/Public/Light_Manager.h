@@ -15,13 +15,19 @@ public:
 
 public:
 	const LIGHTDESC* Get_LightDesc(_uint iIndex);
-
+	const LIGHTDESC* Get_StaticLightDesc(_uint iIndex);
+	HRESULT Set_StaticLight(_float fTimeLimit, _float fRange, _float4 vPos, _uint iIndex);
 public:
+	HRESULT Reset_Lights();
 	HRESULT Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
+	HRESULT Add_StaticLight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
 	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+	void Tick(_float fTimeDelta);
 private:
 	list<class CLight*>			m_Lights;
 	typedef list<class CLight*>	LIGHTS;
+
+	list <class CLight*>	m_StaticLights;
 
 public:
 	virtual void Free() override;

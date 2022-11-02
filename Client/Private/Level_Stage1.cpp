@@ -44,22 +44,22 @@ HRESULT CLevel_Stage1::Initialize()
 	MeshInfo.fAngle = _float3{ 1.f,1.f,1.f };
 	GI->Add_GameObjectToLayer(L"Dragon", LEVEL_STAGE1, L"Monster", &MeshInfo);*/
 
-	/*CAnimMesh::MESHINFO MeshInfo;
+	CAnimMesh::MESHINFO MeshInfo;
 	MeshInfo.sTag = L"Theo";
 	MeshInfo.fPos = _float4{ 90.f,0.6f,103.f,1.f };
 	MeshInfo.fScale = _float3{ 1.f,1.f,1.f };
 	MeshInfo.fAngle = _float3{ 1.f,1.f,1.f };
-	GI->Add_GameObjectToLayer(L"Theo", LEVEL_STAGE1, L"Monster", &MeshInfo);*/
+	GI->Add_GameObjectToLayer(L"Theo", LEVEL_STAGE1, L"Monster", &MeshInfo);
 
-	CAnimMesh::MESHINFO MeshInfo;
-	MeshInfo.sTag = L"Golem";
-	MeshInfo.fPos = _float4{ 90.f,0.6f,103.f,1.f };
-	MeshInfo.fScale = _float3{ 1.f,1.f,1.f };
-	MeshInfo.fAngle = _float3{ 1.f,1.f,1.f };
-	GI->Add_GameObjectToLayer(L"Golem", LEVEL_STAGE1, L"Monster", &MeshInfo);
+	//CAnimMesh::MESHINFO MeshInfo;
+	//MeshInfo.sTag = L"Golem";
+	//MeshInfo.fPos = _float4{ 90.f,0.6f,103.f,1.f };
+	//MeshInfo.fScale = _float3{ 1.f,1.f,1.f };
+	//MeshInfo.fAngle = _float3{ 1.f,1.f,1.f };
+	//GI->Add_GameObjectToLayer(L"Golem", LEVEL_STAGE1, L"Monster", &MeshInfo);
 
-	GI->StopAll();
-	GI->PlayBGM(L"Stage1.ogg", 0.6f);
+	//GI->StopAll();
+	//GI->PlayBGM(L"Stage1.ogg", 0.6f);
 
 	m_bScene = false;
 
@@ -112,13 +112,28 @@ HRESULT CLevel_Stage1::Ready_Lights()
 	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
 
 	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
+	LightDesc.bRender = true;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(0.5f, 0.5f, 0.5f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
+
+	ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
+	LightDesc.eType = LIGHTDESC::TYPE_POINT;
+	LightDesc.bRender = false;
+	LightDesc.vPosition = _float4(90.0f, 5.0f, 103.f, 1.f);
+	LightDesc.fRange = 20.f;
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vSpecular = LightDesc.vDiffuse;
+
+	if (FAILED(pGameInstance->Add_StaticLight(m_pDevice, m_pContext, LightDesc)))
+		return E_FAIL;
+
+
 
 	RELEASE_INSTANCE(CGameInstance);
 

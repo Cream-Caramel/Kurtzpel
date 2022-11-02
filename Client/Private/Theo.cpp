@@ -187,6 +187,18 @@ HRESULT CTheo::Render()
 	{
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
+
+		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
+		{
+			m_bNomalTex = false;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+		}
+		else
+		{
+			m_bNomalTex = true;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+		}
+
 		if (m_bPattern)
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
@@ -253,7 +265,7 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 		
 		if (pOther->Can_Hit())
 		{
-			if (m_bPattern && pOther->Get_Damage() == 1.f)
+			if (m_bPattern && pOther->Get_Damage() == 1.f || m_bPattern && pOther->Get_Damage() == 100.f)
 			{
 				m_bFinish = false;
 				if (!m_bFinish)
@@ -721,13 +733,16 @@ void CTheo::Update(_float fTimeDelta)
 		break;
 	case Client::CTheo::WALK:
 	{
-		m_fWalkSpeed = 1.5f;
-		Set_Dir();
-		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
-		if (Distance < 5.f)
-			Set_State(RUN);
-		else
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, m_pNavigation, fTimeDelta);
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			m_fWalkSpeed = 1.5f;
+			Set_Dir();
+			_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
+			if (Distance < 5.f)
+				Set_State(RUN);
+			else
+				m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fWalkSpeed, m_pNavigation, fTimeDelta);
+		}
 		break;
 	}
 	}

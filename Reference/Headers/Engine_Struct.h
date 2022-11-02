@@ -21,7 +21,7 @@ namespace Engine
 		enum TYPE { TYPE_POINT, TYPE_DIRECTIONAL, TYPE_END };
 
 		TYPE			eType;
-
+		bool			bRender;
 		XMFLOAT4		vDirection;
 
 		XMFLOAT4		vPosition;

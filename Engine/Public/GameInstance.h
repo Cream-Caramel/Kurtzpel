@@ -83,7 +83,11 @@ public: /* For.PipeLine */
 
 public: /* For.Light_Manager */
 	const LIGHTDESC* Get_LightDesc(_uint iIndex);
+	const LIGHTDESC* Get_StaticLightDesc(_uint iIndex);
+	HRESULT Set_StaticLight(_float fTimeLimit, _float fRange, _float4 vPos, _uint iIndex);
 	HRESULT Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
+	HRESULT Add_StaticLight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
+	HRESULT Reset_Lights();
 
 public: /* For.Font_Manager */
 	HRESULT Add_Fonts(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontTag, const _tchar* pFontFilePath);

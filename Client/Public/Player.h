@@ -15,7 +15,7 @@ class CPlayer final : public CAnimMesh
 public:
 	enum AnimModel {MODEL_PLAYER, MODEL_TOP, MODEL_BOTTOM, MODEL_END};
 	enum Parts { PARTS_HEAD, PARTS_HAIRBACK, PARTS_HAIRFRONT, PARTS_HAIRSIDE, PARTS_HAIRTAIL, PARTS_SWORD, PARTS_END };
-	enum Socket {SOCKET_HEAD, SOCKET_WEAPONHANDR, SOCKET_END};
+	enum Socket {SOCKET_HEAD, SOCKET_WEAPONHANDR, SOCKET_WEAPON_SPINE_R, SOCKET_END};
 	enum DIR {DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_LEFT, DIR_LU, DIR_RU, DIR_LD, DIR_RD, DIR_END};
 	enum STATE {HITBACK, HITFRONT
 		, JUMP, JUMPEND, JUMPUP, JUMPSTART
@@ -24,7 +24,7 @@ public:
 		, DIE, RESPAWN
 		, RUN, RUNEND
 		, SPINCOMBOEND, SPINCOMBOLOOF, SPINCOMBOSTART
-		, FASTCOMBOEND, FASTCOMBOSTART
+		, FASTCOMBOEND, FASTCOMBOSTART 
 		, ROCKBREAK
 		, CHARGECRASH, CHARGEREADY
 		, AIRCOMBO1, AIRCOMBO2, AIRCOMBO3, AIRCOMBO4, AIRCOMBOEND
@@ -84,6 +84,7 @@ public:
 private:
 	void Set_FastComboTime(_float fTimeDelta);
 	void Hit_Shake();
+	void Change_WeaponPos();
 #pragma region PrivateFunction
 
 #pragma region KeyInput
@@ -126,14 +127,16 @@ private:
 #pragma endregion KeyInput
 
 #pragma region Variable
+	_bool m_bAction = false; // 액션중인지 아닌지 액션중이 아니면 칼의 위치는 등 액션중이라면 칼의 위치는 오른손
 	_bool m_bUseSkill = true; //스킬을 사용할수있는지 대기 or 달리기 도중에 가능
 	_bool m_bBattle = false; //전투를 했는지 안했는지
 	_bool m_bKeyInput = false; //방향키가 눌렸는지
 	_bool m_bSpinComboEnd = false; // 스핀콤보가 끝났는지
-	_bool m_bRespawn = false; 
-	_bool m_bDoubleSlash = false;
-	_bool m_bDoubleSlashFov = false;
-	
+	_bool m_bRespawn = false; // 리스폰중인지 
+	_bool m_bDoubleSlash = false; //EX스킬중인지
+	_bool m_bDoubleSlashFov = false; //EX스킬 확대중인지
+	_bool m_bSpinCombo = false;
+
 	_float m_fJumpSpeed = 15.f; // 점프중 스피드
 	_float m_fRunSpeed = 8.f; // 달리기이동스피드
 	_float m_fRunEndSpeed = 8.f; //달리기엔드스피드
@@ -158,7 +161,7 @@ private:
 	_float m_fChargeCrashSpeed = 6.f; //ChargeCrash 전진속도
 	_float m_fSpinComboAcc = 0.f; //스핀콤보 히트간격
 	_float m_fFastComboAcc = 0.f; //패스트콤보 히트간격
-	_bool m_bSpinCombo = false;
+	
 #pragma endregion Variable
 
 private:

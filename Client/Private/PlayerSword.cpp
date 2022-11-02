@@ -54,9 +54,10 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 	m_bColliderRender = true;
 	m_bCollision = false;
 	
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ 0.05f,0.f,0.f,1.f });
-	m_pTransformCom->Set_Scale(_vector{ 0.8f,0.8f,0.8f });
-	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 90.f, _float3{ 0.f,1.f,0.f }, 180.f, _float3{ 0.f,0.f,1.f }, 0.f);
+	//등 보정값
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ -0.3f,0.f,-0.4f,1.f });
+	m_pTransformCom->Set_Scale(_vector{ 1.f,1.f,1.f });
+	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 95.f, _float3{ 0.f,1.f,0.f }, 27.f, _float3{ 0.f,0.f,1.f }, 20.f);
 
 	CCollider::COLLIDERDESC		ColliderDesc;
 	ColliderDesc.vSize = _float3(0.3f, 2.2f, 0.3f);
@@ -88,6 +89,7 @@ void CPlayerSword::LateTick(_float fTimeDelta)
 	_matrix _WorldMatrix;
 	_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix();
 
+	//m_pTrail->TrailOff();
 	if (!m_pTrail->Get_On())
 		m_pTrail->TrailOn(_WorldMatrix);
 	m_pTrail->Tick(fTimeDelta, _WorldMatrix);
@@ -123,6 +125,17 @@ HRESULT CPlayerSword::Render()
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 
+		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
+		{
+			m_bNomalTex = false;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+		}
+		else
+		{
+			m_bNomalTex = true;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+		}
+
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
 
@@ -137,6 +150,36 @@ HRESULT CPlayerSword::Render()
 		return E_FAIL;
 	m_pTrail->Render();
 	return S_OK;
+}
+
+void CPlayerSword::Collision(CGameObject * pOther, string sTag)
+{
+	if (sTag == "Monster_Body")
+	{
+		
+		_float4 vPos;
+		vPos.x = m_pOBB->Get_Collider().Center.x;
+		vPos.y = m_pOBB->Get_Collider().Center.y + 3.f;
+		vPos.z = m_pOBB->Get_Collider().Center.z;
+		vPos.w = 1.f;
+		GI->Set_StaticLight(0.2f, 8.f, vPos, 0);
+		CRM->Start_Shake(0.2f, 2.f, 0.03f);
+	}
+	
+
+}
+
+void CPlayerSword::Set_RHand()
+{
+	//오른손 보정값
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ 0.05f,0.f,0.f,1.f });
+	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 90.f, _float3{ 0.f,1.f,0.f }, 180.f, _float3{ 0.f,0.f,1.f }, 0.f);
+}
+
+void CPlayerSword::Set_Spine()
+{
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ -0.3f,0.f,-0.4f,1.f });
+	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 95.f, _float3{ 0.f,1.f,0.f }, 27.f, _float3{ 0.f,0.f,1.f }, 20.f);
 }
 
 CPlayerSword * CPlayerSword::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

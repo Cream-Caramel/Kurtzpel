@@ -10,6 +10,15 @@ CLight::CLight(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	Safe_AddRef(m_pContext);
 }
 
+HRESULT CLight::Set_StaticLight(_float fTimeLimit, _float fRange, _float4 vPos, _uint iIndex)
+{
+	m_LightDesc.bRender = true;
+	m_fTimeLimit = fTimeLimit;
+	m_LightDesc.fRange = fRange;
+	m_LightDesc.vPosition = vPos;
+	return S_OK;
+}
+
 HRESULT CLight::Initialize(const LIGHTDESC & LightDesc)
 {
 	m_LightDesc = LightDesc;
@@ -19,6 +28,8 @@ HRESULT CLight::Initialize(const LIGHTDESC & LightDesc)
 
 HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 {
+	
+
 	_uint		iPassIndex = 0;
 
 	if (LIGHTDESC::TYPE_DIRECTIONAL == m_LightDesc.eType)
@@ -30,22 +41,42 @@ HRESULT CLight::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 	}
 	else
 	{
+		if (FAILED(pShader->Set_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof(_float4))))
+			return E_FAIL;
+		if (FAILED(pShader->Set_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof(_float))))
+			return E_FAIL;
 		iPassIndex = 2;
 	}
-	if (FAILED(pShader->Set_RawValue("g_vLightDiffuse", &m_LightDesc.vDiffuse, sizeof(_float4))))
-		return E_FAIL;
+	if (m_LightDesc.bRender)
+	{
+		if (FAILED(pShader->Set_RawValue("g_vLightDiffuse", &m_LightDesc.vDiffuse, sizeof(_float4))))
+			return E_FAIL;
 
-	if (FAILED(pShader->Set_RawValue("g_vLightAmbient", &m_LightDesc.vAmbient, sizeof(_float4))))
-		return E_FAIL;
+		if (FAILED(pShader->Set_RawValue("g_vLightAmbient", &m_LightDesc.vAmbient, sizeof(_float4))))
+			return E_FAIL;
 
-	if (FAILED(pShader->Set_RawValue("g_vLightSpecular", &m_LightDesc.vSpecular, sizeof(_float4))))
-		return E_FAIL;
+		if (FAILED(pShader->Set_RawValue("g_vLightSpecular", &m_LightDesc.vSpecular, sizeof(_float4))))
+			return E_FAIL;
 
-	pShader->Begin(iPassIndex);
+		pShader->Begin(iPassIndex);
 
-	pVIBuffer->Render();
-
+		pVIBuffer->Render();
+	}
 	return S_OK;
+}
+
+void CLight::Tick(_float fTimeDelta)
+{
+	if (m_LightDesc.bRender)
+	{
+		m_fTimeLimitAcc += 1.f * fTimeDelta;
+		if (m_fTimeLimitAcc >= m_fTimeLimit)
+		{
+			m_fTimeLimitAcc = 0.f;
+			m_fTimeLimit = 0.f;
+			m_LightDesc.bRender = false;
+		}
+	}
 }
 
 CLight * CLight::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const LIGHTDESC & LightDesc)
