@@ -86,6 +86,8 @@ private:
 	void Set_FastComboTime(_float fTimeDelta);
 	void Hit_Shake();
 	void Change_WeaponPos();
+	void RockBreakVoice();
+	void RastAttackVoice();
 #pragma region PrivateFunction
 
 #pragma region KeyInput
