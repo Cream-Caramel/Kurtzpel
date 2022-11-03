@@ -425,11 +425,6 @@ HRESULT CGameInstance::StopAll()
 	return S_OK;
 }
 
-int CGameInstance::SoundIsPlay(const _uint & eID, bool & bPlay)
-{
-	return m_pSound_Manager->FMOD_Channel_IsPlaying;
-}
-
 void CGameInstance::Release_Engine()
 {
 	CLight_Manager::Get_Instance()->Destroy_Instance();

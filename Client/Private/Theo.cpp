@@ -80,6 +80,8 @@ HRESULT CTheo::Initialize(void * pArg)
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
 
+	
+
 	return S_OK;
 }
 
@@ -99,6 +101,8 @@ void CTheo::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
+
+	DebugKeyInput();
 
 	if (!m_bCollision)
 	{
@@ -133,6 +137,7 @@ void CTheo::LateTick(_float fTimeDelta)
 		m_bCollision = false;
 		m_bRHand = false;
 		m_bLHand = false;
+		GI->PlaySoundW(L"TheoDie.ogg", SD_MONSTERVOICE, 0.9f);
 	}
 
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.1f);
@@ -269,6 +274,7 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 				m_bFinish = false;
 				if (!m_bFinish)
 					UM->Set_Count(2);
+				GI->PlaySoundW(L"TheoGroggy.ogg", SD_MONSTERVOICE, 0.9f);
 				m_bPattern = false;
 				m_bLHand = false;
 				m_bRHand = false;
@@ -397,6 +403,33 @@ void CTheo::Set_NextAttack()
 	}
 }
 
+void CTheo::DebugKeyInput()
+{
+	if (GI->Key_Down(DIK_NUMPAD0))
+		Set_State(APPEAR);
+
+	if (GI->Key_Down(DIK_NUMPAD1))
+		Set_State(SKILL1);
+
+	if (GI->Key_Down(DIK_NUMPAD2))
+		Set_State(SKILL2);
+
+	if (GI->Key_Down(DIK_NUMPAD3))
+		Set_State(SKILL3);
+
+	if (GI->Key_Down(DIK_NUMPAD4))
+		Set_State(SKILL4);
+
+	if (GI->Key_Down(DIK_NUMPAD5))
+		Set_State(SKILL5);
+
+	if (GI->Key_Down(DIK_NUMPAD6))
+		Set_State(SKILL6);
+
+	if (GI->Key_Down(DIK_NUMPAD7))
+		Set_State(DOWN);
+}
+
 void CTheo::Set_State(STATE eState)
 {
 	if (m_eNextState == eState)
@@ -432,6 +465,7 @@ void CTheo::Set_State(STATE eState)
 		break;
 	case Client::CTheo::SKILL5:
 			m_fDamage = 20.f;
+			GI->PlaySoundW(L"TheoSkill5.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CTheo::SKILL6:
 		break;
@@ -546,8 +580,14 @@ void CTheo::Update(_float fTimeDelta)
 		break;
 	case Client::CTheo::RUN:
 	{
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0))
-			CRM->Start_Shake(0.3f, 2.5f, 0.03f);	
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			{
+				CRM->Start_Shake(0.3f, 2.5f, 0.03f);
+				GI->PlaySoundW(L"TheoRun.ogg", SD_MONSTER1, 1.f);
+			}
+		}
 		m_fRunSpeed = 6.f;
 		Set_Dir(); 
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
@@ -567,6 +607,8 @@ void CTheo::Update(_float fTimeDelta)
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
 				m_bLHand = true;
+				GI->PlaySoundW(L"TheoAttack1.ogg", SD_MONSTER1, 1.f);
+				GI->PlaySoundW(L"TheoSkill1.ogg", SD_MONSTERVOICE, 0.9f);
 				CRM->Start_Shake(0.3f, 3.f, 0.04f);
 				return;
 			}
@@ -585,6 +627,12 @@ void CTheo::Update(_float fTimeDelta)
 	case Client::CTheo::SKILL2:
 		m_bPattern = false;
 		m_bRHand = false;
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(6) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(7))
+		{
+			GI->PlaySoundW(L"TheoSkill2.ogg", SD_MONSTERVOICE, 0.9f);
+		}
+
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 4.f, m_pNavigation, fTimeDelta);
@@ -594,6 +642,7 @@ void CTheo::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
 			m_bRHand = true;
+			GI->PlaySoundW(L"TheoAttack1.ogg", SD_MONSTER1, 1.f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
 			return;
 		}
@@ -603,6 +652,8 @@ void CTheo::Update(_float fTimeDelta)
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 				m_bPattern = true;
 		}
+
+
 		break;
 	case Client::CTheo::SKILL3:
 		m_bCollision = false;
@@ -615,6 +666,8 @@ void CTheo::Update(_float fTimeDelta)
 		{
 			m_fDamage = 30.f;
 			m_bRHand = true;
+			GI->PlaySoundW(L"TheoAttack1.ogg", SD_MONSTER1, 1.f);
+			GI->PlaySoundW(L"TheoAppearAttack.ogg", SD_MONSTERVOICE, 0.9f);
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 4.f, m_pNavigation, fTimeDelta);
 			CRM->Start_Shake(0.3f, 3.f, 0.03f);
 			m_fRushSpeed = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION))) * 0.65f;
@@ -628,6 +681,8 @@ void CTheo::Update(_float fTimeDelta)
 		{
 			m_fDamage = 110.f;
 			m_bRHand = true;
+			GI->PlaySoundW(L"TheoAttack3.ogg", SD_MONSTER1, 1.f);
+			GI->PlaySoundW(L"TheoFinish.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.4f, 6.f, 0.05f);
 			return;
 		}
@@ -635,10 +690,12 @@ void CTheo::Update(_float fTimeDelta)
 	case Client::CTheo::SKILL4:
 		m_bRHand = false;
 		m_bPattern = false;
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(7))
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
+			GI->PlaySoundW(L"TheoAttack4.ogg", SD_MONSTER1, 1.f);
+			GI->PlaySoundW(L"TheoSkill4.ogg", SD_MONSTERVOICE, 0.9f);
 			m_bRHand = true;
 			return;
 		}
@@ -653,7 +710,8 @@ void CTheo::Update(_float fTimeDelta)
 		
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
 		{
-			CRM->Start_Shake(0.5f, 4.f, 0.03f);
+			GI->PlaySoundW(L"TheoSkill4_2.ogg", SD_MONSTERVOICE, 0.9f);
+			CRM->Start_Shake(0.4f, 5.f, 0.05f);
 			return;
 		}
 		break;
@@ -662,7 +720,7 @@ void CTheo::Update(_float fTimeDelta)
 		m_bRHand = false;
 		m_bPattern = false;
 		if (!m_pAnimModel->GetChangeBool())
-		{
+		{			
 			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
 			{
 				m_bPattern = true;
@@ -677,6 +735,7 @@ void CTheo::Update(_float fTimeDelta)
 			if (m_fRushShakeAcc >= m_fRushTempo)
 			{
 				m_fRushShakeAcc = 0.f;
+				GI->PlaySoundW(L"TheoRun.ogg", SD_MONSTER1, 1.f);
 				CRM->Start_Shake(0.3f, 3.f, 0.04f);
 			}
 			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed, m_pNavigation, fTimeDelta))
@@ -686,12 +745,14 @@ void CTheo::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(4) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
 		{
+			GI->PlaySoundW(L"TheoRun.ogg", SD_MONSTER1, 1.f);
 			CRM->Start_Shake(0.3f, 3.f, 0.04f);
 			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed, m_pNavigation, fTimeDelta))
 				Set_Dir();
 			m_bLHand = true;
 			m_bRHand = true;
 		}
+
 		break;
 	case Client::CTheo::SKILL6:
 		m_bPattern = false;
@@ -713,7 +774,8 @@ void CTheo::Update(_float fTimeDelta)
 				m_fNowMp += 3.f;
 				if (m_fNowMp >= 100.f)
 					m_bFinish = true;
-				CRM->Start_Shake(0.5f, 4.f, 0.03f);
+				GI->PlaySoundW(L"TheoSkill6.ogg", SD_MONSTERVOICE, 0.9f);
+				CRM->Start_Shake(0.6f, 5.f, 0.05f);
 			}
 		}
 
@@ -724,7 +786,19 @@ void CTheo::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CTheo::APPEAR:
-		Set_Dir();
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			Set_Dir();
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+			{
+				GI->PlaySoundW(L"TheoAppearAttack.ogg", SD_MONSTERVOICE, 0.9f);
+				CRM->Start_Shake(0.3f, 4.f, 0.04f);
+				return;
+			}
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+				GI->PlaySoundW(L"TheoAppear.ogg", SD_MONSTERVOICE, 0.9f);
+		
+		}
 		break;
 	case Client::CTheo::IDLE:
 		break;

@@ -57,6 +57,7 @@ private:
 	void Update(_float fTimeDelta); // 현재 상태에 따라 작업수행
 	HRESULT Ready_Sockets();
 	HRESULT Load_UI(char* DatName);
+	void DebugKeyInput();
 	
 private:
 	STATE m_eCurState; // 현재 상태
@@ -67,6 +68,7 @@ private:
 	_float m_fRunTempo = 0.f;
 	_float m_fRunTempoAcc = 0.f;
 private:
+	_bool m_bFinishTime = false;
 	_bool m_bFinishStart = false;
 	_bool m_bLHand = false;
 	_bool m_bRHand = false;

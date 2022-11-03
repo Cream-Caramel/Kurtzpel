@@ -35,7 +35,7 @@ void CMPBar::Tick(_float fTimeDelta)
 	{
 		if (UM->Get_PlayerState() == CPlayer::IDLE || UM->Get_PlayerState() == CPlayer::RUN)
 		{
-			m_fPlayerMp += 8.f * fTimeDelta;
+			m_fPlayerMp += 12.f * fTimeDelta;
 			UM->Set_PlayerMp(m_fPlayerMp);
 
 			if (m_fPlayerMp >= 100.f)

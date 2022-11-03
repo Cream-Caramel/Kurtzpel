@@ -61,7 +61,7 @@ private:
 	void Update(_float fTimeDelta); // 현재 상태에 따라 작업수행
 	HRESULT Ready_Sockets();
 	HRESULT Load_UI(char* DatName);
-	
+	void DebugKeyInput();
 private:
 	STATE m_eCurState; // 현재 상태
 	STATE m_eNextState; // 바꿔야할 상태

@@ -23,8 +23,11 @@ HRESULT CSound_Manager::Initialize()
 	if (m_pSystem == nullptr)
 		return E_FAIL;
 
-	LoadSoundFile(); 
-
+	LoadSoundFile("../../Client/Bin/Resources/Sounds/BGM/");
+	LoadSoundFile("../../Client/Bin/Resources/Sounds/Player/");
+	LoadSoundFile("../../Client/Bin/Resources/Sounds/Theo/");
+	LoadSoundFile("../../Client/Bin/Resources/Sounds/Golem/");
+	LoadSoundFile("../../Client/Bin/Resources/Sounds/Dragon/");
 	return S_OK;
 }
 
@@ -142,20 +145,24 @@ int CSound_Manager::Pause(const _uint & eID)
 	return 0;
 }
 
-void CSound_Manager::LoadSoundFile()
+void CSound_Manager::LoadSoundFile(const char* FilePath)
 {
 	// _finddata_t : <io.h>에서 제공하며 파일 정보를 저장하는 구조체
 	_finddata_t fd; 
-
+	string Path = FilePath;
+	string Exe = "*.*";
+	string FullPath = Path + Exe;
 	// _findfirst : <io.h>에서 제공하며 사용자가 설정한 경로 내에서 가장 첫 번째 파일을 찾는 함수
-	intptr_t handle = _findfirst("../../Client/Bin/Resources/Sounds/*.*", &fd);
-
+	//intptr_t handle = _findfirst("../../Client/Bin/Resources/Sounds/*.*", &fd);
+	intptr_t handle = _findfirst(FullPath.c_str(), &fd);
 	if (handle == -1)
 		return; 
 
 	int iResult = 0; 
 
-	char szCurPath[128] = "../../Client/Bin/Resources/Sounds/";
+	//char szCurPath[128] = "../../Client/Bin/Resources/Sounds/";
+	char szCurPath[128];
+	strcpy_s(szCurPath, sizeof(char) * 128, Path.c_str());
 	char szFullPath[128] = ""; 
 
 	while (iResult != -1)

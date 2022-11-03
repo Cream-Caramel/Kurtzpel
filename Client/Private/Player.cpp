@@ -217,6 +217,7 @@ void CPlayer::Collision(CGameObject * pOther, string sTag)
 					m_fNowHp = 0.f;
 					m_bDie = true;
 					Set_State(DIE);
+					GI->PlaySoundW(L"DieVoice.ogg", SD_PLAYERVOICE, 0.9f);
 				}
 
 				m_bCollision = false;
@@ -312,6 +313,7 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"HitBack.ogg", SD_PLAYERVOICE, 0.9f);
@@ -321,6 +323,7 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"HitFront.ogg", SD_PLAYERVOICE, 0.9f);
@@ -330,6 +333,7 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		m_bAction = false;
@@ -339,6 +343,7 @@ void CPlayer::Set_State(STATE eState)
 		{
 			m_bAction = false;
 			Change_WeaponPos();
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 		}
 		m_bAction = false;
 		break;
@@ -355,6 +360,7 @@ void CPlayer::Set_State(STATE eState)
 		{
 			m_bAction = false;
 			Change_WeaponPos();
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 		}
 		m_bAction = false;
 		GI->PlaySoundW(L"Jump.ogg", SD_PLAYER1, 0.6f);
@@ -367,6 +373,7 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		m_bAction = false;
@@ -378,6 +385,7 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"Dash.ogg", SD_PLAYER1, 0.6f);
@@ -398,6 +406,7 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		m_bAction = false;
@@ -409,6 +418,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
+		GI->PlaySoundW(L"Respawn.ogg", SD_PLAYERVOICE, 0.6f);
 		m_bAction = false;
 		CRM->Set_FovSpeed(60.f);
 		CRM->Set_FovDir(true);
@@ -419,6 +429,7 @@ void CPlayer::Set_State(STATE eState)
 		{
 			m_fRunSoundAcc = m_fRunSoundTempo - 0.01f;
 			m_bAction = false;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		m_fRunSpeed = 8.f;
@@ -440,6 +451,7 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"SpinComboStart.ogg", SD_PLAYER1, 0.6f);
@@ -455,6 +467,7 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"FastVoice.ogg", SD_PLAYERVOICE, 0.9f);
@@ -468,6 +481,7 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		m_bAction = true;
@@ -489,6 +503,7 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"ChargeVoice.ogg", SD_PLAYERVOICE, 0.9f);
@@ -501,6 +516,7 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"AttackVoice1.ogg", SD_PLAYERVOICE, 0.9f);
@@ -545,6 +561,7 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"VoidFront.ogg", SD_PLAYER1, 0.6f);
@@ -558,6 +575,7 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"VoidBack.ogg", SD_PLAYER1, 0.6f);
@@ -570,6 +588,7 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		int iRandom = GI->Get_Random(1, 2);
@@ -662,6 +681,7 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"BladeVoice.ogg", SD_PLAYERVOICE, 0.9f);
@@ -674,6 +694,7 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		m_bDoubleSlash = true;
@@ -690,6 +711,7 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"RockBreakStart.ogg", SD_PLAYER1, 0.6f);
@@ -706,6 +728,7 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"ChargeVoice.ogg", SD_PLAYERVOICE, 0.9f);
@@ -1621,6 +1644,14 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::DIE:
 		m_bCollision = false;
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
+		{
+			GI->PlaySoundW(L"Die_1.ogg", SD_PLAYER1, 0.9f);
+		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		{
+			GI->PlaySoundW(L"Die_2.ogg", SD_PLAYER2, 0.9f);
+		}
 		break;
 	case Client::CPlayer::RESPAWN:
 		m_bCollision = false;
@@ -1698,22 +1729,49 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fSpinComboStartSpeed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fSpinComboStartSpeed, m_pNavigation, fTimeDelta);
 		}
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		{
+			GI->PlaySoundW(L"AttackVoice4.ogg", SD_PLAYERVOICE, 0.6f);
+			GI->PlaySoundW(L"NormalCombo2.ogg", SD_PLAYER1, 0.6f);			
+		}
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+		{
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			
+		}
+		else
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
+
+
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2))
+		{
 			if (m_fSpinComboAcc >= 0.3f)
 			{
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				m_fSpinComboAcc = 0.f;
 			}
+		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1))
 		{
 			m_fSpinComboLoofAcc += 1.f * fTimeDelta;
-			if (m_fSpinComboLoofAcc >= m_fSpinComboLoofTempo)
+			if (m_fSpinComboLoofAcc >= 0.4f)
 			{
 				GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
 				m_fSpinComboLoofAcc = 0.f;
 			}
+
+			m_fSpinComboAcc += 1.f * fTimeDelta;
+			if (m_fSpinComboAcc >= 0.3f)
+			{
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				m_fSpinComboAcc = 0.f;
+			}
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		}
 		break;
 	case Client::CPlayer::FASTCOMBOEND:

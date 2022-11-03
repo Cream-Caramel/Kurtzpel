@@ -112,6 +112,8 @@ void CGolem::Tick(_float fTimeDelta)
 		}
 	}
 
+	DebugKeyInput();
+
 	if (m_bHit)
 	{
 		m_fHitAcc += 1.f * fTimeDelta;
@@ -480,8 +482,10 @@ void CGolem::Set_State(STATE eState)
 	case Client::CGolem::DOWN:
 		break;
 	case Client::CGolem::DIE:
+		GI->PlaySoundW(L"GolemDie.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CGolem::RTDOWN:
+		GI->PlaySoundW(L"GolemGroggy.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CGolem::RUN:
 		m_fRunTempo = 1.7f;
@@ -498,8 +502,10 @@ void CGolem::Set_State(STATE eState)
 			m_fDamage = 15.f;
 		break;
 	case Client::CGolem::SKILL4_1:
+		GI->PlaySoundW(L"GolemSkill4.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CGolem::SKILL4_2:
+		GI->PlaySoundW(L"GolemSkill4_2.ogg", SD_MONSTERVOICE, 0.9f);
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 10.f, 8.f, 10.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,4.f,0.f });
 			m_fDamage = 25.f;
@@ -507,6 +513,7 @@ void CGolem::Set_State(STATE eState)
 	case Client::CGolem::SKILL4_3:
 		break;
 	case Client::CGolem::SKILL5_1:
+		GI->PlaySoundW(L"GolemSkill5.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CGolem::SKILL5_2:
 		break;
@@ -515,25 +522,27 @@ void CGolem::Set_State(STATE eState)
 	case Client::CGolem::SKILL8:
 		break;
 	case Client::CGolem::SKILL9:
-		if (m_fNowMp >= 100.f)
-			m_fDamage = 20.f;
-		else
-			m_fDamage = 10.f;
+		m_fDamage = 15.f;
+		GI->PlaySoundW(L"GolemSkill9.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CGolem::SKILL10_1:
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 300.f, 300.f, 300.f });
 		m_fDamage = 110.f;
+		GI->PlaySoundW(L"GolemSkill10.ogg", SD_MONSTERVOICE, 0.9f);
 		m_bFinishStart = false;
 		break;
 	case Client::CGolem::SKILL10_2:
 		break;
 	case Client::CGolem::SKILL10_3:
+		m_bFinishTime = false;
 		break;
 	case Client::CGolem::STANDUP:
+		GI->PlaySoundW(L"GolemStand.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CGolem::START:
 		break;
 	case Client::CGolem::IDLE:
+		GI->PlaySoundW(L"GolemWait.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CGolem::STATE_END:
 		break;
@@ -657,6 +666,7 @@ void CGolem::Update(_float fTimeDelta)
 		if (m_fRunTempoAcc >= m_fRunTempo)
 		{
 			m_fRunTempoAcc = 0.f;
+			GI->PlaySoundW(L"GolemRun.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 3.5f, 0.04f);
 		}
 
@@ -681,13 +691,18 @@ void CGolem::Update(_float fTimeDelta)
 			}
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-		{
 			m_bPattern = true;
+		
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(7) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(8))
+		{
+			GI->PlaySoundW(L"GolemSkill1.ogg", SD_MONSTERVOICE, 0.9f);
 			return;
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
 			m_bRHand = true;
+			GI->PlaySoundW(L"GolemAttack1.ogg", SD_MONSTER1, 0.9f);
 			CRM->Start_Shake(0.2f, 3.f, 0.03f);
 			return;
 		}
@@ -702,12 +717,22 @@ void CGolem::Update(_float fTimeDelta)
 		{
 			m_fDamage = 15.f;
 			m_bLHand = true;
+			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
+			GI->PlaySoundW(L"GolemSkill1_2.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.2f, 4.f, 0.04f);
 		}
 		break;
 	case Client::CGolem::SKILL2:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			Set_Dir();
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+		{
+			GI->PlaySoundW(L"GolemSkill2.ogg", SD_MONSTERVOICE, 0.9f);
+			return;
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(4) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
+			GI->PlaySoundW(L"GolemSkill2_2.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CGolem::SKILL3:
 		m_bPattern = false;
@@ -720,12 +745,18 @@ void CGolem::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
 			m_bPattern = true;
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+		{
+			GI->PlaySoundW(L"GolemSkill3.ogg", SD_MONSTERVOICE, 0.9f);
 			return;
 		}
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
 			m_bAttack = true;
+			GI->PlaySoundW(L"GolemAttack3.ogg", SD_MONSTER1, 0.9f);
 			CRM->Start_Shake(0.3f, 5.f, 0.04f);
 		}
 		break;
@@ -743,6 +774,10 @@ void CGolem::Update(_float fTimeDelta)
 				return;
 			}
 
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+			{
+				GI->PlaySoundW(L"GolemRun.ogg", SD_MONSTERVOICE, 0.9f);
+			}
 
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
@@ -751,8 +786,12 @@ void CGolem::Update(_float fTimeDelta)
 				return;
 			}
 
-			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3))
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+			{
+				GI->PlaySoundW(L"GolemAttack4.ogg", SD_MONSTER1, 0.9f);
 				CRM->Start_Shake(0.4f, 5.f, 0.05f);
+
+			}
 		}
 		break;
 	case Client::CGolem::SKILL4_3:
@@ -778,15 +817,45 @@ void CGolem::Update(_float fTimeDelta)
 		break;
 	case Client::CGolem::SKILL8:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
+			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
+			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
+			return;
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+		{
+			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
+			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
+			return;
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(4) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
+		{
+			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
+			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
+			return;
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(6) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(7))
+		{
+			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
+			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
+			return;
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(10) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(11))
+		{
+		
+			GI->PlaySoundW(L"GolemSkill8_2.ogg", SD_MONSTERVOICE, 0.9f);
+			return;
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(8) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(9))
-			CRM->Start_Shake(0.4f, 6.f, 0.06f);
+		{
+			GI->PlaySoundW(L"GolemAttack1.ogg", SD_MONSTER1, 0.9f);
+			CRM->Start_Shake(0.5f, 6.f, 0.05f);
+			return;
+		}
 		break;
 	case Client::CGolem::SKILL9:
 		m_bPattern = false;
@@ -806,6 +875,7 @@ void CGolem::Update(_float fTimeDelta)
 
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
+				GI->PlaySoundW(L"GolemSkill9_2.ogg", SD_MONSTERVOICE, 0.9f);
 				m_bLHand = true;
 			}
 
@@ -833,9 +903,16 @@ void CGolem::Update(_float fTimeDelta)
 				return;
 			}
 
-			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 			{
+				if (!m_bFinishTime)
+				{
+					m_bFinishTime = true;
+					GI->PlaySoundW(L"GolemSkill10_1.ogg", SD_MONSTERVOICE, 0.9f);
+				}
 				GI->Set_Speed(L"Timer_Main", 1.f);
+				
+			
 				m_bAttack = true;
 			}
 					
@@ -850,8 +927,14 @@ void CGolem::Update(_float fTimeDelta)
 	case Client::CGolem::STANDUP:
 		break;
 	case Client::CGolem::START:
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
-			CRM->Start_Shake(0.4f, 3.f, 0.03f);
+		if (!m_pAnimModel->GetChangeBool())
+		{
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			{
+				GI->PlaySoundW(L"GolemStart.ogg", SD_MONSTERVOICE, 0.9f);
+				CRM->Start_Shake(0.4f, 3.f, 0.03f);
+			}
+		}
 		break;
 	case Client::CGolem::IDLE:
 		break;
@@ -974,6 +1057,42 @@ HRESULT CGolem::Load_UI(char* DatName)
 	CloseHandle(hFile);
 
 	return S_OK;
+}
+
+void CGolem::DebugKeyInput()
+{
+	if (GI->Key_Down(DIK_NUMPAD0))
+		Set_State(START);
+
+	if (GI->Key_Down(DIK_NUMPAD1))
+		Set_State(SKILL1);
+
+	if (GI->Key_Down(DIK_NUMPAD2))
+		Set_State(SKILL2);
+
+	if (GI->Key_Down(DIK_NUMPAD3))
+		Set_State(SKILL3);
+
+	if (GI->Key_Down(DIK_NUMPAD4))
+		Set_State(SKILL4_1);
+
+	if (GI->Key_Down(DIK_NUMPAD5))
+		Set_State(SKILL5_1);
+
+	if (GI->Key_Down(DIK_NUMPAD6))
+		Set_State(SKILL8);
+
+	if (GI->Key_Down(DIK_NUMPAD7))
+		Set_State(SKILL9);
+
+	if (GI->Key_Down(DIK_NUMPAD8))
+		Set_State(SKILL10_1);
+
+	if (GI->Key_Down(DIK_NUMPAD9))
+		Set_State(RTDOWN);
+
+	if (GI->Key_Down(DIK_M))
+		Set_State(STANDUP);
 }
 
 CGolem * CGolem::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

@@ -28,7 +28,6 @@ public:
 public:
 	void PlaySound(TCHAR* pSoundKey, const _uint& eID, const float& fVolume);
 	void PlayBGM(TCHAR * pSoundKey, const float& fVolume);
-	
 	void StopSound(const _uint& eID);
 	void StopAll();
 
@@ -40,7 +39,7 @@ public:
 	int  Pause(const _uint& eID);
 
 private:
-	void LoadSoundFile(); 
+	void LoadSoundFile(const char* FilePath); 
 
 private:
 	float m_volume = SOUND_DEFAULT;

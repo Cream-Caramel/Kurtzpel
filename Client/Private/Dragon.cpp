@@ -50,10 +50,10 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 50;
+	m_fMaxHp = 100;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
-	m_fNowMp = 30.f;
+	m_fNowMp = 90.f;
 	m_fDamage = 10.f;
 
 	m_fColiisionTime = 0.1f;
@@ -64,18 +64,18 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	Set_Dir();
 
-	//CNavigation::NAVIGATIONDESC NaviDesc;
-	//NaviDesc.iCurrentIndex = 1;
-	//if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-	//return E_FAIL;
-
 	CNavigation::NAVIGATIONDESC NaviDesc;
+	NaviDesc.iCurrentIndex = 1;
+	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
+	return E_FAIL;
+
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 172;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
 	m_pNavigation->Set_BattleIndex(145);
-	CRM->Start_Scene("Scene_Stage4Boss");
+	CRM->Start_Scene("Scene_Stage4Boss");*/
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -116,7 +116,7 @@ void CDragon::Tick(_float fTimeDelta)
 			m_bCollision = true;
 		}
 	}
-
+	DebugKeyInput();
 	if (m_bHit)
 	{
 		m_fHitAcc += 1.f * fTimeDelta;
@@ -143,6 +143,7 @@ void CDragon::LateTick(_float fTimeDelta)
 		m_bRHand = false;
 		m_bLHand = false;
 		m_bAttack = false;
+		GI->PlaySoundW(L"DragonDie.ogg", SD_MONSTERVOICE, 0.9f);
 	}
 
 	
@@ -284,6 +285,7 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 				m_bFinish = false;
 				if(!m_bFinish)
 					UM->Set_Count(2);
+				GI->PlaySoundW(L"DragonGroggy.ogg", SD_MONSTERVOICE, 0.9f);
 				m_bPattern = false;
 				m_bLHand = false;
 				m_bRHand = false;
@@ -511,6 +513,7 @@ void CDragon::Set_State(STATE eState)
 	switch (m_eNextState)
 	{
 	case Client::CDragon::BACKSTEP:
+		GI->PlaySoundW(L"DragonBackStep.ogg", SD_MONSTERVOICE, 0.9f);
 		XMStoreFloat3(&m_vBackStepLook, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - XMLoadFloat3(&PM->Get_PlayerPointer()->Get_Pos()));
 		break;
 	case Client::CDragon::DIE:
@@ -569,7 +572,7 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::SKILL10_2:
 		break;
 	case Client::CDragon::SKILL13:
-		if (m_fNowMp >= 100.f)
+		GI->PlaySoundW(L"DragonSkill13.ogg", SD_MONSTERVOICE, 0.9f);
 		m_fDamage = 30.f;
 		break;
 	case Client::CDragon::SKILL14_1:
@@ -588,8 +591,10 @@ void CDragon::Set_State(STATE eState)
 			CRM->Start_Shake(0.5f, 6.f, 0.07f);
 		break;
 	case Client::CDragon::IDLE:
+		GI->PlaySoundW(L"DragonWait.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CDragon::WALK:
+		GI->PlaySoundW(L"DragonWait.ogg", SD_MONSTERVOICE, 0.9f);
 		m_fWalkShakeAcc = 0.f;
 		break;
 	case Client::CDragon::FINISH:
@@ -660,9 +665,10 @@ void CDragon::End_Animation()
 			m_bFinish = false;
 			m_pAnimModel->Set_AnimIndex(SKILL7_2);
 			m_eNextState = SKILL7_2;
+			GI->PlaySoundW(L"DragonFinish.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.5f, 8.f, 0.04f);
 			break;
-		case Client::CDragon::SKILL7_2:	
+		case Client::CDragon::SKILL7_2:
 			m_pAnimModel->Set_AnimIndex(SKILL7_3);
 			m_eNextState = SKILL7_3;
 			break;
@@ -746,18 +752,35 @@ void CDragon::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
+			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		}
 		break;
 	case Client::CDragon::DIE:
 		break;
 	case Client::CDragon::GROGGYEND:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
+			GI->PlaySoundW(L"DragonFly.ogg", SD_MONSTERVOICE, 0.9f);
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+		{
+			m_bCollision = false;
+		}
 		break;
 	case Client::CDragon::GROGGYLOOF:
 		break;
 	case Client::CDragon::GROGGYSTART:
 		break;
 	case Client::CDragon::SKILL1:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+		{
+			GI->PlaySoundW(L"DragonFly.ogg", SD_MONSTERVOICE, 0.9f);
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+		{
+			GI->PlaySoundW(L"DragonFly.ogg", SD_MONSTERVOICE, 0.9f);
+		}
 		if (m_bFinishUpdate)
 		{
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
@@ -770,12 +793,15 @@ void CDragon::Update(_float fTimeDelta)
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			{
 				CRM->Start_Shake(0.3f, 5.f, 0.04f);
+				GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			}
+
 			return;
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
 			CRM->Start_Shake(0.3f, 5.f, 0.04f);
+			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 		}
 		break;
 	case Client::CDragon::SKILL3:
@@ -788,6 +814,15 @@ void CDragon::Update(_float fTimeDelta)
 				Set_Dir();
 				return;
 			}
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(9) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(10))
+		{
+			GI->PlaySoundW(L"DragonAttack1.ogg", SD_MONSTER1, 0.9f);
+		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(11) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(12))
+		{
+			GI->PlaySoundW(L"DragonAttack1_2.ogg", SD_MONSTER1, 0.9f);
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
 		{
@@ -809,7 +844,7 @@ void CDragon::Update(_float fTimeDelta)
 			m_bLHand = true;
 			return;
 		}
-		
+
 		break;
 	case Client::CDragon::SKILL4:
 		m_bPattern = false;
@@ -822,7 +857,18 @@ void CDragon::Update(_float fTimeDelta)
 				return;
 			}
 		}
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(7) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(8))
+		{
+			GI->PlaySoundW(L"DragonBottom.ogg", SD_MONSTER1, 0.5f);
+		}
 
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(9) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(10))
+		{
+			GI->PlaySoundW(L"DragonBottom.ogg", SD_MONSTER1, 0.5f);
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+			GI->PlaySoundW(L"DragonSkill4.ogg", SD_MONSTERVOICE, 0.9f);
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
 			m_bPattern = true;
@@ -830,14 +876,14 @@ void CDragon::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 			m_bAttack = true;
-		
+
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
 			if (m_fSkill4Speed >= 1.f)
 				m_fSkill4Speed -= 1.f;
-			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fSkill4Speed, m_pNavigation, fTimeDelta);	
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fSkill4Speed, m_pNavigation, fTimeDelta);
 		}
-		
+
 		break;
 	case Client::CDragon::SKILL5:
 		m_bPattern = false;
@@ -856,6 +902,11 @@ void CDragon::Update(_float fTimeDelta)
 			return;
 		}
 
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+		{
+			GI->PlaySoundW(L"DragonAttack5.ogg", SD_MONSTERVOICE, 0.9f);
+		}
+
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 		{
 			m_bLHand = true;
@@ -869,16 +920,30 @@ void CDragon::Update(_float fTimeDelta)
 				Set_Dir();
 				return;
 			}
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+			{
+				GI->PlaySoundW(L"DragonSkill6.ogg", SD_MONSTERVOICE, 0.9f);
+			}
 		}
 		break;
 	case Client::CDragon::SKILL7_1:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
+			GI->PlaySoundW(L"DragonBottom.ogg", SD_MONSTER1, 0.5f);
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+		{
+			GI->PlaySoundW(L"DragonBottom.ogg", SD_MONSTER1, 0.5f);
+		}
 		break;
 	case Client::CDragon::SKILL7_2:
-		if(!m_pAnimModel->GetChangeBool())
+		if (!m_pAnimModel->GetChangeBool())
 			m_bAttack = true;
 		break;
 	case Client::CDragon::SKILL7_3:
-			m_bAttack = false;
+		m_bAttack = false;
 		break;
 	case Client::CDragon::SKILL8:
 		m_bPattern = false;
@@ -890,7 +955,7 @@ void CDragon::Update(_float fTimeDelta)
 				Set_Dir();
 				return;
 			}
-			
+
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
 				m_bPattern = true;
@@ -900,6 +965,7 @@ void CDragon::Update(_float fTimeDelta)
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 			{
 				m_bAttack = true;
+				GI->PlaySoundW(L"DragonSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 				return;
 			}
 		}
@@ -919,6 +985,7 @@ void CDragon::Update(_float fTimeDelta)
 			if (m_fRushShakeAcc >= m_fRushTempo)
 			{
 				m_fRushShakeAcc = 0.f;
+				GI->PlaySoundW(L"DragonWalk.ogg", SD_MONSTERVOICE, 0.9f);
 				CRM->Start_Shake(0.3f, 3.f, 0.04f);
 			}
 			if (m_pTransformCom->Go_NoSlide(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta))
@@ -934,6 +1001,7 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_fRushShakeAcc >= m_fRushTempo)
 		{
 			m_fRushShakeAcc = 0.f;
+			GI->PlaySoundW(L"DragonWalk.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 3.f, 0.04f);
 		}
 		if (m_pTransformCom->Go_NoSlide(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta))
@@ -952,6 +1020,7 @@ void CDragon::Update(_float fTimeDelta)
 				if (m_fRushShakeAcc >= m_fRushTempo)
 				{
 					m_fRushShakeAcc = 0.f;
+					GI->PlaySoundW(L"DragonWalk.ogg", SD_MONSTERVOICE, 0.9f);
 					CRM->Start_Shake(0.3f, 3.f, 0.04f);
 				}
 				if (m_pTransformCom->Go_NoSlide(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta))
@@ -961,13 +1030,28 @@ void CDragon::Update(_float fTimeDelta)
 		}
 		break;
 	}
-	case Client::CDragon::SKILL10_1:	
+	case Client::CDragon::SKILL10_1:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
 			Set_Dir();
-			return;
+
 		}
-		
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+		{
+			GI->PlaySoundW(L"DragonFly.ogg", SD_MONSTERVOICE, 0.9f);
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(4) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
+		{
+
+			GI->PlaySoundW(L"DragonFly.ogg", SD_MONSTERVOICE, 0.9f);
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3))
+		{
+			m_bCollision = false;
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1))
 		{
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fFlyAttackSpeed, m_pNavigation, fTimeDelta);
@@ -975,6 +1059,12 @@ void CDragon::Update(_float fTimeDelta)
 		}
 		else
 			m_bAttack = false;
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+		{
+			GI->PlaySoundW(L"DragonFly_2.ogg", SD_MONSTERVOICE, 0.9f);
+		}
+		
 		break;
 	case Client::CDragon::SKILL10_2:
 		m_bPattern = true;
@@ -989,6 +1079,7 @@ void CDragon::Update(_float fTimeDelta)
 			}
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 			{
+				GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 				CRM->Start_Shake(0.3f, 4.f, 0.04f);
 			}
 			else
@@ -1016,6 +1107,7 @@ void CDragon::Update(_float fTimeDelta)
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
+			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			CRM->Start_Shake(0.4f, 4.f, 0.04f);
 		}
 
@@ -1027,10 +1119,10 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
 			m_bRHand = true;
-			return;		
+			return;
 		}
 
-		
+
 		break;
 	case Client::CDragon::SKILL14_1:
 		if (!m_pAnimModel->GetChangeBool())
@@ -1039,6 +1131,9 @@ void CDragon::Update(_float fTimeDelta)
 				m_bPattern = true;
 			else
 				m_bPattern = false;
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+				GI->PlaySoundW(L"DragonSkill14.ogg", SD_MONSTERVOICE, 0.9f);
 		}
 		break;
 	case Client::CDragon::SKILL14_2:
@@ -1054,6 +1149,17 @@ void CDragon::Update(_float fTimeDelta)
 		m_bAttack = false;
 		if (!m_pAnimModel->GetChangeBool())
 		{
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+			{
+				GI->PlaySoundW(L"DragonWing.ogg", SD_MONSTERVOICE, 0.9f);
+				return;
+			}
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+			{
+				m_bCollision = false;
+			}
+
 			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
 			{
 				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 3.f, m_pNavigation, fTimeDelta);
@@ -1063,19 +1169,25 @@ void CDragon::Update(_float fTimeDelta)
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			{
 				m_bAttack = true;
+				GI->PlaySoundW(L"DragonAttack15.ogg", SD_MONSTER1, 0.9f);
 				CRM->Start_Shake(0.4f, 6.f, 0.05f);
 				return;
 			}
-			
+
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
 				m_bPattern = true;
 			}
+
+			
 		}
 		break;
 	case Client::CDragon::START:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
+			GI->PlaySoundW(L"DragonStart.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.4f, 3.f, 0.03f);
+		}
 		break;
 	case Client::CDragon::IDLE:
 		break;
@@ -1085,18 +1197,22 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_fWalkShakeAcc >= m_fWalkTempo)
 		{
 			m_fWalkShakeAcc = 0.f;
+			GI->PlaySoundW(L"DragonWalk.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 3.f, 0.04f);
 		}
-		if(!m_pAnimModel->GetChangeBool())
+		if (!m_pAnimModel->GetChangeBool())
 			Set_Dir();
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		if (Distance > 8.f)
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRunSpeed, m_pNavigation, fTimeDelta);
 		else
 			Close_Attack();
-	}
 		break;
 	}
+
+	}
+
+	
 	
 }
 
@@ -1212,6 +1328,42 @@ HRESULT CDragon::Load_UI(char* DatName)
 	CloseHandle(hFile);
 
 	return S_OK;
+}
+
+void CDragon::DebugKeyInput()
+{
+	if (GI->Key_Down(DIK_NUMPAD0))
+		Set_State(BACKSTEP);
+
+	if (GI->Key_Down(DIK_NUMPAD1))
+		Set_State(SKILL1);
+
+	if (GI->Key_Down(DIK_NUMPAD2))
+		Set_State(SKILL3);
+
+	if (GI->Key_Down(DIK_NUMPAD3))
+		Set_State(SKILL4);
+
+	if (GI->Key_Down(DIK_NUMPAD4))
+		Set_State(SKILL5);
+
+	if (GI->Key_Down(DIK_NUMPAD5))
+		Set_State(SKILL6);
+
+	if (GI->Key_Down(DIK_NUMPAD6))
+		Set_State(SKILL7_1);
+
+	if (GI->Key_Down(DIK_NUMPAD7))
+		Set_State(SKILL8);
+
+	if (GI->Key_Down(DIK_NUMPAD8))
+		Set_State(SKILL15);
+
+	if (GI->Key_Down(DIK_NUMPAD9))
+		Set_State(SKILL13);
+
+	if (GI->Key_Down(DIK_M))
+		Set_State(SKILL10_1);
 }
 
 CDragon * CDragon::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

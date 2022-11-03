@@ -33,6 +33,7 @@ public:
 	HRESULT Ready_Collider();
 	void Set_NextMotion();
 	void Set_NextAttack();
+	void DebugKeyInput();
 
 private:
 	void Set_State(STATE eState); // 상태를 설정 보간을 하는 애니메이션은 여기서 애니메이션 셋팅

@@ -89,7 +89,9 @@ void CPlayerSword::LateTick(_float fTimeDelta)
 	_matrix _WorldMatrix;
 	_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix();
 
-	//m_pTrail->TrailOff();
+	if (!m_bTrail)
+		m_pTrail->TrailOff();
+
 	if (!m_pTrail->Get_On())
 		m_pTrail->TrailOn(_WorldMatrix);
 	m_pTrail->Tick(fTimeDelta, _WorldMatrix);
@@ -187,6 +189,13 @@ void CPlayerSword::Set_Spine()
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ -0.3f,0.f,-0.4f,1.f });
 	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 95.f, _float3{ 0.f,1.f,0.f }, 27.f, _float3{ 0.f,0.f,1.f }, 20.f);
 }
+
+void CPlayerSword::Set_Trail(_bool bTrail)
+{
+	m_bTrail = bTrail;
+}
+
+
 
 CPlayerSword * CPlayerSword::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {

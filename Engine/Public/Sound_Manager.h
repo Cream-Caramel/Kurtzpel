@@ -39,7 +39,7 @@ public:
 	int  Pause(const _uint& eID);
 
 private:
-	void LoadSoundFile(); 
+	void LoadSoundFile(const char* FilePath); 
 
 private:
 	float m_volume = SOUND_DEFAULT;
