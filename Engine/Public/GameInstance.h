@@ -99,6 +99,7 @@ public:/*For. Sound_Manager*/
 	HRESULT PlayBGM(TCHAR * pSoundKey, const float& fVolume);
 	HRESULT StopSound(const _uint& eID);
 	HRESULT StopAll();
+	
 
 private:
 	CGraphic_Device*				m_pGraphic_Device = nullptr;

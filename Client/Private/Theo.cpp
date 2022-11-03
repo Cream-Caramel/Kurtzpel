@@ -79,7 +79,6 @@ HRESULT CTheo::Initialize(void * pArg)
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
-	
 
 	return S_OK;
 }

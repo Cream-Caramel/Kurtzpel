@@ -54,8 +54,15 @@ void CAnimMesh::Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float f
 	m_pTransformCom->RotationThree(vAxis, fRadian, vAxis2, fRadian2, vAxis3, fRadian3);
 }
 
+_vector CAnimMesh::Get_vPos()
+{
+	return m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+}
+
 _float3 CAnimMesh::Get_Pos()
 {
+	if (this == nullptr)
+		return _float3{ 10000.f, 0.f, 0.f };
 	_float3 Pos;
 	XMStoreFloat3(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	return Pos;

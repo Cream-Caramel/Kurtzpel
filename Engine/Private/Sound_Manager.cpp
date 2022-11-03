@@ -83,6 +83,7 @@ void CSound_Manager::PlayBGM(TCHAR * pSoundKey, const float& fVolume)
 	//FMOD_System_Update(m_pSystem);
 }
 
+
 void CSound_Manager::StopSound(const _uint& eID)
 {
 	m_pChannelArr[eID]->stop();

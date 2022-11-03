@@ -40,6 +40,7 @@ public:
 
 public:
 	void Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3);
+	_vector Get_vPos();
 	_float3 Get_Pos();
 	void Set_Pos(_float4 Pos);
 	const _tchar* Get_Tag() { return sTag.c_str(); }

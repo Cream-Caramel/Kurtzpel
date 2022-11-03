@@ -16,7 +16,7 @@ private:
 public:
 	void Add_Player(CPlayer* pPlayer);
 	CPlayer* Get_PlayerPointer() { return m_pPlayer; }
-
+	CAnimMesh* Get_BossPointer() { return m_pBoss; }
 	void Add_CameraPlayer(CCamera_Player* pCameraPlayer);
 	CCamera_Player* Get_CameraPlayer() { return m_pCameraPlayer; }
 	_float3 Get_CameraPlayerPos();

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\SkillFrame.h"
-
+#include "Pointer_Manager.h"
 
 CSkillFrame::CSkillFrame(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)
@@ -99,11 +99,11 @@ HRESULT CSkillFrame::Render()
 		if (FAILED(m_pShaderCom->Begin(PASS_COOLTIMEON)))
 			return E_FAIL;
 	}
-
+	
 	else if (!UM->Get_UseSkill())
 	{
 		if (FAILED(m_pShaderCom->Begin(PASS_IMPOSSIBLE)))
-			return E_FAIL;
+			return E_FAIL;	
 	}
 
 	else
@@ -129,7 +129,7 @@ void CSkillFrame::Setting()
 	else if (m_UIInfo->UIPosX == 290)
 	{
 		m_fCoolTime = 0.f;
-		m_fMaxCoolTime = 2.f;	
+		m_fMaxCoolTime = 10.f;	
 		m_iIndex = 1;
 	}
 	else if (m_UIInfo->UIPosX == 350)

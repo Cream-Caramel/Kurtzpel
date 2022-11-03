@@ -70,6 +70,7 @@ public:
 	HRESULT Create_Navigation(char* FileName);
 	void Set_bBattle(_bool bBattle) { m_bBattle = bBattle; }
 	void Reset_BattleIndex();
+	_bool Get_bJump();
 #pragma endregion MainFunction
 
 #pragma region UtilFunction
@@ -122,8 +123,10 @@ private:
 	void GroundRun_KeyInput(_float fTimeDelta);
 	void LeapReady_KeyInput(_float fTimeDelta);
 	void LeapRun_KeyInput(_float fTimeDelta);
+	void Ex1Attack_keyInput(_float fTimeDelta);
 	void Ex1Ready_KeyInput(_float fTimeDelta);
 	void Ex2Ready_KeyInput(_float fTimeDelta);
+
 #pragma endregion KeyInput
 
 #pragma region Variable
@@ -135,7 +138,7 @@ private:
 	_bool m_bRespawn = false; // 리스폰중인지 
 	_bool m_bDoubleSlash = false; //EX스킬중인지
 	_bool m_bDoubleSlashFov = false; //EX스킬 확대중인지
-	_bool m_bSpinCombo = false;
+	_bool m_bSpinCombo = false; // 스핀콤보중인지
 
 	_float m_fJumpSpeed = 15.f; // 점프중 스피드
 	_float m_fRunSpeed = 8.f; // 달리기이동스피드
@@ -161,6 +164,11 @@ private:
 	_float m_fChargeCrashSpeed = 6.f; //ChargeCrash 전진속도
 	_float m_fSpinComboAcc = 0.f; //스핀콤보 히트간격
 	_float m_fFastComboAcc = 0.f; //패스트콤보 히트간격
+	_float m_fRunSoundAcc = 0.f; //달리기 사운드 누적
+	_float m_fRunSoundTempo = 0.3f; //달리기 사운드 간격
+	_float m_fSpinComboLoofAcc = 0.f;
+	_float m_fSpinComboLoofTempo = 0.4f;
+	_float m_fEx1AttackSpeed = 0.f;
 	
 #pragma endregion Variable
 

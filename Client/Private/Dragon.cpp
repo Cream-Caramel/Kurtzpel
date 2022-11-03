@@ -50,7 +50,7 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 400;
+	m_fMaxHp = 50;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 30.f;
@@ -514,8 +514,6 @@ void CDragon::Set_State(STATE eState)
 		XMStoreFloat3(&m_vBackStepLook, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - XMLoadFloat3(&PM->Get_PlayerPointer()->Get_Pos()));
 		break;
 	case Client::CDragon::DIE:
-		PM->Delete_Boss();
-		Set_Dead();
 		break;
 	case Client::CDragon::GROGGYEND:
 		break;
@@ -628,6 +626,8 @@ void CDragon::End_Animation()
 			Set_NextAttack();
 			break;
 		case Client::CDragon::DIE:
+			PM->Delete_Boss();
+			Set_Dead();
 			break;
 		case Client::CDragon::GROGGYEND:
 			Set_NextMotion();

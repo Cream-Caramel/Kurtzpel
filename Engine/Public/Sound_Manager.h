@@ -28,7 +28,6 @@ public:
 public:
 	void PlaySound(TCHAR* pSoundKey, const _uint& eID, const float& fVolume);
 	void PlayBGM(TCHAR * pSoundKey, const float& fVolume);
-	
 	void StopSound(const _uint& eID);
 	void StopAll();
 

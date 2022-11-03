@@ -40,7 +40,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 	
 	CTrail::TRAILINFO TrailInfo;
 	TrailInfo._HighAndLow = TrailPos;
-	TrailInfo._Color = _float4{ 1.f,0.5f,0.f,1.f };
+	TrailInfo._Color = _float4{ 0.3f,0.3f,0.3f,1.f };
 	
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"Prototype_Component_Trail", TEXT("SwordTrail"), (CComponent**)&m_pTrail,&TrailInfo)))
 		return E_FAIL;
@@ -156,7 +156,8 @@ void CPlayerSword::Collision(CGameObject * pOther, string sTag)
 {
 	if (sTag == "Monster_Body")
 	{
-		
+
+		GI->PlaySoundW(L"SwordHit.ogg", SD_PLAYER1, 0.6f);
 		_float4 vPos;
 		vPos.x = m_pOBB->Get_Collider().Center.x;
 		vPos.y = m_pOBB->Get_Collider().Center.y + 3.f;
@@ -167,6 +168,11 @@ void CPlayerSword::Collision(CGameObject * pOther, string sTag)
 	}
 	
 
+}
+
+void CPlayerSword::Set_OBB(_float3 vSize)
+{
+	m_pOBB->ChangeExtents(_float3{ vSize.x, vSize.y, vSize.z });
 }
 
 void CPlayerSword::Set_RHand()

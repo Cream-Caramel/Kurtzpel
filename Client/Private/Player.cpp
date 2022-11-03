@@ -355,6 +355,7 @@ void CPlayer::Set_State(STATE eState)
 			Change_WeaponPos();
 		}
 		m_bAction = false;
+		GI->PlaySoundW(L"Jump.ogg", SD_PLAYER1, 0.6f);
 		m_pTransformCom->Set_Jump(true);
 		m_pTransformCom->Set_Gravity(0.f);
 		m_pTransformCom->Set_JumpPower(0.6f);
@@ -377,6 +378,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
+		GI->PlaySoundW(L"Dash.ogg", SD_PLAYER1, 0.6f);
 		m_bAction = false;
 		m_fNowMp -= 5.f;
 		m_fDashSpeed = 20.f;
@@ -413,6 +415,7 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::RUN:	
 		if (m_bAction)
 		{
+			m_fRunSoundAcc = m_fRunSoundTempo - 0.01f;
 			m_bAction = false;
 			Change_WeaponPos();
 		}
@@ -437,6 +440,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
+		GI->PlaySoundW(L"SpinComboStart.ogg", SD_PLAYER1, 0.6f);
 		CRM->Start_Fov(50.f, 100.f);
 		m_fNowMp -= 15.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(2.f);
@@ -467,10 +471,12 @@ void CPlayer::Set_State(STATE eState)
 		m_bAction = true;
 		m_fNowMp -= 5.f;
 		m_fRockBreakSpeed = 6.f;
+		GI->PlaySoundW(L"RockBreakStart.ogg", SD_PLAYER1, 0.6f);
 		m_Parts[PARTS_SWORD]->Set_Damage(1.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::CHARGECRASH:
+		GI->PlaySoundW(L"SpinComboEnd.ogg", SD_PLAYER1, 0.6f); 
 		m_fChargeCrashSpeed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(100.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
@@ -482,6 +488,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
+		GI->PlaySoundW(L"ChargeReady.ogg", SD_PLAYER1, 0.6f);
 		m_bMotionChange = false;
 		CRM->Start_Fov(30.f, 20.f);
 		m_fNowMp -= 20.f;
@@ -519,7 +526,6 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::AIRCOMBOEND:
 		CRM->Start_Fov(50.f, 140.f);
 		CRM->Set_FovDir(true);
-		GI->PlaySoundW(L"AirComboEnd.ogg", SD_PLAYER1, 0.6f);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		CRM->Set_FovDir(true);
 		m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -533,6 +539,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
+		GI->PlaySoundW(L"VoidFront.ogg", SD_PLAYER1, 0.6f);
 		CRM->Start_Fov(40.f, 100.f);
 		CRM->Set_FovDir(true);
 		m_fNowMp -= 10.f;
@@ -545,6 +552,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
+		GI->PlaySoundW(L"VoidBack.ogg", SD_PLAYER1, 0.6f);
 		CRM->Start_Fov(40.f, 70.f);
 		CRM->Set_FovDir(true);
 		m_fNowMp -= 10.f;
@@ -555,7 +563,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
-		GI->PlaySoundW(L"NomalCombo1.ogg", SD_PLAYER1, 0.6f);
+		GI->PlaySoundW(L"NormalCombo1.ogg", SD_PLAYER1, 0.6f);
 		CRM->Start_Fov(50.f, 90.f);
 		m_fNC1Speed = 5.f;
 		m_fNomalCombo1Acc = 0.f;
@@ -565,7 +573,7 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
 		CRM->Fix_Fov(40.f, 90.f);
-		GI->PlaySoundW(L"NomalCombo2.ogg", SD_PLAYER1, 0.6f);
+		GI->PlaySoundW(L"NormalCombo2.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
 		m_fNC2Speed = 5.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(7.f);
@@ -573,7 +581,7 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
 		CRM->Fix_Fov(30.f, 90.f);
-		GI->PlaySoundW(L"NomalCombo3.ogg", SD_PLAYER1, 0.6f);
+		GI->PlaySoundW(L"NormalCombo3.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 5.f;
 		m_fNC3Speed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(8.f);
@@ -581,7 +589,7 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
 		CRM->Fix_Fov(30.f, 90.f);
-		GI->PlaySoundW(L"NomalCombo4.ogg", SD_PLAYER1, 0.6f);
+		GI->PlaySoundW(L"NormalCombo4.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 5.f;
 		m_fNC4Speed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
@@ -591,6 +599,7 @@ void CPlayer::Set_State(STATE eState)
 		CRM->Fix_Fov(40.f, 90.f);
 		m_fNowMp -= 3.f;
 		m_fNC5Speed = 5.f;
+		GI->PlaySoundW(L"NormalCombo5.ogg", SD_PLAYER1, 0.6f);
 		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
@@ -598,6 +607,7 @@ void CPlayer::Set_State(STATE eState)
 		CRM->Fix_Fov(30.f, 90.f);
 		m_fNowMp -= 5.f;
 		m_fNC6Speed = 8.f;
+		GI->PlaySoundW(L"RockBreakStart.ogg", SD_PLAYER1, 0.6f);
 		m_Parts[PARTS_SWORD]->Set_Damage(20.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
@@ -634,6 +644,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
+		GI->PlaySoundW(L"BladeAttackStart.ogg", SD_PLAYER1, 1.f);
 		m_fNowMp -= 20.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(10);
@@ -646,6 +657,7 @@ void CPlayer::Set_State(STATE eState)
 		}
 		m_bDoubleSlash = true;
 		m_fNowMp -= 30.f;
+		GI->PlaySoundW(L"DoubleSlash.ogg", SD_PLAYER2, 0.6f);
 		m_Parts[PARTS_SWORD]->Set_Damage(5.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(30);
 		break;
@@ -653,17 +665,32 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::EX1ATTACK:
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
+		GI->PlaySoundW(L"RockBreakStart.ogg", SD_PLAYER1, 0.6f);
+		if(m_fEx1AttackSpeed != 15.1f)
+			XMStoreFloat3(&m_vTargetLook, XMLoadFloat3(&PM->Get_BossPointer()->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		
 		break;
 	case Client::CPlayer::EX2ATTACK:
 		
-		break;
 	case Client::CPlayer::EX1READY:
 		
 		break;
 	case Client::CPlayer::EX2READY:	
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
+		GI->PlaySoundW(L"ChargeReady.ogg", SD_PLAYER1, 0.6f);
+		m_fNowMp -= 20.f;
+		m_Parts[PARTS_SWORD]->Set_Damage(70.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
-	
 	}
 	for (int i = 0; i < MODEL_END; ++i)
 	{
@@ -797,13 +824,17 @@ void CPlayer::End_Animation()
 			m_fSpinComboEndSpeed = 6.f;
 			CRM->Fix_Fov(30.f, 160.f);
 			CRM->Set_FovDir(true);
+			GI->PlaySoundW(L"SpinComboEnd.ogg", SD_PLAYER1, 0.6f);
 			}
+			
 			m_Parts[PARTS_SWORD]->Set_Damage(5.f);
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::SPINCOMBOSTART:
 			for (int i = 0; i < MODEL_END; ++i)
-				m_pAnimModel[i]->Set_AnimIndex(SPINCOMBOLOOF);			
+				m_pAnimModel[i]->Set_AnimIndex(SPINCOMBOLOOF);		
+	
+			m_fSpinComboLoofAcc = m_fSpinComboLoofTempo - 0.01f;
 			m_eNextState = SPINCOMBOLOOF;
 			m_Parts[PARTS_SWORD]->Set_Damage(2.f);
 			m_fSpinComboSpeed = 2.f;
@@ -825,6 +856,7 @@ void CPlayer::End_Animation()
 			m_fFastComboEndSpeed = 8.f;		
 			CRM->Fix_Fov(30.f, 160.f);
 			CRM->Set_FovDir(true);
+			GI->PlaySoundW(L"FastComboEnd.ogg", SD_PLAYER1, 0.6f);
 			break;
 		case Client::CPlayer::ROCKBREAK:
 			Set_State(IDLE);
@@ -927,6 +959,8 @@ void CPlayer::End_Animation()
 		case Client::CPlayer::ROCKSHOT:
 			break;
 		case Client::CPlayer::EX1ATTACK:
+			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::EX2ATTACK:
 			break;
@@ -1074,6 +1108,9 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 	case Client::CPlayer::LEAPRUN:
 		LeapRun_KeyInput(fTimeDelta);
 		break;
+	case Client::CPlayer::EX1ATTACK:
+		Ex1Attack_keyInput(fTimeDelta);
+		break;
 	case Client::CPlayer::EX1READY:
 		Ex1Ready_KeyInput(fTimeDelta);
 		break;
@@ -1085,46 +1122,77 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 
 void CPlayer::Set_FastComboTime(_float fTimeDelta)
 {
+	
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 	{
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
+	
+		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		
 		return;
 	}
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
 	{
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
 		return;
 	}
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(5) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(6))
 	{
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
 		return;
 	}
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(7) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(8))
 	{
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
 		return;
 	}
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(9) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(10))
 	{
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
 		return;
 	}
 
-	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(10))
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(11) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(12))
 	{
-		m_fFastComboAcc += 1.f * fTimeDelta;
-		if (m_fFastComboAcc >= 0.4f)
-		{
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			m_fFastComboAcc = 0.f;
-		}
-		else
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		return;
+	}
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(13) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(14))
+	{
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		return;
+	}
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(15) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(16))
+	{
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		return;
+	}
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(17) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(18))
+	{
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		return;
+	}
+
+	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(19) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(20))
+	{
+		m_Parts[PARTS_SWORD]->Set_Collision(true);
+		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		return;
 	}
 
 	else
@@ -1428,6 +1496,7 @@ void CPlayer::Update(_float fTimeDelta)
 			{
 				m_pTransformCom->Set_Jump(false);
 				m_pTransformCom->Set_Gravity(0.f);
+				GI->PlaySoundW(L"JumpEnd.ogg", SD_PLAYER1, 0.6f);
 				Set_State(JUMPEND);
 				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
 			}
@@ -1466,12 +1535,22 @@ void CPlayer::Update(_float fTimeDelta)
 		m_bCollision = false;
 		break;
 	case Client::CPlayer::RUN:
-		m_bMotionChange = true;
-		//GI->PlaySoundW(L"Run.ogg", SD_PLAYER1, 0.6f);
+		
 		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			CRM->Set_FovSpeed(150.f);
-			CRM->Set_FovDir(true);
+			m_bMotionChange = true;
+			m_fRunSoundAcc += 1.f * fTimeDelta;
+			if (m_fRunSoundAcc >= m_fRunSoundTempo)
+			{
+				GI->PlaySoundW(L"Run.ogg", SD_PLAYER1, 0.6f);
+				m_fRunSoundAcc = 0.f;
+			}
+			
+			if (CRM->Get_bFov())
+			{
+				CRM->Set_FovSpeed(150.f);
+				CRM->Set_FovDir(true);
+			}
 		}	
 		m_bUseSkill = true;
 		for (int i = 0; i < OBB_END; ++i)
@@ -1504,6 +1583,14 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::SPINCOMBOLOOF:
 		m_bMotionChange = false;
+
+		m_fSpinComboLoofAcc += 1.f * fTimeDelta;
+		if (m_fSpinComboLoofAcc >= m_fSpinComboLoofTempo)
+		{
+			GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+			m_fSpinComboLoofAcc = 0.f;
+		}
+
 		m_fSpinComboAcc += 1.f * fTimeDelta;
 		if (m_fSpinComboAcc >= 0.3f)
 		{
@@ -1526,10 +1613,17 @@ void CPlayer::Update(_float fTimeDelta)
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				m_fSpinComboAcc = 0.f;
 			}
-			else
-				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1))
+		{
+			m_fSpinComboLoofAcc += 1.f * fTimeDelta;
+			if (m_fSpinComboLoofAcc >= m_fSpinComboLoofTempo)
+			{
+				GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+				m_fSpinComboLoofAcc = 0.f;
+			}
+		}
 		break;
 	case Client::CPlayer::FASTCOMBOEND:
 		m_bMotionChange = false;
@@ -1565,6 +1659,7 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
+			GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			CRM->Start_Shake(0.3f, 2.f, 0.02f);
 		}
@@ -1581,6 +1676,7 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
+			GI->PlaySoundW(L"ChargeAttack.ogg", SD_PLAYER1, 0.6f);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			CRM->Start_Shake(0.4f, 6.f, 0.05f);
 			CRM->Set_FovSpeed(150.f);
@@ -1674,6 +1770,7 @@ void CPlayer::Update(_float fTimeDelta)
 				if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
 				{
 					m_pTransformCom->Set_Jump(false);
+					GI->PlaySoundW(L"AirComboEnd.ogg", SD_PLAYER1, 0.6f);
 					m_pTransformCom->Set_Gravity(0.f); 
 					Set_State(AIRCOMBOEND);
 					m_pTransformCom->Set_JumpEndPos(m_pNavigation);
@@ -1793,23 +1890,14 @@ void CPlayer::Update(_float fTimeDelta)
 		m_bMotionChange = false;
 		if (m_fNC6Speed > 0.f)
 		{		
-			if (m_fNC6Speed >= 4.f)
-			{
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,0.05f,0.f,0.f });
-			}
-			else
-			{
-				m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,-0.05f,0.f,0.f });
-			}
 			m_fNC6Speed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC6Speed, m_pNavigation, fTimeDelta);
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			CRM->Start_Fov(70.f, 100.f);
-			CRM->Set_FovDir(true);
-			CRM->Start_Shake(0.3f, 3.f, 0.02f);
+			GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
+			CRM->Start_Shake(0.3f, 3.f, 0.03f);
 		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -1837,6 +1925,8 @@ void CPlayer::Update(_float fTimeDelta)
 		m_bMotionChange = false;
 		if (m_bDoubleSlashFov)
 			CRM->Start_Fov(30.f, 20.f);
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+			GI->PlaySoundW(L"BladeAttack.ogg", SD_PLAYER1, 0.6f);
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -1869,6 +1959,7 @@ void CPlayer::Update(_float fTimeDelta)
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			GI->PlaySoundW(L"DoubleSlashStart.ogg", SD_PLAYER1, 0.6f);
 			return;
 		}
 
@@ -1892,6 +1983,26 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::ROCKSHOT:
 		break;
 	case Client::CPlayer::EX1ATTACK:
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
+		{
+			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fEx1AttackSpeed, m_pNavigation, fTimeDelta);
+			return;
+		}
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
+		{
+			GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			CRM->Start_Shake(0.4f, 6.f, 0.05f);
+			CRM->Set_FovDir(true);
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3{ 12.f,12.f,12.f });
+			return;
+		}
+		else
+		{
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3(0.3f, 2.2f, 0.3f));
+		}
 		break;
 	case Client::CPlayer::EX2ATTACK:
 		break;
@@ -1991,6 +2102,11 @@ void CPlayer::Reset_BattleIndex()
 	m_pNavigation->Set_BattleIndex(-1);
 }
 
+_bool CPlayer::Get_bJump()
+{
+	return m_pTransformCom->Get_Jump();
+}
+
 void CPlayer::Jump_KeyInput(_float fTimeDelta)
 {
 	Input_Direction();
@@ -2057,13 +2173,23 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_LSHIFT))
 	{
-			Set_State(DASH);	
+		Set_State(DASH);	
 		return;
 	}
 
 	if (GI->Mouse_Down(DIMK_LBUTTON))
 	{
 		Set_State(NOMALCOMBO1);
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_E))
+	{
+		if (!UM->Get_CoolTime(1))
+		{
+			UM->Set_CoolTime(1);
+			Set_State(EX2READY);
+		}
 		return;
 	}
 
@@ -2108,8 +2234,7 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 		if (m_fNowMp >= 30.f && UM->Get_ExGaugeTex() >= 43)
 		{
 			Set_State(SLASHATTACK);
-			UM->Reset_ExGaugeTex();
-			
+			UM->Reset_ExGaugeTex();		
 		}
 		return;
 	}
@@ -2124,13 +2249,11 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
+	if (GI->Key_Pressing(DIK_4))
 	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
-			Set_State(ROCKBREAK);
-		}
+		
+		Set_State(ROCKBREAK);
+		
 		return;
 	}
 
@@ -2157,105 +2280,116 @@ void CPlayer::Dash_KeyInput(_float fTimeDelta)
 
 void CPlayer::Run_KeyInput(_float fTimeDelta)
 {
-	if (GI->Key_Pressing(DIK_LSHIFT))
+	if (!m_pAnimModel[0]->GetChangeBool())
 	{
-		Set_State(DASH);
-		return;
-	}
-
-	if (GI->Mouse_Down(DIMK_LBUTTON))
-	{
-		Set_State(NOMALCOMBO1);
-		return;
-	}
-
-	if (GI->Key_Pressing(DIK_C))
-	{
-		if (!UM->Get_CoolTime(4))
+		if (GI->Key_Pressing(DIK_LSHIFT))
 		{
-			UM->Set_CoolTime(4);
-			Set_State(VOIDFRONT);
+			Set_State(DASH);
+			return;
 		}
-		return;
-	}
 
-	if (GI->Key_Pressing(DIK_V))
-	{
-		if (!UM->Get_CoolTime(4))
+		if (GI->Mouse_Down(DIMK_LBUTTON))
 		{
-			UM->Set_CoolTime(4);
-			Set_State(VOIDBACK);
+			Set_State(NOMALCOMBO1);
+			return;
 		}
-		return;
-	}
 
-	if (GI->Key_Pressing(DIK_SPACE))
-	{
-		Set_State(JUMPSTART);
-		return;
-	}
-
-	if (GI->Key_Pressing(DIK_F))
-	{
-		if (!UM->Get_CoolTime(2))
+		if (GI->Key_Pressing(DIK_C))
 		{
-			UM->Set_CoolTime(2);
-			Set_State(BLADEATTACK);
+			if (!UM->Get_CoolTime(4))
+			{
+				UM->Set_CoolTime(4);
+				Set_State(VOIDFRONT);
+			}
+			return;
 		}
-			
-		return;
-	}
 
-	if (GI->Key_Pressing(DIK_R))
-	{
-		if (m_fNowMp >= 30.f && UM->Get_ExGaugeTex() >= 43)
+		if (GI->Key_Pressing(DIK_E))
 		{
-			Set_State(SLASHATTACK);
-			UM->Reset_ExGaugeTex();
+			if (!UM->Get_CoolTime(1))
+			{
+				UM->Set_CoolTime(1);
+				Set_State(EX2READY);
+			}
+			return;
 		}
-		return;
-	}
 
-	if (GI->Key_Pressing(DIK_Q))
-	{
-		if (!UM->Get_CoolTime(0))
+		if (GI->Key_Pressing(DIK_V))
 		{
-			UM->Set_CoolTime(0);
-			Set_State(FASTCOMBOSTART);
+			if (!UM->Get_CoolTime(4))
+			{
+				UM->Set_CoolTime(4);
+				Set_State(VOIDBACK);
+			}
+			return;
 		}
-		return;
-	}
 
-	if (GI->Key_Pressing(DIK_E))
-	{
-		if (!UM->Get_CoolTime(1))
+		if (GI->Key_Pressing(DIK_SPACE))
 		{
-			UM->Set_CoolTime(1);
+			Set_State(JUMPSTART);
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_F))
+		{
+			if (!UM->Get_CoolTime(2))
+			{
+				UM->Set_CoolTime(2);
+				Set_State(BLADEATTACK);
+			}
+
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_R))
+		{
+			if (m_fNowMp >= 30.f && UM->Get_ExGaugeTex() >= 43)
+			{
+				Set_State(SLASHATTACK);
+				UM->Reset_ExGaugeTex();
+			}
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_Q))
+		{
+			if (!UM->Get_CoolTime(0))
+			{
+				UM->Set_CoolTime(0);
+				Set_State(FASTCOMBOSTART);
+			}
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_4))
+		{
+		
 			Set_State(ROCKBREAK);
+			
+			return;
 		}
-		return;
-	}
 
-	if (GI->Key_Pressing(DIK_TAB))
-	{
-		if (!UM->Get_CoolTime(3))
+		if (GI->Key_Pressing(DIK_TAB))
 		{
-			UM->Set_CoolTime(3);
-			Set_State(CHARGEREADY);
+			if (!UM->Get_CoolTime(3))
+			{
+				UM->Set_CoolTime(3);
+				Set_State(CHARGEREADY);
+			}
+			return;
 		}
-		return;
-	}
 
-	if (GI->Key_Pressing(DIK_2))
-	{
-		Set_State(CHARGEREADY);
-		return;
-	}
+		if (GI->Key_Pressing(DIK_2))
+		{
+			Set_State(CHARGEREADY);
+			return;
+		}
 
-	if (!Input_Direction())
-	{
-		Set_State(RUNEND);
-		return;
+		if (!Input_Direction())
+		{
+			Set_State(RUNEND);
+			return;
+		}
 	}
 
 }
@@ -2282,13 +2416,11 @@ void CPlayer::RunEnd_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
+	if (GI->Key_Pressing(DIK_4))
 	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
-			Set_State(ROCKBREAK);
-		}
+		
+		Set_State(ROCKBREAK);
+		
 		return;
 	}
 
@@ -2398,23 +2530,19 @@ void CPlayer::SpinComboEnd_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
+	if (GI->Key_Pressing(DIK_4))
 	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
-			Set_State(ROCKBREAK);
-		}
+		
+		Set_State(ROCKBREAK);
+		
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
+	if (GI->Key_Pressing(DIK_4))
 	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
-			Set_State(ROCKBREAK);
-		}
+		
+		Set_State(ROCKBREAK);
+		
 		return;
 	}
 
@@ -2457,14 +2585,12 @@ void CPlayer::SpinComboLoof_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
+	if (GI->Key_Pressing(DIK_4))
 	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
-			Set_State(ROCKBREAK);
-			m_bSpinCombo = false;
-		}
+		
+		Set_State(ROCKBREAK);
+		m_bSpinCombo = false;
+		
 		return;
 	}
 
@@ -2622,13 +2748,11 @@ void CPlayer::FastComboEnd_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
+	if (GI->Key_Pressing(DIK_4))
 	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
+	
 			Set_State(ROCKBREAK);
-		}
+		
 		return;
 	}
 
@@ -2667,13 +2791,9 @@ void CPlayer::FastComboStart_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
-	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
-			Set_State(ROCKBREAK);
-		}
+	if (GI->Key_Pressing(DIK_4))
+	{	
+		Set_State(ROCKBREAK);	
 		return;
 	}
 
@@ -2797,26 +2917,45 @@ void CPlayer::AirCombo3_KeyInput(_float fTimeDelta)
 
 void CPlayer::AirComboEnd_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_LSHIFT))
+	{
+		Set_State(DASH);
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_4))
+	{
+
+		Set_State(ROCKBREAK);
+		
+		return;
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		if (Input_Direction())
 		{
 			Set_State(RUN);
-			return;
-		}
-		if (GI->Key_Pressing(DIK_C))
-		{
-			Set_State(VOIDFRONT);
-			return;
-		}
-		if (GI->Key_Pressing(DIK_V))
-		{
-			Set_State(VOIDBACK);
-			return;
-		}
-		if (GI->Key_Pressing(DIK_LSHIFT))
-		{
-			Set_State(DASH);
 			return;
 		}
 	}
@@ -2844,15 +2983,20 @@ void CPlayer::NomalCombo1_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
+	if (GI->Key_Pressing(DIK_4))
 	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
-			Set_State(ROCKBREAK);
-		}
+
+		Set_State(ROCKBREAK);
+		
 		return;
 	}
+
+	if (GI->Key_Pressing(DIK_LSHIFT))
+	{
+		Set_State(DASH);
+		return;
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();
@@ -2914,15 +3058,20 @@ void CPlayer::NomalCombo2_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
+	if (GI->Key_Pressing(DIK_4))
 	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
-			Set_State(ROCKBREAK);
-		}
+
+		Set_State(ROCKBREAK);
+		
 		return;
 	}
+
+	if (GI->Key_Pressing(DIK_LSHIFT))
+	{
+		Set_State(DASH);
+		return;
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();
@@ -2972,13 +3121,11 @@ void CPlayer::NomalCombo3_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
+	if (GI->Key_Pressing(DIK_4))
 	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
-			Set_State(ROCKBREAK);
-		}
+
+		Set_State(ROCKBREAK);
+		
 		return;
 	}
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
@@ -2993,6 +3140,12 @@ void CPlayer::NomalCombo3_KeyInput(_float fTimeDelta)
 
 		if (GI->Key_Pressing(DIK_LSHIFT))
 			Set_State(DASH);
+	}
+
+	if (GI->Key_Pressing(DIK_LSHIFT))
+	{
+		Set_State(DASH);
+		return;
 	}
 	
 }
@@ -3019,15 +3172,20 @@ void CPlayer::NomalCombo4_KeyInput(_float fTimeDelta)
 		return;
 	}
 
-	if (GI->Key_Pressing(DIK_E))
+	if (GI->Key_Pressing(DIK_4))
 	{
-		if (!UM->Get_CoolTime(1))
-		{
-			UM->Set_CoolTime(1);
-			Set_State(ROCKBREAK);
-		}
+		
+		Set_State(ROCKBREAK);
+		
 		return;
 	}
+
+	if (GI->Key_Pressing(DIK_LSHIFT))
+	{
+		Set_State(DASH);
+		return;
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();
@@ -3045,6 +3203,41 @@ void CPlayer::NomalCombo4_KeyInput(_float fTimeDelta)
 
 void CPlayer::NomalCombo5_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_LSHIFT))
+	{
+		Set_State(DASH);
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_4))
+	{
+
+		Set_State(ROCKBREAK);
+		
+		return;
+	}
+
+
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();
@@ -3062,6 +3255,40 @@ void CPlayer::NomalCombo5_KeyInput(_float fTimeDelta)
 
 void CPlayer::NomalCombo6_KeyInput(_float fTimeDelta)
 {
+	if (GI->Key_Pressing(DIK_LSHIFT))
+	{
+		Set_State(DASH);
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_C))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDFRONT);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_V))
+	{
+		if (!UM->Get_CoolTime(4))
+		{
+			UM->Set_CoolTime(4);
+			Set_State(VOIDBACK);
+		}
+		return;
+	}
+
+	if (GI->Key_Pressing(DIK_4))
+	{
+		
+		Set_State(ROCKBREAK);
+		
+		return;
+	}
+
 	if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		Input_Direction();
@@ -3093,12 +3320,77 @@ void CPlayer::LeapRun_KeyInput(_float fTimeDelta)
 {
 }
 
+void CPlayer::Ex1Attack_keyInput(_float fTimeDelta)
+{
+	if (!m_pAnimModel[0]->GetChangeBool())
+	{
+		if (GI->Key_Pressing(DIK_LSHIFT))
+		{
+			Set_State(DASH);
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_C))
+		{
+			if (!UM->Get_CoolTime(4))
+			{
+				UM->Set_CoolTime(4);
+				Set_State(VOIDFRONT);
+			}
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_V))
+		{
+			if (!UM->Get_CoolTime(4))
+			{
+				UM->Set_CoolTime(4);
+				Set_State(VOIDBACK);
+			}
+			return;
+		}
+
+		if (GI->Key_Pressing(DIK_4))
+		{
+
+			Set_State(ROCKBREAK);
+
+			return;
+		}
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2))
+		{
+			if (Input_Direction())
+				Set_State(RUN);
+
+			if (GI->Key_Pressing(DIK_LSHIFT))
+				Set_State(DASH);
+		}
+	}
+}
+
 void CPlayer::Ex1Ready_KeyInput(_float fTimeDelta)
 {
 }
 
 void CPlayer::Ex2Ready_KeyInput(_float fTimeDelta)
 {
+	if (!m_pAnimModel[0]->GetChangeBool())
+	{
+		Input_Direction();
+
+		if (GI->Mouse_Pressing(DIMK_LBUTTON))
+		{
+			CRM->Start_Fov(30.f, 120.f);
+			_float3 BossPos = PM->Get_BossPointer()->Get_Pos();
+			if (BossPos.x == 10000.f)
+				m_fEx1AttackSpeed = 15.1f;
+			else
+				m_fEx1AttackSpeed = XMVectorGetX(XMVector4Length(XMLoadFloat3(&PM->Get_BossPointer()->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION))) * 1.f;
+			Set_State(EX1ATTACK);
+			return;
+		}
+	}
 }
 
 HRESULT CPlayer::Ready_Sockets()

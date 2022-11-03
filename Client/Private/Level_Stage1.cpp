@@ -58,8 +58,8 @@ HRESULT CLevel_Stage1::Initialize()
 	//MeshInfo.fAngle = _float3{ 1.f,1.f,1.f };
 	//GI->Add_GameObjectToLayer(L"Golem", LEVEL_STAGE1, L"Monster", &MeshInfo);
 
-	//GI->StopAll();
-	//GI->PlayBGM(L"Stage1.ogg", 0.6f);
+	GI->StopAll();
+	GI->PlayBGM(L"Stage1.ogg", 0.6f);
 
 	m_bScene = false;
 
@@ -114,7 +114,7 @@ HRESULT CLevel_Stage1::Ready_Lights()
 	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
 	LightDesc.bRender = true;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
 	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 

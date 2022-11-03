@@ -24,7 +24,7 @@ public:
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void Collision(CGameObject* pOther, string sTag);
-
+	void Set_OBB(_float3 vSize);
 	void Set_RHand();
 	void Set_Spine();
 
