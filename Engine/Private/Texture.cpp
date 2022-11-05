@@ -63,8 +63,6 @@ HRESULT CTexture::Set_SRV(CShader * pShader, const char * pConstantName, _uint i
 	if (iTextureIndex >= m_iNumTextures)
 		return E_FAIL;
 
-
-
 	return pShader->Set_ShaderResourceView(pConstantName, m_SRVs[iTextureIndex]);	
 
 }

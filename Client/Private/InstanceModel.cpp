@@ -72,13 +72,13 @@ HRESULT CInstanceModel::Render()
 			return E_FAIL;
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
 		{
-			m_bNomalTex = false;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+			m_bNormalTex = false;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
 		}
 		else
 		{
-			m_bNomalTex = true;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+			m_bNormalTex = true;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
 		}
 
 		if (FAILED(m_pShaderCom->Begin(0)))

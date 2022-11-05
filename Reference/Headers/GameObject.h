@@ -70,7 +70,7 @@ protected:
 	_float m_fDamage;
 	_uint m_iMaxHit = 0;
 	_uint m_iNumHit = 0;
-	_bool m_bNomalTex = false;
+	_bool m_bNormalTex = false;
 	
 
 protected:

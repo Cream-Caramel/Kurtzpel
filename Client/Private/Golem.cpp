@@ -202,13 +202,13 @@ HRESULT CGolem::Render()
 
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
 		{
-			m_bNomalTex = false;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+			m_bNormalTex = false;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
 		}
 		else
 		{
-			m_bNomalTex = true;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNomalTex, sizeof(bool));
+			m_bNormalTex = true;
+			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
 		}
 
 		if (m_bPattern)
