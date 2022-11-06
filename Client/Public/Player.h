@@ -72,7 +72,7 @@ public:
 	void Set_bBattle(_bool bBattle) { m_bBattle = bBattle; }
 	void Reset_BattleIndex();
 	_bool Get_bJump();
-	void Set_MoveDir();
+	void Set_SwordTrailMatrix();
 #pragma endregion MainFunction
 
 #pragma region UtilFunction
@@ -180,7 +180,7 @@ private:
 	_float m_fRenderLimit = 0.f; //랜더 시간
 	_float m_fMoveSpeed = 0.f;
 	_float m_fMoveSpeedTempo = 0.f;
-	_float3 m_vMoveDir;
+	_float3 m_vMoveDir = { 1.f,0.f,0.f };
 	_matrix m_SwordTrailMatrix;
 	CMesh::TURNDIR m_eTurnDir;
 

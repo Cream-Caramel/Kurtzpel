@@ -1416,6 +1416,7 @@ bool CPlayer::Input_Direction()
 	}
 	
 	return m_bKeyInput; 
+
 	/*if (PM->Get_CameraPlayerPos().z < m_vPlayerPos.z && m_fCamDistanceZ > m_fCamDistanceX)
 	{
 		if (GI->Key_Pressing(DIK_W))
@@ -1965,6 +1966,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (m_fNC1Speed > 0.15f)
 		{
 			m_fNC1Speed -= 0.15f;
@@ -1977,6 +1979,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::NOMALCOMBO2:
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (m_fNC2Speed > 0.15f)
 		{
 			m_fNC2Speed -= 0.15f;
@@ -1989,6 +1992,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (m_fNC3Speed > 0.1f)
 		{
 			m_fNC3Speed -= 0.1f;
@@ -2001,6 +2005,29 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(8) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(9))
+		{
+			Update_SwordTrails(NOMALCOMBO3);
+			return;
+		}
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(6) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(7))
+		{
+			m_SwordTrailMatrix.r[0] = _vector{ -0.35f,0.16f,0.92f,0.f };
+			m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.98f,0.17f,0.f };
+			m_SwordTrailMatrix.r[2] = _vector{ 0.93f,0.06f,0.35f,0.f };
+			m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+			m_fTurnSpeed = 12.f;
+			m_fRenderLimit = 0.4f;
+			m_fMoveSpeed = 3.f;
+			m_fMoveSpeedTempo = 0.15f;
+			m_eTurnDir = CMesh::TURN_FRONT;
+			m_SwordTrails[SWORDTRAIL_MAIN]->Set_EffectMatrix(m_SwordTrailMatrix);
+			m_SwordTrails[SWORDTRAIL_MAIN]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
+			return;
+		}
+
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -2271,42 +2298,12 @@ _bool CPlayer::Get_bJump()
 	return m_pTransformCom->Get_Jump();
 }
 
-void CPlayer::Set_MoveDir()
+void CPlayer::Set_SwordTrailMatrix()
 {
-	if (GI->Key_Pressing(DIK_W))
-	{
-		m_vMoveDir = { 1.f,0.f,0.f };
-		if (GI->Key_Pressing(DIK_D))
-		{
-			m_vMoveDir = { 1.f,0.f,0.f };
-		}
-		if (GI->Key_Pressing(DIK_A))
-		{
-			m_vMoveDir = { 1.f,0.f,0.f };
-		}
-	}
-	else if (GI->Key_Pressing(DIK_S))
-	{
-		m_vMoveDir = { 1.f,0.f,0.f };
-		if (GI->Key_Pressing(DIK_D))
-		{
-			m_vMoveDir = { 1.f,0.f,0.f };
-		}
-		if (GI->Key_Pressing(DIK_A))
-		{
-			m_vMoveDir = { 1.f,0.f,0.f };
-		}
-
-	}
-	else if (GI->Key_Pressing(DIK_D))
-	{
-		m_vMoveDir = { 1.f,0.f,0.f };
-	}
-	else if (GI->Key_Pressing(DIK_A))
-	{
-		m_vMoveDir = { 1.f,0.f,0.f };
-	}
+	_matrix PlayerMatrix = m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+	m_SwordTrails[SWORDTRAIL_MAIN]->SetUp_State(PlayerMatrix);
 }
+
 
 void CPlayer::Jump_KeyInput(_float fTimeDelta)
 {
@@ -3229,12 +3226,6 @@ void CPlayer::NomalCombo1_KeyInput(_float fTimeDelta)
 			Set_State(NOMALCOMBO5);
 			return;
 		}
-
-		if (GI->Key_Pressing(DIK_LSHIFT))
-		{
-			Set_State(DASH);
-			return;
-		}
 	}	
 }
 
@@ -3691,9 +3682,8 @@ HRESULT CPlayer::Update_Parts()
 HRESULT CPlayer::Update_SwordTrails(STATE eState)
 {
 
-	_matrix WeaponHandRMatrix = m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
-	
-	m_SwordTrails[SWORDTRAIL_MAIN]->SetUp_State(WeaponHandRMatrix);
+	_matrix PlayerMatrix = m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();	
+	m_SwordTrails[SWORDTRAIL_MAIN]->SetUp_State(PlayerMatrix);
 
 	switch (eState)
 	{
@@ -3730,7 +3720,7 @@ HRESULT CPlayer::Update_SwordTrails(STATE eState)
 		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.4f,0.f,1.f };
 		m_fTurnSpeed = 8.f;
 		m_fRenderLimit = 0.4f;
-		m_fMoveSpeed = 7.f;
+		m_fMoveSpeed = 3.f;
 		m_fMoveSpeedTempo = 0.15f;		
 		m_eTurnDir = CMesh::TURN_FRONT;
 		break;
@@ -3739,13 +3729,22 @@ HRESULT CPlayer::Update_SwordTrails(STATE eState)
 		m_SwordTrailMatrix.r[1] = _vector{ 0.f,1.f,0.f,0.f };
 		m_SwordTrailMatrix.r[2] = _vector{ -0.34f,0.f,-0.93f,0.f };
 		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
-		m_fTurnSpeed = 5.f;
+		m_fTurnSpeed = 6.f;
 		m_fRenderLimit = 0.6f;
-		m_fMoveSpeed = 7.f;
+		m_fMoveSpeed = 3.f;
 		m_fMoveSpeedTempo = 0.15f;
 		m_eTurnDir = CMesh::TURN_FRONT;
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
+		m_SwordTrailMatrix.r[0] = _vector{ 0.37f,-0.80f,0.46f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.49f,-0.86f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.92f,0.32f,-0.18f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 15.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 3.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_FRONT;
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
 		break;
@@ -3768,8 +3767,6 @@ HRESULT CPlayer::Update_SwordTrails(STATE eState)
 	case Client::CPlayer::STATE_END:
 		break;
 	}
-
-	Set_MoveDir();
 	
 	m_SwordTrails[SWORDTRAIL_MAIN]->Set_EffectMatrix(m_SwordTrailMatrix);
 	m_SwordTrails[SWORDTRAIL_MAIN]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
