@@ -15,6 +15,7 @@ class CPlayer final : public CAnimMesh
 public:
 	enum AnimModel {MODEL_PLAYER, MODEL_TOP, MODEL_BOTTOM, MODEL_END};
 	enum Parts { PARTS_HEAD, PARTS_HAIRBACK, PARTS_HAIRFRONT, PARTS_HAIRSIDE, PARTS_HAIRTAIL, PARTS_SWORD, PARTS_END };
+	enum SwordTrail {SWORDTRAIL_MAIN, SWORDTRAIL_END};
 	enum Socket {SOCKET_HEAD, SOCKET_WEAPONHANDR, SOCKET_WEAPON_SPINE_R, SOCKET_END};
 	enum DIR {DIR_UP, DIR_DOWN, DIR_RIGHT, DIR_LEFT, DIR_LU, DIR_RU, DIR_LD, DIR_RD, DIR_END};
 	enum STATE {HITBACK, HITFRONT
@@ -71,6 +72,7 @@ public:
 	void Set_bBattle(_bool bBattle) { m_bBattle = bBattle; }
 	void Reset_BattleIndex();
 	_bool Get_bJump();
+	void Set_MoveDir();
 #pragma endregion MainFunction
 
 #pragma region UtilFunction
@@ -172,6 +174,17 @@ private:
 	_float m_fSpinComboLoofTempo = 0.4f;
 	_float m_fEx1AttackSpeed = 0.f;
 	
+	
+	
+	_float m_fTurnSpeed = 0.f; //이팩트 턴스피드
+	_float m_fRenderLimit = 0.f; //랜더 시간
+	_float m_fMoveSpeed = 0.f;
+	_float m_fMoveSpeedTempo = 0.f;
+	_float3 m_vMoveDir;
+	_matrix m_SwordTrailMatrix;
+	CMesh::TURNDIR m_eTurnDir;
+
+	
 #pragma endregion Variable
 
 private:
@@ -187,11 +200,12 @@ private:
 	CNavigation* m_pNavigation = nullptr;
 
 	vector<CMesh*>				m_Parts;
+	vector<CMesh*>				m_SwordTrails;
 	vector<class CHierarchyNode*>		m_Sockets;
 	HRESULT Ready_Sockets();
 	HRESULT Ready_PlayerParts();
 	HRESULT Update_Parts();
-
+	HRESULT Update_SwordTrails(STATE eState);
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);

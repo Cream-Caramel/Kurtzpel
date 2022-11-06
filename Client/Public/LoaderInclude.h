@@ -34,8 +34,14 @@
 #include "TRSky.h"
 #include "TRStair.h"
 #include "SideLiner.h"
+#include "PlayerTrailMain.h"
 #include "InstanceModel.h"
 #pragma endregion Model클래스
+
+#pragma region Effect클래스
+#include "Effect.h"
+
+#pragma endregion Effect클래스
 
 #pragma region UI클래스
 #include "UI.h"

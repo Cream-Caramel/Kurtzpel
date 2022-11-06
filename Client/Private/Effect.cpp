@@ -1,23 +1,23 @@
 #include "stdafx.h"
-#include "..\Public\Mesh.h"
+#include "..\Public\Effect.h"
 #include "GameInstance.h"
 
-CMesh::CMesh(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CEffect::CEffect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject(pDevice, pContext)
 {
 }
 
-CMesh::CMesh(const CMesh & rhs)
+CEffect::CEffect(const CEffect & rhs)
 	: CGameObject(rhs)
 {
 }
 
-HRESULT CMesh::Initialize_Prototype()
+HRESULT CEffect::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CMesh::Initialize(void * pArg)
+HRESULT CEffect::Initialize(void * pArg)
 {
 	m_MeshInfo = ((MESHINFO*)pArg);
 
@@ -32,21 +32,21 @@ HRESULT CMesh::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CMesh::Tick(_float fTimeDelta)
+void CEffect::Tick(_float fTimeDelta)
 {
 }
 
-void CMesh::LateTick(_float fTimeDelta)
+void CEffect::LateTick(_float fTimeDelta)
 {
-	
+
 }
 
-HRESULT CMesh::Render()
+HRESULT CEffect::Render()
 {
 	return S_OK;
 }
 
-HRESULT CMesh::SetUp_State(_fmatrix StateMatrix)
+HRESULT CEffect::SetUp_State(_fmatrix StateMatrix)
 {
 	m_pParentTransformCom->Set_State(CTransform::STATE_RIGHT, StateMatrix.r[0]);
 	m_pParentTransformCom->Set_State(CTransform::STATE_UP, StateMatrix.r[1]);
@@ -58,47 +58,24 @@ HRESULT CMesh::SetUp_State(_fmatrix StateMatrix)
 	return S_OK;
 }
 
-
-
-void CMesh::Set_EffectMatrix(_matrix Matrix)
+void CEffect::Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3)
 {
-	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, Matrix.r[0]);
-	m_pTransformCom->Set_State(CTransform::STATE_UP, Matrix.r[1]);
-	m_pTransformCom->Set_State(CTransform::STATE_LOOK, Matrix.r[2]);
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, Matrix.r[3]);
+	m_pTransformCom->RotationThree(vAxis, fRadian, vAxis2, fRadian2, vAxis3, fRadian3);
 }
 
-void CMesh::Set_EffectInfo(_float fTurnSpeed, _float fRenderLimit, _float fMoveSpeed, _float fMoveSpeedTempo, _float3 vTargetLook, TURNDIR eTurnDir)
-{
-	m_bRenderObj = true;
-	m_pTransformCom->Set_TurnSpeed(fTurnSpeed);
-	m_eTurnDir = eTurnDir;
-	m_fRenderLimit = fRenderLimit;
-	m_fMoveSpeed = fMoveSpeed;
-	m_fMoveSpeedTempo = fMoveSpeedTempo;
-	m_vTargetLook = vTargetLook;
-	m_fRenderLimitAcc = 0.f;
-	m_fShaderUVAcc = 0.f;
-}
-
-void CMesh::Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3)
-{
-	m_pTransformCom->RotationThree(vAxis, fRadian, vAxis2, fRadian2, vAxis3, fRadian3);	
-}
-
-_float3 CMesh::Get_Pos()
+_float3 CEffect::Get_Pos()
 {
 	_float3 Pos;
 	XMStoreFloat3(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	return Pos;
 }
 
-void CMesh::Set_Pos(_float4 Pos)
+void CEffect::Set_Pos(_float4 Pos)
 {
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&Pos));
 }
 
-HRESULT CMesh::Ready_Components()
+HRESULT CEffect::Ready_Components()
 {
 
 	CTransform::TRANSFORMDESC		TransformDesc;
@@ -125,35 +102,36 @@ HRESULT CMesh::Ready_Components()
 	return S_OK;
 }
 
-CMesh * CMesh::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CEffect * CEffect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CMesh*		pInstance = new CMesh(pDevice, pContext);
+	CEffect*		pInstance = new CEffect(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CMesh"));
+		MSG_BOX(TEXT("Failed To Created : CEffect"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CMesh::Clone(void * pArg)
+CGameObject * CEffect::Clone(void * pArg)
 {
-	CMesh*		pInstance = new CMesh(*this);
+	CEffect*		pInstance = new CEffect(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CMesh"));
+		MSG_BOX(TEXT("Failed To Cloned : CEffect"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CMesh::Free()
+void CEffect::Free()
 {
 	__super::Free();
+	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pTransformCom);

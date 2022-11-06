@@ -52,7 +52,8 @@ void CMainApp::Tick(_float fTimeDelta)
 	m_fTimeAcc += fTimeDelta;
 #endif // _DEBUG
 
-	
+	if (GI->Key_Down(DIK_RSHIFT))
+		m_bScreen = !m_bScreen;
 
 	m_pGameInstance->Tick_Engine(fTimeDelta);
 	if (GI->Key_Down(DIK_9))
@@ -63,12 +64,18 @@ void CMainApp::Tick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_F3))
 		m_pRenderer->Set_bRenderTarget();
 
-	RECT Clip;
-	GetClientRect(g_hWnd, &Clip);
-	ClientToScreen(g_hWnd, (LPPOINT)&Clip);
-	ClientToScreen(g_hWnd, (LPPOINT)(&Clip.right));
-	ClipCursor(&Clip);
-
+	if (m_bScreen)
+	{
+		RECT Clip;
+		GetClientRect(g_hWnd, &Clip);
+		ClientToScreen(g_hWnd, (LPPOINT)&Clip);
+		ClientToScreen(g_hWnd, (LPPOINT)(&Clip.right));
+		ClipCursor(&Clip);
+	}
+	else
+	{
+		ClipCursor(nullptr);
+	}
 
 }
 

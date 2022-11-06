@@ -182,6 +182,16 @@ void CTransform::Move_LD(_float fTimeDelta, _float fSpeed)
 }
 
 
+void CTransform::Go_Dir(_fvector vDir, _float fSpeed, _float fTimeDelta)
+{
+	_vector vPosition = Get_State(CTransform::STATE_POSITION);
+	_vector vLook = XMVector3Normalize(vDir);
+
+	vPosition += vLook * fSpeed * fTimeDelta;
+	
+	Set_State(CTransform::STATE_POSITION, vPosition);
+}
+
 void CTransform::Go_Dir(_fvector vDir, _float fSpeed, CNavigation* pNavigation, _float fTimeDelta)
 {
 	_vector vPosition = Get_State(CTransform::STATE_POSITION);

@@ -44,6 +44,7 @@ public:
 	_bool Can_Hit();
 	_bool Get_bCollision() { return m_bCollision; }
 	
+	HRESULT CGameObject::Compute_CamZ(_fvector vWorldPos);
 
 protected:
 	ID3D11Device*			m_pDevice = nullptr;
@@ -60,7 +61,7 @@ protected:
 	_float m_fColiisionTime; // Ãæµ¹ ÄðÅ¸ÀÓ
 	_bool				m_bDead = false;
 	_bool				m_bCollision = false;
-	
+	_bool				m_bRenderObj = false;
 	_bool				m_bMotionChange = true;
 	string m_sTag = "";
 	_float m_fMaxHp;
@@ -70,7 +71,7 @@ protected:
 	_float m_fDamage;
 	_uint m_iMaxHit = 0;
 	_uint m_iNumHit = 0;
-	_bool m_bNomalTex = false;
+	_bool m_bNormalTex = false;
 	
 
 protected:

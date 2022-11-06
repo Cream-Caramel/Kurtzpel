@@ -181,6 +181,7 @@
     <ClInclude Include="..\Public\Collider_Manager.h" />
     <ClInclude Include="..\Public\Count.h" />
     <ClInclude Include="..\Public\Dragon.h" />
+    <ClInclude Include="..\Public\Effect.h" />
     <ClInclude Include="..\Public\ExGauge.h" />
     <ClInclude Include="..\Public\ExSkillFrame.h" />
     <ClInclude Include="..\Public\Golem.h" />
@@ -213,6 +214,7 @@
     <ClInclude Include="..\Public\PlayerHairTail.h" />
     <ClInclude Include="..\Public\PlayerHead.h" />
     <ClInclude Include="..\Public\PlayerSword.h" />
+    <ClInclude Include="..\Public\PlayerTrailMain.h" />
     <ClInclude Include="..\Public\Pointer_Manager.h" />
     <ClInclude Include="..\Public\Release_Manager.h" />
     <ClInclude Include="..\Public\SideLiner.h" />
@@ -250,6 +252,7 @@
     <ClCompile Include="..\Private\Collider_Manager.cpp" />
     <ClCompile Include="..\Private\Count.cpp" />
     <ClCompile Include="..\Private\Dragon.cpp" />
+    <ClCompile Include="..\Private\Effect.cpp" />
     <ClCompile Include="..\Private\ExGauge.cpp" />
     <ClCompile Include="..\Private\ExSkillFrame.cpp" />
     <ClCompile Include="..\Private\Golem.cpp" />
@@ -281,6 +284,7 @@
     <ClCompile Include="..\Private\PlayerHairTail.cpp" />
     <ClCompile Include="..\Private\PlayerHead.cpp" />
     <ClCompile Include="..\Private\PlayerSword.cpp" />
+    <ClCompile Include="..\Private\PlayerTrailMain.cpp" />
     <ClCompile Include="..\Private\Pointer_Manager.cpp" />
     <ClCompile Include="..\Private\Release_Manager.cpp" />
     <ClCompile Include="..\Private\SideLiner.cpp" />
@@ -316,6 +320,7 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Cube.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_EffectModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModelInstance.hlsl" />

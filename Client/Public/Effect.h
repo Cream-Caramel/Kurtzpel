@@ -12,7 +12,7 @@ END
 
 BEGIN(Client)
 
-class CMesh : public CGameObject
+class CEffect : public CGameObject
 {
 public:
 	typedef struct tagMeshInfo
@@ -23,12 +23,11 @@ public:
 		_float3 fAngle;
 
 	}MESHINFO;
-public:
-	enum TURNDIR {TURN_FRONT, TURN_BACK, TURN_END};
+
 protected:
-	CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CMesh(const CMesh& rhs);
-	virtual ~CMesh() = default;
+	CEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CEffect(const CEffect& rhs);
+	virtual ~CEffect() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype()override;
@@ -40,8 +39,7 @@ public:
 
 public:
 	HRESULT SetUp_State(_fmatrix StateMatrix);
-	void Set_EffectMatrix(_matrix Matrix);
-	void Set_EffectInfo(_float fTurnSpeed, _float fRenderLimit, _float fMoveSpeed, _float fMoveSpeedTempo, _float3 vTargetLook, TURNDIR eTurnDir);
+
 
 public:
 	void Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3);
@@ -49,21 +47,10 @@ public:
 	void Set_Pos(_float4 Pos);
 
 protected:
-	_float m_fShaderUVAcc;
-	_float m_fUVCount;
-	_float m_fRenderLimitAcc = 0.f;
-	_float m_fRenderLimit;
-	_float m_fMoveSpeed;
-	_float m_fMoveSpeedTempo;
-	_float3 m_vTargetLook = { 0.f,0.f,0.f };
-	_uint m_iShaderUVIndex;
-	_uint m_iMaxUVIndex;
-	TURNDIR m_eTurnDir = TURN_FRONT;
-
-protected:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CTransform*				m_pTransformCom = nullptr;
+	CModel*					m_pModelCom = nullptr;
 	MESHINFO*				m_MeshInfo;
 	CTransform*				m_pParentTransformCom = nullptr;
 
@@ -72,7 +59,7 @@ protected:
 	HRESULT Ready_Components();
 
 public:
-	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
 };

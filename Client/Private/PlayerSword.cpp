@@ -89,7 +89,7 @@ void CPlayerSword::LateTick(_float fTimeDelta)
 	_matrix _WorldMatrix;
 	_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix();
 
-	if (!m_bTrail)
+	//if (!m_bTrail)
 		m_pTrail->TrailOff();
 
 	if (!m_pTrail->Get_On())

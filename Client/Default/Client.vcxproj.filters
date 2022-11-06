@@ -154,6 +154,15 @@
     <Filter Include="03.UI\Count">
       <UniqueIdentifier>{f94d12dd-b5f5-4d95-aff0-2fbe5e1afd5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect">
+      <UniqueIdentifier>{97fe9178-6ca2-4ebb-9364-ba7beabeb50a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Player">
+      <UniqueIdentifier>{91c26883-8e56-450d-b15d-21cc682af911}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Player\Trail">
+      <UniqueIdentifier>{39b1e29e-b242-4d94-9491-6b11811072a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -363,6 +372,12 @@
     <ClInclude Include="..\Public\Count.h">
       <Filter>03.UI\Count</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PlayerTrailMain.h">
+      <Filter>02.GameObjects\Effect\Player\Trail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect.h">
+      <Filter>02.GameObjects\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -554,6 +569,12 @@
     <ClCompile Include="..\Private\Count.cpp">
       <Filter>03.UI\Count</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\PlayerTrailMain.cpp">
+      <Filter>02.GameObjects\Effect\Player\Trail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect.cpp">
+      <Filter>02.GameObjects\Effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -585,6 +606,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModelInstance.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_EffectModel.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

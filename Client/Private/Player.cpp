@@ -140,6 +140,11 @@ void CPlayer::LateTick(_float fTimeDelta)
 
 	End_Animation();
 
+	if (m_bAction)
+	{
+		for (auto& pTrail : m_SwordTrails)
+			pTrail->LateTick(fTimeDelta);
+	}
 	for (auto& pPart : m_Parts)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, pPart);
 
@@ -152,7 +157,7 @@ void CPlayer::LateTick(_float fTimeDelta)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYER, this, m_pOBB[OBB_BODY]);
 	
 	Check_Battle();
-
+	
 	Set_PlayerUseInfo();
 
 }
@@ -591,13 +596,14 @@ void CPlayer::Set_State(STATE eState)
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
+		Update_SwordTrails(NOMALCOMBO1);
 		int iRandom = GI->Get_Random(1, 2);
 		if (iRandom == 1)
 			GI->PlaySoundW(L"AttackVoice1.ogg", SD_PLAYERVOICE, 0.9f);
 		else
 			GI->PlaySoundW(L"AttackVoice2.ogg", SD_PLAYERVOICE, 0.9f);
 		GI->PlaySoundW(L"NormalCombo1.ogg", SD_PLAYER1, 0.6f);
-		CRM->Start_Fov(50.f, 90.f);
+		CRM->Start_Fov(55.f, 90.f);
 		m_fNC1Speed = 5.f;
 		m_fNomalCombo1Acc = 0.f;
 		m_fNowMp -= 2.f;
@@ -606,16 +612,17 @@ void CPlayer::Set_State(STATE eState)
 		break;
 	}
 	case Client::CPlayer::NOMALCOMBO2:
-		CRM->Fix_Fov(40.f, 90.f);
+		CRM->Fix_Fov(50.f, 90.f);
 		GI->PlaySoundW(L"AttackVoice3.ogg", SD_PLAYERVOICE, 0.9f);
 		GI->PlaySoundW(L"NormalCombo2.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
 		m_fNC2Speed = 5.f;
+		Update_SwordTrails(NOMALCOMBO2);
 		m_Parts[PARTS_SWORD]->Set_Damage(7.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
-		CRM->Fix_Fov(30.f, 90.f);
+		CRM->Fix_Fov(40.f, 90.f);
 		RastAttackVoice();
 		GI->PlaySoundW(L"NormalCombo3.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 5.f;
@@ -624,7 +631,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
-		CRM->Fix_Fov(30.f, 90.f);
+		CRM->Fix_Fov(40.f, 90.f);
 		RastAttackVoice();
 		GI->PlaySoundW(L"NormalCombo4.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 5.f;
@@ -633,7 +640,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
-		CRM->Fix_Fov(40.f, 90.f);
+		CRM->Fix_Fov(50.f, 90.f);
 		m_fNowMp -= 3.f;
 		m_fNC5Speed = 5.f;
 		GI->PlaySoundW(L"AttackVoice4.ogg", SD_PLAYERVOICE, 0.9f);
@@ -642,7 +649,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
-		CRM->Fix_Fov(30.f, 90.f);
+		CRM->Fix_Fov(40.f, 90.f);
 		m_fNowMp -= 5.f;
 		m_fNC6Speed = 8.f;
 		GI->PlaySoundW(L"AttackVoice7.ogg", SD_PLAYERVOICE, 0.9f);
@@ -2264,6 +2271,43 @@ _bool CPlayer::Get_bJump()
 	return m_pTransformCom->Get_Jump();
 }
 
+void CPlayer::Set_MoveDir()
+{
+	if (GI->Key_Pressing(DIK_W))
+	{
+		m_vMoveDir = { 1.f,0.f,0.f };
+		if (GI->Key_Pressing(DIK_D))
+		{
+			m_vMoveDir = { 1.f,0.f,0.f };
+		}
+		if (GI->Key_Pressing(DIK_A))
+		{
+			m_vMoveDir = { 1.f,0.f,0.f };
+		}
+	}
+	else if (GI->Key_Pressing(DIK_S))
+	{
+		m_vMoveDir = { 1.f,0.f,0.f };
+		if (GI->Key_Pressing(DIK_D))
+		{
+			m_vMoveDir = { 1.f,0.f,0.f };
+		}
+		if (GI->Key_Pressing(DIK_A))
+		{
+			m_vMoveDir = { 1.f,0.f,0.f };
+		}
+
+	}
+	else if (GI->Key_Pressing(DIK_D))
+	{
+		m_vMoveDir = { 1.f,0.f,0.f };
+	}
+	else if (GI->Key_Pressing(DIK_A))
+	{
+		m_vMoveDir = { 1.f,0.f,0.f };
+	}
+}
+
 void CPlayer::Jump_KeyInput(_float fTimeDelta)
 {
 	Input_Direction();
@@ -3605,6 +3649,12 @@ HRESULT CPlayer::Ready_PlayerParts()
 	if (nullptr == pPlayerSword)
 		return E_FAIL;
 	m_Parts.push_back((CMesh*)pPlayerSword);
+
+	CGameObject*		pTrailMain = GI->Clone_GameObject(TEXT("PlayerTrailMain"), MeshInfo);
+	if (nullptr == pTrailMain)
+		return E_FAIL;
+	m_SwordTrails.push_back((CMesh*)pTrailMain);
+
 	
 
 	Safe_Delete(MeshInfo);
@@ -3635,6 +3685,97 @@ HRESULT CPlayer::Update_Parts()
 		_matrix WeaponSpineRMatrix = m_Sockets[SOCKET_WEAPON_SPINE_R]->Get_CombinedTransformation()* m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
 		m_Parts[PARTS_SWORD]->SetUp_State(WeaponSpineRMatrix);
 	}
+	return S_OK;
+}
+
+HRESULT CPlayer::Update_SwordTrails(STATE eState)
+{
+
+	_matrix WeaponHandRMatrix = m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+	
+	m_SwordTrails[SWORDTRAIL_MAIN]->SetUp_State(WeaponHandRMatrix);
+
+	switch (eState)
+	{
+	case Client::CPlayer::SPINCOMBOEND:
+		break;
+	case Client::CPlayer::SPINCOMBOLOOF:
+		break;
+	case Client::CPlayer::SPINCOMBOSTART:
+		break;
+	case Client::CPlayer::FASTCOMBOEND:
+		break;
+	case Client::CPlayer::FASTCOMBOSTART:
+		break;
+	case Client::CPlayer::ROCKBREAK:
+		break;
+	case Client::CPlayer::CHARGECRASH:
+		break;
+	case Client::CPlayer::CHARGEREADY:
+		break;
+	case Client::CPlayer::AIRCOMBO1:
+		break;
+	case Client::CPlayer::AIRCOMBO2:
+		break;
+	case Client::CPlayer::AIRCOMBO3:
+		break;
+	case Client::CPlayer::AIRCOMBO4:
+		break;
+	case Client::CPlayer::AIRCOMBOEND:
+		break;
+	case Client::CPlayer::NOMALCOMBO1:
+		m_SwordTrailMatrix.r[0] = _vector{ -0.66f,-0.48f,0.57f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.76f,-0.64f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.75f,-0.42f,0.5f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.4f,0.f,1.f };
+		m_fTurnSpeed = 8.f;
+		m_fRenderLimit = 0.4f;
+		m_fMoveSpeed = 7.f;
+		m_fMoveSpeedTempo = 0.15f;		
+		m_eTurnDir = CMesh::TURN_FRONT;
+		break;
+	case Client::CPlayer::NOMALCOMBO2:
+		m_SwordTrailMatrix.r[0] = _vector{ -0.93f,0.f,0.34f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,1.f,0.f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ -0.34f,0.f,-0.93f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 5.f;
+		m_fRenderLimit = 0.6f;
+		m_fMoveSpeed = 7.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_FRONT;
+		break;
+	case Client::CPlayer::NOMALCOMBO3:
+		break;
+	case Client::CPlayer::NOMALCOMBO4:
+		break;
+	case Client::CPlayer::NOMALCOMBO5:
+		break;
+	case Client::CPlayer::NOMALCOMBO6:
+		break;
+	case Client::CPlayer::BLADEATTACK:
+		break;
+	case Client::CPlayer::SLASHATTACK:
+		break;
+	case Client::CPlayer::EX1ATTACK:
+		break;
+	case Client::CPlayer::EX2ATTACK:
+		break;
+	case Client::CPlayer::EX1READY:
+		break;
+	case Client::CPlayer::EX2READY:
+		break;
+	case Client::CPlayer::STATE_END:
+		break;
+	}
+
+	Set_MoveDir();
+	
+	m_SwordTrails[SWORDTRAIL_MAIN]->Set_EffectMatrix(m_SwordTrailMatrix);
+	m_SwordTrails[SWORDTRAIL_MAIN]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
+
+
+
 	return S_OK;
 }
 
@@ -3676,6 +3817,9 @@ void CPlayer::Free()
 
 	for (auto& pPart : m_Parts)
 		Safe_Release(pPart);
+
+	for (auto& pSwordTrail : m_SwordTrails)
+		Safe_Release(pSwordTrail);
 
 	m_Parts.clear();
 	Safe_Release(m_pNavigation);

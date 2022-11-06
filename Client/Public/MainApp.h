@@ -23,6 +23,7 @@ public:
 	HRESULT Render();	
 
 private:
+	_bool						m_bScreen = false;
 	CGameInstance*				m_pGameInstance = nullptr;
 	CRenderer*					m_pRenderer = nullptr;
 
