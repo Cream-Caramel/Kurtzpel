@@ -43,6 +43,8 @@ public:
 	void Set_MaxHit(_uint iMaxHit) { m_iMaxHit = iMaxHit; m_iNumHit = 0; }
 	_bool Can_Hit();
 	_bool Get_bCollision() { return m_bCollision; }
+	_bool Get_bRenderObj() { return m_bRenderObj; }
+	void Set_bRenderObj(_bool bRenderObj) { m_bRenderObj = bRenderObj; }
 	
 	HRESULT CGameObject::Compute_CamZ(_fvector vWorldPos);
 

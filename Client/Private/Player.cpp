@@ -140,11 +140,9 @@ void CPlayer::LateTick(_float fTimeDelta)
 
 	End_Animation();
 
-	if (m_bAction)
-	{
-		for (auto& pTrail : m_SwordTrails)
-			pTrail->LateTick(fTimeDelta);
-	}
+	for (auto& pTrail : m_SwordTrails)
+		pTrail->LateTick(fTimeDelta);
+
 	for (auto& pPart : m_Parts)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, pPart);
 
@@ -656,33 +654,6 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_Damage(20.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
-	case Client::CPlayer::GROUNDCRASH:
-		
-		break;
-	case Client::CPlayer::GROUNDREADY:
-		
-		break;
-	case Client::CPlayer::GROUNDRUN:
-		
-		break;
-	case Client::CPlayer::LEAPDOWN:
-	
-		break;
-	case Client::CPlayer::LEAPUP:
-	
-		break;
-	case Client::CPlayer::LEAPEND:
-	
-		break;
-	case Client::CPlayer::LEAPREADY:
-	
-		break;
-	case Client::CPlayer::LEAPRUN:
-	
-		break;
-	case Client::CPlayer::LEAPSTART:
-		
-		break;
 	case Client::CPlayer::BLADEATTACK:
 		if (!m_bAction)
 		{
@@ -748,6 +719,14 @@ void CPlayer::Set_State(STATE eState)
 	{
 		m_pAnimModel[i]->SetNextIndex(m_eNextState);
 		m_pAnimModel[i]->SetChangeBool(true);
+	}
+
+	if (!m_bAction)
+	{
+		for (int i = 0; i < SWORDTRAIL_END; ++i)
+		{
+			m_SwordTrails[i]->Set_bRenderObj(false);
+		}
 	}
 }
 
@@ -1705,7 +1684,7 @@ void CPlayer::Update(_float fTimeDelta)
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			CRM->Start_Shake(0.3f, 4.f, 0.04f);
+			CRM->Start_Shake(0.3f, 3.f, 0.03f);
 		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -1807,42 +1786,57 @@ void CPlayer::Update(_float fTimeDelta)
 			Set_FastComboTime(fTimeDelta);	
 		break;
 	case Client::CPlayer::ROCKBREAK:
-		m_bMotionChange = false;
-		if (m_fRockBreakSpeed > 0.15f)
+		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			m_fRockBreakSpeed -= 0.15f;
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRockBreakSpeed, m_pNavigation, fTimeDelta);
+			m_bMotionChange = false;
+			Set_SwordTrailMatrix();
+			if (m_fRockBreakSpeed > 0.15f)
+			{
+				m_fRockBreakSpeed -= 0.15f;
+				m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRockBreakSpeed, m_pNavigation, fTimeDelta);
+			}
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+				Update_SwordTrails(ROCKBREAK);
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			{
+				GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				CRM->Start_Shake(0.3f, 3.f, 0.03f);
+			}
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		}
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
-		{
-			GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			CRM->Start_Shake(0.3f, 3.f, 0.03f);
-		}
-		else
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
-		
 		break;
 	case Client::CPlayer::CHARGECRASH:
-		m_bMotionChange = false;
-		if (m_fChargeCrashSpeed > 0.1f)
+		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			m_fChargeCrashSpeed -= 0.1f;
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fChargeCrashSpeed, m_pNavigation, fTimeDelta);
-		}
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
-		{
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3(10.f, 10.f, 10.f));
-			GI->PlaySoundW(L"ChargeAttack.ogg", SD_PLAYER1, 0.6f);
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			CRM->Start_Shake(0.4f, 6.f, 0.05f);
-			CRM->Set_FovSpeed(150.f);
-			CRM->Set_FovDir(true);
-		}
-		else
-		{
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3(0.3f, 2.2f, 0.3f));
+			m_bMotionChange = false;
+			Set_SwordTrailMatrix();
+			if (m_fChargeCrashSpeed > 0.1f)
+			{
+				m_fChargeCrashSpeed -= 0.1f;
+				m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fChargeCrashSpeed, m_pNavigation, fTimeDelta);
+			}
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+				Update_SwordTrails(CHARGECRASH);
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			{
+				((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3(10.f, 10.f, 10.f));
+				GI->PlaySoundW(L"ChargeAttack.ogg", SD_PLAYER1, 0.6f);
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				CRM->Start_Shake(0.4f, 6.f, 0.05f);
+				CRM->Set_FovSpeed(150.f);
+				CRM->Set_FovDir(true);
+			}
+			else
+			{
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
+				((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3(0.3f, 2.2f, 0.3f));
+			}
 		}
 		break;
 	case Client::CPlayer::CHARGEREADY:
@@ -1850,6 +1844,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::AIRCOMBO1:
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1) + 1.f)
 		{
 			m_pTransformCom->Set_Gravity(0.f);
@@ -1866,6 +1861,10 @@ void CPlayer::Update(_float fTimeDelta)
 				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
 			}
 		}
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+			Update_SwordTrails(AIRCOMBO1);
+
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 		else
@@ -1873,6 +1872,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::AIRCOMBO2:
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1) + 1.f)
 		{
 			m_pTransformCom->Set_Gravity(0.f);
@@ -1889,6 +1889,10 @@ void CPlayer::Update(_float fTimeDelta)
 				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
 			}
 		}
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+			Update_SwordTrails(AIRCOMBO2);
+
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 		else
@@ -1896,6 +1900,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::AIRCOMBO3:
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1) + 1.f)
 		{
 			m_pTransformCom->Set_Gravity(0.f);
@@ -1912,6 +1917,10 @@ void CPlayer::Update(_float fTimeDelta)
 				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
 			}
 		}
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+			Update_SwordTrails(AIRCOMBO3);
+
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 		else
@@ -1919,6 +1928,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::AIRCOMBO4:
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (!m_pAnimModel[0]->GetChangeBool())
 		{
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
@@ -1926,15 +1936,17 @@ void CPlayer::Update(_float fTimeDelta)
 				m_pTransformCom->Set_Gravity(1.f);
 				m_pTransformCom->Set_Jump(true);
 			}
-		
-				if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
-				{
-					m_pTransformCom->Set_Jump(false);
-					GI->PlaySoundW(L"AirComboEnd.ogg", SD_PLAYER1, 0.6f);
-					m_pTransformCom->Set_Gravity(0.f); 
-					Set_State(AIRCOMBOEND);
-					m_pTransformCom->Set_JumpEndPos(m_pNavigation);
-				}
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+				Update_SwordTrails(AIRCOMBO4);
+			if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
+			{
+				m_pTransformCom->Set_Jump(false);
+				GI->PlaySoundW(L"AirComboEnd.ogg", SD_PLAYER1, 0.6f);
+				m_pTransformCom->Set_Gravity(0.f); 
+				Set_State(AIRCOMBOEND);
+				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
+			}
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 			else
@@ -1976,140 +1988,155 @@ void CPlayer::Update(_float fTimeDelta)
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
-	case Client::CPlayer::NOMALCOMBO2:
-		m_bMotionChange = false;
-		Set_SwordTrailMatrix();
-		if (m_fNC2Speed > 0.15f)
+	case Client::CPlayer::NOMALCOMBO2:	
+		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			m_fNC2Speed -= 0.15f;
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC2Speed, m_pNavigation, fTimeDelta);
+			m_bMotionChange = false;
+			Set_SwordTrailMatrix();
+			if (m_fNC2Speed > 0.15f)
+			{
+				m_fNC2Speed -= 0.15f;
+				m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC2Speed, m_pNavigation, fTimeDelta);
+			}
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+				Update_SwordTrails(NOMALCOMBO2);
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		}
-
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
-			Update_SwordTrails(NOMALCOMBO2);
-
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-		else
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
-		m_bMotionChange = false;
-		Set_SwordTrailMatrix();
-		if (m_fNC3Speed > 0.1f)
+		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			m_fNC3Speed -= 0.1f;
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC3Speed, m_pNavigation, fTimeDelta);
-		}
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
-		{
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			return;
-		}
-		else
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
-
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(8) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(9))
-		{
-			Update_SwordTrails(NOMALCOMBO3);
-			return;
-		}
-
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(6) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(7))
-		{
-			m_SwordTrailMatrix.r[0] = _vector{ -0.35f,0.16f,0.92f,0.f };
-			m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.98f,0.17f,0.f };
-			m_SwordTrailMatrix.r[2] = _vector{ 0.93f,0.06f,0.35f,0.f };
-			m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
-			m_fTurnSpeed = 12.f;
-			m_fRenderLimit = 0.4f;
-			m_fMoveSpeed = 3.f;
-			m_fMoveSpeedTempo = 0.15f;
-			m_eTurnDir = CMesh::TURN_FRONT;
-			for (int i = 0; i < SWORDTRAIL_END; ++i)
+			m_bMotionChange = false;
+			Set_SwordTrailMatrix();
+			if (m_fNC3Speed > 0.1f)
 			{
-				m_SwordTrails[i]->Set_EffectMatrix(m_SwordTrailMatrix);
-				m_SwordTrails[i]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
+				m_fNC3Speed -= 0.1f;
+				m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC3Speed, m_pNavigation, fTimeDelta);
 			}
-			return;
-		}
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			{
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				return;
+			}
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
-		{
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			return;
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(8) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(9))
+			{
+				Update_SwordTrails(NOMALCOMBO3);
+				return;
+			}
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(6) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(7))
+			{
+				m_SwordTrailMatrix.r[0] = _vector{ -0.35f,0.16f,0.92f,0.f };
+				m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.98f,0.17f,0.f };
+				m_SwordTrailMatrix.r[2] = _vector{ 0.93f,0.06f,0.35f,0.f };
+				m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+				m_fTurnSpeed = 18.f;
+				m_fRenderLimit = 0.25f;
+				m_fMoveSpeed = 3.f;
+				m_fMoveSpeedTempo = 0.15f;
+				m_eTurnDir = CMesh::TURN_FRONT;
+				for (int i = 0; i < SWORDTRAIL_END; ++i)
+				{
+					m_SwordTrails[i]->Set_EffectMatrix(m_SwordTrailMatrix);
+					m_SwordTrails[i]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
+				}
+				return;
+			}
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+			{
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				return;
+			}
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		}
-		else
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
-		m_bMotionChange = false;
-		Set_SwordTrailMatrix();
-		if (m_fNC4Speed > 0.1f)
+		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			m_fNC4Speed -= 0.1f;
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC4Speed, m_pNavigation, fTimeDelta);
-		}
+			m_bMotionChange = false;
+			Set_SwordTrailMatrix();
+			if (m_fNC4Speed > 0.1f)
+			{
+				m_fNC4Speed -= 0.1f;
+				m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC4Speed, m_pNavigation, fTimeDelta);
+			}
 
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(6) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(7))
-			Update_SwordTrails(NOMALCOMBO4);
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(6) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(7))
+				Update_SwordTrails(NOMALCOMBO4);
 
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
-		{
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			return;
-		}
-		else
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			{
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				return;
+			}
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
-		{
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			return;
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+			{
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				return;
+			}
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		}
-		else
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::NOMALCOMBO5:
-		m_bMotionChange = false;
-		Set_SwordTrailMatrix();
-		if (m_fNC5Speed > 0.15f)
+		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			m_fNC5Speed -= 0.1f;
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC5Speed, m_pNavigation, fTimeDelta);
-		}
+			m_bMotionChange = false;
+			Set_SwordTrailMatrix();
+			if (m_fNC5Speed > 0.15f)
+			{
+				m_fNC5Speed -= 0.1f;
+				m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC5Speed, m_pNavigation, fTimeDelta);
+			}
 
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
-			Update_SwordTrails(NOMALCOMBO5);
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+				Update_SwordTrails(NOMALCOMBO5);
 
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
-		{
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			CRM->Start_Shake(0.2f, 2.f, 0.02f);
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			{
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				CRM->Start_Shake(0.2f, 2.f, 0.02f);
+			}
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		}
-		else
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::NOMALCOMBO6:
-		m_bMotionChange = false;
-		Set_SwordTrailMatrix();
-		if (m_fNC6Speed > 0.f)
-		{		
-			m_fNC6Speed -= 0.15f;
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC6Speed, m_pNavigation, fTimeDelta);
-		}
-
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
-			Update_SwordTrails(NOMALCOMBO6);
-
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
-			CRM->Start_Shake(0.3f, 3.f, 0.03f);
+			m_bMotionChange = false;
+			Set_SwordTrailMatrix();
+			if (m_fNC6Speed > 0.f)
+			{
+				m_fNC6Speed -= 0.15f;
+				m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC6Speed, m_pNavigation, fTimeDelta);
+			}
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+				Update_SwordTrails(NOMALCOMBO6);
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			{
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
+				CRM->Start_Shake(0.3f, 3.f, 0.03f);
+			}
+			else
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		}
-		else
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::GROUNDCRASH:
 		break;
@@ -3735,18 +3762,72 @@ HRESULT CPlayer::Update_SwordTrails(STATE eState)
 	case Client::CPlayer::FASTCOMBOSTART:
 		break;
 	case Client::CPlayer::ROCKBREAK:
+		m_SwordTrailMatrix.r[0] = _vector{ -0.21f,0.96f,0.16f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.17f,0.98f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.97f,0.20f,0.03f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.2f;
+		m_fMoveSpeed = 3.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
 		break;
 	case Client::CPlayer::CHARGECRASH:
+		m_SwordTrailMatrix.r[0] = _vector{ 0.7f,0.7f,0.f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,0.f,1.f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.7f,-0.7f,0.f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.5f,0.f,1.f };
+		m_fTurnSpeed = 7.5f;
+		m_fRenderLimit = 0.30f;
+		m_fMoveSpeed = 3.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
 		break;
 	case Client::CPlayer::CHARGEREADY:
 		break;
 	case Client::CPlayer::AIRCOMBO1:
+		m_SwordTrailMatrix.r[0] = _vector{ 0.72f,0.68f,-0.12f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,0.17f,0.98f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.69f,-0.71f,0.12f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 10.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 0.f;
+		m_fMoveSpeedTempo = 0.f;
+		m_eTurnDir = CMesh::TURN_BACK;
 		break;
 	case Client::CPlayer::AIRCOMBO2:
+		m_SwordTrailMatrix.r[0] = _vector{ -0.64f,0.72f,0.26f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.34f,0.93f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.76f,0.60f,0.21f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 10.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 0.f;
+		m_fMoveSpeedTempo = 0.f;
+		m_eTurnDir = CMesh::TURN_BACK;
 		break;
 	case Client::CPlayer::AIRCOMBO3:
+		m_SwordTrailMatrix.r[0] = _vector{ -1.f,0.05f,0.02f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.34f,0.93f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.05f,0.93f,0.34f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 10.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 0.f;
+		m_fMoveSpeedTempo = 0.f;
+		m_eTurnDir = CMesh::TURN_FRONT;
 		break;
 	case Client::CPlayer::AIRCOMBO4:
+		m_SwordTrailMatrix.r[0] = _vector{ -0.19f,0.98f,0.f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,0.f,1.f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.98f,0.19f,0.f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 10.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 0.f;
+		m_fMoveSpeedTempo = 0.f;
+		m_eTurnDir = CMesh::TURN_BACK;
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
 		break;
