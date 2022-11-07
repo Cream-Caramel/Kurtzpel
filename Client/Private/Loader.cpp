@@ -141,6 +141,14 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CPlayerTrailMain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerTrailSub1"),
+		CPlayerTrailSub1::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerTrailSub2"),
+		CPlayerTrailSub2::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerHead"),
 		CPlayerHead::Create(m_pDevice, m_pContext))))
 		return E_FAIL;

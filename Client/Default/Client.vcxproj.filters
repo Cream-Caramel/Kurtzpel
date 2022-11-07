@@ -378,6 +378,12 @@
     <ClInclude Include="..\Public\Effect.h">
       <Filter>02.GameObjects\Effect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PlayerTrailSub1.h">
+      <Filter>02.GameObjects\Effect\Player\Trail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerTrailSub2.h">
+      <Filter>02.GameObjects\Effect\Player\Trail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -574,6 +580,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect.cpp">
       <Filter>02.GameObjects\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerTrailSub1.cpp">
+      <Filter>02.GameObjects\Effect\Player\Trail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerTrailSub2.cpp">
+      <Filter>02.GameObjects\Effect\Player\Trail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -35,6 +35,8 @@
 #include "TRStair.h"
 #include "SideLiner.h"
 #include "PlayerTrailMain.h"
+#include "PlayerTrailSub1.h"
+#include "PlayerTrailSub2.h"
 #include "InstanceModel.h"
 #pragma endregion Model≈¨∑°Ω∫
 
