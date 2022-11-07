@@ -74,6 +74,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_pTransformCom->Set_Gravity(0.f);
 	m_pTransformCom->Set_JumpPower(0.4f);
 	m_bAction = false;
+
 	return S_OK;
 }
 
@@ -98,8 +99,6 @@ void CPlayer::Tick(_float fTimeDelta)
 	m_bKeyInput = false;
 	m_bUseSkill = false;
 	Get_KeyInput(fTimeDelta);
-
-
 	
 	if (!m_bCollision)
 	{
@@ -121,6 +120,7 @@ void CPlayer::Tick(_float fTimeDelta)
 	Update_Parts();
 	for (auto& pPart : m_Parts)
 		pPart->Tick(fTimeDelta);
+
 }
 
 void CPlayer::LateTick(_float fTimeDelta)
@@ -181,6 +181,17 @@ HRESULT CPlayer::Render()
 			{
 				if (FAILED(m_pAnimModel[i]->SetUp_OnShader(m_pShaderCom, m_pAnimModel[i]->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 					return E_FAIL;
+
+				if (FAILED(m_pAnimModel[i]->SetUp_OnShader(m_pShaderCom, m_pAnimModel[i]->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
+				{
+					m_bNormalTex = false;
+					m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+				}
+				else
+				{
+					m_bNormalTex = true;
+					m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+				}
 
 				if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j)))
 					return E_FAIL;
@@ -1162,7 +1173,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
-		
+		Update_SwordTrails(FASTCOMBOSTART);
 		return;
 	}
 
@@ -1173,7 +1184,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
-
+		Update_SwordTrails(EX1READY);
 		return;
 	}
 
@@ -1184,6 +1195,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		Update_SwordTrails(FASTCOMBOSTART);
 		return;
 	}
 
@@ -1194,6 +1206,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		Update_SwordTrails(EX1READY);
 		return;
 	}
 
@@ -1204,6 +1217,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		Update_SwordTrails(FASTCOMBOSTART);
 		return;
 	}
 
@@ -1214,6 +1228,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		Update_SwordTrails(EX1READY);
 		return;
 	}
 
@@ -1224,6 +1239,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		Update_SwordTrails(FASTCOMBOSTART);
 		return;
 	}
 
@@ -1234,6 +1250,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
+		Update_SwordTrails(EX1READY);
 		return;
 	}
 
@@ -1244,6 +1261,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER2, 0.6f);
+		Update_SwordTrails(FASTCOMBOSTART);
 		return;
 	}
 
@@ -1253,6 +1271,7 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYERSKILL1, 0.6f);
+		Update_SwordTrails(EX1READY);
 		return;
 	}
 
@@ -1676,6 +1695,7 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::SPINCOMBOEND:
 		m_bSpinCombo = false;
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (m_fSpinComboEndSpeed > 0.15f)
 		{
 			m_fSpinComboEndSpeed -= 0.15f;
@@ -1683,6 +1703,7 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
+			Update_SwordTrails(SPINCOMBOEND);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			CRM->Start_Shake(0.3f, 3.f, 0.03f);
 		}
@@ -1691,7 +1712,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::SPINCOMBOLOOF:
 		m_bMotionChange = false;
-
+		Set_SwordTrailMatrix();
 		m_fSpinComboLoofAcc += 1.f * fTimeDelta;
 		if (m_fSpinComboLoofAcc >= m_fSpinComboLoofTempo)
 		{
@@ -1702,6 +1723,7 @@ void CPlayer::Update(_float fTimeDelta)
 		m_fSpinComboAcc += 1.f * fTimeDelta;
 		if (m_fSpinComboAcc >= 0.3f)
 		{
+			Update_SwordTrails(SPINCOMBOLOOF);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			m_fSpinComboAcc = 0.f;
 		}
@@ -1709,6 +1731,7 @@ void CPlayer::Update(_float fTimeDelta)
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
 	case Client::CPlayer::SPINCOMBOSTART:
+		Set_SwordTrailMatrix();
 		m_bMotionChange = false;
 		if (m_fSpinComboStartSpeed > 0.15f)
 		{
@@ -1725,43 +1748,29 @@ void CPlayer::Update(_float fTimeDelta)
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+			Update_SwordTrails(SPINCOMBOSTART);
 			
 		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 
-
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2))
-		{
-			if (m_fSpinComboAcc >= 0.3f)
-			{
-				m_Parts[PARTS_SWORD]->Set_Collision(true);
-				m_fSpinComboAcc = 0.f;
-			}
-		}
-		else
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1))
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(6))
 		{
 			m_fSpinComboLoofAcc += 1.f * fTimeDelta;
-			if (m_fSpinComboLoofAcc >= 0.4f)
+			if (m_fSpinComboLoofAcc >= m_fSpinComboLoofTempo)
 			{
+				Update_SwordTrails(SPINCOMBOLOOF);
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
 				m_fSpinComboLoofAcc = 0.f;
 			}
-
-			m_fSpinComboAcc += 1.f * fTimeDelta;
-			if (m_fSpinComboAcc >= 0.3f)
-			{
-				m_Parts[PARTS_SWORD]->Set_Collision(true);
-				m_fSpinComboAcc = 0.f;
-			}
 			else
-				m_Parts[PARTS_SWORD]->Set_Collision(false);
+				m_Parts[PARTS_SWORD]->Set_Collision(false);				
 		}
 		break;
 	case Client::CPlayer::FASTCOMBOEND:
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (m_fFastComboEndSpeed > 0.15f)
 		{
 			m_fFastComboEndSpeed -= 0.15f;
@@ -1769,6 +1778,7 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
+			Update_SwordTrails(FASTCOMBOEND);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
 			RastAttackVoice();
@@ -1778,6 +1788,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::FASTCOMBOSTART:
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (m_fFastComboStartSpeed > 0.15f)
 		{
 			m_fFastComboStartSpeed -= 0.15f;
@@ -1801,6 +1812,10 @@ void CPlayer::Update(_float fTimeDelta)
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+				GI->Add_GameObjectToLayer(L"PlayerRockBreak", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
 				GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				CRM->Start_Shake(0.3f, 3.f, 0.03f);
@@ -1825,6 +1840,10 @@ void CPlayer::Update(_float fTimeDelta)
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				EffectInfo.vScale = _float3{ 2.5f,2.5f,2.5f };
+				GI->Add_GameObjectToLayer(L"PlayerRockBreak", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
 				((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3(10.f, 10.f, 10.f));
 				GI->PlaySoundW(L"ChargeAttack.ogg", SD_PLAYER1, 0.6f);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -1940,12 +1959,17 @@ void CPlayer::Update(_float fTimeDelta)
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
 				Update_SwordTrails(AIRCOMBO4);
 			if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
-			{
+			{	
 				m_pTransformCom->Set_Jump(false);
 				GI->PlaySoundW(L"AirComboEnd.ogg", SD_PLAYER1, 0.6f);
 				m_pTransformCom->Set_Gravity(0.f); 
 				Set_State(AIRCOMBOEND);
 				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				EffectInfo.WorldMatrix.r[1].m128_f32[1] = m_pNavigation->Get_PosY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+				GI->Add_GameObjectToLayer(L"PlayerRockBreak", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
 			}
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -2107,6 +2131,10 @@ void CPlayer::Update(_float fTimeDelta)
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+				GI->Add_GameObjectToLayer(L"PlayerRockBreak", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				CRM->Start_Shake(0.2f, 2.f, 0.02f);
 			}
@@ -2130,6 +2158,10 @@ void CPlayer::Update(_float fTimeDelta)
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				EffectInfo.vScale = _float3{ 1.5f,1.5f,1.5f };
+				GI->Add_GameObjectToLayer(L"PlayerRockBreak", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
 				CRM->Start_Shake(0.3f, 3.f, 0.03f);
@@ -2157,29 +2189,39 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::LEAPSTART:
 		break;
 	case Client::CPlayer::BLADEATTACK:
-		m_bCollision = false;
-		m_bMotionChange = false;
-		if (m_bDoubleSlashFov)
-			CRM->Start_Fov(30.f, 20.f);
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
-			GI->PlaySoundW(L"BladeAttack.ogg", SD_PLAYER1, 0.6f);
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			CRM->Start_Fov(30.f, 200.f);
-			CRM->Start_Shake(0.5f, 1.5f, 0.03f);
-		}
-			
-		else
-		{
-			CRM->Set_FovDir(true);
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
-			
+			m_bCollision = false;
+			m_bMotionChange = false;
+			if (m_bDoubleSlashFov)
+				CRM->Start_Fov(30.f, 20.f);
+
+			_matrix WeaponHandRMatrix = m_Sockets[SOCKET_WEAPONHANDR]->Get_CombinedTransformation()* m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+			m_pSwordEx->SetUp_State(WeaponHandRMatrix);
+			m_pSwordEx->LateTick(fTimeDelta);
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+				GI->PlaySoundW(L"BladeAttack.ogg", SD_PLAYER1, 0.6f);
+
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			{
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				CRM->Start_Fov(30.f, 200.f);
+				CRM->Start_Shake(0.5f, 1.5f, 0.03f);
+			}
+
+			else
+			{
+				CRM->Set_FovDir(true);
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
+
+			}
 		}
 		break;
 	case Client::CPlayer::SLASHATTACK:
 		m_bCollision = false;
 		m_bMotionChange = false;
+		Set_SwordTrailMatrix();
 		if (m_bDoubleSlash)
 		{		
 			CRM->Set_PlayerScene(true);
@@ -2194,6 +2236,7 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 		{
+			Update_SwordTrails(FASTCOMBOSTART);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			GI->PlaySoundW(L"DoubleSlashStart.ogg", SD_PLAYER1, 0.6f);
 			return;
@@ -2231,6 +2274,10 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			EffectInfo.vScale = _float3{ 1.2f,1.2f,1.2f };
+			GI->Add_GameObjectToLayer(L"Rock", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
 			GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			CRM->Start_Shake(0.4f, 6.f, 0.05f);
@@ -2470,10 +2517,11 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_F))
 	{
-		if (!UM->Get_CoolTime(2) && m_fNowMp >= 20.f)
-		{ 
+		
 			UM->Set_CoolTime(2);
 			Set_State(BLADEATTACK);
+			if (!UM->Get_CoolTime(2) && m_fNowMp >= 20.f)
+			{
 		}
 		return;
 	}
@@ -3625,7 +3673,7 @@ void CPlayer::Ex2Ready_KeyInput(_float fTimeDelta)
 
 		if (GI->Mouse_Pressing(DIMK_LBUTTON))
 		{
-			CRM->Start_Fov(30.f, 120.f);
+			CRM->Start_Fov(40.f, 120.f);
 			_float3 BossPos = PM->Get_BossPointer()->Get_Pos();
 			if (BossPos.x == 10000.f)
 				m_fEx1AttackSpeed = 15.1f;
@@ -3707,6 +3755,10 @@ HRESULT CPlayer::Ready_PlayerParts()
 		return E_FAIL;
 	m_SwordTrails.push_back((CMesh*)pTrailSub2);
 
+	CGameObject*		pSwordEx = GI->Clone_GameObject(TEXT("PlayerEx"), MeshInfo);
+	if (nullptr == pSwordEx)
+		return E_FAIL;
+	m_pSwordEx = ((CMesh*)pSwordEx);
 	
 
 	Safe_Delete(MeshInfo);
@@ -3752,14 +3804,59 @@ HRESULT CPlayer::Update_SwordTrails(STATE eState)
 	switch (eState)
 	{
 	case Client::CPlayer::SPINCOMBOEND:
+		m_SwordTrailMatrix.r[0] = _vector{ -0.58f,0.6f,0.53f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.65f,0.75f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.8f,0.44f,0.38f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.2f;
+		m_fMoveSpeed = 4.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
 		break;
 	case Client::CPlayer::SPINCOMBOLOOF:
+		m_SwordTrailMatrix.r[0] = _vector{ -0.93f,0.f,0.34f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,1.f,0.f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ -0.34f,0.f,-0.93f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.3f,0.f,1.f };
+		m_fTurnSpeed = 8.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 0.f;
+		m_fMoveSpeedTempo = 0.f;
+		m_eTurnDir = CMesh::TURN_FRONT;
 		break;
 	case Client::CPlayer::SPINCOMBOSTART:
+		m_SwordTrailMatrix.r[0] = _vector{ -0.58f,0.6f,0.53f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.65f,0.75f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.8f,0.44f,0.38f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.2f;
+		m_fMoveSpeed = 3.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
 		break;
 	case Client::CPlayer::FASTCOMBOEND:
+		m_SwordTrailMatrix.r[0] = _vector{ -0.14f,0.65f,-0.74f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,0.75f,0.65f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.98f,0.09f,-0.1f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.25f;
+		m_fMoveSpeed = 4.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
 		break;
 	case Client::CPlayer::FASTCOMBOSTART:
+		m_SwordTrailMatrix.r[0] = _vector{ -0.14f,0.65f,-0.74f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,0.75f,0.65f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.98f,0.09f,-0.1f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.2f;
+		m_fMoveSpeed = 0.f;
+		m_fMoveSpeedTempo = 0.f;
+		m_eTurnDir = CMesh::TURN_BACK;
 		break;
 	case Client::CPlayer::ROCKBREAK:
 		m_SwordTrailMatrix.r[0] = _vector{ -0.21f,0.96f,0.16f,0.f };
@@ -3779,7 +3876,7 @@ HRESULT CPlayer::Update_SwordTrails(STATE eState)
 		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.5f,0.f,1.f };
 		m_fTurnSpeed = 7.5f;
 		m_fRenderLimit = 0.30f;
-		m_fMoveSpeed = 3.f;
+		m_fMoveSpeed = 4.f;
 		m_fMoveSpeedTempo = 0.15f;
 		m_eTurnDir = CMesh::TURN_BACK;
 		break;
@@ -3906,6 +4003,16 @@ HRESULT CPlayer::Update_SwordTrails(STATE eState)
 	case Client::CPlayer::EX2ATTACK:
 		break;
 	case Client::CPlayer::EX1READY:
+		//FastCombo2
+		m_SwordTrailMatrix.r[0] = _vector{ -0.58f,0.6f,0.53f,0.f };
+		m_SwordTrailMatrix.r[1] = _vector{ 0.f,-0.65f,0.75f,0.f };
+		m_SwordTrailMatrix.r[2] = _vector{ 0.8f,0.44f,0.38f,0.f };
+		m_SwordTrailMatrix.r[3] = _vector{ 0.f,1.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.2f;
+		m_fMoveSpeed = 0.f;
+		m_fMoveSpeedTempo = 0.f;
+		m_eTurnDir = CMesh::TURN_BACK;
 		break;
 	case Client::CPlayer::EX2READY:
 		break;
@@ -3964,6 +4071,8 @@ void CPlayer::Free()
 
 	for (auto& pSwordTrail : m_SwordTrails)
 		Safe_Release(pSwordTrail);
+
+	Safe_Release(m_pSwordEx);
 
 	m_Parts.clear();
 	Safe_Release(m_pNavigation);

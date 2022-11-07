@@ -201,6 +201,7 @@ private:
 
 	vector<CMesh*>				m_Parts;
 	vector<CMesh*>				m_SwordTrails;
+	CMesh*						m_pSwordEx = nullptr;
 	vector<class CHierarchyNode*>		m_Sockets;
 	HRESULT Ready_Sockets();
 	HRESULT Ready_PlayerParts();

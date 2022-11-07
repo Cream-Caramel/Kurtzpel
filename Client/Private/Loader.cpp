@@ -90,7 +90,8 @@ HRESULT CLoader::Loading_ForStatic()
 	lstrcpy(m_szLoadingText, TEXT("¸ðµ¨ ·ÎµùÁß "));
 
 	LoadAnimModel("Level_Static");
-
+	LoadAnimModel("PlayerEffect");
+	LoadAnimModel("StaticEffect");
 	LoadModel("Level_Static");
 	LoadModel("Level_Stage1");
 	//LoadModel("Level_Stage2");
@@ -135,6 +136,18 @@ HRESULT CLoader::Loading_ObjectProtoType()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Player"),
 		CPlayer::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerEx"),
+		CPlayerEx::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerRockBreak"),
+		CPlayerRockBreak::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Rock"),
+		CRock::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerTrailMain"),

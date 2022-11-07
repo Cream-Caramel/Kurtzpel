@@ -46,6 +46,8 @@ public:
 
 	void Set_State(STATE eState, _fvector vState);
 
+	void Set_WorldMatrix(_matrix matrix);
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);

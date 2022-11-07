@@ -60,7 +60,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 95.f, _float3{ 0.f,1.f,0.f }, 27.f, _float3{ 0.f,0.f,1.f }, 20.f);
 
 	CCollider::COLLIDERDESC		ColliderDesc;
-	ColliderDesc.vSize = _float3(0.3f, 2.2f, 0.3f);
+	ColliderDesc.vSize = _float3(0.3f, 3.6f, 0.3f);
 	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
 	ColliderDesc.vRotation = _float3(0.f, XMConvertToRadians(45.f), 0.f);
 	ColliderDesc.sTag = "Player_Sword";

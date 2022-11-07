@@ -25,6 +25,13 @@ public:
 
 	}MESHINFO;
 
+	typedef struct tagEffectInfo
+	{
+		_matrix WorldMatrix;
+		_float3 vScale;
+
+	}EFFECTINFO;
+
 protected:
 	CAnimMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CAnimMesh(const CAnimMesh& rhs);
@@ -46,9 +53,6 @@ public:
 	const _tchar* Get_Tag() { return sTag.c_str(); }
 	int Get_AnimIndex() { return m_iAniIndex; }
 	int Get_NumAnimations();
-	const char* Get_AnimName(int AniIndex);
-	void Set_AnimName(const char* Name, int AniIndex);
-	void SaveBinary();
 	void ChangeAni(int iAniIndex);
 	_bool Get_Die() { return m_bDie; }
 	_bool Get_Finish() { return m_bFinish; }

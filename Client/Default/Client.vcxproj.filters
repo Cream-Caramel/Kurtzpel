@@ -163,6 +163,15 @@
     <Filter Include="02.GameObjects\Effect\Player\Trail">
       <UniqueIdentifier>{39b1e29e-b242-4d94-9491-6b11811072a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Player\RockBreak">
+      <UniqueIdentifier>{5a4c514b-7bc1-4fdb-8666-d09a35c7b844}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Static">
+      <UniqueIdentifier>{3b6ede52-d0ec-4833-82b2-a5a369340bb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Player\Ex">
+      <UniqueIdentifier>{db8376d5-135b-42a9-8200-7593bc16dede}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -384,6 +393,15 @@
     <ClInclude Include="..\Public\PlayerTrailSub2.h">
       <Filter>02.GameObjects\Effect\Player\Trail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PlayerRockBreak.h">
+      <Filter>02.GameObjects\Effect\Player\RockBreak</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Rock.h">
+      <Filter>02.GameObjects\Effect\Static</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerEx.h">
+      <Filter>02.GameObjects\Effect\Player\Ex</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -586,6 +604,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\PlayerTrailSub2.cpp">
       <Filter>02.GameObjects\Effect\Player\Trail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerRockBreak.cpp">
+      <Filter>02.GameObjects\Effect\Player\RockBreak</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Rock.cpp">
+      <Filter>02.GameObjects\Effect\Static</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerEx.cpp">
+      <Filter>02.GameObjects\Effect\Player\Ex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

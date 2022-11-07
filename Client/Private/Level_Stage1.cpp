@@ -58,7 +58,7 @@ HRESULT CLevel_Stage1::Initialize()
 	MeshInfo.fAngle = _float3{ 1.f,1.f,1.f };
 	GI->Add_GameObjectToLayer(L"Golem", LEVEL_STAGE1, L"Monster", &MeshInfo);*/
 
-
+	PM->Set_Level(LEVEL_STAGE1);
 
 	GI->StopAll();
 	GI->PlayBGM(L"Stage1.ogg", 0.6f);
