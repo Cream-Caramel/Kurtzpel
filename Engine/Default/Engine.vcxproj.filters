@@ -154,6 +154,9 @@
     <ClCompile Include="..\Private\Sound_Manager.cpp">
       <Filter>05.System\02.Sound</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Particle.cpp">
+      <Filter>03.Components\02.VIBuffer\Particle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -326,6 +329,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Sound_Manager.h">
       <Filter>05.System\02.Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Particle.h">
+      <Filter>03.Components\02.VIBuffer\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -502,6 +508,9 @@
     </Filter>
     <Filter Include="05.System\02.Sound">
       <UniqueIdentifier>{67425453-75f5-4ca0-a9ec-c0ed4cde209f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.Components\02.VIBuffer\Particle">
+      <UniqueIdentifier>{b275f80a-16dc-4bb5-baed-c20fc87231cf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

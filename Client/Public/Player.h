@@ -173,6 +173,7 @@ private:
 	_float m_fSpinComboLoofAcc = 0.f;
 	_float m_fSpinComboLoofTempo = 0.4f;
 	_float m_fEx1AttackSpeed = 0.f;
+	_float m_fExReadyAcc = 0.f;
 	
 	
 	

@@ -8,6 +8,7 @@
 #include "VIBuffer_Cube.h"
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Tile.h"
+#include "VIBuffer_Particle.h"
 #include "Model.h"
 #include "AnimModel.h"
 #include "Navigation.h"

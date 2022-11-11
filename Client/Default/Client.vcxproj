@@ -168,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Bin\ShaderFiles\Client_Shader_Defines.hpp" />
+    <ClInclude Include="..\Public\AlphaParticle.h" />
     <ClInclude Include="..\Public\AnimMesh.h" />
     <ClInclude Include="..\Public\BarLine.h" />
     <ClInclude Include="..\Public\BossBarLine.h" />
@@ -207,6 +208,7 @@
     <ClInclude Include="..\Public\MeshInstance.h" />
     <ClInclude Include="..\Public\MPBar.h" />
     <ClInclude Include="..\Public\MPBarFrame.h" />
+    <ClInclude Include="..\Public\Particle_Manager.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerEx.h" />
     <ClInclude Include="..\Public\PlayerHairBack.h" />
@@ -245,6 +247,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\AlphaParticle.cpp" />
     <ClCompile Include="..\Private\AnimMesh.cpp" />
     <ClCompile Include="..\Private\BarLine.cpp" />
     <ClCompile Include="..\Private\BossBarLine.cpp" />
@@ -282,6 +285,7 @@
     <ClCompile Include="..\Private\MeshInstance.cpp" />
     <ClCompile Include="..\Private\MPBar.cpp" />
     <ClCompile Include="..\Private\MPBarFrame.cpp" />
+    <ClCompile Include="..\Private\Particle_Manager.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerEx.cpp" />
     <ClCompile Include="..\Private\PlayerHairBack.cpp" />
@@ -336,6 +340,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModelInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_UI.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

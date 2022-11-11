@@ -125,7 +125,17 @@ namespace Engine
 	}VTXCUBE_DECLARATION;
 
 
-	
+	typedef struct tagVertexPoint
+	{
+		XMFLOAT3			vPosition;
+		XMFLOAT2			vSize;
+	}VTXPOINT;
+
+	typedef struct ENGINE_DLL tagVertexPoint_Declaration
+	{
+		static const unsigned int iNumElements = 2;
+		static const D3D11_INPUT_ELEMENT_DESC Elements[iNumElements];
+	}VTXPOINT_DECLARATION;
 
 	typedef struct tagVertexCubeTexture
 	{

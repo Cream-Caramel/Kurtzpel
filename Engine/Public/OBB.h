@@ -30,6 +30,7 @@ public:
 	virtual _bool Collision(CCollider* pTargetCollider);
 	void ChangeExtents(_float3 vExtents);
 	void ChangeCenter(_float3 vCenter);
+	_float3 Get_Center() { return m_ColliderDesc.vCenter; }
 	
 #ifdef _DEBUG
 public:

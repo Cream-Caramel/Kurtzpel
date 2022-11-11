@@ -98,6 +98,8 @@ HRESULT CLoader::Loading_ForStatic()
 	//LoadModel("Level_Stage3");
 	//LoadModel("Level_Stage4");
 	
+	LoadParticleTexture();
+	PTM->Initalize();
 	Loading_Shader();
 
 	Loading_Component();
@@ -122,6 +124,10 @@ HRESULT CLoader::Loading_ObjectProtoType()
 	/* For.Prototype_GameObject_Terrain*/
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
 		CTerrain::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("AlphaParticle"),
+		CAlphaParticle::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	/* For.Prototype_GameObject_Camera_Free */
@@ -354,6 +360,11 @@ HRESULT CLoader::Loading_Shader()
 	/* For.Prototype_Component_Shader_RectInstance*/
 	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_ModelInstance"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModelInstance.hlsl"), MODELINSTANCE_DECLARATION::Elements, MODELINSTANCE_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Shader_VtxPoint*/
+	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPoint"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPoint.hlsl"), VTXPOINT_DECLARATION::Elements, VTXPOINT_DECLARATION::iNumElements))))
 		return E_FAIL;
 
 	return S_OK;
@@ -783,6 +794,68 @@ HRESULT CLoader::LoadTexture(char * DatName)
 	// 3. 파일 소멸
 	CloseHandle(hFile);
 
+	return S_OK;
+}
+
+HRESULT CLoader::LoadParticleTexture()
+{
+	string FileSave = "../Data/ParticleData/ParticleTexture.dat";
+
+	wchar_t FilePath[256] = { 0 };
+
+	for (int i = 0; i < FileSave.size(); i++)
+	{
+		FilePath[i] = FileSave[i];
+	}
+
+	HANDLE		hFile = CreateFile(FilePath,			// 파일 경로와 이름 명시
+		GENERIC_READ,				// 파일 접근 모드 (GENERIC_WRITE 쓰기 전용, GENERIC_READ 읽기 전용)
+		NULL,						// 공유방식, 파일이 열려있는 상태에서 다른 프로세스가 오픈할 때 허용할 것인가, NULL인 경우 공유하지 않는다
+		NULL,						// 보안 속성, 기본값	
+		OPEN_EXISTING,				// 생성 방식, CREATE_ALWAYS는 파일이 없다면 생성, 있다면 덮어 쓰기, OPEN_EXISTING 파일이 있을 경우에면 열기
+		FILE_ATTRIBUTE_NORMAL,		// 파일 속성(읽기 전용, 숨기 등), FILE_ATTRIBUTE_NORMAL 아무런 속성이 없는 일반 파일 생성
+		NULL);						// 생성도리 파일의 속성을 제공할 템플릿 파일, 우리는 사용하지 않아서 NULL
+
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		// 팝업 창을 출력해주는 기능의 함수
+		// 1. 핸들 2. 팝업 창에 띄우고자하는 메시지 3. 팝업 창 이름 4. 버튼 속성
+		MessageBox(g_hWnd, _T("Load File"), _T("Fail"), MB_OK);
+		return E_FAIL;
+	}
+
+	DWORD		dwByte = 0;
+
+
+	while (true)
+	{
+		
+		_tchar Path[256];
+		ReadFile(hFile, &Path, sizeof(_tchar) * 256, &dwByte, nullptr);	
+		_tchar Name[256];
+		ReadFile(hFile, &Name, sizeof(_tchar) * 256, &dwByte, nullptr);
+		int iTexNum;
+		ReadFile(hFile, &iTexNum, sizeof(int), &dwByte, nullptr);
+
+		if (0 == dwByte)	// 더이상 읽을 데이터가 없을 경우
+			break;
+
+		_tchar* TexPath = new _tchar[256];
+		_tchar* TexName = new _tchar[256];
+
+		lstrcpy(TexPath, Path);
+		lstrcpy(TexName, Name);
+
+		if (FAILED(GI->Add_Prototype(LEVEL_STATIC, TexName,
+			CTexture::Create(m_pDevice, m_pContext, TexPath, iTexNum))))
+			MSG_BOX(TEXT("Fail To Load Texture"));
+
+		RM->Pushtchar(TexPath);
+		RM->Pushtchar(TexName);
+	}
+
+	// 3. 파일 소멸
+	CloseHandle(hFile);
 	return S_OK;
 }
 

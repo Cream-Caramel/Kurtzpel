@@ -2,6 +2,7 @@
 #pragma region Main클래스
 #include "GameInstance.h"
 #include "Release_Manager.h"
+#include "Particle_Manager.h"
 #include "Texture.h"
 #include "Camera_Free.h"
 #include "Camera_Player.h"
@@ -78,3 +79,7 @@
 #include "BossMPBarFrame.h"
 #include "Count.h"
 #pragma endregion UI클래스
+
+#pragma region Particle클래스
+#include "AlphaParticle.h"
+#pragma endregion Particle클래스

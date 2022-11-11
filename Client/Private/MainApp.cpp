@@ -5,6 +5,7 @@
 #include "Release_Manager.h"
 #include "Pointer_Manager.h"
 #include "Collider_Manager.h"
+#include "Particle_Manager.h"
 #include "Camera_Manager.h"
 #include "UI_Manager.h"
 
@@ -155,6 +156,10 @@ HRESULT CMainApp::Ready_Prototype_Component()
 		CVIBuffer_Tile::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Particle"),
+		CVIBuffer_Particle::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/* For.Prototype_Component_Transform */
 	if (FAILED(m_pGameInstance->Add_Prototype(LEVEL_STATIC, TEXT("Prototype_Component_Transform"),
 		CTransform::Create(m_pDevice, m_pContext))))
@@ -200,7 +205,9 @@ void CMainApp::Free()
 	CGameInstance::Release_Engine();
 	CRelease_Manager::Destroy_Instance();
 	CPointer_Manager::Destroy_Instance();
+	CParticle_Manager::Destroy_Instance();
 	CUI_Manager::Destroy_Instance();
 	CCollider_Manager::Destroy_Instance();
 	CCamera_Manager::Destroy_Instance();
+
 }

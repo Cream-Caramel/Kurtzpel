@@ -172,6 +172,12 @@
     <Filter Include="02.GameObjects\Effect\Player\Ex">
       <UniqueIdentifier>{db8376d5-135b-42a9-8200-7593bc16dede}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Particle">
+      <UniqueIdentifier>{162d4cd0-0254-4624-a4c1-07559783ceac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96.Manager\ParticleManager">
+      <UniqueIdentifier>{d2492a52-570c-4ad4-8cf0-c5c01bfc46c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -402,6 +408,10 @@
     <ClInclude Include="..\Public\PlayerEx.h">
       <Filter>02.GameObjects\Effect\Player\Ex</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\AlphaParticle.h">
+      <Filter>02.GameObjects\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Particle_Manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -614,6 +624,10 @@
     <ClCompile Include="..\Private\PlayerEx.cpp">
       <Filter>02.GameObjects\Effect\Player\Ex</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\AlphaParticle.cpp">
+      <Filter>02.GameObjects\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Particle_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -648,6 +662,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_EffectModel.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

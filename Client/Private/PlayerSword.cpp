@@ -6,6 +6,7 @@
 #include "Pointer_Manager.h"
 #include "Player.h"
 #include "Trail.h"
+#include "Particle_Manager.h"
 
 CPlayerSword::CPlayerSword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)
@@ -76,11 +77,32 @@ void CPlayerSword::Tick(_float fTimeDelta)
 {
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
+
+	if (GI->Key_Down(DIK_P))
+	{
+		_float4 OriginPos;
+		_float4 ParentPos;
+		XMStoreFloat4(&OriginPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		XMStoreFloat4(&ParentPos, m_pParentTransformCom->Get_State(CTransform::STATE_POSITION));
+		_matrix _WorldMatrix;
+		_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix();
+
+		_float3 Center = m_pOBB->Get_Center();
+		
+		XMStoreFloat3(&Center, XMVector3TransformCoord(XMLoadFloat3(&Center), _WorldMatrix));
+	
+		_float4 WorldPos;		
+		WorldPos.x = Center.x;
+		WorldPos.y = Center.y;
+		WorldPos.z = Center.z;
+		WorldPos.w = 1.f;
+		PTM->CreateParticle(L"Hit", WorldPos, false, true, false);
+	}
 }
 
 void CPlayerSword::LateTick(_float fTimeDelta)
 {
-	_float4x4		WorldMatrix;
+
 	if (m_bCollision)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYERSWORD, this, m_pOBB);
 		
@@ -90,11 +112,11 @@ void CPlayerSword::LateTick(_float fTimeDelta)
 	_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix();
 
 	//if (!m_bTrail)
-		m_pTrail->TrailOff();
+		/*m_pTrail->TrailOff();
 
 	if (!m_pTrail->Get_On())
 		m_pTrail->TrailOn(_WorldMatrix);
-	m_pTrail->Tick(fTimeDelta, _WorldMatrix);
+	m_pTrail->Tick(fTimeDelta, _WorldMatrix);*/
 }
 
 HRESULT CPlayerSword::Render()
@@ -167,6 +189,7 @@ void CPlayerSword::Collision(CGameObject * pOther, string sTag)
 		vPos.w = 1.f;
 		GI->Set_StaticLight(0.2f, 8.f, vPos, 0);
 		CRM->Start_Shake(0.2f, 2.f, 0.03f);
+		
 	}
 	
 

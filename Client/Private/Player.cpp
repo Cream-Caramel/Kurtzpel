@@ -10,6 +10,7 @@
 #include "Navigation.h"
 #include "Camera_Manager.h"
 #include "PlayerSword.h"
+#include "Particle_Manager.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -87,6 +88,10 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_1))
 		Set_State(DIE);
 
+	if (GI->Key_Down(DIK_4))
+	{
+		
+	}
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
 
@@ -1819,6 +1824,7 @@ void CPlayer::Update(_float fTimeDelta)
 				GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				CRM->Start_Shake(0.3f, 3.f, 0.03f);
+				
 			}
 			else
 				m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -2283,6 +2289,9 @@ void CPlayer::Update(_float fTimeDelta)
 			CRM->Start_Shake(0.4f, 6.f, 0.05f);
 			CRM->Set_FovDir(true);
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3{ 12.f,12.f,12.f });
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"Player1", WorldPos, false, true, false);
 			return;
 		}
 		else
@@ -2294,8 +2303,17 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::EX2ATTACK:
 		break;
 	case Client::CPlayer::EX1READY:
+		
 		break;
 	case Client::CPlayer::EX2READY:
+		m_fExReadyAcc += 1.f * fTimeDelta;
+		if (m_fExReadyAcc >= 1.f)
+		{
+			m_fExReadyAcc = 0.f;
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"Test", WorldPos, false, true, true);
+		}
 		break;
 	case Client::CPlayer::STATE_END:
 		break;

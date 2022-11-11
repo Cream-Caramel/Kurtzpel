@@ -43,6 +43,7 @@ public:
 	HRESULT LoadAnimModel(char* DatName);
 	HRESULT LoadModel(char* DatName);
 	HRESULT LoadTexture(char* DatName);
+	HRESULT LoadParticleTexture();
 
 #pragma endregion Public
 
