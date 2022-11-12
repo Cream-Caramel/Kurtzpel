@@ -83,8 +83,6 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
-	// -1 ~ 1
-	//  0 ~ 1
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
 
@@ -94,6 +92,21 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	return Out;
 }
+
+PS_OUT NonLight_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = (vector)1.f;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	if (0 == Out.vDiffuse.a)
+		discard;
+
+	return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -105,6 +118,16 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN();
+	}
+
+	pass NonLightPass
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 NonLight_MAIN();
 	}
 
 

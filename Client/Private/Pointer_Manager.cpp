@@ -17,6 +17,11 @@ void CPointer_Manager::Add_Player(CPlayer * pPlayer)
 	Safe_AddRef(m_pPlayer);
 }
 
+_float3 CPointer_Manager::Get_PlayerPos()
+{
+	return m_pPlayer->Get_Pos();
+}
+
 void CPointer_Manager::Add_CameraPlayer(CCamera_Player * pCameraPlayer)
 {
 	m_pCameraPlayer = pCameraPlayer;

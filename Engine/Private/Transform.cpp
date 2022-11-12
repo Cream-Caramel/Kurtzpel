@@ -276,6 +276,35 @@ _float3 CTransform::Get_Scale()
 		XMVectorGetX(XMVector3Length(Get_State(CTransform::STATE_LOOK))));
 }
 
+void CTransform::Set_ScaleAxis(AXIS eAxis, _float fScale)
+{
+	switch (eAxis)
+	{
+	case Engine::CTransform::AXIS_X:
+		Set_State(CTransform::STATE_RIGHT,	XMVector3Normalize(Get_State(CTransform::STATE_RIGHT)) * fScale);
+		break;
+	case Engine::CTransform::AXIS_Y:
+		Set_State(CTransform::STATE_UP, XMVector3Normalize(Get_State(CTransform::STATE_UP)) * fScale);
+		break;
+	case Engine::CTransform::AXIS_Z:
+		Set_State(CTransform::STATE_LOOK, XMVector3Normalize(Get_State(CTransform::STATE_LOOK)) * fScale);
+		break;
+	}
+}
+
+_float CTransform::Get_ScaleAxis(AXIS eAxis)
+{
+	switch (eAxis)
+	{
+	case Engine::CTransform::AXIS_X:
+		return 	XMVectorGetX(XMVector3Length(Get_State(CTransform::STATE_RIGHT)));
+	case Engine::CTransform::AXIS_Y:
+		return 	XMVectorGetX(XMVector3Length(Get_State(CTransform::STATE_UP)));
+	case Engine::CTransform::AXIS_Z:
+		return 	XMVectorGetX(XMVector3Length(Get_State(CTransform::STATE_LOOK)));
+	}
+}
+
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 {
 	_matrix		RotationMatrix = XMMatrixRotationAxis(vAxis, m_TransformDesc.fRotationPerSec * fTimeDelta);

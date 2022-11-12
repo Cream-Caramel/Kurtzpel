@@ -46,6 +46,8 @@
 #include "PlayerTrailSub1.h"
 #include "PlayerTrailSub2.h"
 #include "PlayerEx.h"
+#include "PlayerLight.h"
+#include "PlayerGage.h"
 
 //Anim
 #include "PlayerRockBreak.h"

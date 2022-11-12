@@ -156,6 +156,10 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CRock::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerGage"),
+		CPlayerGage::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerTrailMain"),
 		CPlayerTrailMain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -166,6 +170,10 @@ HRESULT CLoader::Loading_ObjectProtoType()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerTrailSub2"),
 		CPlayerTrailSub2::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerLight"),
+		CPlayerLight::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerHead"),

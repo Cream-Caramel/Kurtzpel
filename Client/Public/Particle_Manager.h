@@ -35,7 +35,6 @@ public:
 	void LoadParticle();
 	void CreateParticle(_tchar* ParticleName, _float4 vPos, _bool bFollow, _bool bLoof, _bool bCenter);
 	PARTICLECREATE SearchParticle(_tchar* ParticleName);
-
 private:
 	_float4 m_vPos = { 0.f,0.f,0.f,1.f };
 	_float2 m_vSize;

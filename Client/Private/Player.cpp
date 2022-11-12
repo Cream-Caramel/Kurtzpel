@@ -11,6 +11,8 @@
 #include "Camera_Manager.h"
 #include "PlayerSword.h"
 #include "Particle_Manager.h"
+#include "PlayerLight.h"
+#include "PlayerGage.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -96,8 +98,16 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_bColliderRender = !m_bColliderRender;
 
 	if (GI->Key_Down(DIK_5))
-		CRM->Start_Scene("Scene_Stage2");
-
+	{
+		CPlayerLight::PLAYERLIGHT PlayerLightInfo;
+		_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMLoadFloat3(&m_vTargetLook) * 5.f;
+		XMStoreFloat4(&PlayerLightInfo.vPos, Pos);
+		PlayerLightInfo.fCloseSpeed = 0.1f;
+		PlayerLightInfo.vScale = { 4.f,10.f,4.f };
+		PlayerLightInfo.vAngle = { 0.f,0.f,0.f };
+		GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
+		
+	}
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
 
@@ -516,7 +526,7 @@ void CPlayer::Set_State(STATE eState)
 		m_fChargeCrashSpeed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(100.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
-		
+		PM->Set_PlayerGage(false);
 		break;
 	case Client::CPlayer::CHARGEREADY:
 		if (!m_bAction)
@@ -525,10 +535,12 @@ void CPlayer::Set_State(STATE eState)
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
+		PM->Set_PlayerGage(true);
+		m_bChargeCreateGage = false;
 		GI->PlaySoundW(L"ChargeVoice.ogg", SD_PLAYERVOICE, 0.9f);
 		GI->PlaySoundW(L"ChargeReady.ogg", SD_PLAYER1, 0.6f);
 		m_bMotionChange = false;
-		CRM->Start_Fov(30.f, 20.f);
+		CRM->Start_Fov(80.f, 30.f);
 		m_fNowMp -= 20.f;
 		break;
 	case Client::CPlayer::AIRCOMBO1:
@@ -707,6 +719,8 @@ void CPlayer::Set_State(STATE eState)
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
+	
+		PM->Set_PlayerGage(false);
 		GI->PlaySoundW(L"RockBreakStart.ogg", SD_PLAYER1, 0.6f);
 		if(m_fEx1AttackSpeed != 15.1f)
 			XMStoreFloat3(&m_vTargetLook, XMLoadFloat3(&PM->Get_BossPointer()->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION));
@@ -724,9 +738,12 @@ void CPlayer::Set_State(STATE eState)
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
+		PM->Set_PlayerGage(true);
+		m_bEx1CreateGage = false;
 		GI->PlaySoundW(L"ChargeVoice.ogg", SD_PLAYERVOICE, 0.9f);
 		GI->PlaySoundW(L"ChargeReady.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 20.f;
+		CRM->Start_Fov(80.f, 30.f);
 		m_Parts[PARTS_SWORD]->Set_Damage(70.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
@@ -1338,6 +1355,70 @@ void CPlayer::RastAttackVoice()
 	}
 }
 
+void CPlayer::Ex1AttackLight()
+{
+	CPlayerLight::PLAYERLIGHT PlayerLightInfo;
+	XMStoreFloat4(&PlayerLightInfo.vPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	PlayerLightInfo.fCloseSpeed = 1.f;
+	PlayerLightInfo.vScale = { 4.f,10.f,4.f };
+	PlayerLightInfo.vAngle = { 0.f,0.f,0.f };
+	GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
+
+
+	for (int i = 0; i < 15; ++i)
+	{
+		XMStoreFloat4(&PlayerLightInfo.vPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		PlayerLightInfo.fCloseSpeed = GI->Get_FloatRandom(0.05f, 0.1f);
+		PlayerLightInfo.vScale = { GI->Get_FloatRandom(0.5f,2.f),10.f, GI->Get_FloatRandom(0.5f,2.f) };
+		PlayerLightInfo.vAngle = { GI->Get_FloatRandom(0.f,360.f),GI->Get_FloatRandom(0.f,360.f),GI->Get_FloatRandom(0.f,360.f) };
+		GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
+	}
+}
+
+void CPlayer::ChargeAttackLight()
+{
+	CPlayerLight::PLAYERLIGHT PlayerLightInfo;
+	_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMLoadFloat3(&m_vTargetLook) * 5.f;
+	XMStoreFloat4(&PlayerLightInfo.vPos, Pos);
+	PlayerLightInfo.fCloseSpeed = 1.f;
+	PlayerLightInfo.vScale = { 5.f,10.f,5.f };
+	PlayerLightInfo.vAngle = { 0.f,0.f,0.f };
+	GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
+
+
+	for (int i = 0; i < 15; ++i)
+	{
+		_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMLoadFloat3(&m_vTargetLook) * 5.f;
+		XMStoreFloat4(&PlayerLightInfo.vPos, Pos);
+		PlayerLightInfo.fCloseSpeed = GI->Get_FloatRandom(0.05f, 0.1f);
+		PlayerLightInfo.vScale = { GI->Get_FloatRandom(1.f,2.f),10.f, GI->Get_FloatRandom(1.f,2.f) };
+		PlayerLightInfo.vAngle = { GI->Get_FloatRandom(0.f,360.f),GI->Get_FloatRandom(0.f,360.f),GI->Get_FloatRandom(0.f,360.f) };
+		GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
+	}
+}
+
+void CPlayer::CreateGage()
+{
+	for (int i = 0; i < 5; ++i)
+	{
+		_float4 WorldPos;
+		XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		CParticle_Manager::PARTICLECREATE ParticleInfo;
+		ParticleInfo = PTM->SearchParticle(L"PlayerGage");
+		CPlayerGage::GAGEINFO GageInfo;
+		GageInfo.fLifeTime = ParticleInfo.fMinLifeTime;
+		GageInfo.vSize = ParticleInfo.vMaxSize;
+		GageInfo.vPosition = ParticleInfo.vMaxPos;
+		GageInfo.vWorldPos = WorldPos;
+		GageInfo.TexNum = ParticleInfo.TexNums;
+		GageInfo.TexPath = ParticleInfo.TexPath;
+		GageInfo.TexName = ParticleInfo.TexName;
+		
+		GI->Add_GameObjectToLayer(L"PlayerGage", PM->Get_NowLevel(), L"Layer_Effect", &GageInfo);
+		
+	}
+}
+
 void CPlayer::Check_Battle()
 {
 	if (!m_bBattle)
@@ -1843,7 +1924,8 @@ void CPlayer::Update(_float fTimeDelta)
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
 				Update_SwordTrails(CHARGECRASH);
-
+		
+			
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			{
 				CAnimMesh::EFFECTINFO EffectInfo;
@@ -1854,8 +1936,12 @@ void CPlayer::Update(_float fTimeDelta)
 				GI->PlaySoundW(L"ChargeAttack.ogg", SD_PLAYER1, 0.6f);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				CRM->Start_Shake(0.4f, 6.f, 0.05f);
-				CRM->Set_FovSpeed(150.f);
 				CRM->Set_FovDir(true);
+				_float4 WorldPos;
+				_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMLoadFloat3(&m_vTargetLook) * 5.f;
+				XMStoreFloat4(&WorldPos, vPos);
+				PTM->CreateParticle(L"Player1", WorldPos, false, true, false);
+				ChargeAttackLight();
 			}
 			else
 			{
@@ -1865,6 +1951,11 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::CHARGEREADY:
+		if (!m_bChargeCreateGage)
+		{
+			CreateGage();
+			m_bChargeCreateGage = true;
+		}
 		m_bMotionChange = false;
 		break;
 	case Client::CPlayer::AIRCOMBO1:
@@ -2292,6 +2383,7 @@ void CPlayer::Update(_float fTimeDelta)
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 			PTM->CreateParticle(L"Player1", WorldPos, false, true, false);
+			Ex1AttackLight();
 			return;
 		}
 		else
@@ -2306,13 +2398,18 @@ void CPlayer::Update(_float fTimeDelta)
 		
 		break;
 	case Client::CPlayer::EX2READY:
+		if (!m_bEx1CreateGage)
+		{
+			CreateGage();
+			m_bEx1CreateGage = true;
+		}
 		m_fExReadyAcc += 1.f * fTimeDelta;
 		if (m_fExReadyAcc >= 1.f)
 		{
 			m_fExReadyAcc = 0.f;
-			_float4 WorldPos;
+			/*_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"Test", WorldPos, false, true, true);
+			PTM->CreateParticle(L"Test", WorldPos, false, true, true);*/
 		}
 		break;
 	case Client::CPlayer::STATE_END:
@@ -3186,6 +3283,7 @@ void CPlayer::ChargeReady_KeyInput(_float fTimeDelta)
 	if (GI->Mouse_Pressing(DIMK_LBUTTON))
 	{
 		Set_State(CHARGECRASH);
+		CRM->Fix_Fov(30.f, 160.f);
 		return;
 	}
 
@@ -3698,6 +3796,8 @@ void CPlayer::Ex2Ready_KeyInput(_float fTimeDelta)
 			else
 				m_fEx1AttackSpeed = XMVectorGetX(XMVector4Length(XMLoadFloat3(&PM->Get_BossPointer()->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION))) * 1.f;
 			Set_State(EX1ATTACK);
+
+			CRM->Fix_Fov(30.f, 160.f);
 			return;
 		}
 	}

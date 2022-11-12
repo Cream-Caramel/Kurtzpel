@@ -16,6 +16,7 @@ private:
 public:
 	void Add_Player(CPlayer* pPlayer);
 	CPlayer* Get_PlayerPointer() { return m_pPlayer; }
+	_float3 Get_PlayerPos();
 	CAnimMesh* Get_BossPointer() { return m_pBoss; }
 	void Add_CameraPlayer(CCamera_Player* pCameraPlayer);
 	CCamera_Player* Get_CameraPlayer() { return m_pCameraPlayer; }
@@ -26,12 +27,15 @@ public:
 	HRESULT Add_Boss(CAnimMesh* pBoss);
 	HRESULT Delete_Boss();
 	_bool Get_BossFinish();
+	void Set_PlayerGage(_bool bPlayerGage) { m_bPlayerGage = bPlayerGage; }
+	_bool Get_PlayerGage() { return m_bPlayerGage; }
 
 private:
 	LEVEL m_eLevel;
 	CPlayer* m_pPlayer;
 	CAnimMesh* m_pBoss = nullptr;
 	CCamera_Player* m_pCameraPlayer;
+	_bool m_bPlayerGage = false;
 public:
 	virtual void Free() override;
 };

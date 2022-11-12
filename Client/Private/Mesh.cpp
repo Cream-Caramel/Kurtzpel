@@ -24,10 +24,10 @@ HRESULT CMesh::Initialize(void * pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 	m_bDead = false;
-	m_MeshInfo->fPos.w = 1.f;
-	Set_Pos(m_MeshInfo->fPos);
-	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_MeshInfo->fScale));
-	Rotation(_float3{ 1.f,0.f,0.f }, m_MeshInfo->fAngle.x, _float3{ 0.f,1.f,0.f }, m_MeshInfo->fAngle.y, _float3{ 0.f,0.f,1.f }, m_MeshInfo->fAngle.z);
+	m_MeshInfo->vPos.w = 1.f;
+	Set_Pos(m_MeshInfo->vPos);
+	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_MeshInfo->vScale));
+	Rotation(_float3{ 1.f,0.f,0.f }, m_MeshInfo->vAngle.x, _float3{ 0.f,1.f,0.f }, m_MeshInfo->vAngle.y, _float3{ 0.f,0.f,1.f }, m_MeshInfo->vAngle.z);
 
 	return S_OK;
 }

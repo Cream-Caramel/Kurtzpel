@@ -8,7 +8,7 @@ class ENGINE_DLL CTransform final : public CComponent
 {
 public:
 	enum STATE { STATE_RIGHT, STATE_UP, STATE_LOOK, STATE_POSITION, STATE_END };
-
+	enum AXIS {AXIS_X, AXIS_Y, AXIS_Z, AXIS_END};
 	typedef struct tagTransformDesc
 	{
 		_float			fSpeedPerSec;
@@ -73,6 +73,8 @@ public:
 
 	void Set_Scale(_fvector vScaleInfo);
 	_float3 Get_Scale();
+	void Set_ScaleAxis(AXIS eAxis, _float fScale);
+	_float Get_ScaleAxis(AXIS eAxis);
 
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Turn(_fvector StartLook, _fvector EndLook, _float _fRatio);

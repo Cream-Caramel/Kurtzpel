@@ -178,6 +178,12 @@
     <Filter Include="96.Manager\ParticleManager">
       <UniqueIdentifier>{d2492a52-570c-4ad4-8cf0-c5c01bfc46c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Player\Light">
+      <UniqueIdentifier>{d1c022b2-6cf8-45f7-bc02-b7ba0889e7d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Player\Gage">
+      <UniqueIdentifier>{a27ecbb3-f13b-4f20-b606-ee016e0ac1e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -411,7 +417,15 @@
     <ClInclude Include="..\Public\AlphaParticle.h">
       <Filter>02.GameObjects\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Particle_Manager.h" />
+    <ClInclude Include="..\Public\Particle_Manager.h">
+      <Filter>96.Manager\ParticleManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerLight.h">
+      <Filter>02.GameObjects\Effect\Player\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerGage.h">
+      <Filter>02.GameObjects\Effect\Player\Gage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -627,7 +641,15 @@
     <ClCompile Include="..\Private\AlphaParticle.cpp">
       <Filter>02.GameObjects\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Particle_Manager.cpp" />
+    <ClCompile Include="..\Private\Particle_Manager.cpp">
+      <Filter>96.Manager\ParticleManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerLight.cpp">
+      <Filter>02.GameObjects\Effect\Player\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerGage.cpp">
+      <Filter>02.GameObjects\Effect\Player\Gage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

@@ -211,11 +211,13 @@
     <ClInclude Include="..\Public\Particle_Manager.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerEx.h" />
+    <ClInclude Include="..\Public\PlayerGage.h" />
     <ClInclude Include="..\Public\PlayerHairBack.h" />
     <ClInclude Include="..\Public\PlayerHairFront.h" />
     <ClInclude Include="..\Public\PlayerHairSide.h" />
     <ClInclude Include="..\Public\PlayerHairTail.h" />
     <ClInclude Include="..\Public\PlayerHead.h" />
+    <ClInclude Include="..\Public\PlayerLight.h" />
     <ClInclude Include="..\Public\PlayerRockBreak.h" />
     <ClInclude Include="..\Public\PlayerSword.h" />
     <ClInclude Include="..\Public\PlayerTrailMain.h" />
@@ -288,11 +290,13 @@
     <ClCompile Include="..\Private\Particle_Manager.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerEx.cpp" />
+    <ClCompile Include="..\Private\PlayerGage.cpp" />
     <ClCompile Include="..\Private\PlayerHairBack.cpp" />
     <ClCompile Include="..\Private\PlayerHairFront.cpp" />
     <ClCompile Include="..\Private\PlayerHairSide.cpp" />
     <ClCompile Include="..\Private\PlayerHairTail.cpp" />
     <ClCompile Include="..\Private\PlayerHead.cpp" />
+    <ClCompile Include="..\Private\PlayerLight.cpp" />
     <ClCompile Include="..\Private\PlayerRockBreak.cpp" />
     <ClCompile Include="..\Private\PlayerSword.cpp" />
     <ClCompile Include="..\Private\PlayerTrailMain.cpp" />

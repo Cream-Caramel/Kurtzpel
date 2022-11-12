@@ -2,7 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
-
+#include "Pointer_Manager.h"
 BEGIN(Engine)
 class CShader;
 class CRenderer;
@@ -18,9 +18,9 @@ public:
 	typedef struct tagMeshInfo
 	{
 		_tchar* sTag;
-		_float3 fScale;
-		_float4 fPos;
-		_float3 fAngle;
+		_float3 vScale{ 1.f,1.f, 1.f };
+		_float4 vPos;
+		_float3 vAngle{ 0.f,0.f,0.f };
 
 	}MESHINFO;
 public:
