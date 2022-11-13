@@ -41,6 +41,9 @@ HRESULT CPlayerRockBreak::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_AnimModel"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Noise"), TEXT("Com_Texture"), (CComponent**)&m_pDissolveTexture)))
+		return E_FAIL;
+
 	m_bDead = false;
 	
 	/* For.Com_Model */
@@ -55,7 +58,10 @@ HRESULT CPlayerRockBreak::Initialize(void * pArg)
 
 void CPlayerRockBreak::Tick(_float fTimeDelta)
 {
-	m_pAnimModel->Play_Animation(fTimeDelta, m_pAnimModel);
+	if(!m_bDissolve)
+		m_pAnimModel->Play_Animation(fTimeDelta, m_pAnimModel);
+	else
+		m_fDissolveAcc += 0.3f * fTimeDelta;
 	
 }
 
@@ -65,7 +71,11 @@ void CPlayerRockBreak::LateTick(_float fTimeDelta)
 		return;
 
 	if (m_pAnimModel->GetAniEnd())
-		this->Set_Dead();
+		m_bDissolve = true;
+
+	if (m_fDissolveAcc >= 2.f)
+		Set_Dead();
+
 	if(!m_bDead)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	
@@ -99,16 +109,38 @@ HRESULT CPlayerRockBreak::Render()
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
 		{
 			m_bNormalTex = false;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+			if (!m_bDissolve)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i)))
+					return E_FAIL;
+			}
+			else
+			{
+				m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
+				m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i, ANIM_DISSOLVE)))
+					return E_FAIL;
+			}
 		}
 		else
 		{
 			m_bNormalTex = true;
 			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+			if (!m_bDissolve)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i)))
+					return E_FAIL;
+			}
+			else
+			{
+				m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
+				m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i, ANIM_DISSOLVE)))
+					return E_FAIL;
+			}
 		}
 
-		if (FAILED(m_pAnimModel->Render(m_pShaderCom, i)))
-			return E_FAIL;
+	
 	}
 	return S_OK;
 }
@@ -142,6 +174,7 @@ CGameObject * CPlayerRockBreak::Clone(void * pArg)
 void CPlayerRockBreak::Free()
 {
 	__super::Free();
+	Safe_Release(m_pDissolveTexture);
 	Safe_Release(m_pAnimModel);
 
 }

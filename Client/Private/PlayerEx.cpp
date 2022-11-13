@@ -42,6 +42,9 @@ HRESULT CPlayerEx::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Transform"), TEXT("Com_ParentTransform"), (CComponent**)&m_pParentTransformCom)))
 		return E_FAIL;
 
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Noise"), TEXT("Com_Texture"), (CComponent**)&m_pDissolveTexture)))
+		return E_FAIL;
+
 	m_bDead = false;
 	
 	/* For.Com_Model */
@@ -56,7 +59,7 @@ HRESULT CPlayerEx::Initialize(void * pArg)
 
 void CPlayerEx::Tick(_float fTimeDelta)
 {
-
+	
 }
 
 void CPlayerEx::LateTick(_float fTimeDelta)
@@ -64,7 +67,17 @@ void CPlayerEx::LateTick(_float fTimeDelta)
 	if (nullptr == m_pRendererCom)
 		return;
 
+	
+	m_fDissolveAcc += 0.3f * fTimeDelta;
+	if (m_fDissolveAcc >= 0.67f)
+	{
+		m_bStartDissolve = false;
+		m_bEndDissolve = true;
+		m_fDissolveAcc = 0.f;
+	}
+	
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+
 }
 
 HRESULT CPlayerEx::Render()
@@ -98,20 +111,49 @@ HRESULT CPlayerEx::Render()
 		{
 			m_bNormalTex = false;
 			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
-		}
-		else
-		{
-			m_bNormalTex = true;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+
+			if (m_bStartDissolve)
+			{
+				if (FAILED(m_pShaderCom->Begin(MODEL_STARTDISSOLVE)))
+					return E_FAIL;
+
+				m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
+				m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
+
+				if (FAILED(m_pModel->Render(i)))
+					return E_FAIL;
+			}
+
+			else if (m_bEndDissolve)
+			{
+				if (FAILED(m_pShaderCom->Begin(MODEL_DISSOLVE)))
+					return E_FAIL;
+
+				m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
+				m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
+
+				if (FAILED(m_pModel->Render(i)))
+					return E_FAIL;
+			}
+
 		}
 
-		if (FAILED(m_pShaderCom->Begin(0)))
-			return E_FAIL;
-
-		if (FAILED(m_pModel->Render(i)))
-			return E_FAIL;
 	}
 	return S_OK;
+}
+
+void CPlayerEx::StartDissolve()
+{
+	m_bStartDissolve = true;
+	m_bEndDissolve = false;
+	m_fDissolveAcc = 0.f;
+}
+
+void CPlayerEx::EndDissolve()
+{
+	m_bEndDissolve = true;
+	m_bStartDissolve = false;
+	m_fDissolveAcc = 0.f;
 }
 
 CMesh * CPlayerEx::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -143,6 +185,7 @@ CGameObject * CPlayerEx::Clone(void * pArg)
 void CPlayerEx::Free()
 {
 	__super::Free();
+	Safe_Release(m_pDissolveTexture);
 	Safe_Release(m_pModel);
 
 }

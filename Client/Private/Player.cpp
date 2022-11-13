@@ -12,6 +12,7 @@
 #include "PlayerSword.h"
 #include "Particle_Manager.h"
 #include "PlayerLight.h"
+#include "PlayerEx.h"
 #include "PlayerGage.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -689,7 +690,6 @@ void CPlayer::Set_State(STATE eState)
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
-		GI->PlaySoundW(L"BladeVoice.ogg", SD_PLAYERVOICE, 0.9f);
 		GI->PlaySoundW(L"BladeAttackStart.ogg", SD_PLAYER1, 1.f);
 		m_fNowMp -= 20.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
@@ -2293,13 +2293,19 @@ void CPlayer::Update(_float fTimeDelta)
 			if (m_bDoubleSlashFov)
 				CRM->Start_Fov(30.f, 20.f);
 
+			m_pSwordEx->LateTick(fTimeDelta);
 			_matrix WeaponHandRMatrix = m_Sockets[SOCKET_WEAPONHANDR]->Get_CombinedTransformation()* m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
 			m_pSwordEx->SetUp_State(WeaponHandRMatrix);
-			m_pSwordEx->LateTick(fTimeDelta);
-
+			
+				
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+			{
+				
 				GI->PlaySoundW(L"BladeAttack.ogg", SD_PLAYER1, 0.6f);
-
+				GI->PlaySoundW(L"BladeVoice.ogg", SD_PLAYERVOICE, 0.9f);
+				
+			}	
+				
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			{
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -2307,6 +2313,7 @@ void CPlayer::Update(_float fTimeDelta)
 				CRM->Start_Shake(0.5f, 1.5f, 0.03f);
 			}
 
+		
 			else
 			{
 				CRM->Set_FovDir(true);
@@ -2632,11 +2639,11 @@ void CPlayer::Idle_KeyInput(_float fTimeDelta)
 
 	if (GI->Key_Pressing(DIK_F))
 	{
-		
+		if (!UM->Get_CoolTime(2) && m_fNowMp >= 20.f)
+		{
 			UM->Set_CoolTime(2);
-			Set_State(BLADEATTACK);
-			if (!UM->Get_CoolTime(2) && m_fNowMp >= 20.f)
-			{
+			((CPlayerEx*)m_pSwordEx)->StartDissolve();
+			Set_State(BLADEATTACK);		
 		}
 		return;
 	}
@@ -2745,9 +2752,10 @@ void CPlayer::Run_KeyInput(_float fTimeDelta)
 
 		if (GI->Key_Pressing(DIK_F))
 		{
-			if (!UM->Get_CoolTime(2))
+			if (!UM->Get_CoolTime(2) && m_fNowMp >= 20.f)
 			{
 				UM->Set_CoolTime(2);
+				((CPlayerEx*)m_pSwordEx)->StartDissolve();
 				Set_State(BLADEATTACK);
 			}
 

@@ -49,15 +49,17 @@ public:
 	void Set_Pos(_float4 Pos);
 
 protected:
-	_float m_fShaderUVAcc;
-	_float m_fUVCount;
+	_float m_fShaderUVAcc = 0.f;
+	_float m_fUVSpeed = 0.1f;
+	_float m_fShaderUVIndexX = 0;
+	_float m_fShaderUVIndexY = 0;
+	_float m_fMaxUVIndexX = 0;
+	_float m_fMaxUVIndexY = 0;
 	_float m_fRenderLimitAcc = 0.f;
 	_float m_fRenderLimit;
 	_float m_fMoveSpeed;
 	_float m_fMoveSpeedTempo;
-	_float3 m_vTargetLook = { 0.f,0.f,0.f };
-	_uint m_iShaderUVIndex;
-	_uint m_iMaxUVIndex;
+	_float3 m_vTargetLook = { 0.f,0.f,0.f };	
 	TURNDIR m_eTurnDir = TURN_FRONT;
 
 protected:

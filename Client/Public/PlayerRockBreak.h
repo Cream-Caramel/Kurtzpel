@@ -20,6 +20,9 @@ public:
 
 private:
 	CAnimModel* m_pAnimModel;
+	CTexture* m_pDissolveTexture = nullptr;
+	_bool m_bDissolve = false;
+	_float m_fDissolveAcc = 0.f;
 
 
 public:

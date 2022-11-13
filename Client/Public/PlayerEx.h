@@ -17,10 +17,16 @@ public:
 	virtual void Tick(_float fTimeDelta) override;
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	void StartDissolve();
+	void EndDissolve();
+
 
 private:
 	CModel* m_pModel;
-
+	CTexture* m_pDissolveTexture = nullptr;
+	_bool m_bStartDissolve = false;
+	_bool m_bEndDissolve = false;
+	_float m_fDissolveAcc = 0.f;
 
 public:
 	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

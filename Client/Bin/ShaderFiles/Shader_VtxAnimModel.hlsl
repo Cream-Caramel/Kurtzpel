@@ -1,5 +1,7 @@
 #include "Client_Shader_Defines.hpp"
 matrix		g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+
+float g_fDissolveAcc;
 bool g_bNormalTex;
 struct tagBoneMatrices
 {
@@ -10,6 +12,7 @@ tagBoneMatrices		g_BoneMatrices;
 
 texture2D	g_DiffuseTexture;
 texture2D	g_NormalTexture;
+texture2D	g_DissolveTexture;
 
 sampler DefaultSampler = sampler_state {
 
@@ -251,6 +254,59 @@ PS_OUT PlayerVoid_MAIN(PS_IN In)
 	return Out;
 }
 
+PS_OUT Dissolve_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	if (g_bNormalTex)
+	{
+		Out.vDiffuse = (vector)1.f;
+
+		Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+		vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+
+		float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+		float3x3	WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+		vNormal = normalize(mul(vNormal, WorldMatrix));
+
+		Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+		Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+		Out.vDiffuse.r = 0.8f;
+	}
+
+	else
+	{
+		Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+		Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+		Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+		Out.vDiffuse.r = 0.8f;
+
+	}
+
+	float fDissolve = length(g_DissolveTexture.Sample(DefaultSampler, In.vTexUV));
+	fDissolve = smoothstep(0.f, 4.f, fDissolve);
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	if (fDissolve <= g_fDissolveAcc)
+		discard;
+
+	if (fDissolve <= g_fDissolveAcc + 0.03f)
+	{
+		Out.vDiffuse.r = 1.f;
+		Out.vDiffuse.g = 1.f;
+		Out.vDiffuse.b *= 1.f - (g_fDissolveAcc - fDissolve);
+	}
+
+	if (0 == Out.vDiffuse.a)
+		discard;
+
+	return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass DefaultPass
@@ -306,6 +362,17 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PlayerVoid_MAIN();
+	}
+
+	pass DissolvePass
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 Dissolve_MAIN();
 	}
 
 }

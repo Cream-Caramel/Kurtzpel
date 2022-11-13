@@ -49,12 +49,13 @@ HRESULT CPlayerTrailMain::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_fShaderUVAcc = 0.f;
-	m_fUVCount = 0.1f;
-	m_iShaderUVIndex = 0;
-	m_iMaxUVIndex = 3;
-
+	m_fUVSpeed = 0.1f;
+	m_fShaderUVIndexX = 0;
+	m_fShaderUVIndexY = 0;
+	m_fMaxUVIndexX = 2;	
+	m_fMaxUVIndexY = 2;
 	//m_pTransformCom->Set_State(CTransform::STATE_RIGHT, )
-
+	
 	/*m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ 0.f,0.f,0.f,1.f });
 
 	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 130.f, _float3{ 0.f,1.f,0.f }, 200.f, _float3{ 0.f,0.f,1.f },0.f);*/
@@ -81,12 +82,19 @@ void CPlayerTrailMain::LateTick(_float fTimeDelta)
 			m_fRenderLimitAcc = 0.f;
 		}
 		m_fShaderUVAcc += 1.f * fTimeDelta;
-		if (m_fShaderUVAcc >= m_fUVCount)
+		if (m_fShaderUVAcc >= m_fUVSpeed)
 		{
 			m_fShaderUVAcc = 0.f;
-			m_iShaderUVIndex += 1;
-			if (m_iShaderUVIndex > m_iMaxUVIndex)
-				m_iShaderUVIndex = 0;
+			m_fShaderUVIndexX += 1.f;
+			if (m_fShaderUVIndexX >= m_fMaxUVIndexX)
+			{
+				m_fShaderUVIndexX = 0.f;
+				m_fShaderUVIndexY += 1.f;
+				if (m_fShaderUVIndexY >= m_fMaxUVIndexY)
+				{
+					m_fShaderUVIndexY = 0.f;
+				}
+			}
 		}
 
 		if (m_eTurnDir == TURN_FRONT)
@@ -146,7 +154,10 @@ HRESULT CPlayerTrailMain::Render()
 			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
 		}
 
-		m_pShaderCom->Set_RawValue("g_iUVIndex", &m_iShaderUVIndex, sizeof(_uint));
+		m_pShaderCom->Set_RawValue("g_fMaxUVIndexX", &m_fMaxUVIndexX, sizeof(_float));
+		m_pShaderCom->Set_RawValue("g_fMaxUVIndexY", &m_fMaxUVIndexY, sizeof(_float));
+		m_pShaderCom->Set_RawValue("g_fUVIndexX", &m_fShaderUVIndexX, sizeof(_float));
+		m_pShaderCom->Set_RawValue("g_fUVIndexY", &m_fShaderUVIndexY, sizeof(_float));
 
 		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
