@@ -92,7 +92,7 @@ private:
 	void RastAttackVoice();
 	void Ex1AttackLight();
 	void ChargeAttackLight();
-	void CreateGage();
+	void CreateGage(_bool Gage2_1);
 #pragma region PrivateFunction
 
 #pragma region KeyInput
@@ -146,8 +146,6 @@ private:
 	_bool m_bDoubleSlash = false; //EX스킬중인지
 	_bool m_bDoubleSlashFov = false; //EX스킬 확대중인지
 	_bool m_bSpinCombo = false; // 스핀콤보중인지
-	_bool m_bEx1CreateGage = false;
-	_bool m_bChargeCreateGage = false;
 
 	_float m_fJumpSpeed = 15.f; // 점프중 스피드
 	_float m_fRunSpeed = 8.f; // 달리기이동스피드

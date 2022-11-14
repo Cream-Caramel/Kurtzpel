@@ -212,6 +212,7 @@
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerEx.h" />
     <ClInclude Include="..\Public\PlayerGage.h" />
+    <ClInclude Include="..\Public\PlayerGage2.h" />
     <ClInclude Include="..\Public\PlayerHairBack.h" />
     <ClInclude Include="..\Public\PlayerHairFront.h" />
     <ClInclude Include="..\Public\PlayerHairSide.h" />
@@ -291,6 +292,7 @@
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerEx.cpp" />
     <ClCompile Include="..\Private\PlayerGage.cpp" />
+    <ClCompile Include="..\Private\PlayerGage2.cpp" />
     <ClCompile Include="..\Private\PlayerHairBack.cpp" />
     <ClCompile Include="..\Private\PlayerHairFront.cpp" />
     <ClCompile Include="..\Private\PlayerHairSide.cpp" />

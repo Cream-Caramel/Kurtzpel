@@ -184,6 +184,9 @@
     <Filter Include="02.GameObjects\Effect\Player\Gage">
       <UniqueIdentifier>{a27ecbb3-f13b-4f20-b606-ee016e0ac1e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Player\Gage2">
+      <UniqueIdentifier>{c2c5af90-b51d-4c61-af0b-664900cbdff6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -426,6 +429,9 @@
     <ClInclude Include="..\Public\PlayerGage.h">
       <Filter>02.GameObjects\Effect\Player\Gage</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PlayerGage2.h">
+      <Filter>02.GameObjects\Effect\Player\Gage2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -649,6 +655,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\PlayerGage.cpp">
       <Filter>02.GameObjects\Effect\Player\Gage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerGage2.cpp">
+      <Filter>02.GameObjects\Effect\Player\Gage2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

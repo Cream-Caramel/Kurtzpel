@@ -29,6 +29,10 @@ public:
 	_bool Get_BossFinish();
 	void Set_PlayerGage(_bool bPlayerGage) { m_bPlayerGage = bPlayerGage; }
 	_bool Get_PlayerGage() { return m_bPlayerGage; }
+	void Set_PlayerGage2_1(_bool bPlayerGage) { m_bPlayerGage2_1 = bPlayerGage; }
+	_bool Get_PlayerGage2_1() { return m_bPlayerGage2_1; }
+	void Set_PlayerGage2_2(_bool bPlayerGage) { m_bPlayerGage2_2 = bPlayerGage; }
+	_bool Get_PlayerGage2_2() { return m_bPlayerGage2_2; }
 
 private:
 	LEVEL m_eLevel;
@@ -36,6 +40,8 @@ private:
 	CAnimMesh* m_pBoss = nullptr;
 	CCamera_Player* m_pCameraPlayer;
 	_bool m_bPlayerGage = false;
+	_bool m_bPlayerGage2_1 = false;
+	_bool m_bPlayerGage2_2 = false;
 public:
 	virtual void Free() override;
 };

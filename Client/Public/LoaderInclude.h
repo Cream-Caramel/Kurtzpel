@@ -48,6 +48,7 @@
 #include "PlayerEx.h"
 #include "PlayerLight.h"
 #include "PlayerGage.h"
+#include "PlayerGage2.h"
 
 //Anim
 #include "PlayerRockBreak.h"
