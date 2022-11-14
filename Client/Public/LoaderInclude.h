@@ -53,6 +53,9 @@
 //Anim
 #include "PlayerRockBreak.h"
 #include "Rock.h"
+#include "GolemRock1.h"
+#include "GolemRock2.h"
+#include "GolemRock3.h"
 #pragma endregion Effect클래스
 
 #pragma region UI클래스

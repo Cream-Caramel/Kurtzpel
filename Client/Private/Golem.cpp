@@ -505,6 +505,7 @@ void CGolem::Set_State(STATE eState)
 		GI->PlaySoundW(L"GolemSkill4.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CGolem::SKILL4_2:
+		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 8.f, 8.f, 8.f });
 		GI->PlaySoundW(L"GolemSkill4_2.ogg", SD_MONSTERVOICE, 0.9f);
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 10.f, 8.f, 10.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,4.f,0.f });
@@ -781,13 +782,18 @@ void CGolem::Update(_float fTimeDelta)
 
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
-				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta);
-				m_bAttack = true;
+				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta);			
 				return;
 			}
 
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 			{
+				m_bAttack = true;
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				EffectInfo.WorldMatrix.r[3] = EffectInfo.WorldMatrix.r[3] + _vector{ 10.f,0.f,2.f };
+				EffectInfo.vScale = _float3{ 1.5f,1.5f,1.5f };
+				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 				GI->PlaySoundW(L"GolemAttack4.ogg", SD_MONSTER1, 0.9f);
 				CRM->Start_Shake(0.4f, 5.f, 0.05f);
 
@@ -818,6 +824,12 @@ void CGolem::Update(_float fTimeDelta)
 	case Client::CGolem::SKILL8:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_vector Pos = EffectInfo.WorldMatrix.r[3] + XMLoadFloat3(&m_vTargetLook) * 15.f;
+			EffectInfo.WorldMatrix.r[3] = Pos;
+			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
@@ -825,6 +837,12 @@ void CGolem::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_vector Pos = EffectInfo.WorldMatrix.r[3] + XMLoadFloat3(&m_vTargetLook) * 25.f;
+			EffectInfo.WorldMatrix.r[3] = Pos;
+			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
@@ -832,6 +850,11 @@ void CGolem::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(4) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			EffectInfo.WorldMatrix.r[3] = EffectInfo.WorldMatrix.r[3];
+			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
@@ -839,6 +862,11 @@ void CGolem::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(6) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(7))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			EffectInfo.WorldMatrix.r[3] = EffectInfo.WorldMatrix.r[3];
+			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
@@ -846,14 +874,19 @@ void CGolem::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(10) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(11))
 		{
-		
 			GI->PlaySoundW(L"GolemSkill8_2.ogg", SD_MONSTERVOICE, 0.9f);
 			return;
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(8) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(9))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			EffectInfo.WorldMatrix.r[3] = EffectInfo.WorldMatrix.r[3];
+			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+			CRM->Start_Shake(0.4f, 6.f, 0.05f);
 			GI->PlaySoundW(L"GolemAttack1.ogg", SD_MONSTER1, 0.9f);
-			CRM->Start_Shake(0.5f, 6.f, 0.05f);
+		
 			return;
 		}
 		break;

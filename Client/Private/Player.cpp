@@ -101,7 +101,10 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_5))
 	{
-		
+		CAnimMesh::EFFECTINFO EffectInfo;
+		EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+		EffectInfo.vScale = _float3{ 1.2f,1.2f,1.2f };
+		GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
 	}
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
@@ -2150,9 +2153,7 @@ void CPlayer::Update(_float fTimeDelta)
 			{
 				m_fNC2Speed -= 0.15f;
 				m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC2Speed, m_pNavigation, fTimeDelta);
-			}
-
-			
+			}		
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -2436,6 +2437,7 @@ void CPlayer::Update(_float fTimeDelta)
 		
 		break;
 	case Client::CPlayer::EX2READY:
+		m_bMotionChange = false;
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 		{
 			CRM->Fix_Fov(70.f, 100.f);

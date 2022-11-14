@@ -92,6 +92,7 @@ HRESULT CLoader::Loading_ForStatic()
 	LoadAnimModel("Level_Static");
 	LoadAnimModel("PlayerEffect");
 	LoadAnimModel("StaticEffect");
+	LoadAnimModel("GolemEffect");
 	LoadModel("Level_Static");
 	LoadModel("Level_Stage1");
 	LoadModel("PlayerEffect");
@@ -227,6 +228,18 @@ HRESULT CLoader::Loading_ObjectProtoType()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Golem"),
 		CGolem::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("GolemRock1"),
+		CGolemRock1::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("GolemRock2"),
+		CGolemRock2::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("GolemRock3"),
+		CGolemRock3::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Dragon"),

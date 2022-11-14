@@ -187,6 +187,18 @@
     <Filter Include="02.GameObjects\Effect\Player\Gage2">
       <UniqueIdentifier>{c2c5af90-b51d-4c61-af0b-664900cbdff6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Golem">
+      <UniqueIdentifier>{97154f42-f102-4aae-828c-a424303abe5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Golem\Rock1">
+      <UniqueIdentifier>{419df160-5735-4d59-804c-011c012668b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Golem\Rock2">
+      <UniqueIdentifier>{9bc0554d-223a-4465-849e-e7a15cf4e102}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Golem\Rock3">
+      <UniqueIdentifier>{013d3ac7-8bf9-4b2a-aff6-0f8b52f63dac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -432,6 +444,15 @@
     <ClInclude Include="..\Public\PlayerGage2.h">
       <Filter>02.GameObjects\Effect\Player\Gage2</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\GolemRock1.h">
+      <Filter>02.GameObjects\Effect\Golem\Rock1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GolemRock2.h">
+      <Filter>02.GameObjects\Effect\Golem\Rock2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GolemRock3.h">
+      <Filter>02.GameObjects\Effect\Golem\Rock3</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -658,6 +679,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\PlayerGage2.cpp">
       <Filter>02.GameObjects\Effect\Player\Gage2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GolemRock1.cpp">
+      <Filter>02.GameObjects\Effect\Golem\Rock1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GolemRock2.cpp">
+      <Filter>02.GameObjects\Effect\Golem\Rock2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GolemRock3.cpp">
+      <Filter>02.GameObjects\Effect\Golem\Rock3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

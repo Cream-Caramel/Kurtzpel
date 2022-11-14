@@ -186,6 +186,9 @@
     <ClInclude Include="..\Public\ExGauge.h" />
     <ClInclude Include="..\Public\ExSkillFrame.h" />
     <ClInclude Include="..\Public\Golem.h" />
+    <ClInclude Include="..\Public\GolemRock1.h" />
+    <ClInclude Include="..\Public\GolemRock2.h" />
+    <ClInclude Include="..\Public\GolemRock3.h" />
     <ClInclude Include="..\Public\HPBarFrame.h" />
     <ClInclude Include="..\Public\InstanceModel.h" />
     <ClInclude Include="..\Public\KeyE.h" />
@@ -267,6 +270,9 @@
     <ClCompile Include="..\Private\ExGauge.cpp" />
     <ClCompile Include="..\Private\ExSkillFrame.cpp" />
     <ClCompile Include="..\Private\Golem.cpp" />
+    <ClCompile Include="..\Private\GolemRock1.cpp" />
+    <ClCompile Include="..\Private\GolemRock2.cpp" />
+    <ClCompile Include="..\Private\GolemRock3.cpp" />
     <ClCompile Include="..\Private\HPBarFrame.cpp" />
     <ClCompile Include="..\Private\InstanceModel.cpp" />
     <ClCompile Include="..\Private\KeyE.cpp" />

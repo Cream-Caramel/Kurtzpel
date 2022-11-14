@@ -1,25 +1,25 @@
 #include "stdafx.h"
-#include "..\Public\Rock.h"
+#include "..\Public\GolemRock3.h"
 #include "GameInstance.h"
 
-CRock::CRock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CGolemRock3::CGolemRock3(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
 {
 	m_pAnimModel = nullptr;
 }
 
-CRock::CRock(const CRock& rhs)
+CGolemRock3::CGolemRock3(const CGolemRock3& rhs)
 	: CAnimMesh(rhs)
 {
 }
 
-HRESULT CRock::Initialize_Prototype()
+HRESULT CGolemRock3::Initialize_Prototype()
 {
 	__super::Initialize_Prototype();
 	return S_OK;
 }
 
-HRESULT CRock::Initialize(void * pArg)
+HRESULT CGolemRock3::Initialize(void * pArg)
 {
 	EFFECTINFO* EffectInfo = ((EFFECTINFO*)pArg);
 
@@ -44,7 +44,7 @@ HRESULT CRock::Initialize(void * pArg)
 	m_bDead = false;
 	
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"Rock", TEXT("Rock"), (CComponent**)&m_pAnimModel)))
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"GolemRock3", TEXT("GolemRock3"), (CComponent**)&m_pAnimModel)))
 		return E_FAIL;
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Noise"), TEXT("Com_Texture"), (CComponent**)&m_pDissolveTexture)))
@@ -56,7 +56,7 @@ HRESULT CRock::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CRock::Tick(_float fTimeDelta)
+void CGolemRock3::Tick(_float fTimeDelta)
 {
 	if (!m_bDissolve)
 		m_pAnimModel->Play_Animation(fTimeDelta, m_pAnimModel);
@@ -65,7 +65,7 @@ void CRock::Tick(_float fTimeDelta)
 	
 }
 
-void CRock::LateTick(_float fTimeDelta)
+void CGolemRock3::LateTick(_float fTimeDelta)
 {
 	if (nullptr == m_pRendererCom)
 		return;
@@ -82,7 +82,7 @@ void CRock::LateTick(_float fTimeDelta)
 
 }
 
-HRESULT CRock::Render()
+HRESULT CGolemRock3::Render()
 {
 	if (nullptr == m_pAnimModel ||
 		nullptr == m_pShaderCom)
@@ -126,33 +126,33 @@ HRESULT CRock::Render()
 	return S_OK;
 }
 
-CAnimMesh * CRock::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CAnimMesh * CGolemRock3::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CRock*		pInstance = new CRock(pDevice, pContext);
+	CGolemRock3*		pInstance = new CGolemRock3(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CRock"));
+		MSG_BOX(TEXT("Failed To Created : CGolemRock3"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CRock::Clone(void * pArg)
+CGameObject * CGolemRock3::Clone(void * pArg)
 {
-	CRock*		pInstance = new CRock(*this);
+	CGolemRock3*		pInstance = new CGolemRock3(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CRock"));
+		MSG_BOX(TEXT("Failed To Cloned : CGolemRock3"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CRock::Free()
+void CGolemRock3::Free()
 {
 	__super::Free();
 	Safe_Release(m_pAnimModel);

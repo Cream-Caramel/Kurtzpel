@@ -3,13 +3,13 @@
 #include "AnimMesh.h"
 BEGIN(Client)
 
-class CRock final : public CAnimMesh
+class CGolemRock1 final : public CAnimMesh
 {
 
 private:
-	CRock(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
-	CRock(const CRock& rhs);
-	virtual ~CRock() = default;
+	CGolemRock1(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
+	CGolemRock1(const CGolemRock1& rhs);
+	virtual ~CGolemRock1() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
