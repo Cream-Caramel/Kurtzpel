@@ -9,6 +9,8 @@
 #include "Pointer_Manager.h"
 #include "Player.h"
 #include "Level_Loading.h"
+#include "Particle_Manager.h"
+#include "PlayerLight.h"
 
 CGolem::CGolem(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -204,11 +206,13 @@ HRESULT CGolem::Render()
 		{
 			m_bNormalTex = false;
 			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+			m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
 		}
 		else
 		{
 			m_bNormalTex = true;
 			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+			m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
 		}
 
 		if (m_bPattern)
@@ -219,9 +223,6 @@ HRESULT CGolem::Render()
 
 		else if (m_bHit)
 		{
-			
-			m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
-
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
 				return E_FAIL;
 		}
@@ -944,14 +945,23 @@ void CGolem::Update(_float fTimeDelta)
 		m_bAttack = false;
 		if (!m_pAnimModel->GetChangeBool())
 		{
-			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+			{
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				PTM->CreateParticle(L"GolemCharge", WorldPos, false, false, CAlphaParticle::DIR_GOLEM);
+				
+			}
+			/*if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
 			{
 				Set_Dir();
 				_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 				if (Distance > 6.f)
 					m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 3.f, m_pNavigation, fTimeDelta);
 				return;
-			}
+			}*/
+			
+
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
 				GI->Set_Speed(L"Timer_Main", 0.2f);
@@ -964,9 +974,13 @@ void CGolem::Update(_float fTimeDelta)
 				{
 					m_bFinishTime = true;
 					GI->PlaySoundW(L"GolemSkill10_1.ogg", SD_MONSTERVOICE, 0.9f);
+					
 				}
 				GI->Set_Speed(L"Timer_Main", 1.f);
-				
+				CreateLight();
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				PTM->CreateParticle(L"GolemFinish", WorldPos, false, false, CAlphaParticle::DIR_END);
 			
 				m_bAttack = true;
 			}
@@ -992,6 +1006,11 @@ void CGolem::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CGolem::IDLE:
+	{
+		/*_float4 WorldPos;
+		XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		PTM->CreateParticle(L"GolemCharge", WorldPos, false, false, CAlphaParticle::DIR_GOLEM);*/
+	}
 		break;
 	case Client::CGolem::STATE_END:
 		break;
@@ -1148,6 +1167,28 @@ void CGolem::DebugKeyInput()
 
 	if (GI->Key_Down(DIK_M))
 		Set_State(STANDUP);
+}
+
+void CGolem::CreateLight()
+{
+	CPlayerLight::PLAYERLIGHT PlayerLightInfo;
+	_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+	XMStoreFloat4(&PlayerLightInfo.vPos, Pos);
+	PlayerLightInfo.fCloseSpeed = 1.f;
+	PlayerLightInfo.vScale = { 5.f,10.f,5.f };
+	PlayerLightInfo.vAngle = { 0.f,0.f,0.f };
+	GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
+
+
+	for (int i = 0; i < 15; ++i)
+	{
+		_vector Pos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
+		XMStoreFloat4(&PlayerLightInfo.vPos, Pos);
+		PlayerLightInfo.fCloseSpeed = GI->Get_FloatRandom(0.05f, 0.1f);
+		PlayerLightInfo.vScale = { GI->Get_FloatRandom(1.f,2.f),10.f, GI->Get_FloatRandom(1.f,2.f) };
+		PlayerLightInfo.vAngle = { GI->Get_FloatRandom(0.f,360.f),GI->Get_FloatRandom(0.f,360.f),GI->Get_FloatRandom(0.f,360.f) };
+		GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
+	}
 }
 
 CGolem * CGolem::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

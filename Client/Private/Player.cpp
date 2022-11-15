@@ -162,7 +162,7 @@ void CPlayer::LateTick(_float fTimeDelta)
 	for (int i = 0; i < OBB_END; ++i)
 		m_pOBB[i]->Update(m_pTransformCom->Get_WorldMatrix());
 
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	
 	if(m_bCollision)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYER, this, m_pOBB[OBB_BODY]);

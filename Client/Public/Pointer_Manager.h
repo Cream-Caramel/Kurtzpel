@@ -18,6 +18,7 @@ public:
 	CPlayer* Get_PlayerPointer() { return m_pPlayer; }
 	_float3 Get_PlayerPos();
 	CAnimMesh* Get_BossPointer() { return m_pBoss; }
+	_float3 Get_BossPos();
 	void Add_CameraPlayer(CCamera_Player* pCameraPlayer);
 	CCamera_Player* Get_CameraPlayer() { return m_pCameraPlayer; }
 	_float3 Get_CameraPlayerPos();

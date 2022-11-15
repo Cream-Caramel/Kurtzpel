@@ -247,6 +247,11 @@ HRESULT CRenderer::Render_Lights()
 	if (FAILED(m_pTarget_Manager->End_MRT(m_pContext)))
 		return E_FAIL;
 
+	ID3D11ShaderResourceView* pSRVs[8] = {};
+
+	m_pContext->PSSetShaderResources(0, 8, pSRVs);
+		//몇번 째 타겟부터 어디타겟까지 셰이더에 바인딩되어있는 랜더타겟을 해제한다.
+
 	return S_OK;
 }
 
@@ -284,6 +289,10 @@ HRESULT CRenderer::Render_Blend()
 	m_pShader->Begin(3);
 
 	m_pVIBuffer->Render();
+
+	ID3D11ShaderResourceView* pSRVs[8] = {};
+
+	m_pContext->PSSetShaderResources(0, 8, pSRVs);
 
 	return S_OK;
 }

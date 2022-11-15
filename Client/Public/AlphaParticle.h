@@ -16,7 +16,7 @@ BEGIN(Client)
 class CAlphaParticle : public CGameObject
 {
 public:
-	enum DIRPOINT {DIR_PLAYER, DIR_PLAYERSOWRD, DIR_END};
+	enum DIRPOINT {DIR_PLAYER, DIR_PLAYERSOWRD, DIR_GOLEM, DIR_END};
 public:
 	typedef struct tagParticleInfo
 	{

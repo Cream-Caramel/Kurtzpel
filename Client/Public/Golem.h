@@ -58,6 +58,7 @@ private:
 	HRESULT Ready_Sockets();
 	HRESULT Load_UI(char* DatName);
 	void DebugKeyInput();
+	void CreateLight();
 	
 private:
 	STATE m_eCurState; // 현재 상태

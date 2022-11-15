@@ -148,6 +148,13 @@ void CAlphaParticle::SetDirPoint(_float4 vWorldPos)
 		if (m_ParticleInfo.vDirection.x == 0 && m_ParticleInfo.vDirection.y == 0 && m_ParticleInfo.vDirection.z == 0)
 			XMStoreFloat3(&m_ParticleInfo.vDirection, _vector{ m_ParticleInfo.vPosition.x, m_ParticleInfo.vPosition.y , m_ParticleInfo.vPosition.z } -_vector{ 0.f,0.f,0.f });
 		break;
+	case DIR_GOLEM:
+	{
+		_float3 DirPos = PM->Get_BossPos();
+		DirPos.y += 0.5f;
+		_vector BossDir = XMLoadFloat3(&DirPos) - _vector{ vWorldPos.x,vWorldPos.y,vWorldPos.z };
+		XMStoreFloat3(&m_ParticleInfo.vDirection, BossDir);
+	}
 	}
 	
 }
@@ -164,6 +171,15 @@ void CAlphaParticle::CheckDead()
 			Set_Dead();
 	}
 		break;
+
+	case DIR_GOLEM:
+	{
+		_float3 DirPos = PM->Get_BossPos();
+		DirPos.y += 0.5f;
+		if (0.1f >= XMVector3Length(XMLoadFloat3(&DirPos) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)).m128_f32[0])
+			Set_Dead();
+	}
+	break;
 
 	}
 

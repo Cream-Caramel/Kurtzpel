@@ -22,6 +22,11 @@ _float3 CPointer_Manager::Get_PlayerPos()
 	return m_pPlayer->Get_Pos();
 }
 
+_float3 CPointer_Manager::Get_BossPos()
+{
+	return m_pBoss->Get_Pos();
+}
+
 void CPointer_Manager::Add_CameraPlayer(CCamera_Player * pCameraPlayer)
 {
 	m_pCameraPlayer = pCameraPlayer;

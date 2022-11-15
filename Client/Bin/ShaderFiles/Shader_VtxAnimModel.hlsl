@@ -74,7 +74,7 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vTexUV = In.vTexUV;
 	Out.vProjPos = Out.vPosition;
 
-	Out.vCamDir = /*normalize(g_vCamPos - */vWorld;
+	Out.vCamDir = normalize(g_vCamPos - vWorld);
 
 	return Out;
 }
@@ -117,6 +117,12 @@ PS_OUT PS_MAIN(PS_IN In)
 		Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 		Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
 	
+		float rim = (dot(vNormal, normalize(In.vCamDir)));
+		if (rim < 0.3f)
+		{
+			Out.vDiffuse.r = 1;
+			Out.vDiffuse.gb = 0;
+		}
 	}
 
 	else
