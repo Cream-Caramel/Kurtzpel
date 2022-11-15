@@ -107,37 +107,30 @@ HRESULT CPlayerEx::Render()
 	{
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
-		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
+	
+		if (m_bStartDissolve)
 		{
-			m_bNormalTex = false;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+			if (FAILED(m_pShaderCom->Begin(MODEL_NSTARTDISSOLVE)))
+				return E_FAIL;
 
-			if (m_bStartDissolve)
-			{
-				if (FAILED(m_pShaderCom->Begin(MODEL_STARTDISSOLVE)))
-					return E_FAIL;
+			m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
+			m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
 
-				m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
-				m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
-
-				if (FAILED(m_pModel->Render(i)))
-					return E_FAIL;
-			}
-
-			else if (m_bEndDissolve)
-			{
-				if (FAILED(m_pShaderCom->Begin(MODEL_DISSOLVE)))
-					return E_FAIL;
-
-				m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
-				m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
-
-				if (FAILED(m_pModel->Render(i)))
-					return E_FAIL;
-			}
-
+			if (FAILED(m_pModel->Render(i)))
+				return E_FAIL;
 		}
 
+		else if (m_bEndDissolve)
+		{
+			if (FAILED(m_pShaderCom->Begin(MODEL_NENDDISSOLVE)))
+				return E_FAIL;
+
+			m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
+			m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));		
+		}
+		
+		if (FAILED(m_pModel->Render(i)))
+			return E_FAIL;
 	}
 	return S_OK;
 }

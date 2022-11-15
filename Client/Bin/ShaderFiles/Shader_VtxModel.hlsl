@@ -94,6 +94,23 @@ PS_OUT PS_MAIN(PS_IN In)
 	return Out;
 }
 
+PS_OUT NPS_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+
+	if (0 == Out.vDiffuse.a)
+		discard;
+
+	return Out;
+}
+
+
 PS_OUT NonLight_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
@@ -108,7 +125,7 @@ PS_OUT NonLight_MAIN(PS_IN In)
 	return Out;
 }
 
-PS_OUT Dissolve_MAIN(PS_IN In)
+PS_OUT EndDissolve_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
@@ -124,6 +141,36 @@ PS_OUT Dissolve_MAIN(PS_IN In)
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+
+	float fDissolve = length(g_DissolveTexture.Sample(DefaultSampler, In.vTexUV));
+	fDissolve = smoothstep(0.f, 4.f, fDissolve);
+
+	if (fDissolve <= g_fDissolveAcc)
+		discard;
+
+	if (fDissolve <= g_fDissolveAcc + 0.03f)
+	{
+		Out.vDiffuse.r = 1.f;
+		Out.vDiffuse.g = 1.f;
+		Out.vDiffuse.b *= 1.f - (g_fDissolveAcc - fDissolve);
+	}
+
+	if (0 == Out.vDiffuse.a)
+		discard;
+
+	return Out;
+
+}
+
+PS_OUT NEndDissolve_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
 
 	float fDissolve = length(g_DissolveTexture.Sample(DefaultSampler, In.vTexUV));
@@ -184,6 +231,36 @@ PS_OUT StartDissolve_MAIN(PS_IN In)
 
 }
 
+PS_OUT NStartDissolve_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+
+	float fDissolve = length(g_DissolveTexture.Sample(DefaultSampler, In.vTexUV));
+	fDissolve = smoothstep(0.f, 5.f, fDissolve);
+
+	if (fDissolve >= g_fDissolveAcc)
+		discard;
+
+	if (fDissolve >= g_fDissolveAcc + 0.03f)
+	{
+		Out.vDiffuse.r = 1.f;
+		Out.vDiffuse.g = 1.f;
+		Out.vDiffuse.b *= 1.f - (g_fDissolveAcc - fDissolve);
+	}
+
+	if (0 == Out.vDiffuse.a)
+		discard;
+
+	return Out;
+
+}
+
 
 technique11 DefaultTechnique
 {
@@ -197,6 +274,16 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
+	pass NDefaultPass
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 NPS_MAIN();
+	}
+
 	pass NonLightPass
 	{
 		SetRasterizerState(RS_Default);
@@ -207,14 +294,24 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 NonLight_MAIN();
 	}
 
-	pass DissolvePass
+	pass EndDissolvePass
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DSS_Default, 0);
 		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 Dissolve_MAIN();
+		PixelShader = compile ps_5_0 EndDissolve_MAIN();
+	}
+
+	pass NEndDissolvePass
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 NEndDissolve_MAIN();
 	}
 
 	pass StartDissolvePass
@@ -225,6 +322,16 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 StartDissolve_MAIN();
+	}
+
+	pass NStartDissolvePass
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 NStartDissolve_MAIN();
 	}
 
 

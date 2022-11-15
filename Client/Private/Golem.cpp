@@ -204,43 +204,55 @@ HRESULT CGolem::Render()
 
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
 		{
-			m_bNormalTex = false;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
-			m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
+			if (m_bPattern)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NPATTERN)))
+					return E_FAIL;
+			}
+
+			else if (m_bHit)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
+					return E_FAIL;
+			}
+
+			else if (m_bFinish)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NFINISH)))
+					return E_FAIL;
+			}
+
+			else
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NDEFAULT)))
+					return E_FAIL;
+			}
 		}
 		else
 		{
-			m_bNormalTex = true;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
-			m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
-		}
+			if (m_bPattern)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
+					return E_FAIL;
+			}
 
-		if (m_bPattern)
-		{
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
-				return E_FAIL;
-		}
+			else if (m_bHit)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
+					return E_FAIL;
+			}
 
-		else if (m_bHit)
-		{
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
-				return E_FAIL;
-		}
-		
-		else if (m_bFinish)
-		{
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
-				return E_FAIL;
-		}
+			else if (m_bFinish)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
+					return E_FAIL;
+			}
 
-		else
-		{
-			_float3 CameraDir;
-			XMStoreFloat3(&CameraDir, XMVector3Normalize(XMLoadFloat4(&GI->Get_CamPosition()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
-			m_pShaderCom->Set_RawValue("g_CameraDir", &CameraDir, sizeof(_float3));
-
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
-				return E_FAIL;
+			else
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
+					return E_FAIL;
+			}
 		}
 	}
 

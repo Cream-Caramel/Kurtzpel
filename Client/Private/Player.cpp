@@ -196,20 +196,18 @@ HRESULT CPlayer::Render()
 					return E_FAIL;
 
 				if (FAILED(m_pAnimModel[i]->SetUp_OnShader(m_pShaderCom, m_pAnimModel[i]->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
-				{
-					m_bNormalTex = false;
-					m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
-					m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
+				{			
+					if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_NDEFAULT)))
+						return E_FAIL;		
 				}
 				else
 				{
-					m_bNormalTex = true;
-					m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
-					m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
-				}
 
-				if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j)))
-					return E_FAIL;
+					m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+					if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_DEFAULT)))
+						return E_FAIL;
+
+				}		
 			}	
 		}
 	}

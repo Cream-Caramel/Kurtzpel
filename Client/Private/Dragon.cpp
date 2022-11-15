@@ -206,36 +206,55 @@ HRESULT CDragon::Render()
 
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
 		{
-			m_bNormalTex = false;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+			if (m_bPattern)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NPATTERN)))
+					return E_FAIL;
+			}
+
+			else if (m_bHit)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
+					return E_FAIL;
+			}
+
+			else if (m_bFinish)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NFINISH)))
+					return E_FAIL;
+			}
+
+			else
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NDEFAULT)))
+					return E_FAIL;
+			}
 		}
 		else
 		{
-			m_bNormalTex = true;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
-		}
+			if (m_bPattern)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
+					return E_FAIL;
+			}
 
-		if (m_bPattern)
-		{
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
-				return E_FAIL;
-		}
+			else if (m_bHit)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
+					return E_FAIL;
+			}
 
-		else if (m_bHit)
-		{
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
-				return E_FAIL;
-		}
+			else if (m_bFinish)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
+					return E_FAIL;
+			}
 
-		else if (m_bFinish)
-		{
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
-				return E_FAIL;
-		}
-		else
-		{
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
-				return E_FAIL;
+			else
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
+					return E_FAIL;
+			}
 		}
 	}
 

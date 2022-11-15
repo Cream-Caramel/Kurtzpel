@@ -106,21 +106,17 @@ HRESULT CGolemRock2::Render()
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 
-		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
+		if (!m_bDissolve)
 		{
-			m_bNormalTex = false;
-			if (!m_bDissolve)
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i)))
-					return E_FAIL;
-			}
-			else
-			{
-				m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
-				m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i, ANIM_DISSOLVE)))
-					return E_FAIL;
-			}
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, i)))
+				return E_FAIL;
+		}
+		else
+		{
+			m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
+			m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, i, ANIM_DISSOLVE)))
+				return E_FAIL;
 		}
 	}
 	return S_OK;

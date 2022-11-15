@@ -108,27 +108,25 @@ HRESULT CPlayerRockBreak::Render()
 
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
 		{
-			m_bNormalTex = false;
+		
 			if (!m_bDissolve)
 			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i)))
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i, ANIM_NDEFAULT)))
 					return E_FAIL;
 			}
 			else
 			{
 				m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
 				m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i, ANIM_DISSOLVE)))
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i, ANIM_NDISSOLVE)))
 					return E_FAIL;
 			}
 		}
 		else
 		{
-			m_bNormalTex = true;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
 			if (!m_bDissolve)
 			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i)))
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, i, ANIM_DEFAULT)))
 					return E_FAIL;
 			}
 			else
