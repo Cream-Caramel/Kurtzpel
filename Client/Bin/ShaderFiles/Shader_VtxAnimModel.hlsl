@@ -1,6 +1,7 @@
 #include "Client_Shader_Defines.hpp"
 matrix		g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
+float3 g_vCamPos;
 float g_fDissolveAcc;
 bool g_bNormalTex;
 struct tagBoneMatrices
@@ -39,6 +40,7 @@ struct VS_OUT
 	float4		vProjPos : TEXCOORD1;
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
+	float3		vCamDir : TEXCOORD2;
 };
 
 
@@ -62,6 +64,8 @@ VS_OUT VS_MAIN(VS_IN In)
 	vector		vNormal = mul(vector(In.vNormal, 0.f), BoneMatrix);
 	vector		vTangent = mul(vector(In.vTangent, 0.f), BoneMatrix);
 
+	vector		vWorld = mul(vPosition, g_WorldMatrix);
+
 	Out.vPosition = mul(vPosition, matWVP);
 	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
 	Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix)).xyz;
@@ -69,6 +73,8 @@ VS_OUT VS_MAIN(VS_IN In)
 
 	Out.vTexUV = In.vTexUV;
 	Out.vProjPos = Out.vPosition;
+
+	Out.vCamDir = /*normalize(g_vCamPos - */vWorld;
 
 	return Out;
 }
@@ -81,6 +87,7 @@ struct PS_IN
 	float4		vProjPos : TEXCOORD1;
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
+	float3		vCamDir : TEXCOORD2;
 };
 
 struct PS_OUT
@@ -109,6 +116,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
 		Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 		Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	
 	}
 
 	else
@@ -181,8 +189,8 @@ PS_OUT Hit_MAIN(PS_IN In)
 		vNormal = normalize(mul(vNormal, WorldMatrix));
 
 		Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+
 		Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
-		Out.vDiffuse.r = 1.f;
 	}
 
 	else

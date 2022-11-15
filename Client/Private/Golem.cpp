@@ -42,15 +42,15 @@ HRESULT CGolem::Initialize(void * pArg)
 	if (FAILED(Ready_Collider()))
 		return E_FAIL;
 
-	m_bColliderRender = true;
+	m_bColliderRender = false;
 
-	m_eCurState = START;
-	m_eNextState = START;
+	m_eCurState = IDLE;
+	m_eNextState = IDLE;
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 350;
+	m_fMaxHp = 1000;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 90.f;
@@ -147,7 +147,7 @@ void CGolem::LateTick(_float fTimeDelta)
 
 	m_pAnimModel->Play_Animation(fTimeDelta, m_pAnimModel);
 
-	End_Animation();
+	//End_Animation();
 
 	m_pOBB[OBB_BODY]->Update(m_pTransformCom->Get_WorldMatrix());
 
@@ -219,10 +219,13 @@ HRESULT CGolem::Render()
 
 		else if (m_bHit)
 		{
+			
+			m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
+
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
 				return E_FAIL;
 		}
-
+		
 		else if (m_bFinish)
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
@@ -231,6 +234,10 @@ HRESULT CGolem::Render()
 
 		else
 		{
+			_float3 CameraDir;
+			XMStoreFloat3(&CameraDir, XMVector3Normalize(XMLoadFloat4(&GI->Get_CamPosition()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
+			m_pShaderCom->Set_RawValue("g_CameraDir", &CameraDir, sizeof(_float3));
+
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
 				return E_FAIL;
 		}
@@ -824,10 +831,14 @@ void CGolem::Update(_float fTimeDelta)
 	case Client::CGolem::SKILL8:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
+
+
 			CAnimMesh::EFFECTINFO EffectInfo;
-			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
-			_vector Pos = EffectInfo.WorldMatrix.r[3] + XMLoadFloat3(&m_vTargetLook) * 15.f;
-			EffectInfo.WorldMatrix.r[3] = Pos;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();			
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Look * 3.f;
+			EffectInfo.WorldMatrix.r[3] += Right * -1.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
 			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
@@ -839,8 +850,10 @@ void CGolem::Update(_float fTimeDelta)
 		{
 			CAnimMesh::EFFECTINFO EffectInfo;
 			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
-			_vector Pos = EffectInfo.WorldMatrix.r[3] + XMLoadFloat3(&m_vTargetLook) * 25.f;
-			EffectInfo.WorldMatrix.r[3] = Pos;
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Look * 3.3f;
+			EffectInfo.WorldMatrix.r[3] += Right * 2.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
 			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
@@ -852,7 +865,10 @@ void CGolem::Update(_float fTimeDelta)
 		{
 			CAnimMesh::EFFECTINFO EffectInfo;
 			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
-			EffectInfo.WorldMatrix.r[3] = EffectInfo.WorldMatrix.r[3];
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Look * 3.f;
+			EffectInfo.WorldMatrix.r[3] += Right * -1.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
 			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
@@ -864,7 +880,10 @@ void CGolem::Update(_float fTimeDelta)
 		{
 			CAnimMesh::EFFECTINFO EffectInfo;
 			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
-			EffectInfo.WorldMatrix.r[3] = EffectInfo.WorldMatrix.r[3];
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Look * 3.3f;
+			EffectInfo.WorldMatrix.r[3] += Right * 2.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
 			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
@@ -881,7 +900,10 @@ void CGolem::Update(_float fTimeDelta)
 		{
 			CAnimMesh::EFFECTINFO EffectInfo;
 			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
-			EffectInfo.WorldMatrix.r[3] = EffectInfo.WorldMatrix.r[3];
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Look * 3.f;
+			EffectInfo.WorldMatrix.r[3] += Right * 2.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
 			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			CRM->Start_Shake(0.4f, 6.f, 0.05f);

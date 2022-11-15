@@ -125,6 +125,9 @@ HRESULT CRenderer::Draw()
 	if (FAILED(Render_NonLight()))
 		return E_FAIL;
 
+	if (FAILED(Render_FrontAlpha()))
+		return E_FAIL;
+
 	if (FAILED(Render_AlphaBlend()))
 		return E_FAIL;
 
@@ -295,6 +298,25 @@ HRESULT CRenderer::Render_NonLight()
 		Safe_Release(pRenderObject);
 	}
 	m_RenderObjects[RENDER_NONLIGHT].clear();
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_FrontAlpha()
+{
+	m_RenderObjects[RENDER_FRONTALPHA].sort([](CGameObject* pSour, CGameObject* pDest)
+	{
+		return pSour->Get_CamDistance() > pDest->Get_CamDistance();
+	});
+
+	for (auto& pRenderObject : m_RenderObjects[RENDER_FRONTALPHA])
+	{
+		if (nullptr != pRenderObject)
+			pRenderObject->Render();
+
+		Safe_Release(pRenderObject);
+	}
+	m_RenderObjects[RENDER_FRONTALPHA].clear();
 
 	return S_OK;
 }

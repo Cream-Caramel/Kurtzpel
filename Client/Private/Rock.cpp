@@ -155,6 +155,7 @@ CGameObject * CRock::Clone(void * pArg)
 void CRock::Free()
 {
 	__super::Free();
+	Safe_Release(m_pDissolveTexture);
 	Safe_Release(m_pAnimModel);
 
 }

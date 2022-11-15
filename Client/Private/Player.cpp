@@ -74,7 +74,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	Ready_PlayerParts();
 
 	UM->Add_Player(this);
-	m_bColliderRender = true;
+	m_bColliderRender = false;
 	
 	m_pTransformCom->Set_Gravity(0.f);
 	m_pTransformCom->Set_JumpPower(0.4f);
@@ -162,7 +162,7 @@ void CPlayer::LateTick(_float fTimeDelta)
 	for (int i = 0; i < OBB_END; ++i)
 		m_pOBB[i]->Update(m_pTransformCom->Get_WorldMatrix());
 
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
 	
 	if(m_bCollision)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYER, this, m_pOBB[OBB_BODY]);
@@ -199,11 +199,13 @@ HRESULT CPlayer::Render()
 				{
 					m_bNormalTex = false;
 					m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+					m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
 				}
 				else
 				{
 					m_bNormalTex = true;
 					m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+					m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
 				}
 
 				if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j)))
@@ -522,7 +524,6 @@ void CPlayer::Set_State(STATE eState)
 	case Client::CPlayer::CHARGECRASH:
 		GI->PlaySoundW(L"SpinComboEnd.ogg", SD_PLAYER1, 0.6f); 
 		m_fChargeCrashSpeed = 6.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(100.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		PM->Set_PlayerGage2_1(true);
 		PM->Set_PlayerGage2_2(true);
@@ -535,6 +536,8 @@ void CPlayer::Set_State(STATE eState)
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
+		m_bCharge1 = false;
+		m_bCharge2 = false;
 		PM->Set_PlayerGage2_1(false);
 		PM->Set_PlayerGage2_2(false);
 		GI->PlaySoundW(L"ChargeVoice.ogg", SD_PLAYERVOICE, 0.9f);
@@ -738,13 +741,14 @@ void CPlayer::Set_State(STATE eState)
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
+		m_bCharge1 = false;
+		m_bCharge2 = false;
 		PM->Set_PlayerGage2_1(false);
 		PM->Set_PlayerGage2_2(false);
 		GI->PlaySoundW(L"ChargeVoice.ogg", SD_PLAYERVOICE, 0.9f);
 		GI->PlaySoundW(L"ChargeReady.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 20.f;
 		CRM->Start_Fov(80.f, 30.f);
-		m_Parts[PARTS_SWORD]->Set_Damage(70.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	}
@@ -1735,7 +1739,7 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::IDLE:
 		m_bMotionChange = true;
-		for(int i = 0; i < OBB_END; ++i)
+		for (int i = 0; i < OBB_END; ++i)
 			m_pOBB[i]->ChangeExtents(_float3(0.7f, 2.f, 0.7f));
 		m_bUseSkill = true;
 		break;
@@ -1745,7 +1749,7 @@ void CPlayer::Update(_float fTimeDelta)
 			m_pOBB[i]->ChangeExtents(_float3(0.7f, 1.5f, 1.4f));
 		if (m_fDashSpeed > 0.5f)
 			m_fDashSpeed -= 0.5f;
-			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fDashSpeed, m_pNavigation, fTimeDelta);	
+		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fDashSpeed, m_pNavigation, fTimeDelta);
 		break;
 	case Client::CPlayer::DIE:
 		m_bCollision = false;
@@ -1762,7 +1766,7 @@ void CPlayer::Update(_float fTimeDelta)
 		m_bCollision = false;
 		break;
 	case Client::CPlayer::RUN:
-		
+
 		if (!m_pAnimModel[0]->GetChangeBool())
 		{
 			m_bMotionChange = true;
@@ -1772,19 +1776,19 @@ void CPlayer::Update(_float fTimeDelta)
 				GI->PlaySoundW(L"Run.ogg", SD_PLAYER1, 0.6f);
 				m_fRunSoundAcc = 0.f;
 			}
-			
+
 			if (CRM->Get_bFov())
 			{
 				CRM->Set_FovSpeed(150.f);
 				CRM->Set_FovDir(true);
 			}
-		}	
+		}
 		m_bUseSkill = true;
 		for (int i = 0; i < OBB_END; ++i)
-			m_pOBB[i]->ChangeExtents(_float3(0.7f, 1.5f, 1.2f));	
+			m_pOBB[i]->ChangeExtents(_float3(0.7f, 1.5f, 1.2f));
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRunSpeed, m_pNavigation, fTimeDelta);
 		break;
-	case Client::CPlayer::RUNEND:	
+	case Client::CPlayer::RUNEND:
 		m_bMotionChange = true;
 		if (m_fRunEndSpeed > 0.15f)
 		{
@@ -1842,14 +1846,14 @@ void CPlayer::Update(_float fTimeDelta)
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
 			GI->PlaySoundW(L"AttackVoice4.ogg", SD_PLAYERVOICE, 0.6f);
-			GI->PlaySoundW(L"NormalCombo2.ogg", SD_PLAYER1, 0.6f);			
+			GI->PlaySoundW(L"NormalCombo2.ogg", SD_PLAYER1, 0.6f);
 		}
 
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			Update_SwordTrails(SPINCOMBOSTART);
-			
+
 		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -1865,7 +1869,7 @@ void CPlayer::Update(_float fTimeDelta)
 				m_fSpinComboLoofAcc = 0.f;
 			}
 			else
-				m_Parts[PARTS_SWORD]->Set_Collision(false);				
+				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		}
 		break;
 	case Client::CPlayer::FASTCOMBOEND:
@@ -1894,7 +1898,7 @@ void CPlayer::Update(_float fTimeDelta)
 			m_fFastComboStartSpeed -= 0.15f;
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fFastComboStartSpeed, m_pNavigation, fTimeDelta);
 		}
-			Set_FastComboTime(fTimeDelta);	
+		Set_FastComboTime(fTimeDelta);
 		break;
 	case Client::CPlayer::ROCKBREAK:
 		if (!m_pAnimModel[0]->GetChangeBool())
@@ -1919,7 +1923,7 @@ void CPlayer::Update(_float fTimeDelta)
 				GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				CRM->Start_Shake(0.3f, 3.f, 0.03f);
-				
+
 			}
 			else
 				m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -1938,8 +1942,8 @@ void CPlayer::Update(_float fTimeDelta)
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
 				Update_SwordTrails(CHARGECRASH);
-		
-			
+
+
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			{
 				CAnimMesh::EFFECTINFO EffectInfo;
@@ -1954,7 +1958,18 @@ void CPlayer::Update(_float fTimeDelta)
 				_float4 WorldPos;
 				_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMLoadFloat3(&m_vTargetLook) * 5.f;
 				XMStoreFloat4(&WorldPos, vPos);
-				PTM->CreateParticle(L"Player1", WorldPos, false, true, false);
+				if (m_bCharge1)
+				{
+					PTM->CreateParticle(L"Player1", WorldPos, false, true, CAlphaParticle::DIR_END);
+					m_Parts[PARTS_SWORD]->Set_Damage(70.f);
+				}
+				else if (m_bCharge2)
+				{
+					PTM->CreateParticle(L"Player2", WorldPos, false, true, CAlphaParticle::DIR_END);
+					m_Parts[PARTS_SWORD]->Set_Damage(50.f);
+				}
+				else
+					m_Parts[PARTS_SWORD]->Set_Damage(30.f);
 				ChargeAttackLight();
 			}
 			else
@@ -1964,8 +1979,33 @@ void CPlayer::Update(_float fTimeDelta)
 			}
 		}
 		break;
-	case Client::CPlayer::CHARGEREADY:	
+	case Client::CPlayer::CHARGEREADY:
 		m_bMotionChange = false;
+
+		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
+		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"ChargeYellow", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+		}
+		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"ChargeOrange", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+			CRM->Start_Shake(0.2f, 1.f, 0.02f);
+			m_bCharge2 = true;
+		}
+
+		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4))
+		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"ChargeOrange2", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+			CRM->Start_Shake(0.2f, 1.5f, 0.02f);
+			m_bCharge1 = true;
+		}
+
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 		{
 			CRM->Fix_Fov(70.f, 100.f);
@@ -1973,7 +2013,7 @@ void CPlayer::Update(_float fTimeDelta)
 			GI->PlaySoundW(L"ChargeReady.ogg", SD_PLAYER1, 0.6f);
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"PlayerGage2_2", WorldPos, false, true, false);
+			PTM->CreateParticle(L"PlayerGage2_2", WorldPos, false, true, CAlphaParticle::DIR_END);
 			CreateGage(false);
 		}
 
@@ -1985,7 +2025,7 @@ void CPlayer::Update(_float fTimeDelta)
 			PM->Set_PlayerGage2_2(true);
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, false);
+			PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, CAlphaParticle::DIR_END);
 			CreateGage(true);
 		}
 		break;
@@ -2087,10 +2127,10 @@ void CPlayer::Update(_float fTimeDelta)
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
 				Update_SwordTrails(AIRCOMBO4);
 			if (m_pTransformCom->Get_JumpEnd(m_pTransformCom->Get_State(CTransform::STATE_POSITION), m_pNavigation) && m_pTransformCom->Get_Jump())
-			{	
+			{
 				m_pTransformCom->Set_Jump(false);
 				GI->PlaySoundW(L"AirComboEnd.ogg", SD_PLAYER1, 0.6f);
-				m_pTransformCom->Set_Gravity(0.f); 
+				m_pTransformCom->Set_Gravity(0.f);
 				Set_State(AIRCOMBOEND);
 				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
 				CAnimMesh::EFFECTINFO EffectInfo;
@@ -2113,18 +2153,18 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::VOIDBACKEND:
 		break;
-	case Client::CPlayer::VOIDFRONT:	
-		if(UM->Get_Count() > 0)
+	case Client::CPlayer::VOIDFRONT:
+		if (UM->Get_Count() > 0)
 			m_bCollision = false;
 		if (m_fVoidFront > 0.5f)
-			m_fVoidFront -= 0.5f;		
+			m_fVoidFront -= 0.5f;
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fVoidFront, m_pNavigation, fTimeDelta);
 		break;
 	case Client::CPlayer::VOIDBACK:
 		if (UM->Get_Count() > 0)
 			m_bCollision = false;
 		if (m_fVoidBack > 0.5f)
-			m_fVoidBack += 0.2f;	
+			m_fVoidBack += 0.2f;
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), -m_fVoidBack, m_pNavigation, fTimeDelta);
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
@@ -2140,7 +2180,7 @@ void CPlayer::Update(_float fTimeDelta)
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
-	case Client::CPlayer::NOMALCOMBO2:	
+	case Client::CPlayer::NOMALCOMBO2:
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
 			Update_SwordTrails(NOMALCOMBO2);
 
@@ -2153,7 +2193,7 @@ void CPlayer::Update(_float fTimeDelta)
 			{
 				m_fNC2Speed -= 0.15f;
 				m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC2Speed, m_pNavigation, fTimeDelta);
-			}		
+			}
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -2328,16 +2368,16 @@ void CPlayer::Update(_float fTimeDelta)
 			m_pSwordEx->LateTick(fTimeDelta);
 			_matrix WeaponHandRMatrix = m_Sockets[SOCKET_WEAPONHANDR]->Get_CombinedTransformation()* m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
 			m_pSwordEx->SetUp_State(WeaponHandRMatrix);
-			
-				
+
+
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
 			{
-				
+
 				GI->PlaySoundW(L"BladeAttack.ogg", SD_PLAYER1, 0.6f);
 				GI->PlaySoundW(L"BladeVoice.ogg", SD_PLAYERVOICE, 0.9f);
-				
-			}	
-				
+
+			}
+
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			{
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -2345,7 +2385,7 @@ void CPlayer::Update(_float fTimeDelta)
 				CRM->Start_Shake(0.5f, 1.5f, 0.03f);
 			}
 
-		
+
 			else
 			{
 				CRM->Set_FovDir(true);
@@ -2359,16 +2399,16 @@ void CPlayer::Update(_float fTimeDelta)
 		m_bMotionChange = false;
 		Set_SwordTrailMatrix();
 		if (m_bDoubleSlash)
-		{		
+		{
 			CRM->Set_PlayerScene(true);
 			CRM->Start_Scene("PlayerDoubleSlash");
 			m_bDoubleSlash = false;
 			return;
-		}	
+		}
 		if (m_bDoubleSlashFov)
 		{
 			CRM->Start_Fov(30.f, 40.f);
-			
+
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 		{
@@ -2391,8 +2431,8 @@ void CPlayer::Update(_float fTimeDelta)
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3{ 4.f,4.f,4.f });
 			if (!m_bDoubleSlashFov && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
 				m_bDoubleSlashFov = true;
-		}		
-		
+		}
+
 		else
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -2421,7 +2461,19 @@ void CPlayer::Update(_float fTimeDelta)
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3{ 12.f,12.f,12.f });
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"Player1", WorldPos, false, true, false);
+			if (m_bCharge1)
+			{
+				PTM->CreateParticle(L"Player1", WorldPos, false, true, CAlphaParticle::DIR_END);
+				m_Parts[PARTS_SWORD]->Set_Damage(60.f);
+			}
+			else if (m_bCharge2)
+			{
+				PTM->CreateParticle(L"Player2", WorldPos, false, true, CAlphaParticle::DIR_END);
+				m_Parts[PARTS_SWORD]->Set_Damage(40.f);
+			}
+			else
+				m_Parts[PARTS_SWORD]->Set_Damage(20.f);
+
 			Ex1AttackLight();
 			return;
 		}
@@ -2434,10 +2486,33 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::EX2ATTACK:
 		break;
 	case Client::CPlayer::EX1READY:
-		
+
 		break;
 	case Client::CPlayer::EX2READY:
 		m_bMotionChange = false;
+		if (m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
+		{	
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"ChargeYellow", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+		}
+		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"ChargeOrange", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+			CRM->Start_Shake(0.2f, 1.f, 0.02f);
+			m_bCharge2 = true;
+		}
+
+		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4))
+		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"ChargeOrange2", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+			CRM->Start_Shake(0.2f, 2.f, 0.03f);
+			m_bCharge1 = true;
+		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 		{
 			CRM->Fix_Fov(70.f, 100.f);
@@ -2445,7 +2520,7 @@ void CPlayer::Update(_float fTimeDelta)
 			GI->PlaySoundW(L"ChargeReady.ogg", SD_PLAYER1, 0.6f);
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"PlayerGage2_2", WorldPos, false, true, false);
+			PTM->CreateParticle(L"PlayerGage2_2", WorldPos, false, true, CAlphaParticle::DIR_END);
 			CreateGage(false);
 		}
 
@@ -2457,7 +2532,7 @@ void CPlayer::Update(_float fTimeDelta)
 			PM->Set_PlayerGage2_2(true);
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, false);
+			PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, CAlphaParticle::DIR_END);
 			CreateGage(true);
 		}
 		break;

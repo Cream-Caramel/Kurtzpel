@@ -50,11 +50,13 @@ HRESULT CPlayerGage2::Initialize(void * pArg)
 
 	if (m_PlayerGage2Info.bGage2_1)
 	{
+		m_pTransformCom->Set_Scale(_vector{ 10.f,2.5f,10.f });
 		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerGage2_1", TEXT("PlayerGage2_1"), (CComponent**)&m_pModel)))
 			return E_FAIL;
 	}
 	else
 	{
+		m_pTransformCom->Set_Scale(_vector{ 8.f,2.f,8.f });
 		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerGage2_2", TEXT("PlayerGage2_2"), (CComponent**)&m_pModel)))
 			return E_FAIL;
 	}
@@ -68,7 +70,7 @@ HRESULT CPlayerGage2::Initialize(void * pArg)
 	m_eTurnDir = m_PlayerGage2Info.eTurnDir;
 	
 	m_pTransformCom->Rotation(_vector{ 0.f,1.f,0.f }, m_PlayerGage2Info.fRotation);
-	m_pTransformCom->Set_Scale(_vector{ 8.f,2.f,8.f });
+	
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_PlayerGage2Info.vWorldPos));
 	m_pTransformCom->Set_TurnSpeed(8.f);
 	return S_OK;
@@ -103,7 +105,6 @@ void CPlayerGage2::Tick(_float fTimeDelta)
 		if (m_pTransformCom->Get_Scale().x <= 0.5f)
 			Set_Dead();
 	}
-	
 
 }
 
@@ -131,10 +132,9 @@ void CPlayerGage2::LateTick(_float fTimeDelta)
 				m_bEnd = true;
 		}
 	}
-	
 
 	Compute_CamZ(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_FRONTALPHA, this);
 	
 
 }

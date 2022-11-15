@@ -47,19 +47,8 @@ HRESULT CAlphaParticle::Initialize(void * pArg)
 	}
 	_float4 WorldPos{ m_ParticleInfo.vPosition.x + m_ParticleInfo.vWorldPos.x, m_ParticleInfo.vPosition.y + m_ParticleInfo.vWorldPos.y, m_ParticleInfo.vPosition.z + m_ParticleInfo.vWorldPos.z, 1.f };
 
-	if (m_ParticleInfo.bCenter)
-	{
+	SetDirPoint(WorldPos);
 
-		_vector test = XMLoadFloat3(&PM->Get_PlayerPointer()->Get_Pos()) - _vector{ WorldPos.x,WorldPos.y,WorldPos.z };
-		XMStoreFloat3(&m_ParticleInfo.vDirection, test);
-		m_vPlayerDir = XMLoadFloat3(&m_ParticleInfo.vDirection);
-	}
-	else
-	{
-		if (m_ParticleInfo.vDirection.x == 0 && m_ParticleInfo.vDirection.y == 0 && m_ParticleInfo.vDirection.z == 0)
-			XMStoreFloat3(&m_ParticleInfo.vDirection, _vector{ m_ParticleInfo.vPosition.x, m_ParticleInfo.vPosition.y , m_ParticleInfo.vPosition.z } -_vector{ 0.f,0.f,0.f });
-	}
-	
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 	
@@ -102,15 +91,13 @@ void CAlphaParticle::LateTick(_float fTimeDelta)
 {
 	if (nullptr == m_pRendererCom)
 		return;
-	
 
-	if (m_ParticleInfo.bCenter)
-	{
-		if (0.1f >= XMVector3Length(XMLoadFloat3(&PM->Get_PlayerPointer()->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)).m128_f32[0])
-			Set_Dead();
-	}
-	XMVector3Length(_vector{ 1.f,1.f,1.f });
 	Compute_CamZ(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+
+	if (m_ParticleInfo.eDirPoint != DIR_END)	
+		CheckDead();
+		
+	
 
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
 
@@ -142,6 +129,45 @@ HRESULT CAlphaParticle::Render()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CAlphaParticle::SetDirPoint(_float4 vWorldPos)
+{
+	
+	switch (m_ParticleInfo.eDirPoint)
+	{
+	case DIR_PLAYER:
+	{
+		_float3 DirPos = PM->Get_PlayerPointer()->Get_Pos();
+		DirPos.y += 0.5f;
+		_vector PlayerDir = XMLoadFloat3(&DirPos) - _vector{ vWorldPos.x,vWorldPos.y,vWorldPos.z };
+		XMStoreFloat3(&m_ParticleInfo.vDirection, PlayerDir);
+	}
+		break;
+	case DIR_END:
+		if (m_ParticleInfo.vDirection.x == 0 && m_ParticleInfo.vDirection.y == 0 && m_ParticleInfo.vDirection.z == 0)
+			XMStoreFloat3(&m_ParticleInfo.vDirection, _vector{ m_ParticleInfo.vPosition.x, m_ParticleInfo.vPosition.y , m_ParticleInfo.vPosition.z } -_vector{ 0.f,0.f,0.f });
+		break;
+	}
+	
+}
+
+void CAlphaParticle::CheckDead()
+{
+	switch (m_ParticleInfo.eDirPoint)
+	{
+	case DIR_PLAYER:
+	{
+		_float3 DirPos = PM->Get_PlayerPointer()->Get_Pos();
+		DirPos.y += 0.5f;
+		if (0.1f >= XMVector3Length(XMLoadFloat3(&DirPos) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)).m128_f32[0])
+			Set_Dead();
+	}
+		break;
+
+	}
+
+	
 }
 
 

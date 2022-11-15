@@ -52,7 +52,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"Prototype_Component_Shader_UI", TEXT("Shader_UI"), (CComponent**)&m_pTexShader)))
 		return E_FAIL;
 
-	m_bColliderRender = true;
+	m_bColliderRender = false;
 	m_bCollision = false;
 	
 	//등 보정값
@@ -96,7 +96,7 @@ void CPlayerSword::Tick(_float fTimeDelta)
 		WorldPos.y = Center.y;
 		WorldPos.z = Center.z;
 		WorldPos.w = 1.f;
-		PTM->CreateParticle(L"Hit", WorldPos, false, true, false);
+		PTM->CreateParticle(L"Hit", WorldPos, false, true, CAlphaParticle::DIR_END);
 	}
 }
 

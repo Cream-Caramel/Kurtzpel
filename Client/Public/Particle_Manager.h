@@ -1,7 +1,9 @@
 #pragma once
 #include "Base.h"
 #include "Client_Defines.h"
+#include "AlphaParticle.h"
 BEGIN(Client)
+class CAlphaParticle;
 
 class CParticle_Manager final : public CBase
 {
@@ -33,7 +35,7 @@ private:
 public:
 	void Initalize();
 	void LoadParticle();
-	void CreateParticle(_tchar* ParticleName, _float4 vPos, _bool bFollow, _bool bLoof, _bool bCenter);
+	void CreateParticle(_tchar* ParticleName, _float4 vPos, _bool bFollow, _bool bLoof, CAlphaParticle::DIRPOINT ePoint);
 	PARTICLECREATE SearchParticle(_tchar* ParticleName);
 private:
 	_float4 m_vPos = { 0.f,0.f,0.f,1.f };

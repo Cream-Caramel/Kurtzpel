@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "..\Public\Particle_Manager.h"
-#include "AlphaParticle.h"
 #include "GameInstance.h"
 #include "Pointer_Manager.h"
 
@@ -81,7 +80,7 @@ void CParticle_Manager::LoadParticle()
 
 
 
-void CParticle_Manager::CreateParticle(_tchar * ParticleName, _float4 vPos, _bool bFollow, _bool bLoof, _bool bCenter)
+void CParticle_Manager::CreateParticle(_tchar * ParticleName, _float4 vPos, _bool bFollow, _bool bLoof, CAlphaParticle::DIRPOINT ePoint)
 {
 	PARTICLECREATE ParticleCreateInfo = SearchParticle(ParticleName);
 	for (int i = 0; i < ParticleCreateInfo.iParticleNum; ++i)
@@ -108,7 +107,7 @@ void CParticle_Manager::CreateParticle(_tchar * ParticleName, _float4 vPos, _boo
 		ParticleInfo.vWorldPos = vPos;
 		ParticleInfo.bFollow = bFollow;
 		ParticleInfo.bLoof = bLoof;
-		ParticleInfo.bCenter = bCenter;
+		ParticleInfo.eDirPoint = ePoint;
 		GI->Add_GameObjectToLayer(L"AlphaParticle", PM->Get_NowLevel(), L"Layer_Particle", &ParticleInfo);
 
 	}

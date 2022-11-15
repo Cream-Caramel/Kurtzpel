@@ -43,10 +43,10 @@ HRESULT CTheo::Initialize(void * pArg)
 	if (FAILED(Ready_Collider()))
 		return E_FAIL;
 
-	m_bColliderRender = true;
+	m_bColliderRender = false;
 
-	m_eCurState = APPEAR;
-	m_eNextState = APPEAR;
+	m_eCurState = IDLE;
+	m_eNextState = IDLE;
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
@@ -144,7 +144,7 @@ void CTheo::LateTick(_float fTimeDelta)
 
 	m_pAnimModel->Play_Animation(fTimeDelta, m_pAnimModel);
 
-	End_Animation();
+	//End_Animation();
 
 	m_pOBB[OBB_BODY]->Update(m_pTransformCom->Get_WorldMatrix());
 
@@ -223,10 +223,12 @@ HRESULT CTheo::Render()
 
 		else
 		{
+			m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float3));
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
 				return E_FAIL;
 		}
 	}
+
 
 	for (int i = 0; i < OBB_END; ++i)
 	{

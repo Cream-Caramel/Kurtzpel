@@ -155,6 +155,7 @@ CGameObject * CGolemRock2::Clone(void * pArg)
 void CGolemRock2::Free()
 {
 	__super::Free();
+	Safe_Release(m_pDissolveTexture);
 	Safe_Release(m_pAnimModel);
 
 }

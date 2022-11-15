@@ -16,6 +16,8 @@ BEGIN(Client)
 class CAlphaParticle : public CGameObject
 {
 public:
+	enum DIRPOINT {DIR_PLAYER, DIR_PLAYERSOWRD, DIR_END};
+public:
 	typedef struct tagParticleInfo
 	{
 		_float4 vPosition;
@@ -31,7 +33,7 @@ public:
 		_float4 vWorldPos;
 		_bool bFollow;
 		_bool bLoof;
-		_bool bCenter;
+		DIRPOINT eDirPoint;
 	}PARTICLEINFO;
 private:
 	CAlphaParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -45,13 +47,15 @@ public:
 	virtual void LateTick(_float fTimeDelta);
 	virtual HRESULT Render();
 
+private:
+	void SetDirPoint(_float4 vWorldPos);
+	void CheckDead();
 
 private:
 	PARTICLEINFO m_ParticleInfo;
 	_float m_fLifeTimeAcc = 0.f;
 	_float m_fFrameAcc = 0.f;
 	_float m_fGravityAcc = 0.f;
-	_vector m_vPlayerDir;
 	int m_iNowFrame = 0;
 	const _tchar* TexPath;
 	const _tchar* TexName;
