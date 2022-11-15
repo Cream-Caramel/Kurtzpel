@@ -34,6 +34,7 @@ public:
 	_bool Get_PlayerGage2_1() { return m_bPlayerGage2_1; }
 	void Set_PlayerGage2_2(_bool bPlayerGage) { m_bPlayerGage2_2 = bPlayerGage; }
 	_bool Get_PlayerGage2_2() { return m_bPlayerGage2_2; }
+	_bool Get_GolemRockOn();
 
 private:
 	LEVEL m_eLevel;

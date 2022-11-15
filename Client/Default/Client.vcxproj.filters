@@ -199,6 +199,21 @@
     <Filter Include="02.GameObjects\Effect\Golem\Rock3">
       <UniqueIdentifier>{013d3ac7-8bf9-4b2a-aff6-0f8b52f63dac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Static\Rock">
+      <UniqueIdentifier>{1129a237-9b3e-4d03-bf16-90cf449dcddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Static\Wall">
+      <UniqueIdentifier>{2f1de14e-2feb-4bc9-864f-ec598cb10898}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Static\Ring">
+      <UniqueIdentifier>{96caf750-55f9-48a4-bf30-519276d18228}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Golem\GolemSkillRock1">
+      <UniqueIdentifier>{9cdb2c20-2691-441f-9c20-5bf1c4246957}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Golem\GolemSkillRock2">
+      <UniqueIdentifier>{0d2f711f-87ed-45e5-9669-1e73b9da2500}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -423,9 +438,6 @@
     <ClInclude Include="..\Public\PlayerRockBreak.h">
       <Filter>02.GameObjects\Effect\Player\RockBreak</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Rock.h">
-      <Filter>02.GameObjects\Effect\Static</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\PlayerEx.h">
       <Filter>02.GameObjects\Effect\Player\Ex</Filter>
     </ClInclude>
@@ -452,6 +464,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\GolemRock3.h">
       <Filter>02.GameObjects\Effect\Golem\Rock3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Rock.h">
+      <Filter>02.GameObjects\Effect\Static\Rock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Wall.h">
+      <Filter>02.GameObjects\Effect\Static\Wall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Ring.h">
+      <Filter>02.GameObjects\Effect\Static\Ring</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GolemSkillRock1.h">
+      <Filter>02.GameObjects\Effect\Golem\GolemSkillRock1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GolemSkillRock2.h">
+      <Filter>02.GameObjects\Effect\Golem\GolemSkillRock2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -659,9 +686,6 @@
     <ClCompile Include="..\Private\PlayerRockBreak.cpp">
       <Filter>02.GameObjects\Effect\Player\RockBreak</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Rock.cpp">
-      <Filter>02.GameObjects\Effect\Static</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\PlayerEx.cpp">
       <Filter>02.GameObjects\Effect\Player\Ex</Filter>
     </ClCompile>
@@ -688,6 +712,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\GolemRock3.cpp">
       <Filter>02.GameObjects\Effect\Golem\Rock3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Rock.cpp">
+      <Filter>02.GameObjects\Effect\Static\Rock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Wall.cpp">
+      <Filter>02.GameObjects\Effect\Static\Wall</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Ring.cpp">
+      <Filter>02.GameObjects\Effect\Static\Ring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GolemSkillRock1.cpp">
+      <Filter>02.GameObjects\Effect\Golem\GolemSkillRock1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GolemSkillRock2.cpp">
+      <Filter>02.GameObjects\Effect\Golem\GolemSkillRock2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

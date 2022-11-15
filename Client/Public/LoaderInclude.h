@@ -49,6 +49,10 @@
 #include "PlayerLight.h"
 #include "PlayerGage.h"
 #include "PlayerGage2.h"
+#include "Wall.h"
+#include "Ring.h"
+#include "GolemSkillRock1.h"
+#include "GolemSkillRock2.h"
 
 //Anim
 #include "PlayerRockBreak.h"

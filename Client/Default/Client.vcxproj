@@ -189,6 +189,8 @@
     <ClInclude Include="..\Public\GolemRock1.h" />
     <ClInclude Include="..\Public\GolemRock2.h" />
     <ClInclude Include="..\Public\GolemRock3.h" />
+    <ClInclude Include="..\Public\GolemSkillRock1.h" />
+    <ClInclude Include="..\Public\GolemSkillRock2.h" />
     <ClInclude Include="..\Public\HPBarFrame.h" />
     <ClInclude Include="..\Public\InstanceModel.h" />
     <ClInclude Include="..\Public\KeyE.h" />
@@ -229,6 +231,7 @@
     <ClInclude Include="..\Public\PlayerTrailSub2.h" />
     <ClInclude Include="..\Public\Pointer_Manager.h" />
     <ClInclude Include="..\Public\Release_Manager.h" />
+    <ClInclude Include="..\Public\Ring.h" />
     <ClInclude Include="..\Public\Rock.h" />
     <ClInclude Include="..\Public\SideLiner.h" />
     <ClInclude Include="..\Public\SkillFrame.h" />
@@ -247,6 +250,7 @@
     <ClInclude Include="..\public\UI.h" />
     <ClInclude Include="..\Public\UIInclude.h" />
     <ClInclude Include="..\Public\UI_Manager.h" />
+    <ClInclude Include="..\Public\Wall.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -273,6 +277,8 @@
     <ClCompile Include="..\Private\GolemRock1.cpp" />
     <ClCompile Include="..\Private\GolemRock2.cpp" />
     <ClCompile Include="..\Private\GolemRock3.cpp" />
+    <ClCompile Include="..\Private\GolemSkillRock1.cpp" />
+    <ClCompile Include="..\Private\GolemSkillRock2.cpp" />
     <ClCompile Include="..\Private\HPBarFrame.cpp" />
     <ClCompile Include="..\Private\InstanceModel.cpp" />
     <ClCompile Include="..\Private\KeyE.cpp" />
@@ -312,6 +318,7 @@
     <ClCompile Include="..\Private\PlayerTrailSub2.cpp" />
     <ClCompile Include="..\Private\Pointer_Manager.cpp" />
     <ClCompile Include="..\Private\Release_Manager.cpp" />
+    <ClCompile Include="..\Private\Ring.cpp" />
     <ClCompile Include="..\Private\Rock.cpp" />
     <ClCompile Include="..\Private\SideLiner.cpp" />
     <ClCompile Include="..\Private\SkillFrame.cpp" />
@@ -329,6 +336,7 @@
     <ClCompile Include="..\Private\TRStair.cpp" />
     <ClCompile Include="..\private\UI.cpp" />
     <ClCompile Include="..\Private\UI_Manager.cpp" />
+    <ClCompile Include="..\Private\Wall.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

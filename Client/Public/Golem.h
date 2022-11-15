@@ -49,6 +49,8 @@ public:
 	void Set_NextAttack();
 	void Range_Attack();
 	void Close_Attack();
+	_bool Get_RockOn() { return m_bRockOn; }
+	void CreateSkillRock2();
 
 private:
 	void Set_State(STATE eState); // 상태를 설정 보간을 하는 애니메이션은 여기서 애니메이션 셋팅
@@ -75,6 +77,7 @@ private:
 	_bool m_bRHand = false;
 	_bool m_bPattern = false;
 	_bool m_bAttack = false;
+	_bool m_bRockOn = false;
 	_uint m_iPreMotion = 0;
 	_uint m_iNextMotion = 1;
 	_uint m_iPreRangeAttack = 0;

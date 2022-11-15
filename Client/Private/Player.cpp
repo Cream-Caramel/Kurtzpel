@@ -15,6 +15,9 @@
 #include "PlayerEx.h"
 #include "PlayerGage.h"
 #include "PlayerGage2.h"
+#include "Wall.h"
+#include "Ring.h"
+#include "GolemSkillRock1.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -100,11 +103,8 @@ void CPlayer::Tick(_float fTimeDelta)
 		m_bColliderRender = !m_bColliderRender;
 
 	if (GI->Key_Down(DIK_5))
-	{
-		CAnimMesh::EFFECTINFO EffectInfo;
-		EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
-		EffectInfo.vScale = _float3{ 1.2f,1.2f,1.2f };
-		GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
+	{	
+		
 	}
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
@@ -520,6 +520,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::CHARGECRASH:
+		GI->PlaySoundW(L"AttackVoice6.ogg", SD_PLAYERVOICE, 0.9f);
 		GI->PlaySoundW(L"SpinComboEnd.ogg", SD_PLAYER1, 0.6f); 
 		m_fChargeCrashSpeed = 6.f;
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
@@ -719,7 +720,7 @@ void CPlayer::Set_State(STATE eState)
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
-	
+		GI->PlaySoundW(L"AttackVoice6.ogg", SD_PLAYERVOICE, 0.9f);
 		PM->Set_PlayerGage2_1(true);
 		PM->Set_PlayerGage2_2(true);
 		GI->PlaySoundW(L"RockBreakStart.ogg", SD_PLAYER1, 0.6f);
@@ -1435,6 +1436,16 @@ void CPlayer::CreateGage(_bool Gage2_1)
 	}
 }
 
+void CPlayer::CreateRing()
+{
+	CRing::RINGINFO RingInfo;	
+	RingInfo.vSize = { 0.2f,0.3f,0.2f };
+	RingInfo.fSpeed = 0.5f;
+	XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_PlayerEffect", &RingInfo);
+	
+}
+
 void CPlayer::Check_Battle()
 {
 	if (!m_bBattle)
@@ -1958,17 +1969,37 @@ void CPlayer::Update(_float fTimeDelta)
 				XMStoreFloat4(&WorldPos, vPos);
 				if (m_bCharge1)
 				{
+					CWall::WALLINFO WallInfo;
+					WallInfo.fMaxUVIndexX = 1.f;
+					WallInfo.fMaxUVIndexY = 4.f;
+					WallInfo.fUVSpeed = 0.05f;
+					WallInfo.vSize = { 1.5f,4.f,1.5f };
+					WallInfo.vSpeed = { 0.04f,0.03f,0.04f };
+					WallInfo.vWorldPos = WorldPos;
+					GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_PlayerEffect", &WallInfo);
+					PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, CAlphaParticle::DIR_END);
 					PTM->CreateParticle(L"Player1", WorldPos, false, true, CAlphaParticle::DIR_END);
 					m_Parts[PARTS_SWORD]->Set_Damage(70.f);
+					ChargeAttackLight();
+					CRing::RINGINFO RingInfo;
+					RingInfo.vSize = { 0.2f,0.3f,0.2f };
+					RingInfo.fSpeed = 0.5f;
+					XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+					_float4 WorldPos;
+					_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMLoadFloat3(&m_vTargetLook) * 5.f;
+					XMStoreFloat4(&RingInfo.vWorldPos, vPos);			
+					GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_PlayerEffect", &RingInfo);
 				}
 				else if (m_bCharge2)
 				{
 					PTM->CreateParticle(L"Player2", WorldPos, false, true, CAlphaParticle::DIR_END);
 					m_Parts[PARTS_SWORD]->Set_Damage(50.f);
+					ChargeAttackLight();
 				}
-				else
+				else			
 					m_Parts[PARTS_SWORD]->Set_Damage(30.f);
-				ChargeAttackLight();
+					
+				
 			}
 			else
 			{
@@ -2444,6 +2475,12 @@ void CPlayer::Update(_float fTimeDelta)
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
 		{
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fEx1AttackSpeed, m_pNavigation, fTimeDelta);
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			if (m_bCharge1)
+				PTM->CreateParticle(L"PlayerOrangeTrail", WorldPos, false, true, CAlphaParticle::DIR_END);
+			else if (m_bCharge2)
+				PTM->CreateParticle(L"PlayerYellowTrail", WorldPos, false, true, CAlphaParticle::DIR_END);			
 			return;
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
@@ -2461,18 +2498,33 @@ void CPlayer::Update(_float fTimeDelta)
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 			if (m_bCharge1)
 			{
+				CWall::WALLINFO WallInfo;
+				WallInfo.fMaxUVIndexX = 1.f;
+				WallInfo.fMaxUVIndexY = 4.f;
+				WallInfo.fUVSpeed = 0.05f;
+				WallInfo.vSize = { 1.f,3.f,1.f };
+				WallInfo.vSpeed = { 0.04f,0.03f,0.04f };
+				XMStoreFloat4(&WallInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_PlayerEffect", &WallInfo);
+
+				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, CAlphaParticle::DIR_END);
 				PTM->CreateParticle(L"Player1", WorldPos, false, true, CAlphaParticle::DIR_END);
 				m_Parts[PARTS_SWORD]->Set_Damage(60.f);
+				Ex1AttackLight();
+				CreateRing();
 			}
 			else if (m_bCharge2)
 			{
+					
 				PTM->CreateParticle(L"Player2", WorldPos, false, true, CAlphaParticle::DIR_END);
 				m_Parts[PARTS_SWORD]->Set_Damage(40.f);
+				Ex1AttackLight();
 			}
 			else
 				m_Parts[PARTS_SWORD]->Set_Damage(20.f);
-
-			Ex1AttackLight();
+			
+			
+			
 			return;
 		}
 		else

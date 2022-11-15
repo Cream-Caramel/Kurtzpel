@@ -1,27 +1,27 @@
 #include "stdafx.h"
-#include "..\Public\PlayerGage2.h"
+#include "..\Public\Wall.h"
 #include "GameInstance.h"
 
-CPlayerGage2::CPlayerGage2(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CWall::CWall(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)
 {
 	m_pModel = nullptr;
 }
 
-CPlayerGage2::CPlayerGage2(const CPlayerGage2& rhs)
+CWall::CWall(const CWall& rhs)
 	: CMesh(rhs)
 {
 }
 
-HRESULT CPlayerGage2::Initialize_Prototype()
+HRESULT CWall::Initialize_Prototype()
 {
 	__super::Initialize_Prototype();
 	return S_OK;
 }
 
-HRESULT CPlayerGage2::Initialize(void * pArg)
+HRESULT CWall::Initialize(void * pArg)
 {
-	m_PlayerGage2Info = (*(PLAYERGAGE2INFO*)pArg);
+	m_WallInfo = (*(WALLINFO*)pArg);
 
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(TransformDesc));
@@ -48,35 +48,25 @@ HRESULT CPlayerGage2::Initialize(void * pArg)
 	
 	/* For.Com_Model */
 
-	if (m_PlayerGage2Info.bGage2_1)
-	{
-		m_pTransformCom->Set_Scale(_vector{ 10.f,2.5f,10.f });
-		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerGage2_1", TEXT("PlayerGage2_1"), (CComponent**)&m_pModel)))
+
+	m_pTransformCom->Set_Scale(_vector{ m_WallInfo.vSize.x, m_WallInfo.vSize.y, m_WallInfo.vSize.z });
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"OrangeWall", TEXT("OrangeWall"), (CComponent**)&m_pModel)))
 			return E_FAIL;
-	}
-	else
-	{
-		m_pTransformCom->Set_Scale(_vector{ 8.f,2.f,8.f });
-		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerGage2_2", TEXT("PlayerGage2_2"), (CComponent**)&m_pModel)))
-			return E_FAIL;
-	}
+
 	m_fShaderUVAcc = 0.f;
 	m_fShaderUVIndexX = 0;
 	m_fShaderUVIndexY = 0;
 
-	m_fMaxUVIndexX = m_PlayerGage2Info.fMaxUVIndexX;
-	m_fMaxUVIndexY = m_PlayerGage2Info.fMaxUVIndexY;
-	m_fUVSpeed = m_PlayerGage2Info.fUVSpeed;
-	m_eTurnDir = m_PlayerGage2Info.eTurnDir;
-	
-	m_pTransformCom->Rotation(_vector{ 0.f,1.f,0.f }, m_PlayerGage2Info.fRotation);
-	
-	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_PlayerGage2Info.vWorldPos));
-	m_pTransformCom->Set_TurnSpeed(8.f);
+	m_fMaxUVIndexX = m_WallInfo.fMaxUVIndexX;
+	m_fMaxUVIndexY = m_WallInfo.fMaxUVIndexY;
+	m_fUVSpeed = m_WallInfo.fUVSpeed;
+
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_WallInfo.vWorldPos));
+
 	return S_OK;
 }
 
-void CPlayerGage2::Tick(_float fTimeDelta)
+void CWall::Tick(_float fTimeDelta)
 {
 	m_fShaderUVAcc += 1.f * fTimeDelta;
 	if (m_fShaderUVAcc >= m_fUVSpeed)
@@ -90,48 +80,24 @@ void CPlayerGage2::Tick(_float fTimeDelta)
 			if (m_fShaderUVIndexY >= m_fMaxUVIndexY)
 			{
 				m_fShaderUVIndexY = 0.f;
+				m_bEnd = true;
 			}
 		}
 	}
 
-	if (m_eTurnDir == TURN_FRONT)
-		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), fTimeDelta);
-	else
-		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP) * -1, fTimeDelta);
-
 	if (m_bEnd)
 	{
-		m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) - _vector{ 0.2f,0.01f,0.2f });
-		if (m_pTransformCom->Get_Scale().x <= 0.5f)
+		m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) - _vector{ m_WallInfo.vSpeed.x, m_WallInfo.vSpeed.y, m_WallInfo.vSpeed.z });
+		if (m_pTransformCom->Get_Scale().x <= 0.1f)
 			Set_Dead();
 	}
 
 }
 
-void CPlayerGage2::LateTick(_float fTimeDelta)
+void CWall::LateTick(_float fTimeDelta)
 {
 	if (nullptr == m_pRendererCom)
 		return;
-
-	
-
-	if (m_PlayerGage2Info.bGage2_1)
-	{
-		if (!m_bEnd)
-		{
-			if (PM->Get_PlayerGage2_1())
-				m_bEnd = true;
-		}
-	}
-
-	else
-	{
-		if (!m_bEnd)
-		{
-			if (PM->Get_PlayerGage2_2())
-				m_bEnd = true;
-		}
-	}
 
 	Compute_CamZ(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_FRONTALPHA, this);
@@ -139,7 +105,7 @@ void CPlayerGage2::LateTick(_float fTimeDelta)
 
 }
 
-HRESULT CPlayerGage2::Render()
+HRESULT CWall::Render()
 {
 	if (nullptr == m_pModel ||
 		nullptr == m_pShaderCom)
@@ -177,33 +143,33 @@ HRESULT CPlayerGage2::Render()
 	return S_OK;
 }
 
-CMesh * CPlayerGage2::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMesh * CWall::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CPlayerGage2*		pInstance = new CPlayerGage2(pDevice, pContext);
+	CWall*		pInstance = new CWall(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CPlayerGage2"));
+		MSG_BOX(TEXT("Failed To Created : CWall"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CPlayerGage2::Clone(void * pArg)
+CGameObject * CWall::Clone(void * pArg)
 {
-	CPlayerGage2*		pInstance = new CPlayerGage2(*this);
+	CWall*		pInstance = new CWall(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CPlayerGage2"));
+		MSG_BOX(TEXT("Failed To Cloned : CWall"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPlayerGage2::Free()
+void CWall::Free()
 {
 	__super::Free();
 	Safe_Release(m_pModel);

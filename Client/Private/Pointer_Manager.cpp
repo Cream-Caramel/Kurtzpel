@@ -4,6 +4,7 @@
 #include "Camera_Player.h"
 #include "GameInstance.h"
 #include "AnimMesh.h"
+#include "Golem.h"
 
 IMPLEMENT_SINGLETON(CPointer_Manager)
 
@@ -147,6 +148,11 @@ _bool CPointer_Manager::Get_BossFinish()
 	if (m_pBoss == nullptr)
 		return false;
 	return m_pBoss->Get_Finish();
+}
+
+_bool CPointer_Manager::Get_GolemRockOn()
+{
+	return ((CGolem*)m_pBoss)->Get_RockOn();
 }
 
 void CPointer_Manager::Free()

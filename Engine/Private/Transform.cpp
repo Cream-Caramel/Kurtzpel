@@ -211,9 +211,7 @@ void CTransform::Go_Dir(_fvector vDir, _float fSpeed, CNavigation* pNavigation, 
 		{
 			vPosition = XMVectorSetY(vPosition, pNavigation->Get_PosY(vPosition));
 		}
-		Set_State(CTransform::STATE_POSITION, vPosition);
-
-		
+		Set_State(CTransform::STATE_POSITION, vPosition);	
 	}
 	else
 	{
@@ -303,6 +301,7 @@ _float CTransform::Get_ScaleAxis(AXIS eAxis)
 	case Engine::CTransform::AXIS_Z:
 		return 	XMVectorGetX(XMVector3Length(Get_State(CTransform::STATE_LOOK)));
 	}
+	return 0.f;
 }
 
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
@@ -360,6 +359,8 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 
 void CTransform::LookAt(_fvector vAt)
 {
+	_float3		vScale = Get_Scale();
+
 	_vector		vLook = vAt - Get_State(CTransform::STATE_POSITION);
 	if (FLT_MIN >= XMVectorGetX(XMVector3Length(vLook)))
 		return;
@@ -368,7 +369,7 @@ void CTransform::LookAt(_fvector vAt)
 
 	_vector		vUp = XMVector3Cross(vLook, vRight);
 
-	_float3		vScale = Get_Scale();
+	
 
 	Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight) * vScale.x);
 	Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp) * vScale.y);

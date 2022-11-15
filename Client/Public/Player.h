@@ -93,6 +93,7 @@ private:
 	void Ex1AttackLight();
 	void ChargeAttackLight();
 	void CreateGage(_bool Gage2_1);
+	void CreateRing();
 #pragma region PrivateFunction
 
 #pragma region KeyInput

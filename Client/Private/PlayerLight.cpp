@@ -79,11 +79,7 @@ HRESULT CPlayerLight::Render()
 
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	_float4x4		WorldMatrix;
-
-	XMStoreFloat4x4(&WorldMatrix, XMMatrixTranspose(m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix()));
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
 		return E_FAIL;
@@ -98,18 +94,8 @@ HRESULT CPlayerLight::Render()
 	{
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
-		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
-		{
-			m_bNormalTex = false;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
-		}
-		else
-		{
-			m_bNormalTex = true;
-			m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
-		}
-
-		if (FAILED(m_pShaderCom->Begin(1)))
+	
+		if (FAILED(m_pShaderCom->Begin(MODEL_NDEFAULT)))
 			return E_FAIL;
 
 		if (FAILED(m_pModel->Render(i)))

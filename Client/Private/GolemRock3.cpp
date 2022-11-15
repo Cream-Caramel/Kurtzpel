@@ -50,7 +50,17 @@ HRESULT CGolemRock3::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Noise"), TEXT("Com_Texture"), (CComponent**)&m_pDissolveTexture)))
 		return E_FAIL;
 
-	m_pTransformCom->Set_WorldMatrix(EffectInfo->WorldMatrix);
+	if (EffectInfo->bObtion)
+	{
+		_float4 vPos;
+		XMStoreFloat4(&vPos, EffectInfo->WorldMatrix.r[3]);
+		vPos.y -= 0.9f;
+		EffectInfo->WorldMatrix.r[3] = XMLoadFloat4(&vPos);
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, EffectInfo->WorldMatrix.r[3]);
+	}
+	else
+		m_pTransformCom->Set_WorldMatrix(EffectInfo->WorldMatrix);
+	
 	m_pTransformCom->Set_Scale(XMLoadFloat3(&EffectInfo->vScale));
 
 	return S_OK;
