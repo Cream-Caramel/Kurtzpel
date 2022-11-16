@@ -116,6 +116,7 @@ void CGolemSkillRock2::LateTick(_float fTimeDelta)
 				EffectInfo.vScale = { 1.f,1.f,1.f };
 				EffectInfo.bObtion = true;
 				GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"GolemEffect", &EffectInfo);
+				CRM->Start_Shake(0.3f, 4.f, 0.04f);
 			}
 			Set_Dead();
 		}

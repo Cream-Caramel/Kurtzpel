@@ -47,11 +47,11 @@ void CLevel_Stage2::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	/*if (!m_bScene)
+	if (!m_bScene)
 	{
 		CRM->Start_Scene("Scene_Stage2");
 		m_bScene = true;
-	}*/
+	}
 }
 
 HRESULT CLevel_Stage2::Render()

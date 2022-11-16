@@ -10,6 +10,9 @@
 #include "Player.h"
 #include "Navigation.h"
 #include "Level_Loading.h"
+#include "GolemRock1.h"
+#include "GolemRock3.h"
+#include "Rock.h"
 
 CTheo::CTheo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -54,7 +57,7 @@ HRESULT CTheo::Initialize(void * pArg)
 	m_fMaxHp = 300;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
-	m_fNowMp = 10.f;
+	m_fNowMp = 95.f;
 	m_fDamage = 10.f;
 
 	m_fColiisionTime = 0.1f;
@@ -144,7 +147,7 @@ void CTheo::LateTick(_float fTimeDelta)
 
 	m_pAnimModel->Play_Animation(fTimeDelta, m_pAnimModel);
 
-	//End_Animation();
+	End_Animation();
 
 	m_pOBB[OBB_BODY]->Update(m_pTransformCom->Get_WorldMatrix());
 
@@ -471,19 +474,21 @@ void CTheo::Set_State(STATE eState)
 	case Client::CTheo::RUN:
 		break;
 	case Client::CTheo::SKILL1:
-		m_fDamage = 20.f;	
+		m_fDamage = 15.f;	
 		break;
 	case Client::CTheo::SKILL2:
-			m_fDamage = 30.f;
+			m_fDamage = 20.f;
 		break;
 	case Client::CTheo::SKILL3:
 		m_pOBB[OBB_RHAND]->ChangeExtents(_float3{ 300.f, 300.f, 300.f });
 		break;
 	case Client::CTheo::SKILL4:
-			m_fDamage = 40.f;
+			m_fDamage = 30.f;
 		break;
 	case Client::CTheo::SKILL5:
 			m_fDamage = 20.f;
+			m_bRushRight = true;
+			m_pOBB[OBB_RHAND]->ChangeExtents(_float3{ 6.f, 6.f, 6.f });
 			GI->PlaySoundW(L"TheoSkill5.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CTheo::SKILL6:
@@ -625,6 +630,14 @@ void CTheo::Update(_float fTimeDelta)
 			
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+				EffectInfo.WorldMatrix.r[3] += Look * 2.f;
+				EffectInfo.WorldMatrix.r[3] += Right * 2.f;
+				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 				m_bLHand = true;
 				GI->PlaySoundW(L"TheoAttack1.ogg", SD_MONSTER1, 1.f);
 				GI->PlaySoundW(L"TheoSkill1.ogg", SD_MONSTERVOICE, 0.9f);
@@ -660,6 +673,14 @@ void CTheo::Update(_float fTimeDelta)
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Look * 3.5f;
+			EffectInfo.WorldMatrix.r[3] += Right * 2.f;
+			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			m_bRHand = true;
 			GI->PlaySoundW(L"TheoAttack1.ogg", SD_MONSTER1, 1.f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
@@ -683,6 +704,14 @@ void CTheo::Update(_float fTimeDelta)
 			Set_Dir();
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Look * 3.f;
+			EffectInfo.WorldMatrix.r[3] += Right * 2.5f;
+			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			m_fDamage = 30.f;
 			m_bRHand = true;
 			GI->PlaySoundW(L"TheoAttack1.ogg", SD_MONSTER1, 1.f);
@@ -698,6 +727,13 @@ void CTheo::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Look * 3.f;
+			EffectInfo.vScale = _float3{ 3.f,1.f,3.f };
+			GI->Add_GameObjectToLayer(L"Rock", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			m_fDamage = 110.f;
 			m_bRHand = true;
 			GI->PlaySoundW(L"TheoAttack3.ogg", SD_MONSTER1, 1.f);
@@ -756,6 +792,30 @@ void CTheo::Update(_float fTimeDelta)
 				m_fRushShakeAcc = 0.f;
 				GI->PlaySoundW(L"TheoRun.ogg", SD_MONSTER1, 1.f);
 				CRM->Start_Shake(0.3f, 3.f, 0.04f);
+				if (m_bRushRight)
+				{
+					CAnimMesh::EFFECTINFO EffectInfo;
+					EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+					_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+					_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+					EffectInfo.WorldMatrix.r[3] += Look * 2.f;
+					EffectInfo.WorldMatrix.r[3] += Right * 1.5f;
+					EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+					GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+					m_bRushRight = false;
+				}
+				else
+				{
+					CAnimMesh::EFFECTINFO EffectInfo;
+					EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+					_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+					_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+					EffectInfo.WorldMatrix.r[3] += Look * 2.f;
+					EffectInfo.WorldMatrix.r[3] += Right * -1.f;
+					EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+					GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+					m_bRushRight = true;
+				}
 			}
 			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed, m_pNavigation, fTimeDelta))
 				Set_Dir();
@@ -770,6 +830,7 @@ void CTheo::Update(_float fTimeDelta)
 				Set_Dir();
 			m_bLHand = true;
 			m_bRHand = true;
+			
 		}
 
 		break;
@@ -797,11 +858,19 @@ void CTheo::Update(_float fTimeDelta)
 				CRM->Start_Shake(0.6f, 5.f, 0.05f);
 			}
 		}
-
-		if (m_bFinishStart && m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3))
+		else
 		{
-			m_bFinishStart = false;
-			Set_State(SKILL3);
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
+			{
+				GI->PlaySoundW(L"TheoSkill6.ogg", SD_MONSTERVOICE, 0.9f);
+				CRM->Start_Shake(0.6f, 5.f, 0.05f);
+			}
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3))
+			{
+				m_bFinishStart = false;
+				Set_State(SKILL3);
+			}
+			
 		}
 		break;
 	case Client::CTheo::APPEAR:

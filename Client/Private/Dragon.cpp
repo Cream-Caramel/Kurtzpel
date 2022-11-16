@@ -8,6 +8,9 @@
 #include "UI_Manager.h"
 #include "Pointer_Manager.h"
 #include "Player.h"
+#include "Rock.h"
+#include "GolemRock1.h"
+#include "GolemRock3.h"
 
 CDragon::CDragon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -41,7 +44,7 @@ HRESULT CDragon::Initialize(void * pArg)
 	if (FAILED(Ready_Collider()))
 		return E_FAIL;
 
-	m_bColliderRender = true;
+	m_bColliderRender = false;
 
 	m_eCurState = START;
 	m_eNextState = START;
@@ -811,6 +814,13 @@ void CDragon::Update(_float fTimeDelta)
 			}
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+				EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
+				EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
+				GI->Add_GameObjectToLayer(L"Rock", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 				CRM->Start_Shake(0.3f, 5.f, 0.04f);
 				GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			}
@@ -819,6 +829,13 @@ void CDragon::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
+			EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
+			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			CRM->Start_Shake(0.3f, 5.f, 0.04f);
 			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 		}
@@ -837,10 +854,28 @@ void CDragon::Update(_float fTimeDelta)
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(9) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(10))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
+			EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
+			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+			CRM->Start_Shake(0.3f, 5.f, 0.04f);
+			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"DragonAttack1.ogg", SD_MONSTER1, 0.9f);
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(11) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(12))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
+			EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
+			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+			CRM->Start_Shake(0.3f, 5.f, 0.04f);
+			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"DragonAttack1_2.ogg", SD_MONSTER1, 0.9f);
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))

@@ -29,7 +29,7 @@ public:
 	{
 		_matrix WorldMatrix;
 		_float3 vScale;
-		_bool bObtion;
+		_bool bObtion = false;
 
 	}EFFECTINFO;
 

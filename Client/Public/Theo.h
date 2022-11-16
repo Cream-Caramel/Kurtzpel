@@ -58,6 +58,7 @@ private:
 	_bool m_bLHand = false;
 	_bool m_bRHand = false;
 	_bool m_bPattern = false;
+	_bool m_bRushRight = true;
 	_uint m_iPreMotion = 0;
 	_uint m_iNextMotion = 1;
 	_uint m_iPreAttack = 0;

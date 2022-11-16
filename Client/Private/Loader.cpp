@@ -98,9 +98,9 @@ HRESULT CLoader::Loading_ForStatic()
 	LoadModel("PlayerEffect");
 	LoadModel("StaticEffect");
 	LoadModel("GolemEffect");
-	//LoadModel("Level_Stage2");
-	//LoadModel("Level_Stage3");
-	//LoadModel("Level_Stage4");
+	LoadModel("Level_Stage2");
+	LoadModel("Level_Stage3");
+	LoadModel("Level_Stage4");
 	
 	LoadParticleTexture();
 	PTM->Initalize();
