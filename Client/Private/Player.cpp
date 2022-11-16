@@ -389,6 +389,12 @@ void CPlayer::Set_State(STATE eState)
 			Change_WeaponPos();
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 		}
+		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			WorldPos.y += 0.5f;
+			PTM->CreateParticle(L"PlayerJump", WorldPos, false, true, CAlphaParticle::DIR_END);
+		}
 		m_bAction = false;
 		GI->PlaySoundW(L"Jump.ogg", SD_PLAYER1, 0.6f);
 		m_pTransformCom->Set_Jump(true);
@@ -581,6 +587,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
+	
 		CRM->Start_Fov(50.f, 140.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.3f, 3.f, 0.03f);
@@ -1441,6 +1448,8 @@ void CPlayer::CreateRing()
 	CRing::RINGINFO RingInfo;	
 	RingInfo.vSize = { 0.2f,0.3f,0.2f };
 	RingInfo.fSpeed = 0.5f;
+	RingInfo.fLifeTime = 0.3f;
+	RingInfo.eColor = CRing::RING_ORANGE;
 	XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_PlayerEffect", &RingInfo);
 	
@@ -1729,6 +1738,10 @@ void CPlayer::Update(_float fTimeDelta)
 				m_pTransformCom->Set_Jump(false);
 				m_pTransformCom->Set_Gravity(0.f);
 				GI->PlaySoundW(L"JumpEnd.ogg", SD_PLAYER1, 0.6f);
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				WorldPos.y += 0.5f;
+				PTM->CreateParticle(L"PlayerJump", WorldPos, false, true, CAlphaParticle::DIR_END);
 				Set_State(JUMPEND);
 				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
 			}
@@ -1976,6 +1989,7 @@ void CPlayer::Update(_float fTimeDelta)
 					WallInfo.vSize = { 1.5f,4.f,1.5f };
 					WallInfo.vSpeed = { 0.04f,0.03f,0.04f };
 					WallInfo.vWorldPos = WorldPos;
+					WallInfo.eColor = CWall::WALL_ORANGE;
 					GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_PlayerEffect", &WallInfo);
 					PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, CAlphaParticle::DIR_END);
 					PTM->CreateParticle(L"Player1", WorldPos, false, true, CAlphaParticle::DIR_END);
@@ -1984,6 +1998,8 @@ void CPlayer::Update(_float fTimeDelta)
 					CRing::RINGINFO RingInfo;
 					RingInfo.vSize = { 0.2f,0.3f,0.2f };
 					RingInfo.fSpeed = 0.5f;
+					RingInfo.eColor = CRing::RING_ORANGE;
+					RingInfo.fLifeTime = 0.3f;
 					XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 					_float4 WorldPos;
 					_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMLoadFloat3(&m_vTargetLook) * 5.f;
@@ -2167,6 +2183,13 @@ void CPlayer::Update(_float fTimeDelta)
 				EffectInfo.WorldMatrix.r[1].m128_f32[1] = m_pNavigation->Get_PosY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
 				GI->Add_GameObjectToLayer(L"PlayerRockBreak", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
+
+				{
+					_float4 WorldPos;
+					XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+					WorldPos.y += 0.7f;
+					PTM->CreateParticle(L"PlayerAirComboEnd", WorldPos, false, true, CAlphaParticle::DIR_END);
+				}
 			}
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -2333,6 +2356,7 @@ void CPlayer::Update(_float fTimeDelta)
 				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
 				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
 				GI->Add_GameObjectToLayer(L"PlayerRockBreak", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
+				GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.5f);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				CRM->Start_Shake(0.2f, 2.f, 0.02f);
 			}

@@ -6,6 +6,9 @@ BEGIN(Client)
 class CWall final : public CMesh
 {
 public:
+	enum WALLCOLOR { WALL_ORANGE, WALL_BLUE, WALL_GREEN, WALL_RED, WALL_END };
+
+public:
 	typedef struct tagWallInfo
 	{
 		_float fUVSpeed = 0.f;
@@ -14,6 +17,7 @@ public:
 		_float3 vSize;
 		_float4 vWorldPos;
 		_float3 vSpeed;
+		WALLCOLOR eColor;
 	}WALLINFO;
 
 private:

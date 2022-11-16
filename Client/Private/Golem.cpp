@@ -13,6 +13,8 @@
 #include "PlayerLight.h"
 #include "GolemSkillRock2.h"
 #include "GolemSkillRock1.h"
+#include "Wall.h"
+#include "Ring.h"
 
 CGolem::CGolem(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -752,6 +754,9 @@ void CGolem::Update(_float fTimeDelta)
 			m_bRHand = true;
 			GI->PlaySoundW(L"GolemAttack1.ogg", SD_MONSTER1, 0.9f);
 			CRM->Start_Shake(0.2f, 3.f, 0.03f);
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"GolemSkill1", WorldPos, false, false, CAlphaParticle::DIR_END);
 			return;
 		}
 
@@ -768,7 +773,7 @@ void CGolem::Update(_float fTimeDelta)
 			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 			EffectInfo.WorldMatrix.r[3] += Look * 3.3f;
-			EffectInfo.WorldMatrix.r[3] += Right * 2.f;
+			EffectInfo.WorldMatrix.r[3] += Right * 1.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
 			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			m_fDamage = 15.f;
@@ -776,6 +781,10 @@ void CGolem::Update(_float fTimeDelta)
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill1_2.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.2f, 4.f, 0.04f);
+			_float4 WorldPos;
+			EffectInfo.WorldMatrix.r[3] -= Right * 2.f;
+			XMStoreFloat4(&WorldPos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"GolemSkill1_2", WorldPos, false, false, CAlphaParticle::DIR_END);
 		}
 		break;
 	case Client::CGolem::SKILL2:
@@ -832,6 +841,23 @@ void CGolem::Update(_float fTimeDelta)
 			m_bAttack = true;
 			GI->PlaySoundW(L"GolemAttack3.ogg", SD_MONSTER1, 0.9f);
 			CRM->Start_Shake(0.3f, 5.f, 0.04f);
+
+			_float4 WorldPos;
+			EffectInfo.WorldMatrix.r[3];
+			EffectInfo.WorldMatrix.r[3] += Right * -3.f;
+			XMStoreFloat4(&WorldPos, EffectInfo.WorldMatrix.r[3]);
+			WorldPos.y += 0.5f;
+			PTM->CreateParticle(L"GolemSkill3", WorldPos, false, false, CAlphaParticle::DIR_END);
+
+			CRing::RINGINFO RingInfo;
+			RingInfo.vSize = { 0.2f,0.3f,0.2f };
+			RingInfo.fSpeed = 0.8f;
+			RingInfo.fLifeTime = 0.3f;
+			RingInfo.eColor = CRing::RING_GREEN;
+			XMStoreFloat4(&RingInfo.vWorldPos, EffectInfo.WorldMatrix.r[3]);
+			RingInfo.vWorldPos.y += 0.5f;
+			GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_PlayerEffect", &RingInfo);
+
 		}
 		break;
 	case Client::CGolem::SKILL4_1:
@@ -1054,6 +1080,25 @@ void CGolem::Update(_float fTimeDelta)
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				PTM->CreateParticle(L"GolemFinish", WorldPos, false, false, CAlphaParticle::DIR_END);
+
+				CRing::RINGINFO RingInfo;
+				RingInfo.vSize = { 0.2f,0.5f,0.2f };
+				RingInfo.fSpeed = 1.f;
+				RingInfo.fLifeTime = 1.f;
+				RingInfo.eColor = CRing::RING_GREEN;
+				XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				RingInfo.vWorldPos.y += 1.f;
+				GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_GolemEffect", &RingInfo);
+
+				CWall::WALLINFO WallInfo;
+				WallInfo.fMaxUVIndexX = 1.f;
+				WallInfo.fMaxUVIndexY = 4.f;
+				WallInfo.fUVSpeed = 0.05f;
+				WallInfo.vSize = { 1.5f,4.f,1.5f };
+				WallInfo.vSpeed = { 0.08f,0.03f,0.08f };
+				WallInfo.vWorldPos = WorldPos;
+				WallInfo.eColor = CWall::WALL_GREEN;
+				GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_PlayerEffect", &WallInfo);
 			
 				m_bAttack = true;
 			}

@@ -50,8 +50,28 @@ HRESULT CWall::Initialize(void * pArg)
 
 
 	m_pTransformCom->Set_Scale(_vector{ m_WallInfo.vSize.x, m_WallInfo.vSize.y, m_WallInfo.vSize.z });
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"OrangeWall", TEXT("OrangeWall"), (CComponent**)&m_pModel)))
+
+	switch (m_WallInfo.eColor)
+	{
+	case WALL_ORANGE:
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"OrangeWall", TEXT("OrangeWall"), (CComponent**)&m_pModel)))
 			return E_FAIL;
+		break;
+	case WALL_BLUE:
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"BlueWall", TEXT("BlueWall"), (CComponent**)&m_pModel)))
+			return E_FAIL;
+		break;
+	case WALL_GREEN:
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"GreenWall", TEXT("GreenWall"), (CComponent**)&m_pModel)))
+			return E_FAIL;
+		break;
+	case WALL_RED:
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"RedWall", TEXT("RedWall"), (CComponent**)&m_pModel)))
+			return E_FAIL;
+		break;
+	}
+
+	
 
 	m_fShaderUVAcc = 0.f;
 	m_fShaderUVIndexX = 0;

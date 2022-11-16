@@ -6,12 +6,15 @@ BEGIN(Client)
 class CRing final : public CMesh
 {
 public:
+	enum RINGCOLOR {RING_ORANGE, RING_BLUE, RING_GREEN, RING_RED, RING_END};
+public:
 	typedef struct tagRingInfo
 	{
 		_float3 vSize;
 		_float fSpeed;
 		_float fLifeTime;
 		_float4 vWorldPos;
+		RINGCOLOR eColor;
 	}RINGINFO;
 
 private:

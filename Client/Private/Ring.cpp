@@ -51,9 +51,28 @@ HRESULT CRing::Initialize(void * pArg)
 	m_fMaxUVIndexX = 0.f;
 
 	m_pTransformCom->Set_Scale(_vector{ m_RingInfo.vSize.x, m_RingInfo.vSize.y, m_RingInfo.vSize.z });
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"RingOrange", TEXT("RingOrange"), (CComponent**)&m_pModel)))
-			return E_FAIL;
 
+
+	switch (m_RingInfo.eColor)
+	{
+	case RING_ORANGE:
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"RingOrange", TEXT("RingOrange"), (CComponent**)&m_pModel)))
+			return E_FAIL;
+		break;
+	case RING_BLUE:
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"BlueRing", TEXT("BlueRing"), (CComponent**)&m_pModel)))
+			return E_FAIL;
+		break;
+	case RING_GREEN:
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"GreenRing", TEXT("GreenRing"), (CComponent**)&m_pModel)))
+			return E_FAIL;
+		break;
+	case RING_RED:
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, L"RedRing", TEXT("RedRing"), (CComponent**)&m_pModel)))
+			return E_FAIL;
+		break;
+	}
+	
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_RingInfo.vWorldPos));
 
 	return S_OK;
@@ -62,8 +81,8 @@ HRESULT CRing::Initialize(void * pArg)
 void CRing::Tick(_float fTimeDelta)
 {
 	m_fLifeTimeAcc += 1.f * fTimeDelta;
-	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) + _vector{ m_RingInfo.fSpeed, m_RingInfo.vSize.y,m_RingInfo.fSpeed });
-	if (m_fLifeTimeAcc >= 0.3f)
+	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) + _vector{ m_RingInfo.fSpeed, 0.f,m_RingInfo.fSpeed });
+	if (m_fLifeTimeAcc >= m_RingInfo.fLifeTime)
 		Set_Dead();
 }
 
