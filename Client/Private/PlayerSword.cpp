@@ -96,7 +96,7 @@ void CPlayerSword::Tick(_float fTimeDelta)
 		WorldPos.y = Center.y;
 		WorldPos.z = Center.z;
 		WorldPos.w = 1.f;
-		PTM->CreateParticle(L"Hit", WorldPos, false, true, CAlphaParticle::DIR_END);
+		PTM->CreateParticle(L"Hit", WorldPos, true, CAlphaParticle::DIR_END);
 	}
 }
 

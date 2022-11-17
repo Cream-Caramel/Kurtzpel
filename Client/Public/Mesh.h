@@ -59,6 +59,7 @@ protected:
 	_float m_fRenderLimit;
 	_float m_fMoveSpeed;
 	_float m_fMoveSpeedTempo;
+	_float m_fEndAcc = 0.f;
 	_float3 m_vTargetLook = { 0.f,0.f,0.f };	
 	TURNDIR m_eTurnDir = TURN_FRONT;
 

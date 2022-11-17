@@ -408,7 +408,7 @@ _bool  CTransform::CameraMove(_fvector vTargetPos, _float fSpeed, _float fTimeDe
 
 void CTransform::Jump(_float fTimeDelta)
 {
-	m_fGravity += 1.f * fTimeDelta;
+	m_fGravity += m_fGravityPower * fTimeDelta;
 	Set_State(CTransform::STATE_POSITION, Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,m_fJumpPower - m_fGravity,0.f,0.f });
 }
 

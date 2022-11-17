@@ -83,7 +83,7 @@ void CRing::Tick(_float fTimeDelta)
 	m_fLifeTimeAcc += 1.f * fTimeDelta;
 	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) + _vector{ m_RingInfo.fSpeed, 0.f,m_RingInfo.fSpeed });
 	if (m_fLifeTimeAcc >= m_RingInfo.fLifeTime)
-		Set_Dead();
+		m_fEndAcc += 3.f * fTimeDelta;
 }
 
 void CRing::LateTick(_float fTimeDelta)
@@ -124,9 +124,17 @@ HRESULT CRing::Render()
 
 		m_pShaderCom->Set_RawValue("g_fMaxUVIndexX", &m_fMaxUVIndexX, sizeof(_float));
 
-		if (FAILED(m_pShaderCom->Begin(EFFECT_NDEFAULT)))
-			return E_FAIL;
-
+		if (m_fEndAcc == 0.f)
+		{
+			if (FAILED(m_pShaderCom->Begin(EFFECT_NDEFAULT)))
+				return E_FAIL;
+		}
+		else
+		{
+			m_pShaderCom->Set_RawValue("g_fEndAcc", &m_fEndAcc, sizeof(_float));
+			if (FAILED(m_pShaderCom->Begin(EFFECT_ENDPASS)))
+				return E_FAIL;
+		}
 		if (FAILED(m_pModel->Render(i)))
 			return E_FAIL;
 	}

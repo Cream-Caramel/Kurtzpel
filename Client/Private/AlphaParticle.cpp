@@ -85,6 +85,27 @@ void CAlphaParticle::Tick(_float fTimeDelta)
 			}
 		}
 	}
+
+	if (m_ParticleInfo.bUV)
+	{
+		m_fShaderUVAcc += 1.f * fTimeDelta;
+		if (m_fShaderUVAcc >= m_ParticleInfo.fUVSpeed)
+		{
+			m_fShaderUVAcc = 0.f;
+			m_fShaderUVIndexX += 1.f;
+			if (m_fShaderUVIndexX >= m_ParticleInfo.fMaxUVIndexX)
+			{
+				m_fShaderUVIndexX = 0.f;
+				m_fShaderUVIndexY += 1.f;
+				if (m_fShaderUVIndexY >= m_ParticleInfo.fMaxUVIndexY)
+				{
+					m_fShaderUVIndexY = 0.f;
+					if (!m_ParticleInfo.bUVLoof)
+						Set_Dead();
+				}
+			}
+		}
+	}
 }
 
 void CAlphaParticle::LateTick(_float fTimeDelta)
@@ -119,6 +140,14 @@ HRESULT CAlphaParticle::Render()
 	{
 		if (FAILED(m_pTextureCom->Set_SRV(m_pShaderCom, "g_DiffuseTexture", m_iNowFrame)))
 			return E_FAIL;
+	}
+
+	if (m_ParticleInfo.bUV)
+	{
+		m_pShaderCom->Set_RawValue("g_fMaxUVIndexX", &m_ParticleInfo.fMaxUVIndexX, sizeof(_float));
+		m_pShaderCom->Set_RawValue("g_fMaxUVIndexY", &m_ParticleInfo.fMaxUVIndexY, sizeof(_float));
+		m_pShaderCom->Set_RawValue("g_fUVIndexX", &m_fShaderUVIndexX, sizeof(_float));
+		m_pShaderCom->Set_RawValue("g_fUVIndexY", &m_fShaderUVIndexY, sizeof(_float));
 	}
 
 	if (FAILED(m_pShaderCom->Begin(0)))
@@ -176,7 +205,7 @@ void CAlphaParticle::CheckDead()
 	{
 		_float3 DirPos = PM->Get_BossPos();
 		DirPos.y += 0.5f;
-		if (0.1f >= XMVector3Length(XMLoadFloat3(&DirPos) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)).m128_f32[0])
+		if (0.15f >= XMVector3Length(XMLoadFloat3(&DirPos) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)).m128_f32[0])
 			Set_Dead();
 	}
 	break;
@@ -198,9 +227,17 @@ HRESULT CAlphaParticle::Ready_Components()
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPoint"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
-		return E_FAIL;
+	if (m_ParticleInfo.bUV)
+	{
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_EffectPoint"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+			return E_FAIL;
+	}
 
+	else
+	{
+		if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxPoint"), TEXT("Com_Shader"), (CComponent**)&m_pShaderCom)))
+			return E_FAIL;
+	}
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Particle"), TEXT("Com_VIBuffer"), (CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;

@@ -31,9 +31,14 @@ public:
 		const _tchar* TexName;
 		int TexNum = 0;
 		_float4 vWorldPos;
-		_bool bFollow;
 		_bool bLoof;
 		DIRPOINT eDirPoint;
+		_bool bUV = false;
+		int iShaderPass;
+		_float fUVSpeed;
+		_float fMaxUVIndexX;
+		_float fMaxUVIndexY;
+		_bool bUVLoof = false;
 	}PARTICLEINFO;
 private:
 	CAlphaParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -53,9 +58,13 @@ private:
 
 private:
 	PARTICLEINFO m_ParticleInfo;
+	int m_iShaderPass = 0;
 	_float m_fLifeTimeAcc = 0.f;
 	_float m_fFrameAcc = 0.f;
 	_float m_fGravityAcc = 0.f;
+	_float m_fShaderUVAcc = 0.f;
+	_float m_fShaderUVIndexX = 0;
+	_float m_fShaderUVIndexY = 0;
 	int m_iNowFrame = 0;
 	const _tchar* TexPath;
 	const _tchar* TexName;

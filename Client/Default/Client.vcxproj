@@ -355,6 +355,7 @@
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Cube.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_EffectModel.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_EffectPoint.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModelInstance.hlsl" />

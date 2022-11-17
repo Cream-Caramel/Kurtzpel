@@ -767,6 +767,9 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_EffectPoint.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt">

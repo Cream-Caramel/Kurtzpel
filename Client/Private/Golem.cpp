@@ -228,6 +228,13 @@ HRESULT CGolem::Render()
 					return E_FAIL;
 			}
 
+			else if (m_bFinishCharge)
+			{
+				m_pShaderCom->Set_RawValue("g_fGolemPatten", &m_fGolemPattern, sizeof(_float));				
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_GOLEMPATTERN)))
+					return E_FAIL;
+			}
+
 			else
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NDEFAULT)))
@@ -236,6 +243,7 @@ HRESULT CGolem::Render()
 		}
 		else
 		{
+		
 			if (m_bPattern)
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
@@ -251,6 +259,15 @@ HRESULT CGolem::Render()
 			else if (m_bFinish)
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
+					return E_FAIL;
+			}
+
+			else if (m_bFinishCharge)
+			{
+				_float a = m_fGolemPattern;
+				if (FAILED(m_pShaderCom->Set_RawValue("g_fGolemPattern", &m_fGolemPattern, sizeof(_float))))
+					return E_FAIL;
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_GOLEMPATTERN)))
 					return E_FAIL;
 			}
 
@@ -572,6 +589,8 @@ void CGolem::Set_State(STATE eState)
 		m_fDamage = 110.f;
 		GI->PlaySoundW(L"GolemSkill10.ogg", SD_MONSTERVOICE, 0.9f);
 		m_bFinishStart = false;
+		m_fGolemPattern = 0.f;
+		m_bFinishCharge = true;
 		break;
 	case Client::CGolem::SKILL10_2:
 		break;
@@ -753,10 +772,10 @@ void CGolem::Update(_float fTimeDelta)
 			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			m_bRHand = true;
 			GI->PlaySoundW(L"GolemAttack1.ogg", SD_MONSTER1, 0.9f);
-			CRM->Start_Shake(0.2f, 3.f, 0.03f);
+			CRM->Start_Shake(0.3f, 3.f, 0.03f);
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, EffectInfo.WorldMatrix.r[3]);
-			PTM->CreateParticle(L"GolemSkill1", WorldPos, false, false, CAlphaParticle::DIR_END);
+			PTM->CreateParticle(L"GolemSkill1", WorldPos, false, CAlphaParticle::DIR_END);
 			return;
 		}
 
@@ -780,11 +799,11 @@ void CGolem::Update(_float fTimeDelta)
 			m_bLHand = true;
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill1_2.ogg", SD_MONSTERVOICE, 0.9f);
-			CRM->Start_Shake(0.2f, 4.f, 0.04f);
+			CRM->Start_Shake(0.4f, 4.f, 0.04f);
 			_float4 WorldPos;
 			EffectInfo.WorldMatrix.r[3] -= Right * 2.f;
 			XMStoreFloat4(&WorldPos, EffectInfo.WorldMatrix.r[3]);
-			PTM->CreateParticle(L"GolemSkill1_2", WorldPos, false, false, CAlphaParticle::DIR_END);
+			PTM->CreateParticle(L"GolemSkill1_2", WorldPos, false, CAlphaParticle::DIR_END);
 		}
 		break;
 	case Client::CGolem::SKILL2:
@@ -847,7 +866,7 @@ void CGolem::Update(_float fTimeDelta)
 			EffectInfo.WorldMatrix.r[3] += Right * -3.f;
 			XMStoreFloat4(&WorldPos, EffectInfo.WorldMatrix.r[3]);
 			WorldPos.y += 0.5f;
-			PTM->CreateParticle(L"GolemSkill3", WorldPos, false, false, CAlphaParticle::DIR_END);
+			PTM->CreateParticle(L"GolemSkill3", WorldPos, false, CAlphaParticle::DIR_END);
 
 			CRing::RINGINFO RingInfo;
 			RingInfo.vSize = { 0.2f,0.3f,0.2f };
@@ -888,7 +907,7 @@ void CGolem::Update(_float fTimeDelta)
 				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta);		
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-				PTM->CreateParticle(L"GolemTrail", WorldPos, false, false, CAlphaParticle::DIR_END);
+				PTM->CreateParticle(L"GolemTrail", WorldPos, false, CAlphaParticle::DIR_END);
 				return;
 			}
 
@@ -907,7 +926,7 @@ void CGolem::Update(_float fTimeDelta)
 				CRM->Start_Shake(0.4f, 5.f, 0.05f);
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-				PTM->CreateParticle(L"GolemSkill4", WorldPos, false, false, CAlphaParticle::DIR_END);
+				PTM->CreateParticle(L"GolemSkill4", WorldPos, false, CAlphaParticle::DIR_END);
 
 			}
 		}
@@ -926,10 +945,15 @@ void CGolem::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CGolem::SKILL5_2:
-			m_fNowHp += 0.2f;
-			m_fNowMp += 0.1f;
-			if (m_fNowMp >= 100.f)
-				m_bFinish = true;
+	{
+		_float4 WorldPos;
+		XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		PTM->CreateParticle(L"GolemCharge", WorldPos, false, CAlphaParticle::DIR_GOLEM);
+		m_fNowHp += 0.2f;
+		m_fNowMp += 0.1f;
+		if (m_fNowMp >= 100.f)
+			m_bFinish = true;
+	}
 		break;
 	case Client::CGolem::SKILL5_3:
 		break;
@@ -1039,6 +1063,13 @@ void CGolem::Update(_float fTimeDelta)
 
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				WorldPos.y += 2.5f;
+				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				XMStoreFloat4(&WorldPos, XMLoadFloat4(&WorldPos) + Look * 3.f);
+				PTM->CreateParticle(L"GolemSkill7", WorldPos, false, CAlphaParticle::DIR_END);
+
 				GI->PlaySoundW(L"GolemSkill9_2.ogg", SD_MONSTERVOICE, 0.9f);
 				m_bLHand = true;
 			}
@@ -1051,13 +1082,15 @@ void CGolem::Update(_float fTimeDelta)
 		break;
 	case Client::CGolem::SKILL10_1:
 		m_bAttack = false;
+		m_fGolemPattern += 0.08f * fTimeDelta;
 		if (!m_pAnimModel->GetChangeBool())
 		{
+			
 			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 			{
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-				PTM->CreateParticle(L"GolemCharge", WorldPos, false, false, CAlphaParticle::DIR_GOLEM);
+				PTM->CreateParticle(L"GolemCharge", WorldPos, false, CAlphaParticle::DIR_GOLEM);
 				
 			}
 			
@@ -1075,16 +1108,17 @@ void CGolem::Update(_float fTimeDelta)
 					GI->PlaySoundW(L"GolemSkill10_1.ogg", SD_MONSTERVOICE, 0.9f);
 					
 				}
+				m_bFinishCharge = false;
 				GI->Set_Speed(L"Timer_Main", 1.f);
 				CreateLight();
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-				PTM->CreateParticle(L"GolemFinish", WorldPos, false, false, CAlphaParticle::DIR_END);
+				PTM->CreateParticle(L"GolemFinish", WorldPos, false, CAlphaParticle::DIR_END);
 
 				CRing::RINGINFO RingInfo;
 				RingInfo.vSize = { 0.2f,0.5f,0.2f };
-				RingInfo.fSpeed = 1.f;
-				RingInfo.fLifeTime = 1.f;
+				RingInfo.fSpeed = 0.8f;
+				RingInfo.fLifeTime = 0.1f;
 				RingInfo.eColor = CRing::RING_GREEN;
 				XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				RingInfo.vWorldPos.y += 1.f;

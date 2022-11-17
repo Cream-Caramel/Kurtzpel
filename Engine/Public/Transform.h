@@ -101,12 +101,15 @@ public:
 	void Set_Gravity(_float fGravity) { m_fGravity = fGravity; }
 	_bool Get_JumpEnd(_fvector vPos, CNavigation* pNavigation);
 	void Set_JumpEndPos(CNavigation* pNavigation);
+	void Set_GravityPower(_float fGravityPower) { m_fGravityPower = fGravityPower; }
+	_float Get_GravityPower() { return m_fGravityPower; }
 private:
 	_float4x4				m_WorldMatrix;
 	TRANSFORMDESC			m_TransformDesc;
 	_float m_fGravity = 0.f; //중력 
 	_bool m_bJump = false; //점프중인지
 	_float m_fJumpPower = 5.f; //뛰어오르는 힘
+	_float m_fGravityPower = 0.f;
 
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

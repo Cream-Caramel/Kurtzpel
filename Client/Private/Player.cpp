@@ -393,13 +393,14 @@ void CPlayer::Set_State(STATE eState)
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 			WorldPos.y += 0.5f;
-			PTM->CreateParticle(L"PlayerJump", WorldPos, false, true, CAlphaParticle::DIR_END);
+			PTM->CreateParticle(L"PlayerJump", WorldPos, true, CAlphaParticle::DIR_END);
 		}
 		m_bAction = false;
 		GI->PlaySoundW(L"Jump.ogg", SD_PLAYER1, 0.6f);
 		m_pTransformCom->Set_Jump(true);
 		m_pTransformCom->Set_Gravity(0.f);
-		m_pTransformCom->Set_JumpPower(0.6f);
+		m_pTransformCom->Set_JumpPower(0.4f);
+		m_pTransformCom->Set_GravityPower(0.6f);
 		m_fJumpSpeed = 10.f;
 		break;
 	case Client::CPlayer::IDLE:
@@ -1741,7 +1742,7 @@ void CPlayer::Update(_float fTimeDelta)
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				WorldPos.y += 0.5f;
-				PTM->CreateParticle(L"PlayerJump", WorldPos, false, true, CAlphaParticle::DIR_END);
+				PTM->CreateParticle(L"PlayerJump", WorldPos, true, CAlphaParticle::DIR_END);
 				Set_State(JUMPEND);
 				m_pTransformCom->Set_JumpEndPos(m_pNavigation);
 			}
@@ -1991,8 +1992,8 @@ void CPlayer::Update(_float fTimeDelta)
 					WallInfo.vWorldPos = WorldPos;
 					WallInfo.eColor = CWall::WALL_ORANGE;
 					GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_PlayerEffect", &WallInfo);
-					PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, CAlphaParticle::DIR_END);
-					PTM->CreateParticle(L"Player1", WorldPos, false, true, CAlphaParticle::DIR_END);
+					PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
+					PTM->CreateParticle(L"Player1", WorldPos, true, CAlphaParticle::DIR_END);
 					m_Parts[PARTS_SWORD]->Set_Damage(70.f);
 					ChargeAttackLight();
 					CRing::RINGINFO RingInfo;
@@ -2008,7 +2009,7 @@ void CPlayer::Update(_float fTimeDelta)
 				}
 				else if (m_bCharge2)
 				{
-					PTM->CreateParticle(L"Player2", WorldPos, false, true, CAlphaParticle::DIR_END);
+					PTM->CreateParticle(L"Player2", WorldPos, true, CAlphaParticle::DIR_END);
 					m_Parts[PARTS_SWORD]->Set_Damage(50.f);
 					ChargeAttackLight();
 				}
@@ -2031,13 +2032,13 @@ void CPlayer::Update(_float fTimeDelta)
 		{
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"ChargeYellow", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+			PTM->CreateParticle(L"ChargeYellow", WorldPos, true, CAlphaParticle::DIR_PLAYER);
 		}
 		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
 		{
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"ChargeOrange", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+			PTM->CreateParticle(L"ChargeOrange", WorldPos, true, CAlphaParticle::DIR_PLAYER);
 			CRM->Start_Shake(0.2f, 1.f, 0.02f);
 			m_bCharge2 = true;
 		}
@@ -2046,7 +2047,7 @@ void CPlayer::Update(_float fTimeDelta)
 		{
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"ChargeOrange2", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+			PTM->CreateParticle(L"ChargeOrange2", WorldPos, true, CAlphaParticle::DIR_PLAYER);
 			CRM->Start_Shake(0.2f, 1.5f, 0.02f);
 			m_bCharge1 = true;
 		}
@@ -2058,7 +2059,7 @@ void CPlayer::Update(_float fTimeDelta)
 			GI->PlaySoundW(L"ChargeReady.ogg", SD_PLAYER1, 0.6f);
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"PlayerGage2_2", WorldPos, false, true, CAlphaParticle::DIR_END);
+			PTM->CreateParticle(L"PlayerGage2_2", WorldPos, true, CAlphaParticle::DIR_END);
 			CreateGage(false);
 		}
 
@@ -2070,7 +2071,7 @@ void CPlayer::Update(_float fTimeDelta)
 			PM->Set_PlayerGage2_2(true);
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, CAlphaParticle::DIR_END);
+			PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
 			CreateGage(true);
 		}
 		break;
@@ -2188,7 +2189,7 @@ void CPlayer::Update(_float fTimeDelta)
 					_float4 WorldPos;
 					XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 					WorldPos.y += 0.7f;
-					PTM->CreateParticle(L"PlayerAirComboEnd", WorldPos, false, true, CAlphaParticle::DIR_END);
+					PTM->CreateParticle(L"PlayerAirComboEnd", WorldPos, true, CAlphaParticle::DIR_END);
 				}
 			}
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
@@ -2502,9 +2503,9 @@ void CPlayer::Update(_float fTimeDelta)
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 			if (m_bCharge1)
-				PTM->CreateParticle(L"PlayerOrangeTrail", WorldPos, false, true, CAlphaParticle::DIR_END);
+				PTM->CreateParticle(L"PlayerOrangeTrail", WorldPos, true, CAlphaParticle::DIR_END);
 			else if (m_bCharge2)
-				PTM->CreateParticle(L"PlayerYellowTrail", WorldPos, false, true, CAlphaParticle::DIR_END);			
+				PTM->CreateParticle(L"PlayerYellowTrail", WorldPos, true, CAlphaParticle::DIR_END);			
 			return;
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
@@ -2528,11 +2529,12 @@ void CPlayer::Update(_float fTimeDelta)
 				WallInfo.fUVSpeed = 0.05f;
 				WallInfo.vSize = { 1.f,3.f,1.f };
 				WallInfo.vSpeed = { 0.04f,0.03f,0.04f };
+				WallInfo.eColor = CWall::WALL_ORANGE;
 				XMStoreFloat4(&WallInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_PlayerEffect", &WallInfo);
 
-				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, CAlphaParticle::DIR_END);
-				PTM->CreateParticle(L"Player1", WorldPos, false, true, CAlphaParticle::DIR_END);
+				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
+				PTM->CreateParticle(L"Player1", WorldPos, true, CAlphaParticle::DIR_END);
 				m_Parts[PARTS_SWORD]->Set_Damage(60.f);
 				Ex1AttackLight();
 				CreateRing();
@@ -2540,7 +2542,7 @@ void CPlayer::Update(_float fTimeDelta)
 			else if (m_bCharge2)
 			{
 					
-				PTM->CreateParticle(L"Player2", WorldPos, false, true, CAlphaParticle::DIR_END);
+				PTM->CreateParticle(L"Player2", WorldPos, true, CAlphaParticle::DIR_END);
 				m_Parts[PARTS_SWORD]->Set_Damage(40.f);
 				Ex1AttackLight();
 			}
@@ -2568,13 +2570,13 @@ void CPlayer::Update(_float fTimeDelta)
 		{	
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"ChargeYellow", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+			PTM->CreateParticle(L"ChargeYellow", WorldPos, true, CAlphaParticle::DIR_PLAYER);
 		}
 		else if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
 		{
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"ChargeOrange", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+			PTM->CreateParticle(L"ChargeOrange", WorldPos, true, CAlphaParticle::DIR_PLAYER);
 			CRM->Start_Shake(0.2f, 1.f, 0.02f);
 			m_bCharge2 = true;
 		}
@@ -2583,7 +2585,7 @@ void CPlayer::Update(_float fTimeDelta)
 		{
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"ChargeOrange2", WorldPos, false, true, CAlphaParticle::DIR_PLAYER);
+			PTM->CreateParticle(L"ChargeOrange2", WorldPos, true, CAlphaParticle::DIR_PLAYER);
 			CRM->Start_Shake(0.2f, 2.f, 0.03f);
 			m_bCharge1 = true;
 		}
@@ -2594,7 +2596,7 @@ void CPlayer::Update(_float fTimeDelta)
 			GI->PlaySoundW(L"ChargeReady.ogg", SD_PLAYER1, 0.6f);
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"PlayerGage2_2", WorldPos, false, true, CAlphaParticle::DIR_END);
+			PTM->CreateParticle(L"PlayerGage2_2", WorldPos, true, CAlphaParticle::DIR_END);
 			CreateGage(false);
 		}
 
@@ -2606,7 +2608,7 @@ void CPlayer::Update(_float fTimeDelta)
 			PM->Set_PlayerGage2_2(true);
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-			PTM->CreateParticle(L"PlayerGage2_1", WorldPos, false, true, CAlphaParticle::DIR_END);
+			PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
 			CreateGage(true);
 		}
 		break;

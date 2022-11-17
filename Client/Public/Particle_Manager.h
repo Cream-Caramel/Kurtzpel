@@ -25,6 +25,12 @@ public:
 		const _tchar* TexName;
 		_float fFrameSpeed = 0.f;
 		int TexNums;
+		_bool bUV;
+		_bool bUVLoof;
+		int iShaderPass;
+		_float fUVMaxIndexX;
+		_float fUVMaxIndexY;
+		_float fUVSpeed;
 	}PARTICLECREATE;
 
 	DECLARE_SINGLETON(CParticle_Manager)
@@ -35,7 +41,7 @@ private:
 public:
 	void Initalize();
 	void LoadParticle();
-	void CreateParticle(_tchar* ParticleName, _float4 vPos, _bool bFollow, _bool bLoof, CAlphaParticle::DIRPOINT ePoint);
+	void CreateParticle(_tchar* ParticleName, _float4 vPos, _bool bLoof, CAlphaParticle::DIRPOINT ePoint);
 	PARTICLECREATE SearchParticle(_tchar* ParticleName);
 private:
 	_float4 m_vPos = { 0.f,0.f,0.f,1.f };

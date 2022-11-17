@@ -70,7 +70,9 @@ private:
 	_float m_fRunSpeed = 3.f;
 	_float m_fRunTempo = 0.f;
 	_float m_fRunTempoAcc = 0.f;
+	_float m_fGolemPattern = 0.f;
 private:
+	_bool m_bFinishCharge = false;
 	_bool m_bFinishTime = false;
 	_bool m_bFinishStart = false;
 	_bool m_bLHand = false;

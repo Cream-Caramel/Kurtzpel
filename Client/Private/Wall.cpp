@@ -109,7 +109,7 @@ void CWall::Tick(_float fTimeDelta)
 	{
 		m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) - _vector{ m_WallInfo.vSpeed.x, m_WallInfo.vSpeed.y, m_WallInfo.vSpeed.z });
 		if (m_pTransformCom->Get_Scale().x <= 0.1f)
-			Set_Dead();
+			m_fEndAcc += 5.f * fTimeDelta;
 	}
 
 }
@@ -154,8 +154,17 @@ HRESULT CWall::Render()
 		m_pShaderCom->Set_RawValue("g_fUVIndexX", &m_fShaderUVIndexX, sizeof(_float));
 		m_pShaderCom->Set_RawValue("g_fUVIndexY", &m_fShaderUVIndexY, sizeof(_float));
 
-		if (FAILED(m_pShaderCom->Begin(EFFECT_NDEFAULT)))
-			return E_FAIL;
+		if (m_fEndAcc == 0.f)
+		{
+			if (FAILED(m_pShaderCom->Begin(EFFECT_NDEFAULT)))
+				return E_FAIL;
+		}
+		else
+		{
+			m_pShaderCom->Set_RawValue("g_fEndAcc", &m_fEndAcc, sizeof(_float));
+			if (FAILED(m_pShaderCom->Begin(EFFECT_ENDPASS)))
+				return E_FAIL;
+		}
 
 		if (FAILED(m_pModel->Render(i)))
 			return E_FAIL;
