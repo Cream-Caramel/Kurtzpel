@@ -104,7 +104,9 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_5))
 	{	
-		
+		_float4 WorldPos;
+		XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		PTM->CreateParticle(L"T", WorldPos, true, CAlphaParticle::DIR_END);
 	}
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
