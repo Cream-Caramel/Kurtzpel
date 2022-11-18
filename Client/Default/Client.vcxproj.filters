@@ -223,6 +223,9 @@
     <Filter Include="02.GameObjects\Effect\Dragon\DragonTrail">
       <UniqueIdentifier>{6593cfb3-7b5d-4068-bc28-5d32151a7308}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Dragon\DragonFire2">
+      <UniqueIdentifier>{0142f1d1-7f7b-4f27-a0b0-2c45b137d5b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -495,6 +498,9 @@
     <ClInclude Include="..\Public\DragonTrail.h">
       <Filter>02.GameObjects\Effect\Dragon\DragonTrail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DragonFire2.h">
+      <Filter>02.GameObjects\Effect\Dragon\DragonFire2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -748,6 +754,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\DragonTrail.cpp">
       <Filter>02.GameObjects\Effect\Dragon\DragonTrail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DragonFire2.cpp">
+      <Filter>02.GameObjects\Effect\Dragon\DragonFire2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,27 +1,27 @@
 #include "stdafx.h"
-#include "..\Public\DragonFire1.h"
+#include "..\Public\DragonFire2.h"
 #include "GameInstance.h"
 #include "Pointer_Manager.h"
 #include "OBB.h"
 #include "Collider_Manager.h"
 
-CDragonFire1::CDragonFire1(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CDragonFire2::CDragonFire2(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject(pDevice, pContext)
 {
 }
 
-CDragonFire1::CDragonFire1(const CDragonFire1 & rhs)
+CDragonFire2::CDragonFire2(const CDragonFire2 & rhs)
 	: CGameObject(rhs)
 {
 }
 
-HRESULT CDragonFire1::Initialize_Prototype()
+HRESULT CDragonFire2::Initialize_Prototype()
 {
 
 	return S_OK;
 }
 
-HRESULT CDragonFire1::Initialize(void * pArg)
+HRESULT CDragonFire2::Initialize(void * pArg)
 {
 	m_DragonFire1Info = (*(DRAGONFIRE1INFO*)pArg);
 			
@@ -34,7 +34,7 @@ HRESULT CDragonFire1::Initialize(void * pArg)
 		return E_FAIL;
 
 	CCollider::COLLIDERDESC		ColliderDesc;
-	ColliderDesc.vSize = _float3(m_DragonFire1Info.vSize.x / 100.f, m_DragonFire1Info.vSize.y / 100.f, m_DragonFire1Info.vSize.z / 100.f);
+	ColliderDesc.vSize = _float3(0.3f, 0.3f, 0.3f);
 	ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.sTag = "Monster_Attack";
@@ -46,18 +46,18 @@ HRESULT CDragonFire1::Initialize(void * pArg)
 	m_DragonFire1Info.vPosition.y += GI->Get_FloatRandom(0.f,2.f);
 	m_DragonFire1Info.vPosition.z += GI->Get_FloatRandom(-2.f, 2.f);
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_DragonFire1Info.vPosition));
-	m_pTransformCom->Set_Scale(_vector{ m_DragonFire1Info.vSize.x, m_DragonFire1Info.vSize.y, m_DragonFire1Info.vSize.z });
-	m_fDamage = m_DragonFire1Info.fDamage;
+	m_pTransformCom->Set_Scale(_vector{ 30.f, 30.f, 30.f});
+	m_fDamage = 50.f;
 	m_iMaxHit = 1;
 	
 	m_vTargetLook = m_DragonFire1Info.vDirection;
 	return S_OK;
 }
 
-void CDragonFire1::Tick(_float fTimeDelta)
+void CDragonFire2::Tick(_float fTimeDelta)
 {
 	
-	m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), GI->Get_FloatRandom(m_DragonFire1Info.vMinSpped, m_DragonFire1Info.vMaxSpeed) , fTimeDelta);
+	m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), GI->Get_FloatRandom(40.f, 60.f) , fTimeDelta);
 
 	if (!m_bEnd)
 	{
@@ -90,7 +90,7 @@ void CDragonFire1::Tick(_float fTimeDelta)
 	
 }
 
-void CDragonFire1::LateTick(_float fTimeDelta)
+void CDragonFire2::LateTick(_float fTimeDelta)
 {
 	if (nullptr == m_pRendererCom)
 		return;
@@ -102,7 +102,7 @@ void CDragonFire1::LateTick(_float fTimeDelta)
 
 }
 
-HRESULT CDragonFire1::Render()
+HRESULT CDragonFire2::Render()
 {
 	if (nullptr == m_pVIBufferCom ||
 		nullptr == m_pShaderCom)
@@ -145,7 +145,7 @@ HRESULT CDragonFire1::Render()
 
 
 
-HRESULT CDragonFire1::Ready_Components()
+HRESULT CDragonFire2::Ready_Components()
 {
 	/* For.Com_Transform */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Transform"), TEXT("Com_Transform"), (CComponent**)&m_pTransformCom)))
@@ -167,33 +167,33 @@ HRESULT CDragonFire1::Ready_Components()
 	return S_OK;
 }
 
-CDragonFire1 * CDragonFire1::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CDragonFire2 * CDragonFire2::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CDragonFire1*		pInstance = new CDragonFire1(pDevice, pContext);
+	CDragonFire2*		pInstance = new CDragonFire2(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CDragonFire1"));
+		MSG_BOX(TEXT("Failed To Created : CDragonFire2"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CDragonFire1::Clone(void * pArg)
+CGameObject * CDragonFire2::Clone(void * pArg)
 {
-	CDragonFire1*		pInstance = new CDragonFire1(*this);
+	CDragonFire2*		pInstance = new CDragonFire2(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CDragonFire1"));
+		MSG_BOX(TEXT("Failed To Cloned : CDragonFire2"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CDragonFire1::Free()
+void CDragonFire2::Free()
 {
 	__super::Free();
 	

@@ -47,11 +47,11 @@ void CLevel_Stage2::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	if (!m_bScene)
+	/*if (!m_bScene)
 	{
 		CRM->Start_Scene("Scene_Stage2");
 		m_bScene = true;
-	}
+	}*/
 }
 
 HRESULT CLevel_Stage2::Render()
@@ -309,7 +309,11 @@ HRESULT CLevel_Stage2::Ready_Load_Model(char * DatName)
 	while (true)
 	{
 		_tchar* ModelName = new _tchar[256];
+		ZeroMemory(ModelName, sizeof(_tchar) * 256);
 		ReadFile(hFile, ModelName, sizeof(_tchar) * 256, &dwByte, nullptr);		
+
+		if (ModelName == nullptr)
+			continue;
 
 		CInstanceModel::INSTANCEINFO* InstanceInfo;
 		InstanceInfo = new CInstanceModel::INSTANCEINFO;
@@ -319,6 +323,8 @@ HRESULT CLevel_Stage2::Ready_Load_Model(char * DatName)
 		wstring Sky = ModelName;
 		if (Sky == L"S2Sky")
 			InstanceInfo->eRenderGroup = CRenderer::RENDER_PRIORITY;
+
+		
 
 		if (0 == dwByte)	// 더이상 읽을 데이터가 없을 경우
 		{

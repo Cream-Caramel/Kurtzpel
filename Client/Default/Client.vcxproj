@@ -183,6 +183,7 @@
     <ClInclude Include="..\Public\Count.h" />
     <ClInclude Include="..\Public\Dragon.h" />
     <ClInclude Include="..\Public\DragonFire1.h" />
+    <ClInclude Include="..\Public\DragonFire2.h" />
     <ClInclude Include="..\Public\DragonTrail.h" />
     <ClInclude Include="..\Public\Effect.h" />
     <ClInclude Include="..\Public\ExGauge.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="..\Private\Count.cpp" />
     <ClCompile Include="..\Private\Dragon.cpp" />
     <ClCompile Include="..\Private\DragonFire1.cpp" />
+    <ClCompile Include="..\Private\DragonFire2.cpp" />
     <ClCompile Include="..\Private\DragonTrail.cpp" />
     <ClCompile Include="..\Private\Effect.cpp" />
     <ClCompile Include="..\Private\ExGauge.cpp" />

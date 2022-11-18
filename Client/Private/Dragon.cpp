@@ -48,9 +48,10 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_bColliderRender = false;
 
-	m_eCurState = IDLE;
-	m_eNextState = IDLE;
+	m_eCurState = START;
+	m_eNextState = START;
 
+	m_pTransformCom->Rotation(_vector{ 0.f,1.f,0.f }, 180.f);
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
@@ -69,18 +70,18 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	Set_Dir();
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-	return E_FAIL;
+	return E_FAIL;*/
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 172;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
 	m_pNavigation->Set_BattleIndex(145);
-	CRM->Start_Scene("Scene_Stage4Boss");*/
+	CRM->Start_Scene("Scene_Stage4Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -1021,12 +1022,13 @@ void CDragon::Update(_float fTimeDelta)
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
+			CreateFire2();
 			GI->PlaySoundW(L"DragonBottom.ogg", SD_MONSTER1, 0.5f);
 		}
 		break;
 	case Client::CDragon::SKILL7_2:
 		if (!m_pAnimModel->GetChangeBool())
-			m_bAttack = true;
+			//m_bAttack = true;
 		break;
 	case Client::CDragon::SKILL7_3:
 		m_bAttack = false;
@@ -1502,9 +1504,35 @@ void CDragon::CreateFire1()
 		_float4 WorldPos;
 		XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		CDragonFire1::DRAGONFIRE1INFO DragonFireInfo;
-
+		DragonFireInfo.vSize = { 15.f,15.f,15.f };
 		XMStoreFloat4(&DragonFireInfo.vPosition, Head.r[3]);
-		
+		DragonFireInfo.vMinSpped = 20.f;
+		DragonFireInfo.vMaxSpeed = 30.f;
+		DragonFireInfo.fDamage = 30.f;
+		XMStoreFloat3(&DragonFireInfo.vDirection, LeftDir * (0 + (_float)i / 20) + RightDir * (1 - (_float)i / 20));
+		GI->Add_GameObjectToLayer(L"DragonFire1", PM->Get_NowLevel(), L"Layer_Dragon", &DragonFireInfo);
+	}
+}
+
+void CDragon::CreateFire2()
+{
+	CRM->Start_Shake(2.f, 7.f, 0.07f);
+	_matrix LeftMatrix = XMMatrixRotationAxis(_vector{ 0.f,1.f,0.f }, -90.f);
+	_matrix RightMatrix = XMMatrixRotationAxis(_vector{ 0.f,1.f,0.f }, 90.f);
+	_vector LeftDir = XMVector3TransformNormal(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -1.f, LeftMatrix);
+	_vector RightDir = XMVector3TransformNormal(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -1.f, RightMatrix);
+
+	for (int i = 0; i < 30; ++i)
+	{
+		_matrix Head = m_Sockets[SOCKET_HEAD]->Get_CombinedTransformation() * m_pAnimModel->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+		_float4 WorldPos;
+		XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		CDragonFire1::DRAGONFIRE1INFO DragonFireInfo;
+		DragonFireInfo.vSize = { 50.f,50.f,50.f };
+		XMStoreFloat4(&DragonFireInfo.vPosition, Head.r[3]);
+		DragonFireInfo.vMinSpped = 35.f;
+		DragonFireInfo.vMaxSpeed = 50.f;
+		DragonFireInfo.fDamage = 100.f;
 		XMStoreFloat3(&DragonFireInfo.vDirection, LeftDir * (0 + (_float)i / 20) + RightDir * (1 - (_float)i / 20));
 		GI->Add_GameObjectToLayer(L"DragonFire1", PM->Get_NowLevel(), L"Layer_Dragon", &DragonFireInfo);
 	}

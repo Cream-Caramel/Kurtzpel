@@ -50,13 +50,14 @@ HRESULT CGolem::Initialize(void * pArg)
 
 	m_bColliderRender = false;
 
-	m_eCurState = IDLE;
-	m_eNextState = IDLE;
+	m_eCurState = START;
+	m_eNextState = START;
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, _vector{ 0.f,0.f,1.f });
+	m_pTransformCom->Rotation(_vector{ 0.f,1.f,0.f }, 180.f);
 	m_vTargetLook = { 0.f,0.f,1.f };
-
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 1000;
+	m_fMaxHp = 50;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 90.f;
@@ -68,21 +69,21 @@ HRESULT CGolem::Initialize(void * pArg)
 	Safe_AddRef(m_pTarget);
 	PM->Add_Boss(this);
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;
+		return E_FAIL;*/
 	
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 478;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE3, L"NavigationStage3", TEXT("NavigationStage3"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
-	m_pNavigation->Set_BattleIndex(473);*/
+	m_pNavigation->Set_BattleIndex(473);
 
 	Set_Dir();
 
-	//CRM->Start_Scene("Scene_Stage3Boss");
+	CRM->Start_Scene("Scene_Stage3Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");

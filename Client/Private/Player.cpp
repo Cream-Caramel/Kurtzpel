@@ -1988,6 +1988,7 @@ void CPlayer::Update(_float fTimeDelta)
 				if (m_bCharge1)
 				{
 					CWall::WALLINFO WallInfo;
+					m_Parts[PARTS_SWORD]->Set_Damage(100.f);
 					WallInfo.fMaxUVIndexX = 1.f;
 					WallInfo.fMaxUVIndexY = 4.f;
 					WallInfo.fUVSpeed = 0.05f;
@@ -2222,7 +2223,7 @@ void CPlayer::Update(_float fTimeDelta)
 		{
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -0.5f));
-			PTM->CreateParticle(L"PlayerYellowTrail", WorldPos, true, CAlphaParticle::DIR_END);
+			PTM->CreateParticle(L"PlayerYellowTrail2", WorldPos, true, CAlphaParticle::DIR_END);
 		}
 		break;
 	case Client::CPlayer::VOIDBACK:
@@ -2566,7 +2567,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
 				PTM->CreateParticle(L"Player1", WorldPos, true, CAlphaParticle::DIR_END);
-				m_Parts[PARTS_SWORD]->Set_Damage(63.f);
+				m_Parts[PARTS_SWORD]->Set_Damage(90.f);
 				Ex1AttackLight();
 				CreateRing();
 			}

@@ -14,7 +14,7 @@ END
 
 BEGIN(Client)
 
-class CDragonFire1 : public CGameObject
+class CDragonFire2 : public CGameObject
 {
 
 public:
@@ -22,15 +22,11 @@ public:
 	{
 		_float4 vPosition;
 		_float3 vDirection;
-		_float3 vSize;
-		_float vMinSpped;
-		_float vMaxSpeed;
-		_float fDamage;
 	}DRAGONFIRE1INFO;
 private:
-	CDragonFire1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CDragonFire1(const CDragonFire1& rhs);
-	virtual ~CDragonFire1() = default;
+	CDragonFire2(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CDragonFire2(const CDragonFire2& rhs);
+	virtual ~CDragonFire2() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -63,7 +59,7 @@ private:
 	HRESULT Ready_Components();
 
 public:
-	static CDragonFire1* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CDragonFire2* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);
 	virtual void Free() override;
 };

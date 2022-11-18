@@ -47,14 +47,15 @@ HRESULT CTheo::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_bColliderRender = false;
+	m_pTransformCom->Rotation(_vector{ 0.f,1.f,0.f }, 180.f);
 
-	m_eCurState = IDLE;
-	m_eNextState = IDLE;
+	m_eCurState = APPEAR;
+	m_eNextState = APPEAR;
 	m_vTargetLook = { 0.f,0.f,1.f };
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 300;
+	m_fMaxHp = 50;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 95.f;
@@ -66,19 +67,19 @@ HRESULT CTheo::Initialize(void * pArg)
 	Safe_AddRef(m_pTarget);
 	PM->Add_Boss(this);
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;
+		return E_FAIL;*/
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 42;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE2, L"NavigationStage2", TEXT("NavigationStage2"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
-	m_pNavigation->Set_BattleIndex(41);*/
+	m_pNavigation->Set_BattleIndex(41);
 
-	//CRM->Start_Scene("Scene_Stage2Boss");
+	CRM->Start_Scene("Scene_Stage2Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -890,7 +891,7 @@ void CTheo::Update(_float fTimeDelta)
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 			{
 				GI->PlaySoundW(L"TheoAppearAttack.ogg", SD_MONSTERVOICE, 0.9f);
-				CRM->Start_Shake(0.3f, 4.f, 0.04f);
+				CRM->Start_Shake(0.2f, 3.f, 0.03f);
 				return;
 			}
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))

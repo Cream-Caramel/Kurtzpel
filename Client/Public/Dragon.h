@@ -64,6 +64,7 @@ private:
 	HRESULT Load_UI(char* DatName);
 	void DebugKeyInput();
 	void CreateFire1();
+	void CreateFire2();
 	void CreateTrail(TRAILSTATE eTS);
 private:
 	STATE m_eCurState; // 현재 상태
