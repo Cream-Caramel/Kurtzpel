@@ -94,10 +94,11 @@ HRESULT CLoader::Loading_ForStatic()
 	LoadAnimModel("StaticEffect");
 	LoadAnimModel("GolemEffect");
 	LoadModel("Level_Static");
-	LoadModel("Level_Stage1");
 	LoadModel("PlayerEffect");
 	LoadModel("StaticEffect");
 	LoadModel("GolemEffect");
+	LoadModel("DragonEffect");
+	LoadModel("Level_Stage1");
 	LoadModel("Level_Stage2");
 	LoadModel("Level_Stage3");
 	LoadModel("Level_Stage4");
@@ -168,12 +169,20 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CPlayerGage2::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("DragonTrail"),
+		CDragonTrail::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Wall"),
 		CWall::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Ring"),
 		CRing::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("DragonFire1"),
+		CDragonFire1::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("GolemSkillRock1"),
@@ -794,6 +803,18 @@ HRESULT CLoader::LoadModel(char * DatName)
 		}
 
 		else if (!strcmp(DatName, "GolemEffect"))
+		{
+			if (FAILED(GI->Add_Prototype(LEVEL_STATIC, ProtoName,
+				CModel::Create(m_pDevice, m_pContext, ModelName, DatName))))
+			{
+				Safe_Delete(ProtoName);
+				return E_FAIL;
+			}
+			RM->Pushtchar(ProtoName);
+			Safe_Delete(ModelName);
+		}
+
+		else if (!strcmp(DatName, "DragonEffect"))
 		{
 			if (FAILED(GI->Add_Prototype(LEVEL_STATIC, ProtoName,
 				CModel::Create(m_pDevice, m_pContext, ModelName, DatName))))

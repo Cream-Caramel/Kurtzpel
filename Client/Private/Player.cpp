@@ -17,7 +17,6 @@
 #include "PlayerGage2.h"
 #include "Wall.h"
 #include "Ring.h"
-#include "GolemSkillRock1.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -104,9 +103,7 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_5))
 	{	
-		_float4 WorldPos;
-		XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-		PTM->CreateParticle(L"T", WorldPos, true, CAlphaParticle::DIR_END);
+		
 	}
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
@@ -401,7 +398,7 @@ void CPlayer::Set_State(STATE eState)
 		GI->PlaySoundW(L"Jump.ogg", SD_PLAYER1, 0.6f);
 		m_pTransformCom->Set_Jump(true);
 		m_pTransformCom->Set_Gravity(0.f);
-		m_pTransformCom->Set_JumpPower(0.4f);
+		m_pTransformCom->Set_JumpPower(0.35f);
 		m_pTransformCom->Set_GravityPower(0.6f);
 		m_fJumpSpeed = 10.f;
 		break;
@@ -1450,7 +1447,7 @@ void CPlayer::CreateRing()
 {
 	CRing::RINGINFO RingInfo;	
 	RingInfo.vSize = { 0.2f,0.3f,0.2f };
-	RingInfo.fSpeed = 0.5f;
+	RingInfo.vSpeed = _float3{ 0.5f, 0.f, 0.5f };
 	RingInfo.fLifeTime = 0.3f;
 	RingInfo.eColor = CRing::RING_ORANGE;
 	XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
@@ -1775,6 +1772,11 @@ void CPlayer::Update(_float fTimeDelta)
 		if (m_fDashSpeed > 0.5f)
 			m_fDashSpeed -= 0.5f;
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fDashSpeed, m_pNavigation, fTimeDelta);
+		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -0.5f));
+			PTM->CreateParticle(L"PlayerYellowTrail2", WorldPos, true, CAlphaParticle::DIR_END);
+		}
 		break;
 	case Client::CPlayer::DIE:
 		m_bCollision = false;
@@ -1989,24 +1991,26 @@ void CPlayer::Update(_float fTimeDelta)
 					WallInfo.fMaxUVIndexX = 1.f;
 					WallInfo.fMaxUVIndexY = 4.f;
 					WallInfo.fUVSpeed = 0.05f;
-					WallInfo.vSize = { 1.5f,4.f,1.5f };
-					WallInfo.vSpeed = { 0.04f,0.03f,0.04f };
+					WallInfo.vSize = { 2.f,6.f,2.f };
+					WallInfo.vSpeed = { 0.06f,0.f,0.06f };
 					WallInfo.vWorldPos = WorldPos;
 					WallInfo.eColor = CWall::WALL_ORANGE;
+					WallInfo.fLifeTime = 1.f;
+					WallInfo.fEndSpeed = 0.5f;
 					GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_PlayerEffect", &WallInfo);
 					PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
 					PTM->CreateParticle(L"Player1", WorldPos, true, CAlphaParticle::DIR_END);
-					m_Parts[PARTS_SWORD]->Set_Damage(70.f);
+					m_Parts[PARTS_SWORD]->Set_Damage(73.f);
 					ChargeAttackLight();
 					CRing::RINGINFO RingInfo;
 					RingInfo.vSize = { 0.2f,0.3f,0.2f };
-					RingInfo.fSpeed = 0.5f;
+					RingInfo.vSpeed = _float3{ 0.5f, 0.f, 0.5f };
 					RingInfo.eColor = CRing::RING_ORANGE;
 					RingInfo.fLifeTime = 0.3f;
 					XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 					_float4 WorldPos;
 					_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMLoadFloat3(&m_vTargetLook) * 5.f;
-					XMStoreFloat4(&RingInfo.vWorldPos, vPos);			
+					XMStoreFloat4(&RingInfo.vWorldPos, vPos);
 					GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_PlayerEffect", &RingInfo);
 				}
 				else if (m_bCharge2)
@@ -2015,10 +2019,10 @@ void CPlayer::Update(_float fTimeDelta)
 					m_Parts[PARTS_SWORD]->Set_Damage(50.f);
 					ChargeAttackLight();
 				}
-				else			
+				else
 					m_Parts[PARTS_SWORD]->Set_Damage(30.f);
-					
-				
+
+
 			}
 			else
 			{
@@ -2214,6 +2218,12 @@ void CPlayer::Update(_float fTimeDelta)
 		if (m_fVoidFront > 0.5f)
 			m_fVoidFront -= 0.5f;
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fVoidFront, m_pNavigation, fTimeDelta);
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
+		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -0.5f));
+			PTM->CreateParticle(L"PlayerYellowTrail", WorldPos, true, CAlphaParticle::DIR_END);
+		}
 		break;
 	case Client::CPlayer::VOIDBACK:
 		if (UM->Get_Count() > 0)
@@ -2221,6 +2231,12 @@ void CPlayer::Update(_float fTimeDelta)
 		if (m_fVoidBack > 0.5f)
 			m_fVoidBack += 0.2f;
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), -m_fVoidBack, m_pNavigation, fTimeDelta);
+		/*if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
+		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 0.5f));
+			PTM->CreateParticle(L"PlayerYellowTrail", WorldPos, true, CAlphaParticle::DIR_END);
+		}*/
 		break;
 	case Client::CPlayer::NOMALCOMBO1:
 		m_bMotionChange = false;
@@ -2499,13 +2515,24 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::EX1ATTACK:
 
+		if (m_bCharge1)
+		{
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+				GI->Set_Speed(L"Timer_Main", 0.2f);
+			else
+				GI->Set_Speed(L"Timer_Main", 1.f);
+		}
+	
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
 		{
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fEx1AttackSpeed, m_pNavigation, fTimeDelta);
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 			if (m_bCharge1)
+			{		
 				PTM->CreateParticle(L"PlayerOrangeTrail", WorldPos, true, CAlphaParticle::DIR_END);
+
+			}
 			else if (m_bCharge2)
 				PTM->CreateParticle(L"PlayerYellowTrail", WorldPos, true, CAlphaParticle::DIR_END);			
 			return;
@@ -2529,15 +2556,17 @@ void CPlayer::Update(_float fTimeDelta)
 				WallInfo.fMaxUVIndexX = 1.f;
 				WallInfo.fMaxUVIndexY = 4.f;
 				WallInfo.fUVSpeed = 0.05f;
-				WallInfo.vSize = { 1.f,3.f,1.f };
-				WallInfo.vSpeed = { 0.04f,0.03f,0.04f };
+				WallInfo.vSize = { 1.5f,5.f,1.5f };
+				WallInfo.vSpeed = { 0.05f,0.f,0.05f };
 				WallInfo.eColor = CWall::WALL_ORANGE;
+				WallInfo.fLifeTime = 1.f;
+				WallInfo.fEndSpeed = 0.5f;
 				XMStoreFloat4(&WallInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_PlayerEffect", &WallInfo);
 
 				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
 				PTM->CreateParticle(L"Player1", WorldPos, true, CAlphaParticle::DIR_END);
-				m_Parts[PARTS_SWORD]->Set_Damage(60.f);
+				m_Parts[PARTS_SWORD]->Set_Damage(63.f);
 				Ex1AttackLight();
 				CreateRing();
 			}

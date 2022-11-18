@@ -41,18 +41,24 @@
 
 #pragma region Effect≈¨∑°Ω∫
 #include "Effect.h"
+//Texture
+#include "PlayerGage.h"
+#include "DragonFire1.h"
+
+
+
 //NonAnim
 #include "PlayerTrailMain.h"
 #include "PlayerTrailSub1.h"
 #include "PlayerTrailSub2.h"
 #include "PlayerEx.h"
 #include "PlayerLight.h"
-#include "PlayerGage.h"
 #include "PlayerGage2.h"
 #include "Wall.h"
 #include "Ring.h"
 #include "GolemSkillRock1.h"
 #include "GolemSkillRock2.h"
+#include "DragonTrail.h"
 
 //Anim
 #include "PlayerRockBreak.h"

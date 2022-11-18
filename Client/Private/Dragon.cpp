@@ -11,6 +11,8 @@
 #include "Rock.h"
 #include "GolemRock1.h"
 #include "GolemRock3.h"
+#include "DragonFire1.h"
+#include "DragonTrail.h"
 
 CDragon::CDragon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -46,8 +48,8 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_bColliderRender = false;
 
-	m_eCurState = START;
-	m_eNextState = START;
+	m_eCurState = IDLE;
+	m_eNextState = IDLE;
 
 	m_vTargetLook = { 0.f,0.f,1.f };
 
@@ -82,7 +84,16 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
-	
+
+	CGameObject*		Trail1 = GI->Clone_GameObject(TEXT("DragonTrail"));
+	if (nullptr == Trail1)
+		return E_FAIL;
+	m_Trails.push_back((CMesh*)Trail1);
+
+	CGameObject*		Trail2 = GI->Clone_GameObject(TEXT("DragonTrail"));
+	if (nullptr == Trail2)
+		return E_FAIL;
+	m_Trails.push_back((CMesh*)Trail2);
 
 	return S_OK;
 }
@@ -106,6 +117,9 @@ void CDragon::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_7))
 		Set_State(SKILL7_1);
+
+	if (GI->Key_Down(DIK_5))
+		CreateFire1();
 
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
@@ -149,6 +163,8 @@ void CDragon::LateTick(_float fTimeDelta)
 		GI->PlaySoundW(L"DragonDie.ogg", SD_MONSTERVOICE, 0.9f);
 	}
 
+	for (auto& iter : m_Trails)
+		iter->LateTick(fTimeDelta);
 	
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.1f);
 
@@ -317,6 +333,18 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 				CRM->Start_Fov(40.f, 120.f);
 				CRM->Set_FovDir(true);
 			}		
+
+			if (pOther->Get_Damage() == 63.f || pOther->Get_Damage() == 73.f)
+			{
+				m_bPattern = false;
+				m_bLHand = false;
+				m_bRHand = false;
+				Set_State(GROGGYSTART);
+				CRM->Start_Shake(0.5f, 5.f, 0.06f);
+				CRM->Start_Fov(40.f, 120.f);
+				CRM->Set_FovDir(true);
+			}
+
 			if (m_eCurState == GROGGYSTART || m_eCurState == GROGGYLOOF)
 				m_fNowHp -= pOther->Get_Damage() * 2.f;
 			else
@@ -852,28 +880,25 @@ void CDragon::Update(_float fTimeDelta)
 			}
 		}
 
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(13) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(14))
+		{
+			CreateTrail(TS3_1);
+			return;
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(15) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(16))
+		{
+			CreateTrail(TS3_2);
+		}
+
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(9) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(10))
 		{
-			CAnimMesh::EFFECTINFO EffectInfo;
-			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
-			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
-			EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
-			EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
-			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			CRM->Start_Shake(0.3f, 5.f, 0.04f);
 			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"DragonAttack1.ogg", SD_MONSTER1, 0.9f);
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(11) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(12))
 		{
-			CAnimMesh::EFFECTINFO EffectInfo;
-			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
-			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
-			EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
-			EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
-			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			CRM->Start_Shake(0.3f, 5.f, 0.04f);
 			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"DragonAttack1_2.ogg", SD_MONSTER1, 0.9f);
@@ -958,6 +983,8 @@ void CDragon::Update(_float fTimeDelta)
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
 		{
+			CRM->Start_Shake(0.4f, 5.f, 0.04f);
+			CreateTrail(TS5);
 			GI->PlaySoundW(L"DragonAttack5.ogg", SD_MONSTERVOICE, 0.9f);
 		}
 
@@ -978,6 +1005,11 @@ void CDragon::Update(_float fTimeDelta)
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
 				GI->PlaySoundW(L"DragonSkill6.ogg", SD_MONSTERVOICE, 0.9f);
+			}
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
+			{
+				CreateFire1();
 			}
 		}
 		break;
@@ -1131,8 +1163,20 @@ void CDragon::Update(_float fTimeDelta)
 					m_fFlyAttackSpeed -= 0.2f;
 				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fFlyAttackSpeed, m_pNavigation, fTimeDelta);
 			}
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+			{
+				CreateTrail(TS10);
+			}
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+				EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
+				EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
+				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 				GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 				CRM->Start_Shake(0.3f, 4.f, 0.04f);
 			}
@@ -1161,6 +1205,14 @@ void CDragon::Update(_float fTimeDelta)
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Look * 6.f;
+			EffectInfo.WorldMatrix.r[3] += Right * 2.5f;
+			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			CRM->Start_Shake(0.4f, 4.f, 0.04f);
 		}
@@ -1168,6 +1220,11 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 		{
 			m_bPattern = true;
+		}
+
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+		{
+			CreateTrail(TS13);
 		}
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
@@ -1223,6 +1280,13 @@ void CDragon::Update(_float fTimeDelta)
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			{
 				m_bAttack = true;
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+				EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
+				EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
+				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 				GI->PlaySoundW(L"DragonAttack15.ogg", SD_MONSTER1, 0.9f);
 				CRM->Start_Shake(0.4f, 6.f, 0.05f);
 				return;
@@ -1281,6 +1345,11 @@ HRESULT CDragon::Ready_Sockets()
 	if (nullptr == R_Finger0)
 		return E_FAIL;
 	m_Sockets.push_back(R_Finger0);
+
+	CHierarchyNode*		Head = m_pAnimModel->Get_HierarchyNode("Head");
+	if (nullptr == Head)
+		return E_FAIL;
+	m_Sockets.push_back(Head);
 
 	return S_OK;
 }
@@ -1420,6 +1489,152 @@ void CDragon::DebugKeyInput()
 		Set_State(SKILL10_1);
 }
 
+void CDragon::CreateFire1()
+{
+	_matrix LeftMatrix = XMMatrixRotationAxis(_vector{ 0.f,1.f,0.f }, -90.f);
+	_matrix RightMatrix = XMMatrixRotationAxis(_vector{ 0.f,1.f,0.f }, 90.f);
+	_vector LeftDir = XMVector3TransformNormal(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -1.f, LeftMatrix);
+	_vector RightDir = XMVector3TransformNormal(m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -1.f, RightMatrix);
+
+	for (int i = 0; i < 20; ++i)
+	{
+		_matrix Head = m_Sockets[SOCKET_HEAD]->Get_CombinedTransformation() * m_pAnimModel->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+		_float4 WorldPos;
+		XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		CDragonFire1::DRAGONFIRE1INFO DragonFireInfo;
+
+		XMStoreFloat4(&DragonFireInfo.vPosition, Head.r[3]);
+		
+		XMStoreFloat3(&DragonFireInfo.vDirection, LeftDir * (0 + (_float)i / 20) + RightDir * (1 - (_float)i / 20));
+		GI->Add_GameObjectToLayer(L"DragonFire1", PM->Get_NowLevel(), L"Layer_Dragon", &DragonFireInfo);
+	}
+}
+
+void CDragon::CreateTrail(TRAILSTATE eTS)
+{
+	_matrix DragonrMatrix = m_pAnimModel->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
+	switch (eTS)
+	{
+	case Client::CDragon::TS3_1:
+	{
+		m_TrailMatrix.r[0] = _vector{ 0.71f,1.45f,-2.52f,0.f };
+		m_TrailMatrix.r[1] = _vector{ 0.f,2.6f,1.5f,0.f };
+		m_TrailMatrix.r[2] = _vector{ 2.91f,-0.35f,0.61f,0.f };
+		m_TrailMatrix.r[3] = _vector{ 0.f,2.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 4.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
+		m_Trails[TRAIL_1]->SetUp_State(DragonrMatrix);
+		m_Trails[TRAIL_1]->Set_EffectMatrix(m_TrailMatrix);
+		m_Trails[TRAIL_1]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
+		break;
+	}
+		
+	case Client::CDragon::TS3_2:
+	{
+		m_TrailMatrix.r[0] = _vector{ 0.85f,1.43f,2.49f,0.f };
+		m_TrailMatrix.r[1] = _vector{ 0.f,-2.6f,1.5f,0.f };
+		m_TrailMatrix.r[2] = _vector{ 2.87f,-0.42f,-0.73f,0.f };
+		m_TrailMatrix.r[3] = _vector{ 0.f,2.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 4.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
+		m_Trails[TRAIL_2]->SetUp_State(DragonrMatrix);
+		m_Trails[TRAIL_2]->Set_EffectMatrix(m_TrailMatrix);
+		m_Trails[TRAIL_2]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
+		break;
+	}
+	
+	case Client::CDragon::TS5:
+	{		
+		m_TrailMatrix.r[0] = _vector{ -1.46f,2.f,-1.68f,0.f };
+		m_TrailMatrix.r[1] = _vector{ 0.f,1.93f,2.3f,0.f };
+		m_TrailMatrix.r[2] = _vector{ 2.61f,1.12f,-1.f,0.f };
+		m_TrailMatrix.r[3] = _vector{ 0.f,2.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 4.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
+		m_Trails[TRAIL_1]->SetUp_State(DragonrMatrix);
+		m_Trails[TRAIL_1]->Set_EffectMatrix(m_TrailMatrix);
+		m_Trails[TRAIL_1]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
+
+
+		m_TrailMatrix.r[0] = _vector{ -0.42f,2.27f,1.9f,0.f };
+		m_TrailMatrix.r[1] = _vector{ 0.f,-1.92f,2.3f,0.f };
+		m_TrailMatrix.r[2] = _vector{ 2.96f,0.33f,0.27f,0.f };
+		m_TrailMatrix.r[3] = _vector{ 0.f,2.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 4.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
+		m_Trails[TRAIL_2]->SetUp_State(DragonrMatrix);
+		m_Trails[TRAIL_2]->Set_EffectMatrix(m_TrailMatrix);
+		m_Trails[TRAIL_2]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);	
+		break;
+	}
+		
+	case Client::CDragon::TS10:
+	{
+		m_TrailMatrix.r[0] = _vector{ -1.75f,-1.f,0.f,0.f };
+		m_TrailMatrix.r[1] = _vector{ 0.f,0.f,2.f,0.f };
+		m_TrailMatrix.r[2] = _vector{ -1.f,1.75f,0.f,0.f };
+		m_TrailMatrix.r[3] = _vector{ 0.f,2.f,2.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 20.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
+		m_Trails[TRAIL_1]->SetUp_State(DragonrMatrix);
+		m_Trails[TRAIL_1]->Set_EffectMatrix(m_TrailMatrix);
+		m_Trails[TRAIL_1]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
+
+
+		m_TrailMatrix.r[0] = _vector{ -1.81f,-0.85f,0.f,0.f };
+		m_TrailMatrix.r[1] = _vector{ 0.f,0.f,2.f,0.f };
+		m_TrailMatrix.r[2] = _vector{ -0.85f,1.8f,0.f,0.f };
+		m_TrailMatrix.r[3] = _vector{ 0.f,2.f,-2.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 20.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
+		m_Trails[TRAIL_2]->SetUp_State(DragonrMatrix);
+		m_Trails[TRAIL_2]->Set_EffectMatrix(m_TrailMatrix);
+		m_Trails[TRAIL_2]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
+		break;
+	}
+		
+	case Client::CDragon::TS13:
+	{
+		m_TrailMatrix.r[0] = _vector{ -1.42f,2.55f,-0.68f,0.f };
+		m_TrailMatrix.r[1] = _vector{ 0.f,0.77f,2.9f,0.f };
+		m_TrailMatrix.r[2] = _vector{ 2.64f,1.37f,-0.36f,0.f };
+		m_TrailMatrix.r[3] = _vector{ 0.f,3.f,0.f,1.f };
+		m_fTurnSpeed = 14.f;
+		m_fRenderLimit = 0.3f;
+		m_fMoveSpeed = 4.f;
+		m_fMoveSpeedTempo = 0.15f;
+		m_eTurnDir = CMesh::TURN_BACK;
+		m_Trails[TRAIL_1]->SetUp_State(DragonrMatrix);
+		m_Trails[TRAIL_1]->Set_EffectMatrix(m_TrailMatrix);
+		m_Trails[TRAIL_1]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
+		break;
+	}
+		
+	}
+
+	
+	
+	
+}
+
 CDragon * CDragon::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CDragon*		pInstance = new CDragon(pDevice, pContext);
@@ -1453,6 +1668,9 @@ void CDragon::Free()
 
 	Safe_Release(m_pTarget);
 	Safe_Release(m_pNavigation);
+
+	for (auto& iter : m_Trails)
+		Safe_Release(iter);
 
 	for(auto& iter : m_pOBB)
 	Safe_Release(iter);

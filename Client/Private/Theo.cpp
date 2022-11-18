@@ -291,7 +291,7 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 		
 		if (pOther->Can_Hit())
 		{
-			if (m_bPattern && pOther->Get_Damage() == 1.f || m_bPattern && pOther->Get_Damage() == 100.f)
+			if (m_bPattern && pOther->Get_Damage() == 1.f)
 			{
 				m_bFinish = false;
 				if (!m_bFinish)
@@ -302,6 +302,16 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 				m_bRHand = false;
 				Set_State(HITSTART);
 				m_fNowMp -= 10.f;
+				CRM->Start_Shake(0.5f, 5.f, 0.06f);
+				CRM->Start_Fov(40.f, 120.f);
+				CRM->Set_FovDir(true);
+			}
+			if (pOther->Get_Damage() == 63.f || pOther->Get_Damage() == 73.f)
+			{
+				m_bPattern = false;
+				m_bLHand = false;
+				m_bRHand = false;
+				Set_State(HITSTART);
 				CRM->Start_Shake(0.5f, 5.f, 0.06f);
 				CRM->Start_Fov(40.f, 120.f);
 				CRM->Set_FovDir(true);
@@ -612,7 +622,7 @@ void CTheo::Update(_float fTimeDelta)
 				GI->PlaySoundW(L"TheoRun.ogg", SD_MONSTER1, 1.f);
 			}
 		}
-		m_fRunSpeed = 6.f;
+		m_fRunSpeed = 10.f;
 		Set_Dir(); 
 		_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		if (Distance < 5.f)

@@ -98,19 +98,21 @@ void CWall::Tick(_float fTimeDelta)
 			m_fShaderUVIndexX = 0.f;
 			m_fShaderUVIndexY += 1.f;
 			if (m_fShaderUVIndexY >= m_fMaxUVIndexY)
-			{
-				m_fShaderUVIndexY = 0.f;
-				m_bEnd = true;
-			}
+				m_fShaderUVIndexY = 0.f;						
 		}
 	}
-
-	if (m_bEnd)
+	
+	if (m_WallInfo.fEndSpeed != 0.f)
 	{
-		m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) - _vector{ m_WallInfo.vSpeed.x, m_WallInfo.vSpeed.y, m_WallInfo.vSpeed.z });
-		if (m_pTransformCom->Get_Scale().x <= 0.1f)
-			m_fEndAcc += 5.f * fTimeDelta;
+		m_fEndAcc += m_WallInfo.fEndSpeed * fTimeDelta;	
 	}
+	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) - _vector{ m_WallInfo.vSpeed.x, m_WallInfo.vSpeed.y, m_WallInfo.vSpeed.z });
+	
+	m_fLifeTimeAcc += 1.f * fTimeDelta;
+	if (m_fLifeTimeAcc >= m_WallInfo.fLifeTime)
+		Set_Dead();
+	
+	
 
 }
 
@@ -153,9 +155,10 @@ HRESULT CWall::Render()
 		m_pShaderCom->Set_RawValue("g_fMaxUVIndexY", &m_fMaxUVIndexY, sizeof(_float));
 		m_pShaderCom->Set_RawValue("g_fUVIndexX", &m_fShaderUVIndexX, sizeof(_float));
 		m_pShaderCom->Set_RawValue("g_fUVIndexY", &m_fShaderUVIndexY, sizeof(_float));
-
+	
 		if (m_fEndAcc == 0.f)
 		{
+
 			if (FAILED(m_pShaderCom->Begin(EFFECT_NDEFAULT)))
 				return E_FAIL;
 		}

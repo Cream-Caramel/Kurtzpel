@@ -113,6 +113,7 @@ void CParticle_Manager::CreateParticle(_tchar * ParticleName, _float4 vPos, _boo
 		ParticleInfo.fMaxUVIndexX = ParticleCreateInfo.fUVMaxIndexX;
 		ParticleInfo.fMaxUVIndexY = ParticleCreateInfo.fUVMaxIndexY;
 		ParticleInfo.fUVSpeed = ParticleCreateInfo.fUVSpeed;
+		ParticleInfo.fReleaseSpeed = ParticleCreateInfo.fReleaseSpeed;
 		GI->Add_GameObjectToLayer(L"AlphaParticle", PM->Get_NowLevel(), L"Layer_Particle", &ParticleInfo);
 
 	}

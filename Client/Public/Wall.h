@@ -17,6 +17,8 @@ public:
 		_float3 vSize;
 		_float4 vWorldPos;
 		_float3 vSpeed;
+		_float fEndSpeed;
+		_float fLifeTime;
 		WALLCOLOR eColor;
 	}WALLINFO;
 
@@ -33,10 +35,9 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_bool m_bEnd = false;
 	CModel* m_pModel;
 	WALLINFO m_WallInfo;
-
+	_float m_fLifeTimeAcc = 0.f;
 public:
 	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg);

@@ -214,6 +214,15 @@
     <Filter Include="02.GameObjects\Effect\Golem\GolemSkillRock2">
       <UniqueIdentifier>{0d2f711f-87ed-45e5-9669-1e73b9da2500}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Dragon">
+      <UniqueIdentifier>{f412a53e-e8ce-484f-9fc2-0eba13f43542}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Dragon\DragonFire1">
+      <UniqueIdentifier>{7fbe819f-a1ae-42c9-b349-c29470ca31fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Dragon\DragonTrail">
+      <UniqueIdentifier>{6593cfb3-7b5d-4068-bc28-5d32151a7308}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -480,6 +489,12 @@
     <ClInclude Include="..\Public\GolemSkillRock2.h">
       <Filter>02.GameObjects\Effect\Golem\GolemSkillRock2</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DragonFire1.h">
+      <Filter>02.GameObjects\Effect\Dragon\DragonFire1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DragonTrail.h">
+      <Filter>02.GameObjects\Effect\Dragon\DragonTrail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -727,6 +742,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\GolemSkillRock2.cpp">
       <Filter>02.GameObjects\Effect\Golem\GolemSkillRock2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DragonFire1.cpp">
+      <Filter>02.GameObjects\Effect\Dragon\DragonFire1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DragonTrail.cpp">
+      <Filter>02.GameObjects\Effect\Dragon\DragonTrail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

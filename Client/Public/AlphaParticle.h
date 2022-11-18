@@ -39,6 +39,7 @@ public:
 		_float fMaxUVIndexX;
 		_float fMaxUVIndexY;
 		_bool bUVLoof = false;
+		_float fReleaseSpeed;
 	}PARTICLEINFO;
 private:
 	CAlphaParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -65,6 +66,7 @@ private:
 	_float m_fShaderUVAcc = 0.f;
 	_float m_fShaderUVIndexX = 0;
 	_float m_fShaderUVIndexY = 0;
+	_float m_fReleaseAcc = 0.f;
 	int m_iNowFrame = 0;
 	const _tchar* TexPath;
 	const _tchar* TexName;

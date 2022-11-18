@@ -333,6 +333,18 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 				CRM->Start_Fov(40.f, 120.f);
 				CRM->Set_FovDir(true);
 			}		
+
+			if (m_eCurState != SKILL8 && pOther->Get_Damage() == 63.f || pOther->Get_Damage() == 73.f)
+			{
+				m_bPattern = false;
+				m_bLHand = false;
+				m_bRHand = false;
+				Set_State(RTDOWN);
+				CRM->Start_Shake(0.5f, 5.f, 0.06f);
+				CRM->Start_Fov(40.f, 120.f);
+				CRM->Set_FovDir(true);
+			}
+
 			if (m_eCurState == RTDOWN || m_eCurState == DOWN)
 				m_fNowHp -= pOther->Get_Damage() * 2.f;
 
@@ -870,7 +882,7 @@ void CGolem::Update(_float fTimeDelta)
 
 			CRing::RINGINFO RingInfo;
 			RingInfo.vSize = { 0.2f,0.3f,0.2f };
-			RingInfo.fSpeed = 0.8f;
+			RingInfo.vSpeed = _float3{ 0.8f, 0.f, 0.8f };
 			RingInfo.fLifeTime = 0.3f;
 			RingInfo.eColor = CRing::RING_GREEN;
 			XMStoreFloat4(&RingInfo.vWorldPos, EffectInfo.WorldMatrix.r[3]);
@@ -969,6 +981,9 @@ void CGolem::Update(_float fTimeDelta)
 			EffectInfo.WorldMatrix.r[3] += Look * 3.f;
 			EffectInfo.WorldMatrix.r[3] += Right * -1.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			_float4 ParticlePos;
+			XMStoreFloat4(&ParticlePos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"GolemRock", ParticlePos, false, CAlphaParticle::DIR_END);
 			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
@@ -985,6 +1000,9 @@ void CGolem::Update(_float fTimeDelta)
 			EffectInfo.WorldMatrix.r[3] += Look * 3.3f;
 			EffectInfo.WorldMatrix.r[3] += Right * 2.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			_float4 ParticlePos;
+			XMStoreFloat4(&ParticlePos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"GolemRock", ParticlePos, false, CAlphaParticle::DIR_END);
 			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
@@ -1001,6 +1019,9 @@ void CGolem::Update(_float fTimeDelta)
 			EffectInfo.WorldMatrix.r[3] += Look * 3.f;
 			EffectInfo.WorldMatrix.r[3] += Right * -1.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			_float4 ParticlePos;
+			XMStoreFloat4(&ParticlePos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"GolemRock", ParticlePos, false, CAlphaParticle::DIR_END);
 			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
@@ -1017,6 +1038,9 @@ void CGolem::Update(_float fTimeDelta)
 			EffectInfo.WorldMatrix.r[3] += Look * 3.3f;
 			EffectInfo.WorldMatrix.r[3] += Right * 2.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			_float4 ParticlePos;
+			XMStoreFloat4(&ParticlePos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"GolemRock", ParticlePos, false, CAlphaParticle::DIR_END);
 			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
@@ -1038,6 +1062,9 @@ void CGolem::Update(_float fTimeDelta)
 			EffectInfo.WorldMatrix.r[3] += Look * 3.f;
 			EffectInfo.WorldMatrix.r[3] += Right * 2.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			_float4 ParticlePos;
+			XMStoreFloat4(&ParticlePos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"GolemSkill8", ParticlePos, false, CAlphaParticle::DIR_END);
 			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			CRM->Start_Shake(0.4f, 6.f, 0.05f);
 			GI->PlaySoundW(L"GolemAttack1.ogg", SD_MONSTER1, 0.9f);
@@ -1114,11 +1141,12 @@ void CGolem::Update(_float fTimeDelta)
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				PTM->CreateParticle(L"GolemFinish", WorldPos, false, CAlphaParticle::DIR_END);
+				PTM->CreateParticle(L"GolemFinish2", WorldPos, false, CAlphaParticle::DIR_END);
 
 				CRing::RINGINFO RingInfo;
-				RingInfo.vSize = { 0.2f,0.5f,0.2f };
-				RingInfo.fSpeed = 0.8f;
-				RingInfo.fLifeTime = 0.1f;
+				RingInfo.vSize = { 0.3f,1.f,0.3f };
+				RingInfo.vSpeed = _float3{ 1.5f, 0.f, 1.5f };
+				RingInfo.fLifeTime = 0.2f;
 				RingInfo.eColor = CRing::RING_GREEN;
 				XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				RingInfo.vWorldPos.y += 1.f;
@@ -1128,9 +1156,11 @@ void CGolem::Update(_float fTimeDelta)
 				WallInfo.fMaxUVIndexX = 1.f;
 				WallInfo.fMaxUVIndexY = 4.f;
 				WallInfo.fUVSpeed = 0.05f;
-				WallInfo.vSize = { 1.5f,4.f,1.5f };
-				WallInfo.vSpeed = { 0.08f,0.03f,0.08f };
+				WallInfo.vSize = { 0.2f,10.f,0.2f };
+				WallInfo.vSpeed = { -0.3f,0.f,-0.3f };
 				WallInfo.vWorldPos = WorldPos;
+				WallInfo.fEndSpeed = 0.5f;
+				WallInfo.fLifeTime = 1.f;
 				WallInfo.eColor = CWall::WALL_GREEN;
 				GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_PlayerEffect", &WallInfo);
 			

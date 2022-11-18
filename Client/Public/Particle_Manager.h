@@ -31,6 +31,7 @@ public:
 		_float fUVMaxIndexX;
 		_float fUVMaxIndexY;
 		_float fUVSpeed;
+		_float fReleaseSpeed;
 	}PARTICLECREATE;
 
 	DECLARE_SINGLETON(CParticle_Manager)

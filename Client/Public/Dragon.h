@@ -33,9 +33,10 @@ class CDragon final : public CAnimMesh
 		WALK,
 		FINISH,
 		STATE_END};
-
+	enum TRAIL {TRAIL_1, TRAIL_2, TRAIL_END};
+	enum TRAILSTATE {TS3_1, TS3_2, TS5, TS10, TS13, TS_END};
 	enum OBB {OBB_BODY, OBB_LHAND, OBB_RHAND, OBB_ATTACK, OBB_END};
-	enum SOCKET {SOCKET_LHAND, SOCKET_RHAND, SOCKET_END};
+	enum SOCKET {SOCKET_LHAND, SOCKET_RHAND, SOCKET_HEAD, SOCKET_END};
 private:
 	CDragon(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
 	CDragon(const CDragon& rhs);
@@ -62,6 +63,8 @@ private:
 	HRESULT Ready_Sockets();
 	HRESULT Load_UI(char* DatName);
 	void DebugKeyInput();
+	void CreateFire1();
+	void CreateTrail(TRAILSTATE eTS);
 private:
 	STATE m_eCurState; // 현재 상태
 	STATE m_eNextState; // 바꿔야할 상태
@@ -92,12 +95,21 @@ private:
 	_uint m_iPreCloseAttack = 0;
 	_uint m_iNextCloseAttack = 1;
 	_uint m_iWalkCount = 0;
+
+	_float m_fTurnSpeed = 0.f; //이팩트 턴스피드
+	_float m_fRenderLimit = 0.f; //랜더 시간
+	_float m_fMoveSpeed = 0.f;
+	_float m_fMoveSpeedTempo = 0.f;
+	_float3 m_vMoveDir = { 1.f,0.f,0.f };
+	_matrix m_TrailMatrix;
+	CMesh::TURNDIR m_eTurnDir;
+
 	CNavigation* m_pNavigation = nullptr;
 	CAnimModel* m_pAnimModel = nullptr;
 	COBB* m_pOBB[OBB_END]{ nullptr };
 	CPlayer* m_pTarget = nullptr;
 	vector<class CHierarchyNode*>		m_Sockets;
-	
+	vector<CMesh*> m_Trails;
 
 public:
 	static CDragon* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

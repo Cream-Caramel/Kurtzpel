@@ -69,6 +69,7 @@ void CAlphaParticle::Tick(_float fTimeDelta)
 		m_fGravityAcc += m_ParticleInfo.fGravity * fTimeDelta;
 		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,m_fGravityAcc, 0.f,0.f });
 	}
+
 	if (m_ParticleInfo.TexNum > 1)
 	{
 		m_fFrameAcc += 1.f * fTimeDelta;
@@ -106,6 +107,12 @@ void CAlphaParticle::Tick(_float fTimeDelta)
 			}
 		}
 	}
+
+	if (m_ParticleInfo.fReleaseSpeed > 0.f)
+	{
+		m_fReleaseAcc += m_ParticleInfo.fReleaseSpeed * fTimeDelta;
+		m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) - _vector{ m_fReleaseAcc, m_fReleaseAcc, m_fReleaseAcc });
+	}
 }
 
 void CAlphaParticle::LateTick(_float fTimeDelta)
@@ -117,8 +124,6 @@ void CAlphaParticle::LateTick(_float fTimeDelta)
 
 	if (m_ParticleInfo.eDirPoint != DIR_END)	
 		CheckDead();
-		
-	
 
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_ALPHABLEND, this);
 

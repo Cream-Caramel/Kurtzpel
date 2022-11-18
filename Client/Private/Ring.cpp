@@ -81,7 +81,7 @@ HRESULT CRing::Initialize(void * pArg)
 void CRing::Tick(_float fTimeDelta)
 {
 	m_fLifeTimeAcc += 1.f * fTimeDelta;
-	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) + _vector{ m_RingInfo.fSpeed, 0.f,m_RingInfo.fSpeed });
+	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) + _vector{ m_RingInfo.vSpeed.x, m_RingInfo.vSpeed.y, m_RingInfo.vSpeed.z});
 	if (m_fLifeTimeAcc >= m_RingInfo.fLifeTime)
 		m_fEndAcc += 3.f * fTimeDelta;
 }
