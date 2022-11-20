@@ -66,6 +66,7 @@ private:
 	void CreateFire1();
 	void CreateFire2();
 	void CreateTrail(TRAILSTATE eTS);
+	void CreateLight(_float4 WorldPos);
 private:
 	STATE m_eCurState; // 현재 상태
 	STATE m_eNextState; // 바꿔야할 상태
@@ -89,6 +90,7 @@ private:
 	_bool m_bRHand = false;
 	_bool m_bPattern = false;
 	_bool m_bAttack = false;
+	_bool m_bRushRight = true;
 	_uint m_iPreMotion = 0;
 	_uint m_iNextMotion = 1;
 	_uint m_iPreRangeAttack = 0;

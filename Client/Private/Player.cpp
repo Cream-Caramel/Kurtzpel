@@ -188,6 +188,8 @@ HRESULT CPlayer::Render()
 	{
 		if (m_pAnimModel[i] != nullptr)
 		{		
+			//m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+				
 			_uint		iNumMeshes = m_pAnimModel[i]->Get_NumMeshes();
 			for (_uint j = 0; j < iNumMeshes; ++j)
 			{
@@ -201,8 +203,7 @@ HRESULT CPlayer::Render()
 				}
 				else
 				{
-
-					m_pShaderCom->Set_RawValue("g_bNormalTex", &m_bNormalTex, sizeof(bool));
+				
 					if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_DEFAULT)))
 						return E_FAIL;
 

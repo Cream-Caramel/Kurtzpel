@@ -1,7 +1,7 @@
 #include "Client_Shader_Defines.hpp"
 matrix		g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-//float3 g_vCamPos;
+vector g_vCamPos;
 float g_fDissolveAcc;
 float g_fGolemPattern;
 
@@ -41,7 +41,7 @@ struct VS_OUT
 	float4		vProjPos : TEXCOORD1;
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
-	//float3		vCamDir : TEXCOORD2;
+	float4		vWorldPos : TEXCOORD2;
 };
 
 
@@ -75,7 +75,7 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vTexUV = In.vTexUV;
 	Out.vProjPos = Out.vPosition;
 
-	//Out.vCamDir = vWorld;
+	Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
 
 	return Out;
 }
@@ -88,7 +88,7 @@ struct PS_IN
 	float4		vProjPos : TEXCOORD1;
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
-	//float3		vCamDir : TEXCOORD2;
+	float4		vWorldPos : TEXCOORD2;
 };
 
 struct PS_OUT
@@ -113,7 +113,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
-	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
 	
 	/*float3 Dir = normalize(g_vCamPos - In.vCamDir);
@@ -122,7 +122,28 @@ PS_OUT PS_MAIN(PS_IN In)
 	{
 		Out.vDiffuse.r = 1;
 		Out.vDiffuse.gb = 0;
-	}*/
+	}
+*/
+	/*float3 vCameraPos = normalize(g_vCamPos - In.vCamDir);
+
+	float rimWidth = 0.2f;
+	float RimLightColor = smoothstep(1.0f - rimWidth, 1.0f, 1 - max(0, dot(normalize(In.vNormal), vCameraPos)));
+
+	float3 rimColor = float3(1.f, 0.f, 0.f);
+
+	Out.vDiffuse.rgb += rimColor * RimLightColor;*/
+
+	/*float3 cameraDirection = normalize(g_vCamPos - In.vWorldPos).xyz;
+
+	float rim = 0;
+	
+	float fRimWidth = 0.8f;
+	rim = smoothstep(1.0f - fRimWidth, 1.f, 1.f - max(0, dot(normalize(vNormal).xyz, cameraDirection)));
+
+	float3 rimColor = float3(1.f, 0.f, 0.f);
+	rimColor = rim * rimColor;
+
+	Out.vDiffuse += rim;*/
 
 	if (0 == Out.vDiffuse.a)
 		discard;

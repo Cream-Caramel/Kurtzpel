@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "AnimMesh.h"
 #include "OBB.h"
+#include "Particle_Manager.h"
 #include "Collider_Manager.h"
 
 CGolemSkillRock1::CGolemSkillRock1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -71,6 +72,10 @@ void CGolemSkillRock1::Tick(_float fTimeDelta)
 	if (m_fSpeed < 50.f)
 		m_fSpeed += 3.f;
 
+	_float4 Pos;
+	XMStoreFloat4(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	PTM->CreateParticle(L"GolemRockTrail", Pos, false, CAlphaParticle::DIR_END);
+
 	XMStoreFloat3(&m_vTargetPos, XMVector3Normalize(XMLoadFloat3(&PM->Get_PlayerPos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 	_vector LookAt = { m_vTargetPos.x * -1, m_vTargetPos.y, m_vTargetPos.z * -1 };
 	XMStoreFloat3(&m_vTargetLook, LookAt);
@@ -95,6 +100,9 @@ void CGolemSkillRock1::LateTick(_float fTimeDelta)
 		EffectInfo.WorldMatrix.r[3].m128_f32[1] += 1.f;
 		EffectInfo.vScale = { 0.6f,0.6f,0.6f };
 		EffectInfo.bObtion = true;
+		_float4 Pos;
+		XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+		PTM->CreateParticle(L"GolemSkill3", Pos, false, CAlphaParticle::DIR_END);
 		GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"GolemEffect", &EffectInfo);	
 		CRM->Start_Shake(0.3f, 4.f, 0.04f);
 		Set_Dead();

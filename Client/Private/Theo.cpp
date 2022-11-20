@@ -13,6 +13,10 @@
 #include "GolemRock1.h"
 #include "GolemRock3.h"
 #include "Rock.h"
+#include "Particle_Manager.h"
+#include "Ring.h"
+#include "Wall.h"
+#include "PlayerLight.h"
 
 CTheo::CTheo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -67,19 +71,19 @@ HRESULT CTheo::Initialize(void * pArg)
 	Safe_AddRef(m_pTarget);
 	PM->Add_Boss(this);
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;*/
+		return E_FAIL;
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 42;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE2, L"NavigationStage2", TEXT("NavigationStage2"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
 	m_pNavigation->Set_BattleIndex(41);
 
-	CRM->Start_Scene("Scene_Stage2Boss");
+	CRM->Start_Scene("Scene_Stage2Boss");*/
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -461,6 +465,9 @@ void CTheo::DebugKeyInput()
 
 	if (GI->Key_Down(DIK_NUMPAD7))
 		Set_State(DOWN);
+
+	if (GI->Key_Down(DIK_NUMPAD8))
+		Set_State(APPEAR);
 }
 
 void CTheo::Set_State(STATE eState)
@@ -646,9 +653,20 @@ void CTheo::Update(_float fTimeDelta)
 				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 				EffectInfo.WorldMatrix.r[3] += Look * 2.f;
+				_float4 Pos;
+				XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+				PTM->CreateParticle(L"TheoSkill1", Pos, false, CAlphaParticle::DIR_END);
+				CRing::RINGINFO RingInfo;
+				RingInfo.vSize = { 0.2f,0.3f,0.2f };
+				RingInfo.vSpeed = _float3{ 0.6f, 0.f, 0.6f };
+				RingInfo.fLifeTime = 0.3f;
+				RingInfo.eColor = CRing::RING_BLUE;
+				RingInfo.vWorldPos = Pos;
+				RingInfo.vWorldPos.y += 0.5f;
+				GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_TheoEffect", &RingInfo);
 				EffectInfo.WorldMatrix.r[3] += Right * 2.f;
 				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
-				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_TheoEffect", &EffectInfo);
 				m_bLHand = true;
 				GI->PlaySoundW(L"TheoAttack1.ogg", SD_MONSTER1, 1.f);
 				GI->PlaySoundW(L"TheoSkill1.ogg", SD_MONSTERVOICE, 0.9f);
@@ -689,9 +707,20 @@ void CTheo::Update(_float fTimeDelta)
 			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 			EffectInfo.WorldMatrix.r[3] += Look * 3.5f;
+			_float4 Pos;
+			XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"TheoSkill1", Pos, false, CAlphaParticle::DIR_END);
+			CRing::RINGINFO RingInfo;
+			RingInfo.vSize = { 0.2f,0.3f,0.2f };
+			RingInfo.vSpeed = _float3{ 0.6f, 0.f, 0.6f };
+			RingInfo.fLifeTime = 0.3f;
+			RingInfo.eColor = CRing::RING_BLUE;
+			RingInfo.vWorldPos = Pos;
+			RingInfo.vWorldPos.y += 0.5f;
+			GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_TheoEffect", &RingInfo);
 			EffectInfo.WorldMatrix.r[3] += Right * 2.f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
-			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_TheoEffect", &EffectInfo);
 			m_bRHand = true;
 			GI->PlaySoundW(L"TheoAttack1.ogg", SD_MONSTER1, 1.f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
@@ -720,9 +749,21 @@ void CTheo::Update(_float fTimeDelta)
 			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 			EffectInfo.WorldMatrix.r[3] += Look * 3.f;
+			_float4 Pos;
+			XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"TheoSkill1", Pos, false, CAlphaParticle::DIR_END);
+			CRing::RINGINFO RingInfo;
+			RingInfo.vSize = { 0.2f,0.6f,0.2f };
+			RingInfo.vSpeed = _float3{ 1.5f, 0.f, 1.5f };
+			RingInfo.fLifeTime = 0.5f;
+			RingInfo.eColor = CRing::RING_BLUE;
+			RingInfo.vWorldPos = Pos;
+			RingInfo.vWorldPos.y += 0.5f;
+			GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_TheoEffect", &RingInfo);
 			EffectInfo.WorldMatrix.r[3] += Right * 2.5f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
-			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_TheoEffect", &EffectInfo);
+		
 			m_fDamage = 30.f;
 			m_bRHand = true;
 			GI->PlaySoundW(L"TheoAttack1.ogg", SD_MONSTER1, 1.f);
@@ -734,6 +775,9 @@ void CTheo::Update(_float fTimeDelta)
 		}		
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{		
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"TheoTrail", WorldPos, false, CAlphaParticle::DIR_END);
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta);
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
@@ -741,15 +785,44 @@ void CTheo::Update(_float fTimeDelta)
 			CAnimMesh::EFFECTINFO EffectInfo;
 			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
 			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
-			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 			EffectInfo.WorldMatrix.r[3] += Look * 3.f;
 			EffectInfo.vScale = _float3{ 3.f,1.f,3.f };
-			GI->Add_GameObjectToLayer(L"Rock", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+			GI->Add_GameObjectToLayer(L"Rock", PM->Get_NowLevel(), L"Layer_TheoEffect", &EffectInfo);
 			m_fDamage = 110.f;
 			m_bRHand = true;
 			GI->PlaySoundW(L"TheoAttack3.ogg", SD_MONSTER1, 1.f);
 			GI->PlaySoundW(L"TheoFinish.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.4f, 6.f, 0.05f);
+
+			
+
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, EffectInfo.WorldMatrix.r[3]);
+			CreateLight(WorldPos);
+
+			PTM->CreateParticle(L"TheoFinish", WorldPos, false, CAlphaParticle::DIR_END);
+
+			PTM->CreateParticle(L"TheoFinish2", WorldPos, false, CAlphaParticle::DIR_END);
+			CRing::RINGINFO RingInfo;
+			RingInfo.vSize = { 0.3f,1.f,0.3f };
+			RingInfo.vSpeed = _float3{ 1.5f, 0.f, 1.5f };
+			RingInfo.fLifeTime = 0.2f;
+			RingInfo.eColor = CRing::RING_BLUE;
+			RingInfo.vWorldPos = WorldPos;
+			RingInfo.vWorldPos.y += 1.f;
+			GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_TheoEffect", &RingInfo);
+
+			CWall::WALLINFO WallInfo;
+			WallInfo.fMaxUVIndexX = 1.f;
+			WallInfo.fMaxUVIndexY = 4.f;
+			WallInfo.fUVSpeed = 0.05f;
+			WallInfo.vSize = { 3.f,10.f,3.f };
+			WallInfo.vSpeed = { 0.2f,0.f,0.2f };
+			WallInfo.eColor = CWall::WALL_BLUE;
+			WallInfo.fLifeTime = 0.5f;
+			WallInfo.fEndSpeed = 0.5f;
+			WallInfo.vWorldPos = WorldPos;
+			GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_TheoEffect", &WallInfo);
 			return;
 		}
 		break;
@@ -773,9 +846,22 @@ void CTheo::Update(_float fTimeDelta)
 				return;
 			}
 		}
+
+		if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
+		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"TheoCharge", WorldPos, false, CAlphaParticle::DIR_THEO);
+			return;
+		}
+
 		
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
 		{
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			WorldPos.y += 3.f;
+			PTM->CreateParticle(L"TheoSkill6", WorldPos, false, CAlphaParticle::DIR_END);
 			GI->PlaySoundW(L"TheoSkill4_2.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.4f, 5.f, 0.05f);
 			return;
@@ -810,9 +896,12 @@ void CTheo::Update(_float fTimeDelta)
 					_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 					_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 					EffectInfo.WorldMatrix.r[3] += Look * 2.f;
+					_float4 Pos;
+					XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+					PTM->CreateParticle(L"TheoSkill1", Pos, false, CAlphaParticle::DIR_END);
 					EffectInfo.WorldMatrix.r[3] += Right * 1.5f;
 					EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
-					GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+					GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_TheoEffect", &EffectInfo);
 					m_bRushRight = false;
 				}
 				else
@@ -822,23 +911,43 @@ void CTheo::Update(_float fTimeDelta)
 					_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 					_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 					EffectInfo.WorldMatrix.r[3] += Look * 2.f;
+					_float4 Pos;
+					XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+					PTM->CreateParticle(L"TheoSkill1", Pos, false, CAlphaParticle::DIR_END);
 					EffectInfo.WorldMatrix.r[3] += Right * -1.f;
 					EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
-					GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+					GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_TheoEffect", &EffectInfo);
 					m_bRushRight = true;
 				}
 			}
-			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed, m_pNavigation, fTimeDelta))
+			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed*1.3f, m_pNavigation, fTimeDelta))
 				Set_Dir();
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"TheoTrail2", WorldPos, false, CAlphaParticle::DIR_END);
 			m_bLHand = true;
 			m_bRHand = true;
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(4) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
 		{
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Look * 2.f;
+			_float4 Pos;
+			XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"TheoSkill1", Pos, false, CAlphaParticle::DIR_END);
+			EffectInfo.WorldMatrix.r[3] += Right * 1.5f;
+			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+			GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_TheoEffect", &EffectInfo);
 			GI->PlaySoundW(L"TheoRun.ogg", SD_MONSTER1, 1.f);
 			CRM->Start_Shake(0.3f, 3.f, 0.04f);
-			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed, m_pNavigation, fTimeDelta))
+			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed*1.3f, m_pNavigation, fTimeDelta))
 				Set_Dir();
+			_float4 WorldPos;
+			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"TheoTrail2", WorldPos, false, CAlphaParticle::DIR_END);
 			m_bLHand = true;
 			m_bRHand = true;
 			
@@ -853,31 +962,54 @@ void CTheo::Update(_float fTimeDelta)
 			{
 				if(!m_bFinishStart)
 					m_bPattern = true;
-				return;
 			}
 			
 		}
 		if (!m_bFinishStart)
 		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			{
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				PTM->CreateParticle(L"TheoCharge", WorldPos, false, CAlphaParticle::DIR_THEO);
+				return;
+			}
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
 				m_fNowHp += 10.f;
 				m_fNowMp += 3.f;
 				if (m_fNowMp >= 100.f)
-					m_bFinish = true;
+					m_bFinish = true;			
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				WorldPos.y += 3.f;
+				PTM->CreateParticle(L"TheoSkill6", WorldPos, false, CAlphaParticle::DIR_END);
 				GI->PlaySoundW(L"TheoSkill6.ogg", SD_MONSTERVOICE, 0.9f);
 				CRM->Start_Shake(0.6f, 5.f, 0.05f);
 			}
 		}
 		else
 		{
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			{
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				WorldPos.y += 2.f;
+				PTM->CreateParticle(L"TheoCharge", WorldPos, false, CAlphaParticle::DIR_THEO);
+				return;
+			}
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				WorldPos.y += 3.f;
+				PTM->CreateParticle(L"TheoSkill6", WorldPos, false, CAlphaParticle::DIR_END);
 				GI->PlaySoundW(L"TheoSkill6.ogg", SD_MONSTERVOICE, 0.9f);
 				CRM->Start_Shake(0.6f, 5.f, 0.05f);
 			}
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3))
 			{
+			
 				m_bFinishStart = false;
 				Set_State(SKILL3);
 			}
@@ -890,6 +1022,26 @@ void CTheo::Update(_float fTimeDelta)
 			Set_Dir();
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+				EffectInfo.WorldMatrix.r[3] += Look * 2.f;
+				EffectInfo.WorldMatrix.r[3] += Right * 2.f;
+				_float4 Pos;
+				XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+				PTM->CreateParticle(L"TheoSkill1", Pos, false, CAlphaParticle::DIR_END);
+				CRing::RINGINFO RingInfo;
+				RingInfo.vSize = { 0.2f,0.3f,0.2f };
+				RingInfo.vSpeed = _float3{ 0.7f, 0.f, 0.7f };
+				RingInfo.fLifeTime = 0.5f;
+				RingInfo.eColor = CRing::RING_BLUE;
+				RingInfo.vWorldPos = Pos;
+				RingInfo.vWorldPos.y += 0.5f;
+				GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_PlayerEffect", &RingInfo);
+				EffectInfo.WorldMatrix.r[3] += Right * 2.f;
+				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 				GI->PlaySoundW(L"TheoAppearAttack.ogg", SD_MONSTERVOICE, 0.9f);
 				CRM->Start_Shake(0.2f, 3.f, 0.03f);
 				return;
@@ -1032,6 +1184,26 @@ HRESULT CTheo::Load_UI(char* DatName)
 	CloseHandle(hFile);
 
 	return S_OK;
+}
+
+void CTheo::CreateLight(_float4 WorldPos)
+{
+	CPlayerLight::PLAYERLIGHT PlayerLightInfo;
+	PlayerLightInfo.vPos = WorldPos;
+	PlayerLightInfo.fCloseSpeed = 1.f;
+	PlayerLightInfo.vScale = { 5.f,10.f,5.f };
+	PlayerLightInfo.vAngle = { 0.f,0.f,0.f };
+	GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
+
+
+	for (int i = 0; i < 15; ++i)
+	{
+		PlayerLightInfo.vPos = WorldPos;
+		PlayerLightInfo.fCloseSpeed = GI->Get_FloatRandom(0.05f, 0.1f);
+		PlayerLightInfo.vScale = { GI->Get_FloatRandom(1.f,2.f),10.f, GI->Get_FloatRandom(1.f,2.f) };
+		PlayerLightInfo.vAngle = { GI->Get_FloatRandom(0.f,360.f),GI->Get_FloatRandom(0.f,360.f),GI->Get_FloatRandom(0.f,360.f) };
+		GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
+	}
 }
 
 CTheo * CTheo::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

@@ -13,6 +13,10 @@
 #include "GolemRock3.h"
 #include "DragonFire1.h"
 #include "DragonTrail.h"
+#include "Particle_Manager.h"
+#include "Ring.h"
+#include "Wall.h"
+#include "PlayerLight.h"
 
 CDragon::CDragon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -70,18 +74,18 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	Set_Dir();
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-	return E_FAIL;*/
+	return E_FAIL;
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 172;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
 	m_pNavigation->Set_BattleIndex(145);
-	CRM->Start_Scene("Scene_Stage4Boss");
+	CRM->Start_Scene("Scene_Stage4Boss");*/
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -606,6 +610,7 @@ void CDragon::Set_State(STATE eState)
 		break;
 	case Client::CDragon::SKILL9_1:
 		m_fRushShakeAcc = 0.6f;
+		m_bRushRight = true;
 		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 8.f, 6.f, 10.f });
 		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,3.f });
 		m_fDamage = 20.f;
@@ -615,8 +620,8 @@ void CDragon::Set_State(STATE eState)
 	case Client::CDragon::SKILL9_3:
 		break;
 	case Client::CDragon::SKILL10_1:
-		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 5.f, 6.f, 6.f });
-		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,2.f });
+		m_pOBB[OBB_ATTACK]->ChangeExtents(_float3{ 6.f, 8.f, 10.f });
+		m_pOBB[OBB_ATTACK]->ChangeCenter(_float3{ 0.f,3.f,3.f });
 		m_fFlyAttackSpeed = 20.f;	
 		m_fDamage = 20.f;
 		break;
@@ -760,10 +765,10 @@ void CDragon::End_Animation()
 		case Client::CDragon::SKILL13:
 			Set_NextMotion();
 			break;
-		case Client::CDragon::SKILL14_1:
+		case Client::CDragon::SKILL14_1:		
 			Set_State(SKILL14_2);
 			if (!m_bFinish)
-				UM->Set_Count(2);
+				UM->Set_Count(2);	
 			break;
 		case Client::CDragon::SKILL14_2:
 			Set_State(SKILL14_3);
@@ -845,11 +850,15 @@ void CDragon::Update(_float fTimeDelta)
 			{
 				CAnimMesh::EFFECTINFO EffectInfo;
 				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				_float4 Pos;
+				XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+				PTM->CreateParticle(L"DragonSkill1", Pos, false, CAlphaParticle::DIR_END);
 				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 				EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
+			
 				EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
-				GI->Add_GameObjectToLayer(L"Rock", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_DragonEffect", &EffectInfo);
 				CRM->Start_Shake(0.3f, 5.f, 0.04f);
 				GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			}
@@ -860,11 +869,15 @@ void CDragon::Update(_float fTimeDelta)
 		{
 			CAnimMesh::EFFECTINFO EffectInfo;
 			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_float4 Pos;
+			XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"DragonSkill1", Pos, false, CAlphaParticle::DIR_END);
 			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 			EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
+			
 			EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
-			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_DragonEffect", &EffectInfo);
 			CRM->Start_Shake(0.3f, 5.f, 0.04f);
 			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 		}
@@ -948,7 +961,22 @@ void CDragon::Update(_float fTimeDelta)
 		}
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+		{
 			GI->PlaySoundW(L"DragonSkill4.ogg", SD_MONSTERVOICE, 0.9f);
+			CAnimMesh::EFFECTINFO EffectInfo;
+			EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+			_float4 Pos;
+			XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+			PTM->CreateParticle(L"DragonRock", Pos, false, CAlphaParticle::DIR_END);
+			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+			EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
+			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
+			EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
+			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_DragonEffect", &EffectInfo);
+			CRM->Start_Shake(0.3f, 5.f, 0.04f);
+
+		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
 			m_bPattern = true;
@@ -960,8 +988,11 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
 			if (m_fSkill4Speed >= 1.f)
-				m_fSkill4Speed -= 1.f;
+				m_fSkill4Speed -= 0.5f;
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fSkill4Speed, m_pNavigation, fTimeDelta);
+			_float4 Pos;
+			XMStoreFloat4(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"DragonTrail", Pos, false, CAlphaParticle::DIR_END);
 		}
 
 		break;
@@ -1072,12 +1103,28 @@ void CDragon::Update(_float fTimeDelta)
 			m_fRushShakeAcc += 1.f * fTimeDelta;
 			if (m_fRushShakeAcc >= m_fRushTempo)
 			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+				EffectInfo.WorldMatrix.r[3] += Look * 8.f;
+				EffectInfo.WorldMatrix.r[3] += Right * 3.f;
+				_float4 Pos;
+				XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+				PTM->CreateParticle(L"DragonRock2", Pos, false, CAlphaParticle::DIR_END);
+				EffectInfo.vScale = _float3{ 1.5f,1.f,1.5f };
+				GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_DragonEffect", &EffectInfo);
+				m_bRushRight = false;
+
 				m_fRushShakeAcc = 0.f;
 				GI->PlaySoundW(L"DragonWalk.ogg", SD_MONSTERVOICE, 0.9f);
 				CRM->Start_Shake(0.3f, 3.f, 0.04f);
 			}
 			if (m_pTransformCom->Go_NoSlide(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta))
 				Set_Dir();
+			_float4 Pos;
+			XMStoreFloat4(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"DragonTrail", Pos, false, CAlphaParticle::DIR_END);
 			m_bAttack = true;
 			return;
 		}
@@ -1088,12 +1135,45 @@ void CDragon::Update(_float fTimeDelta)
 		m_fRushShakeAcc += 1.f * fTimeDelta;
 		if (m_fRushShakeAcc >= m_fRushTempo)
 		{
+			if (m_bRushRight)
+			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+				EffectInfo.WorldMatrix.r[3] += Look * 8.f;
+				EffectInfo.WorldMatrix.r[3] += Right * 3.f;
+				_float4 Pos;
+				XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+				PTM->CreateParticle(L"DragonRock2", Pos, false, CAlphaParticle::DIR_END);
+				EffectInfo.vScale = _float3{ 1.5f,1.f,1.5f };
+				GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_DragonEffect", &EffectInfo);
+				m_bRushRight = false;
+			}
+			else
+			{
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+				EffectInfo.WorldMatrix.r[3] += Look * 8.f;
+				EffectInfo.WorldMatrix.r[3] -= Right * 3.f;
+				_float4 Pos;
+				XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+				PTM->CreateParticle(L"DragonRock2", Pos, false, CAlphaParticle::DIR_END);
+				EffectInfo.vScale = _float3{ 1.5f,1.f,1.5f };
+				GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_DragonEffect", &EffectInfo);
+				m_bRushRight = true;
+			}
 			m_fRushShakeAcc = 0.f;
 			GI->PlaySoundW(L"DragonWalk.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 3.f, 0.04f);
 		}
 		if (m_pTransformCom->Go_NoSlide(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta))
 			Set_Dir();
+		_float4 Pos;
+		XMStoreFloat4(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		PTM->CreateParticle(L"DragonTrail", Pos, false, CAlphaParticle::DIR_END);
 		m_bAttack = true;
 		break;
 	}
@@ -1107,12 +1187,46 @@ void CDragon::Update(_float fTimeDelta)
 				m_fRushShakeAcc += 1.f * fTimeDelta;
 				if (m_fRushShakeAcc >= m_fRushTempo)
 				{
+					if (m_bRushRight)
+					{
+						CAnimMesh::EFFECTINFO EffectInfo;
+						EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+						_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+						_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+						EffectInfo.WorldMatrix.r[3] += Look * 8.f;
+						EffectInfo.WorldMatrix.r[3] += Right * 3.f;
+						_float4 Pos;
+						XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+						PTM->CreateParticle(L"DragonRock2", Pos, false, CAlphaParticle::DIR_END);
+						EffectInfo.vScale = _float3{ 1.5f,1.f,1.5f };
+						GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_DragonEffect", &EffectInfo);
+						m_bRushRight = false;
+					}
+					else
+					{
+						CAnimMesh::EFFECTINFO EffectInfo;
+						EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+						_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+						_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+						EffectInfo.WorldMatrix.r[3] += Look * 8.f;
+						EffectInfo.WorldMatrix.r[3] -= Right * 3.f;
+						_float4 Pos;
+						XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+						PTM->CreateParticle(L"DragonRock2", Pos, false, CAlphaParticle::DIR_END);
+						EffectInfo.vScale = _float3{ 1.5f,1.f,1.5f };
+						GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"Layer_DragonEffect", &EffectInfo);
+						m_bRushRight = true;
+					}
+
 					m_fRushShakeAcc = 0.f;
 					GI->PlaySoundW(L"DragonWalk.ogg", SD_MONSTERVOICE, 0.9f);
 					CRM->Start_Shake(0.3f, 3.f, 0.04f);
 				}
 				if (m_pTransformCom->Go_NoSlide(XMLoadFloat3(&m_vTargetLook), m_fRushSpeed, m_pNavigation, fTimeDelta))
 					Set_Dir();
+				_float4 Pos;
+				XMStoreFloat4(&Pos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				PTM->CreateParticle(L"DragonTrail", Pos, false, CAlphaParticle::DIR_END);
 				m_bAttack = true;
 			}
 		}
@@ -1144,6 +1258,9 @@ void CDragon::Update(_float fTimeDelta)
 		{
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fFlyAttackSpeed, m_pNavigation, fTimeDelta);
 			m_bAttack = true;
+			_float4 TrailPos;
+			XMStoreFloat4(&TrailPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"DragonTrail", TrailPos, false, CAlphaParticle::DIR_END);
 		}
 		else
 			m_bAttack = false;
@@ -1156,34 +1273,60 @@ void CDragon::Update(_float fTimeDelta)
 		break;
 	case Client::CDragon::SKILL10_2:
 		m_bPattern = true;
+		m_bAttack = false;
 		if (!m_pAnimModel->GetChangeBool())
 		{
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
+			{
+				CreateTrail(TS10);
+			}
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 			{
 				m_bAttack = true;
 				if (m_fFlyAttackSpeed >= 0.2f)
 					m_fFlyAttackSpeed -= 0.2f;
 				m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fFlyAttackSpeed, m_pNavigation, fTimeDelta);
+				_float4 TrailPos;
+				XMStoreFloat4(&TrailPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				PTM->CreateParticle(L"DragonTrail", TrailPos, false, CAlphaParticle::DIR_END);
+				return;
 			}
 
-			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
-			{
-				CreateTrail(TS10);
-			}
+			
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 			{
+				m_bAttack = true;
+				_float4 TrailPos;
+				XMStoreFloat4(&TrailPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				PTM->CreateParticle(L"DragonTrail", TrailPos, false, CAlphaParticle::DIR_END);
 				CAnimMesh::EFFECTINFO EffectInfo;
 				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
 				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 				EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
 				EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
-				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_DragonEffect", &EffectInfo);
 				GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 				CRM->Start_Shake(0.3f, 4.f, 0.04f);
+				
+				_vector FixPos;
+				FixPos = EffectInfo.WorldMatrix.r[3] += Look * 2.f -= Right * 3.7f;
+				_float4 Pos;
+				XMStoreFloat4(&Pos, FixPos);
+				PTM->CreateParticle(L"DragonRock", Pos, false, CAlphaParticle::DIR_END);
+
+				CRing::RINGINFO RingInfo;
+				RingInfo.vSize = { 0.2f,0.3f,0.2f };
+				RingInfo.vSpeed = _float3{ 0.8f, 0.f, 0.8f };
+				RingInfo.fLifeTime = 0.3f;
+				RingInfo.eColor = CRing::RING_RED;
+				XMStoreFloat4(&RingInfo.vWorldPos, FixPos);
+				RingInfo.vWorldPos.y += 0.5f;
+				GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_DragonEffect", &RingInfo);
+
+			
 			}
-			else
-				m_bAttack = false;
+
 
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(3) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(4))
 			{
@@ -1202,6 +1345,9 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
 		{
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), 6.f, m_pNavigation, fTimeDelta);
+			_float4 TrailPos;
+			XMStoreFloat4(&TrailPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			PTM->CreateParticle(L"DragonTrail", TrailPos, false, CAlphaParticle::DIR_END);
 			return;
 		}
 
@@ -1212,8 +1358,12 @@ void CDragon::Update(_float fTimeDelta)
 			_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 			_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
 			EffectInfo.WorldMatrix.r[3] += Look * 6.f;
+			_float4 Pos;
+			XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
 			EffectInfo.WorldMatrix.r[3] += Right * 2.5f;
 			EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+						
+			PTM->CreateParticle(L"DragonRock", Pos, false, CAlphaParticle::DIR_END);
 			GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
 			CRM->Start_Shake(0.4f, 4.f, 0.04f);
@@ -1244,9 +1394,38 @@ void CDragon::Update(_float fTimeDelta)
 				m_bPattern = true;
 			else
 				m_bPattern = false;
-
+			if (m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(0))
+			{
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				PTM->CreateParticle(L"DragonCharge", WorldPos, false, CAlphaParticle::DIR_DRAGON);
+				return;
+			}
+					
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			{
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				WorldPos.y += 5.f;
+				PTM->CreateParticle(L"DragonSkill14", WorldPos, false, CAlphaParticle::DIR_END);
 				GI->PlaySoundW(L"DragonSkill14.ogg", SD_MONSTERVOICE, 0.9f);
+				return;
+			}
+
+			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+			{
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				CRing::RINGINFO RingInfo;
+				RingInfo.vSize = { 0.3f,1.f,0.3f };
+				RingInfo.vSpeed = _float3{ 1.5f, 0.f, 1.5f };
+				RingInfo.fLifeTime = 0.5f;
+				RingInfo.eColor = CRing::RING_RED;
+				RingInfo.vWorldPos = WorldPos;
+				RingInfo.vWorldPos.y += 1.f;
+				GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_DragonEffect", &RingInfo);
+			}
+
 		}
 		break;
 	case Client::CDragon::SKILL14_2:
@@ -1286,11 +1465,38 @@ void CDragon::Update(_float fTimeDelta)
 				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
 				_vector Look = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 				_vector Right = XMVector3Normalize(m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
-				EffectInfo.WorldMatrix.r[3] += Right * 3.7f;
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, EffectInfo.WorldMatrix.r[3]);
+				EffectInfo.WorldMatrix.r[3] -= Right * 1.f;
+				CreateLight(WorldPos);
+				CRing::RINGINFO RingInfo;
+				RingInfo.vSize = { 0.3f,1.f,0.3f };
+				RingInfo.vSpeed = _float3{ 1.5f, 0.f, 1.5f };
+				RingInfo.fLifeTime = 0.5f;
+				RingInfo.eColor = CRing::RING_RED;
+				RingInfo.vWorldPos = WorldPos;
+				RingInfo.vWorldPos.y += 1.f;
+				GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_DragonEffect", &RingInfo);
+
+				CWall::WALLINFO WallInfo;
+				WallInfo.fMaxUVIndexX = 1.f;
+				WallInfo.fMaxUVIndexY = 4.f;
+				WallInfo.fUVSpeed = 0.05f;
+				WallInfo.vSize = { 3.f,10.f,3.f };
+				WallInfo.vSpeed = { 0.2f,0.f,0.2f };
+				WallInfo.eColor = CWall::WALL_RED;
+				WallInfo.fLifeTime = 0.5f;
+				WallInfo.fEndSpeed = 0.5f;
+				WallInfo.vWorldPos = WorldPos;
+				GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_DragonEffect", &WallInfo);
+				EffectInfo.WorldMatrix.r[3] += Right * 4.7f;
 				EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
-				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
+				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);			
 				GI->PlaySoundW(L"DragonAttack15.ogg", SD_MONSTER1, 0.9f);
 				CRM->Start_Shake(0.4f, 6.f, 0.05f);
+
+				PTM->CreateParticle(L"DragonRock", WorldPos, false, CAlphaParticle::DIR_END);
+				PTM->CreateParticle(L"DragonSkill15_1", WorldPos, false, CAlphaParticle::DIR_END);
 				return;
 			}
 
@@ -1464,13 +1670,13 @@ void CDragon::DebugKeyInput()
 		Set_State(SKILL1);
 
 	if (GI->Key_Down(DIK_NUMPAD2))
-		Set_State(SKILL3);
+		Set_State(SKILL9_1);
 
 	if (GI->Key_Down(DIK_NUMPAD3))
 		Set_State(SKILL4);
 
 	if (GI->Key_Down(DIK_NUMPAD4))
-		Set_State(SKILL5);
+		Set_State(SKILL14_1);
 
 	if (GI->Key_Down(DIK_NUMPAD5))
 		Set_State(SKILL6);
@@ -1618,7 +1824,7 @@ void CDragon::CreateTrail(TRAILSTATE eTS)
 		m_fRenderLimit = 0.3f;
 		m_fMoveSpeed = 20.f;
 		m_fMoveSpeedTempo = 0.15f;
-		m_eTurnDir = CMesh::TURN_BACK;
+		m_eTurnDir = CMesh::TURN_FRONT;
 		m_Trails[TRAIL_1]->SetUp_State(DragonrMatrix);
 		m_Trails[TRAIL_1]->Set_EffectMatrix(m_TrailMatrix);
 		m_Trails[TRAIL_1]->Set_EffectInfo(m_fTurnSpeed, m_fRenderLimit, m_fMoveSpeed, m_fMoveSpeedTempo, m_vMoveDir, m_eTurnDir);
@@ -1660,6 +1866,19 @@ void CDragon::CreateTrail(TRAILSTATE eTS)
 
 	
 	
+	
+}
+
+void CDragon::CreateLight(_float4 WorldPos)
+{
+	CPlayerLight::PLAYERLIGHT PlayerLightInfo;
+	PlayerLightInfo.vPos = WorldPos;
+	PlayerLightInfo.fCloseSpeed = 1.f;
+	PlayerLightInfo.vScale = { 9.f,10.f,9.f };
+	PlayerLightInfo.vAngle = { 0.f,0.f,0.f };
+	GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
+
+
 	
 }
 

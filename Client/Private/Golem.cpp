@@ -69,21 +69,21 @@ HRESULT CGolem::Initialize(void * pArg)
 	Safe_AddRef(m_pTarget);
 	PM->Add_Boss(this);
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;*/
+		return E_FAIL;
 	
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 478;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE3, L"NavigationStage3", TEXT("NavigationStage3"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
-	m_pNavigation->Set_BattleIndex(473);
+	m_pNavigation->Set_BattleIndex(473);*/
 
 	Set_Dir();
 
-	CRM->Start_Scene("Scene_Stage3Boss");
+	//CRM->Start_Scene("Scene_Stage3Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -528,15 +528,14 @@ void CGolem::Close_Attack()
 
 void CGolem::CreateSkillRock2()
 {
-	for (int i = 0; i < 3; ++i)
-	{
-		CGolemSkillRock2::GOLEMROCK2INFO GolemInfo;
-		XMStoreFloat4(&GolemInfo.vPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-		GolemInfo.vPos.x += GI->Get_FloatRandom(-10.f, 10.f);
-		GolemInfo.vPos.z += GI->Get_FloatRandom(-10.f, 10.f);
-		GolemInfo.vScale = { GI->Get_FloatRandom(0.5f,1.5f),GI->Get_FloatRandom(0.3f,0.6f),GI->Get_FloatRandom(0.5f,1.5f) };
-		GI->Add_GameObjectToLayer(L"GolemSkillRock2", PM->Get_NowLevel(), L"GolemEffect", &GolemInfo);
-	}
+	
+	CGolemSkillRock2::GOLEMROCK2INFO GolemInfo;
+	XMStoreFloat4(&GolemInfo.vPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+	GolemInfo.vPos.x += -10.f;
+	GolemInfo.vPos.z += 10.f;
+	GolemInfo.vScale = { 3.f, 1.5f, 3.f };
+	GI->Add_GameObjectToLayer(L"GolemSkillRock2", PM->Get_NowLevel(), L"GolemEffect", &GolemInfo);
+	
 
 }
 
@@ -989,7 +988,12 @@ void CGolem::Update(_float fTimeDelta)
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
-			CreateSkillRock2();
+			CGolemSkillRock2::GOLEMROCK2INFO GolemInfo;
+			XMStoreFloat4(&GolemInfo.vPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			GolemInfo.vPos.x += -5.f;
+			GolemInfo.vPos.z += 5.f;
+			GolemInfo.vScale = { 2.5f, 1.f, 2.5f };
+			GI->Add_GameObjectToLayer(L"GolemSkillRock2", PM->Get_NowLevel(), L"GolemEffect", &GolemInfo);
 			return;
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
@@ -1008,7 +1012,12 @@ void CGolem::Update(_float fTimeDelta)
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
-			CreateSkillRock2();
+			CGolemSkillRock2::GOLEMROCK2INFO GolemInfo;
+			XMStoreFloat4(&GolemInfo.vPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			GolemInfo.vPos.x += 5.f;
+			GolemInfo.vPos.z += 5.f;
+			GolemInfo.vScale = { 2.f, 1.f, 2.f };
+			GI->Add_GameObjectToLayer(L"GolemSkillRock2", PM->Get_NowLevel(), L"GolemEffect", &GolemInfo);
 			return;
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(4) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(5))
@@ -1027,7 +1036,12 @@ void CGolem::Update(_float fTimeDelta)
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
-			CreateSkillRock2();
+			CGolemSkillRock2::GOLEMROCK2INFO GolemInfo;
+			XMStoreFloat4(&GolemInfo.vPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			GolemInfo.vPos.x += 5.f;
+			GolemInfo.vPos.z += -5.f;
+			GolemInfo.vScale = { 2.f, 1.f, 2.f };
+			GI->Add_GameObjectToLayer(L"GolemSkillRock2", PM->Get_NowLevel(), L"GolemEffect", &GolemInfo);
 			return;
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(6) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(7))
@@ -1046,7 +1060,12 @@ void CGolem::Update(_float fTimeDelta)
 			GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER1, 0.9f);
 			GI->PlaySoundW(L"GolemSkill8.ogg", SD_MONSTERVOICE, 0.9f);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
-			CreateSkillRock2();
+			CGolemSkillRock2::GOLEMROCK2INFO GolemInfo;
+			XMStoreFloat4(&GolemInfo.vPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+			GolemInfo.vPos.x += -5.f;
+			GolemInfo.vPos.z += -5.f;
+			GolemInfo.vScale = { 2.f, 1.f, 2.f };
+			GI->Add_GameObjectToLayer(L"GolemSkillRock2", PM->Get_NowLevel(), L"GolemEffect", &GolemInfo);
 			return;
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(10) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(11))
@@ -1149,7 +1168,7 @@ void CGolem::Update(_float fTimeDelta)
 				RingInfo.vSpeed = _float3{ 1.5f, 0.f, 1.5f };
 				RingInfo.fLifeTime = 0.2f;
 				RingInfo.eColor = CRing::RING_GREEN;
-				XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				RingInfo.vWorldPos = WorldPos;
 				RingInfo.vWorldPos.y += 1.f;
 				GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_GolemEffect", &RingInfo);
 

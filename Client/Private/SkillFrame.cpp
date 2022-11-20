@@ -129,7 +129,7 @@ void CSkillFrame::Setting()
 	else if (m_UIInfo->UIPosX == 290)
 	{
 		m_fCoolTime = 0.f;
-		m_fMaxCoolTime = 10.f;	
+		m_fMaxCoolTime = 5.f;	
 		m_iIndex = 1;
 	}
 	else if (m_UIInfo->UIPosX == 350)
@@ -141,7 +141,7 @@ void CSkillFrame::Setting()
 	else if (m_UIInfo->UIPosX == 320)
 	{
 		m_fCoolTime = 0.f;
-		m_fMaxCoolTime = 10.f;	
+		m_fMaxCoolTime = 5.f;	
 		m_iIndex = 3;
 	}
 	else if (m_UIInfo->UIPosX == 260)

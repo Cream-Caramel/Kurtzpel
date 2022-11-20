@@ -34,7 +34,7 @@ HRESULT CDragonFire1::Initialize(void * pArg)
 		return E_FAIL;
 
 	CCollider::COLLIDERDESC		ColliderDesc;
-	ColliderDesc.vSize = _float3(m_DragonFire1Info.vSize.x / 100.f, m_DragonFire1Info.vSize.y / 100.f, m_DragonFire1Info.vSize.z / 100.f);
+	ColliderDesc.vSize = _float3(m_DragonFire1Info.vSize.x / 90.f, m_DragonFire1Info.vSize.y / 90.f, m_DragonFire1Info.vSize.z / 90.f);
 	ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.sTag = "Monster_Attack";

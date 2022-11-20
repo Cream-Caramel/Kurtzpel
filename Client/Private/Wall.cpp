@@ -106,12 +106,13 @@ void CWall::Tick(_float fTimeDelta)
 	{
 		m_fEndAcc += m_WallInfo.fEndSpeed * fTimeDelta;	
 	}
+
 	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_pTransformCom->Get_Scale()) - _vector{ m_WallInfo.vSpeed.x, m_WallInfo.vSpeed.y, m_WallInfo.vSpeed.z });
-	
+	if (0.1f >= m_pTransformCom->Get_ScaleAxis(CTransform::AXIS_X))
+		Set_Dead();
 	m_fLifeTimeAcc += 1.f * fTimeDelta;
 	if (m_fLifeTimeAcc >= m_WallInfo.fLifeTime)
 		Set_Dead();
-	
 	
 
 }

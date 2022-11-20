@@ -4,6 +4,7 @@
 #include "AnimMesh.h"
 #include "OBB.h"
 #include "Collider_Manager.h"
+#include "Particle_Manager.h"
 
 CGolemSkillRock2::CGolemSkillRock2(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)
@@ -69,7 +70,6 @@ HRESULT CGolemSkillRock2::Initialize(void * pArg)
 
 void CGolemSkillRock2::Tick(_float fTimeDelta)
 {
-	
 
 	if (m_bSetDir)
 	{
@@ -79,11 +79,11 @@ void CGolemSkillRock2::Tick(_float fTimeDelta)
 		m_pTransformCom->TurnY(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.1f);
 	}
 	else
-		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_UP), fTimeDelta);
+		m_pTransformCom->Turn(_vector{ GI->Get_FloatRandom(0.f,1.f),GI->Get_FloatRandom(0.f,1.f), GI->Get_FloatRandom(0.f,1.f) }, fTimeDelta);
 	if (m_fUpAcc <= 1.f)
 	{
 		m_fUpAcc += 1.f * fTimeDelta;
-		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_UP), 10.f, fTimeDelta);
+		m_pTransformCom->Go_Dir(_vector{ 0.f,1.f,0.f }, 10.f, fTimeDelta);
 	}
 	
 }
@@ -96,8 +96,8 @@ void CGolemSkillRock2::LateTick(_float fTimeDelta)
 	if (!m_bSetDir && PM->Get_GolemRockOn())
 	{
 		_float3 RandomPos = PM->Get_PlayerPos();
-		RandomPos.x += GI->Get_FloatRandom(-4.f, 4.f);
-		RandomPos.z += GI->Get_FloatRandom(-4.f, 4.f);
+		RandomPos.x += GI->Get_FloatRandom(-6.f, 6.f);
+		RandomPos.z += GI->Get_FloatRandom(-6.f, 6.f);
 		XMStoreFloat3(&m_vTargetPos, XMVector3Normalize(XMLoadFloat3(&RandomPos) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 		_vector LookAt = { m_vTargetPos.x * -1, m_vTargetPos.y, m_vTargetPos.z * -1 };
 		XMStoreFloat3(&m_vTargetLook, LookAt);
@@ -109,12 +109,15 @@ void CGolemSkillRock2::LateTick(_float fTimeDelta)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB);
 		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] <= PM->Get_PlayerPos().y + 1.f)
 		{
-			if (m_pTransformCom->Get_ScaleAxis(CTransform::AXIS_X) >= 1.2f)
+			if (m_pTransformCom->Get_ScaleAxis(CTransform::AXIS_X) >= 0.8f)
 			{
 				CAnimMesh::EFFECTINFO EffectInfo;
 				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
 				EffectInfo.vScale = { 1.f,1.f,1.f };
 				EffectInfo.bObtion = true;
+				_float4 Pos;
+				XMStoreFloat4(&Pos, EffectInfo.WorldMatrix.r[3]);
+				PTM->CreateParticle(L"GolemSkill3", Pos, false, CAlphaParticle::DIR_END);
 				GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"GolemEffect", &EffectInfo);
 				CRM->Start_Shake(0.3f, 4.f, 0.04f);
 			}
