@@ -161,7 +161,7 @@ HRESULT CPlayerSword::Render()
 	
 	if (FAILED(m_pTexture->Set_SRV(m_pTexShader, "g_DiffuseTexture")))
 		return E_FAIL;
-	m_pTrail->Render();
+	//m_pTrail->Render();
 	return S_OK;
 }
 

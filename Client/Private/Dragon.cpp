@@ -1664,7 +1664,7 @@ HRESULT CDragon::Load_UI(char* DatName)
 void CDragon::DebugKeyInput()
 {
 	if (GI->Key_Down(DIK_NUMPAD0))
-		Set_State(BACKSTEP);
+		Set_State(SKILL5);
 
 	if (GI->Key_Down(DIK_NUMPAD1))
 		Set_State(SKILL1);
@@ -1676,7 +1676,7 @@ void CDragon::DebugKeyInput()
 		Set_State(SKILL4);
 
 	if (GI->Key_Down(DIK_NUMPAD4))
-		Set_State(SKILL14_1);
+		Set_State(SKILL3);
 
 	if (GI->Key_Down(DIK_NUMPAD5))
 		Set_State(SKILL6);

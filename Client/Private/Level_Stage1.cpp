@@ -37,12 +37,12 @@ HRESULT CLevel_Stage1::Initialize()
 
 	PM->Get_PlayerPointer()->Create_Navigation("Level_Stage1");
 
-	CAnimMesh::MESHINFO MeshInfo;
+	/*CAnimMesh::MESHINFO MeshInfo;
 	MeshInfo.sTag = L"Dragon";
 	MeshInfo.fPos = _float4{ 90.f,0.6f,103.f,1.f };
 	MeshInfo.fScale = _float3{ 1.f,1.f,1.f };
 	MeshInfo.fAngle = _float3{ 1.f,1.f,1.f };
-	GI->Add_GameObjectToLayer(L"Dragon", LEVEL_STAGE1, L"Monster", &MeshInfo);
+	GI->Add_GameObjectToLayer(L"Dragon", LEVEL_STAGE1, L"Monster", &MeshInfo);*/
 
 	/*CAnimMesh::MESHINFO MeshInfo;
 	MeshInfo.sTag = L"Theo";
@@ -135,7 +135,20 @@ HRESULT CLevel_Stage1::Ready_Lights()
 	if (FAILED(pGameInstance->Add_StaticLight(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
 
+	/*ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
+	LightDesc.eType = LIGHTDESC::TYPE_POINT;
+	LightDesc.bRender = true;
+	LightDesc.vPosition = _float4(90.0f, 20.0f, 103.f, 1.f);
+	LightDesc.fRange = 100.f;
+	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(1.f, 0.f, 0.f, 1.f);
+	LightDesc.vSpecular = LightDesc.vDiffuse;
 
+	for (int i = 0; i < 100; ++i)
+	{
+		if (FAILED(pGameInstance->Add_StaticLight(m_pDevice, m_pContext, LightDesc)))
+			return E_FAIL;
+	}*/
 
 	RELEASE_INSTANCE(CGameInstance);
 

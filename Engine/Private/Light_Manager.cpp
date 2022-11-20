@@ -73,8 +73,8 @@ HRESULT CLight_Manager::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 	for (auto& pLight : m_Lights)
 		pLight->Render(pShader, pVIBuffer);
 
-	for (auto& pLight : m_StaticLights)
-		pLight->Render(pShader, pVIBuffer);
+	for (auto& pStaticLight : m_StaticLights)
+		pStaticLight->Render(pShader, pVIBuffer);
 
 	return S_OK;
 }
@@ -92,8 +92,8 @@ void CLight_Manager::Free()
 
 	m_Lights.clear();
 
-	for (auto& pLight : m_StaticLights)
-		Safe_Release(pLight);
+	for (auto& pStaticLight : m_StaticLights)
+		Safe_Release(pStaticLight);
 
 	m_StaticLights.clear();
 }
