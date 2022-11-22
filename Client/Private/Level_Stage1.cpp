@@ -117,7 +117,7 @@ HRESULT CLevel_Stage1::Ready_Lights()
 	LightDesc.bRender = true;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
+	LightDesc.vAmbient = _float4(0.7f, 0.7f, 0.7f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
@@ -149,7 +149,7 @@ HRESULT CLevel_Stage1::Ready_Lights()
 		if (FAILED(pGameInstance->Add_StaticLight(m_pDevice, m_pContext, LightDesc)))
 			return E_FAIL;
 	}*/
-
+	
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;

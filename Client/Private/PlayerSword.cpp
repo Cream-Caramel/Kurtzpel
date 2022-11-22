@@ -34,7 +34,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 	/* For.Com_Model */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, L"PlayerSword", TEXT("PlayerSword"), (CComponent**)&m_pModel)))
 		return E_FAIL;
-
+	m_fMaxHp = 0.1f;
 	CTrail::TRAILPOS TrailPos;
 	TrailPos.vHigh = { 0.f,2.1f,0.f };
 	TrailPos.vLow = { 0.f,0.f,0.f };
@@ -75,7 +75,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 
 void CPlayerSword::Tick(_float fTimeDelta)
 {
-	if (GI->Key_Down(DIK_0))
+	/*if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
 
 	if (GI->Key_Down(DIK_P))
@@ -97,26 +97,19 @@ void CPlayerSword::Tick(_float fTimeDelta)
 		WorldPos.z = Center.z;
 		WorldPos.w = 1.f;
 		PTM->CreateParticle(L"Hit", WorldPos, true, CAlphaParticle::DIR_END);
-	}
+	}*/
+
+
 }
 
 void CPlayerSword::LateTick(_float fTimeDelta)
 {
-
+	
 	if (m_bCollision)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYERSWORD, this, m_pOBB);
 		
 	m_pOBB->Update(m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix());
 
-	_matrix _WorldMatrix;
-	_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix();
-
-	//if (!m_bTrail)
-		/*m_pTrail->TrailOff();
-
-	if (!m_pTrail->Get_On())
-		m_pTrail->TrailOn(_WorldMatrix);
-	m_pTrail->Tick(fTimeDelta, _WorldMatrix);*/
 }
 
 HRESULT CPlayerSword::Render()

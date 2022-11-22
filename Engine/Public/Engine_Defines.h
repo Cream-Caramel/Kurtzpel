@@ -2,6 +2,7 @@
 #pragma warning (disable : 4251)
 #pragma warning (disable : 4267)
 
+
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <FX11/d3dx11effect.h>

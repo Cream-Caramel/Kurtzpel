@@ -1,9 +1,14 @@
 #include "Client_Shader_Defines.hpp"
 matrix		g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+matrix g_WorldMatrixInverse, g_ViewMatrixInverse;
 texture2D	g_DiffuseTexture;
 texture2D	g_NormalTexture;
 texture2D	g_DissolveTexture;
 float		g_fDissolveAcc;
+float g_fOutLinePower;
+float g_fWinSizeX;
+float g_fWinSizeY;
+
 sampler DefaultSampler = sampler_state {
 
 	filter = min_mag_mip_linear;
@@ -48,6 +53,35 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vBinormal = normalize(cross(Out.vNormal, Out.vTangent));
 	Out.vTexUV = In.vTexUV;
 	Out.vProjPos = Out.vPosition;
+
+	return Out;
+}
+
+VS_OUT OutLine_MAIN(VS_IN In)
+{
+	VS_OUT		Out = (VS_OUT)0;
+
+	matrix		matWV, matWVP;
+
+	matWV = mul(g_WorldMatrix, g_ViewMatrix);
+	matWVP = mul(matWV, g_ProjMatrix);
+
+	Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
+	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
+	Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix)).xyz;
+	Out.vBinormal = normalize(cross(Out.vNormal, Out.vTangent));
+	Out.vTexUV = In.vTexUV;
+	Out.vProjPos = Out.vPosition;
+
+	matrix matWVInverse;
+	matWVInverse = mul(g_WorldMatrixInverse, g_ViewMatrixInverse);
+
+	vector tNormal = normalize(mul(In.vNormal, matWVInverse));
+
+	float2 offset = mul(g_ProjMatrix, tNormal.xy);
+	offset.x /= g_fWinSizeX;
+	offset.y /= g_fWinSizeY;
+	Out.vPosition.xy += offset * Out.vPosition.z * g_fOutLinePower;
 
 	return Out;
 }
@@ -261,6 +295,17 @@ PS_OUT NStartDissolve_MAIN(PS_IN In)
 
 }
 
+PS_OUT Hit_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+	Out.vDiffuse = (vector)1.f;
+
+	Out.vDiffuse.gb = 0.f;
+	return Out;
+}
+
+
+
 
 technique11 DefaultTechnique
 {
@@ -332,6 +377,26 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 NStartDissolve_MAIN();
+	}
+
+	pass HitPass
+	{
+		SetRasterizerState(RS_OutLine);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 OutLine_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 Hit_MAIN();
+	}
+
+	pass NHitPass
+	{
+		SetRasterizerState(RS_OutLine);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 OutLine_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 Hit_MAIN();
 	}
 
 

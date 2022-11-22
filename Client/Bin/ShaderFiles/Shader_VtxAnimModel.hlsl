@@ -1,9 +1,12 @@
 #include "Client_Shader_Defines.hpp"
 matrix		g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-
+matrix g_WorldMatrixInverse, g_ViewMatrixInverse;
 vector g_vCamPos;
 float g_fDissolveAcc;
 float g_fGolemPattern;
+float g_fOutLinePower;
+float g_fWinSizeX;
+float g_fWinSizeY;
 
 struct tagBoneMatrices
 {
@@ -42,6 +45,7 @@ struct VS_OUT
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
 	float4		vWorldPos : TEXCOORD2;
+	float3      vTestNormal : TEXCOORD3;
 };
 
 
@@ -75,7 +79,53 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vTexUV = In.vTexUV;
 	Out.vProjPos = Out.vPosition;
 
+	Out.vTestNormal = normalize(mul(normalize(vNormal), g_WorldMatrix));
+
 	Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
+	
+
+	return Out;
+}
+
+VS_OUT OutLine_MAIN(VS_IN In)
+{
+	VS_OUT		Out = (VS_OUT)0;
+
+	matrix		matWV, matWVP;
+
+	matWV = mul(g_WorldMatrix, g_ViewMatrix);
+	matWVP = mul(matWV, g_ProjMatrix);
+
+	float		fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+
+	float4x4	BoneMatrix = g_BoneMatrices.BoneMatrix[In.vBlendIndex.x] * In.vBlendWeight.x +
+		g_BoneMatrices.BoneMatrix[In.vBlendIndex.y] * In.vBlendWeight.y +
+		g_BoneMatrices.BoneMatrix[In.vBlendIndex.z] * In.vBlendWeight.z +
+		g_BoneMatrices.BoneMatrix[In.vBlendIndex.w] * fWeightW;
+
+	vector		vPosition = mul(vector(In.vPosition, 1.f), BoneMatrix);
+	vector		vNormal = mul(vector(In.vNormal, 0.f), BoneMatrix);
+	vector		vTangent = mul(vector(In.vTangent, 0.f), BoneMatrix);
+
+	Out.vPosition = mul(vPosition, matWVP);
+	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
+	Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix)).xyz;
+	Out.vBinormal = normalize(cross(Out.vNormal, Out.vTangent));
+
+	Out.vTexUV = In.vTexUV;
+	Out.vProjPos = Out.vPosition;
+	Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
+
+	
+	matrix matWVInverse;
+	matWVInverse = mul(g_WorldMatrixInverse, g_ViewMatrixInverse);
+
+	vector tNormal = normalize(mul(vNormal, matWVInverse));
+
+	float2 offset = mul(g_ProjMatrix, tNormal.xy);
+	offset.x /= g_fWinSizeX;
+	offset.y /= g_fWinSizeY;
+	Out.vPosition.xy += offset * Out.vPosition.z * g_fOutLinePower;
 
 	return Out;
 }
@@ -89,6 +139,7 @@ struct PS_IN
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
 	float4		vWorldPos : TEXCOORD2;
+	float3		vTestNormal : TEXCOORD3;
 };
 
 struct PS_OUT
@@ -113,42 +164,33 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
-	
-	/*float3 Dir = normalize(g_vCamPos - In.vCamDir);
-	float rim = (dot(vNormal, Dir));
-	if (rim < 0.1f)
-	{
-		Out.vDiffuse.r = 1;
-		Out.vDiffuse.gb = 0;
-	}
-*/
-	/*float3 vCameraPos = normalize(g_vCamPos - In.vCamDir);
 
-	float rimWidth = 0.2f;
+	if (0 == Out.vDiffuse.a)
+		discard;
+
+	return Out;
+	//림라이트
+	//float3 rimColor = float3(1.f, 0.f, 0.f);
+
+	//if (rim <= 0.3f)
+	//{
+	//	//Out.vDiffuse.r *= rim;
+	//	Out.vDiffuse.r = 1.f;
+	//	Out.vDiffuse.gb = 0.f;
+	//}
+	//림라이트
+	
+
+	/*float rimWidth = 0.2f;
 	float RimLightColor = smoothstep(1.0f - rimWidth, 1.0f, 1 - max(0, dot(normalize(In.vNormal), vCameraPos)));
 
 	float3 rimColor = float3(1.f, 0.f, 0.f);
 
 	Out.vDiffuse.rgb += rimColor * RimLightColor;*/
 
-	/*float3 cameraDirection = normalize(g_vCamPos - In.vWorldPos).xyz;
-
-	float rim = 0;
 	
-	float fRimWidth = 0.8f;
-	rim = smoothstep(1.0f - fRimWidth, 1.f, 1.f - max(0, dot(normalize(vNormal).xyz, cameraDirection)));
-
-	float3 rimColor = float3(1.f, 0.f, 0.f);
-	rimColor = rim * rimColor;
-
-	Out.vDiffuse += rim;*/
-
-	if (0 == Out.vDiffuse.a)
-		discard;
-
-	return Out;
 }
 
 PS_OUT NPS_MAIN(PS_IN In)
@@ -210,42 +252,9 @@ PS_OUT NPattern_MAIN(PS_IN In)
 PS_OUT Hit_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
-
 	Out.vDiffuse = (vector)1.f;
 
-	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
-	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
-
-	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
-
-	float3x3	WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
-
-	vNormal = normalize(mul(vNormal, WorldMatrix));
-
-	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
-
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
-
-	Out.vDiffuse.r = 1.f;
-
-	if (0 == Out.vDiffuse.a)
-		discard;
-
-	return Out;
-}
-
-PS_OUT NHit_MAIN(PS_IN In)
-{
-	PS_OUT		Out = (PS_OUT)0;
-	
-	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
-
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
-	Out.vDiffuse.r = 1.f;
-
-	if (0 == Out.vDiffuse.a)
-		discard;
+	Out.vDiffuse.gb = 0.f;
 
 	return Out;
 }
@@ -438,24 +447,24 @@ technique11 DefaultTechnique
 
 	pass HitPass
 	{
-		SetRasterizerState(RS_Default);
+		SetRasterizerState(RS_OutLine);
 		SetDepthStencilState(DSS_Default, 0);
 		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-		VertexShader = compile vs_5_0 VS_MAIN();
+		VertexShader = compile vs_5_0 OutLine_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 Hit_MAIN();
 	}
 
 	pass NHitPass
 	{
-		SetRasterizerState(RS_Default);
+		SetRasterizerState(RS_OutLine);
 		SetDepthStencilState(DSS_Default, 0);
 		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-		VertexShader = compile vs_5_0 VS_MAIN();
+		VertexShader = compile vs_5_0 OutLine_MAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 NHit_MAIN();
+		PixelShader = compile ps_5_0 Hit_MAIN();
 	}
 
 	pass FinishPass

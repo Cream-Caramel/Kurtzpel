@@ -56,10 +56,10 @@ HRESULT CTheo::Initialize(void * pArg)
 	m_eCurState = APPEAR;
 	m_eNextState = APPEAR;
 	m_vTargetLook = { 0.f,0.f,1.f };
-
+	m_fOutLinePower = 8.f;
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 50;
+	m_fMaxHp = 500;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 95.f;
@@ -208,12 +208,6 @@ HRESULT CTheo::Render()
 					return E_FAIL;
 			}
 
-			else if (m_bHit)
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
-					return E_FAIL;
-			}
-
 			else if (m_bFinish)
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NFINISH)))
@@ -234,12 +228,6 @@ HRESULT CTheo::Render()
 					return E_FAIL;
 			}
 
-			else if (m_bHit)
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
-					return E_FAIL;
-			}
-
 			else if (m_bFinish)
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
@@ -251,6 +239,28 @@ HRESULT CTheo::Render()
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
 					return E_FAIL;
 			}
+		}
+
+		if (m_bHit)
+		{
+			if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+				return E_FAIL;
+
+			_uint		iNumViewport = 1;
+
+			D3D11_VIEWPORT		ViewportDesc;
+
+			m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
+
+			m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
+			m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
+			m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
+				return E_FAIL;
 		}
 	}
 

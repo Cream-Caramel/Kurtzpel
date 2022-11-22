@@ -65,7 +65,7 @@ HRESULT CDragon::Initialize(void * pArg)
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 90.f;
 	m_fDamage = 10.f;
-
+	m_fOutLinePower = 10.f;
 	m_fColiisionTime = 0.1f;
 
 	m_pTarget = PM->Get_PlayerPointer();
@@ -229,57 +229,46 @@ HRESULT CDragon::Render()
 			return E_FAIL;
 
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
+			return E_FAIL;
+
+		if (m_bPattern)
 		{
-			if (m_bPattern)
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NPATTERN)))
-					return E_FAIL;
-			}
-
-			else if (m_bHit)
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
-					return E_FAIL;
-			}
-
-			else if (m_bFinish)
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NFINISH)))
-					return E_FAIL;
-			}
-
-			else
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NDEFAULT)))
-					return E_FAIL;
-			}
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
+				return E_FAIL;
 		}
+
+		else if (m_bFinish)
+		{
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
+				return E_FAIL;
+		}
+
 		else
 		{
-			if (m_bPattern)
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
-					return E_FAIL;
-			}
-
-			else if (m_bHit)
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_HIT)))
-					return E_FAIL;
-			}
-
-			else if (m_bFinish)
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
-					return E_FAIL;
-			}
-
-			else
-			{
-				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
-					return E_FAIL;
-			}
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
+				return E_FAIL;
 		}
+		if (m_bHit)
+		{
+			if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+				return E_FAIL;
+
+			_uint		iNumViewport = 1;
+
+			D3D11_VIEWPORT		ViewportDesc;
+
+			m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
+
+			m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
+			m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
+			m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
+				return E_FAIL;
+		}	
 	}
 
 	for (int i = 0; i < OBB_END; ++i)

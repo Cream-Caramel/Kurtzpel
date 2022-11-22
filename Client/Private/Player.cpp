@@ -58,7 +58,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_eCurState = IDLE;
 	m_eNextState = IDLE;
 	m_vTargetLook = { 0.f,0.f,1.f};
-
+	m_fOutLinePower = 5.f;
 	Set_AniInfo();
 
 	for (int i = 0; i < MODEL_END; ++i)
@@ -103,7 +103,7 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_5))
 	{	
-		
+	
 	}
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
@@ -147,8 +147,10 @@ void CPlayer::LateTick(_float fTimeDelta)
 		m_pAnimModel[i]->Play_Animation(fTimeDelta, m_pAnimModel[i]);
 	}
 
+	
 	for (auto& pPart : m_Parts)
-		pPart->LateTick(fTimeDelta);
+		pPart->LateTick(fTimeDelta);		
+	
 
 	End_Animation();
 
@@ -188,7 +190,7 @@ HRESULT CPlayer::Render()
 	{
 		if (m_pAnimModel[i] != nullptr)
 		{		
-			//m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+			m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
 				
 			_uint		iNumMeshes = m_pAnimModel[i]->Get_NumMeshes();
 			for (_uint j = 0; j < iNumMeshes; ++j)
@@ -197,16 +199,62 @@ HRESULT CPlayer::Render()
 					return E_FAIL;
 
 				if (FAILED(m_pAnimModel[i]->SetUp_OnShader(m_pShaderCom, m_pAnimModel[i]->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
-				{			
-					if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_NDEFAULT)))
-						return E_FAIL;		
+				{							
+					
+					if (!m_bCollision)
+					{
+						if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
+							return E_FAIL;
+
+						if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+							return E_FAIL;
+
+						_uint		iNumViewport = 1;
+
+						D3D11_VIEWPORT		ViewportDesc;
+
+						m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
+
+						m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
+						m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
+						m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+
+						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_NHIT)))
+							return E_FAIL;
+					}			
+					
+						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_NDEFAULT)))
+							return E_FAIL;
+					
 				}
 				else
-				{
-				
-					if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_DEFAULT)))
-						return E_FAIL;
+				{													
+					
+					if (!m_bCollision)
+					{
+						if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
+							return E_FAIL;
 
+						if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+							return E_FAIL;
+
+						_uint		iNumViewport = 1;
+
+						D3D11_VIEWPORT		ViewportDesc;
+
+						m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
+
+						m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
+						m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
+						m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+
+						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_HIT)))
+							return E_FAIL;
+					}
+					
+						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_DEFAULT)))
+							return E_FAIL;
+					
 				}		
 			}	
 		}
@@ -230,6 +278,12 @@ void CPlayer::Collision(CGameObject * pOther, string sTag)
 {
 	if (sTag == "Monster_Attack")
 	{
+		for (auto& pPart : m_Parts)
+		{
+			if(pPart->Get_MaxHp() != 0.1f)
+				pPart->Set_Collision(false);
+		}			
+
 		if (m_bMotionChange)
 		{
 			if (m_eCurState == HITBACK)
@@ -2434,6 +2488,11 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::BLADEATTACK:
 		if (!m_pAnimModel[0]->GetChangeBool())
 		{
+			for (auto& pPart : m_Parts)
+			{
+				if (pPart->Get_MaxHp() != 0.1f)
+					pPart->Set_Collision(false);
+			}
 			m_bCollision = false;
 			m_bMotionChange = false;
 			if (m_bDoubleSlashFov)
@@ -2469,6 +2528,11 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::SLASHATTACK:
+		for (auto& pPart : m_Parts)
+		{
+			if (pPart->Get_MaxHp() != 0.1f)
+				pPart->Set_Collision(false);
+		}
 		m_bCollision = false;
 		m_bMotionChange = false;
 		Set_SwordTrailMatrix();

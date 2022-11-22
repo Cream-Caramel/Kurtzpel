@@ -61,6 +61,7 @@ protected:
 	_float				m_fCamDistance = 0.f;
 	_float m_fCollisionAcc = 0.f; // 충돌쿨타임 누적시간
 	_float m_fColiisionTime; // 충돌 쿨타임
+	_float m_fOutLinePower;
 	_bool				m_bDead = false;
 	_bool				m_bCollision = false;
 	_bool				m_bRenderObj = false;

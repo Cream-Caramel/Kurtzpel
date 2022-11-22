@@ -17,6 +17,12 @@ CullMode = None;
 
 };
 
+RasterizerState RS_OutLine
+{
+
+	CullMode = Front;
+
+};
 
 RasterizerState RS_Default
 {
@@ -40,6 +46,12 @@ DepthStencilState DSS_Skybox
 {
 	DepthEnable = false;
 	DepthWriteMask = zero;	
+};
+
+DepthStencilState DSS_OutLine
+{
+	DepthWriteMask = zero;
+
 };
 
 

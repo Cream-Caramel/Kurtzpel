@@ -33,11 +33,23 @@ HRESULT CPlayerHairSide::Initialize(void * pArg)
 
 	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 90.f, _float3{ 0.f,1.f,0.f }, 90.f, _float3{ 0.f,0.f,1.f }, 0.f);
 
+	m_fOutLinePower = 3.f;
+	m_fColiisionTime = 1.2f;
+	m_bCollision = false;
 	return S_OK;
 }
 
 void CPlayerHairSide::Tick(_float fTimeDelta)
 {
+	if (!m_bCollision)
+	{
+		m_fCollisionAcc += 1.f * fTimeDelta;
+		if (m_fCollisionAcc >= m_fColiisionTime)
+		{
+			m_fCollisionAcc = 0.f;
+			m_bCollision = true;
+		}
+	}
 }
 
 void CPlayerHairSide::LateTick(_float fTimeDelta)
@@ -75,12 +87,42 @@ HRESULT CPlayerHairSide::Render()
 	{
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
-		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))			
+		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
 			return E_FAIL;
-		
+
+		_matrix SumMatrix = m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix();
+		_float4x4		OutLineWorldMatrix;
+
+		XMStoreFloat4x4(&OutLineWorldMatrix, XMMatrixInverse(nullptr, SumMatrix));
+
+		if (!m_bCollision)
+		{
+			if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &OutLineWorldMatrix, sizeof(_float4x4))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+				return E_FAIL;
+
+			_uint		iNumViewport = 1;
+
+			D3D11_VIEWPORT		ViewportDesc;
+
+			m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
+
+			m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
+			m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
+			m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+
+			if (FAILED(m_pShaderCom->Begin(MODEL_HIT)))
+				return E_FAIL;
+
+			if (FAILED(m_pModel->Render(i)))
+				return E_FAIL;
+
+		}
+
 		if (FAILED(m_pShaderCom->Begin(MODEL_DEFAULT)))
 			return E_FAIL;
-		
 
 		if (FAILED(m_pModel->Render(i)))
 			return E_FAIL;
