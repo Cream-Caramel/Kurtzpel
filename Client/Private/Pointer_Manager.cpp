@@ -28,6 +28,16 @@ _float3 CPointer_Manager::Get_BossPos()
 	return m_pBoss->Get_Pos();
 }
 
+_float3 CPointer_Manager::Get_BossLook()
+{
+	return m_pBoss->Get_Look();
+}
+
+_float3 CPointer_Manager::Get_BossRight()
+{
+	return m_pBoss->Get_Right();
+}
+
 void CPointer_Manager::Add_CameraPlayer(CCamera_Player * pCameraPlayer)
 {
 	m_pCameraPlayer = pCameraPlayer;
@@ -153,6 +163,11 @@ _bool CPointer_Manager::Get_BossFinish()
 _bool CPointer_Manager::Get_GolemRockOn()
 {
 	return ((CGolem*)m_pBoss)->Get_RockOn();
+}
+
+CPlayer::STATE CPointer_Manager::Get_PlayerState()
+{
+	return m_pPlayer->Get_State();
 }
 
 void CPointer_Manager::Free()

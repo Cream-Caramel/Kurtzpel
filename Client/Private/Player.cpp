@@ -17,6 +17,7 @@
 #include "PlayerGage2.h"
 #include "Wall.h"
 #include "Ring.h"
+#include "PlayerHit1.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -394,7 +395,6 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"HitBack.ogg", SD_PLAYERVOICE, 0.9f);
@@ -404,7 +404,6 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"HitFront.ogg", SD_PLAYERVOICE, 0.9f);
@@ -414,7 +413,6 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		m_bAction = false;
@@ -424,7 +422,6 @@ void CPlayer::Set_State(STATE eState)
 		{
 			m_bAction = false;
 			Change_WeaponPos();
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 		}
 		m_bAction = false;
 		break;
@@ -441,7 +438,6 @@ void CPlayer::Set_State(STATE eState)
 		{
 			m_bAction = false;
 			Change_WeaponPos();
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 		}
 		{
 			_float4 WorldPos;
@@ -461,7 +457,6 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		m_bAction = false;
@@ -473,7 +468,6 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"Dash.ogg", SD_PLAYER1, 0.6f);
@@ -494,7 +488,6 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		m_bAction = false;
@@ -517,7 +510,6 @@ void CPlayer::Set_State(STATE eState)
 		{
 			m_fRunSoundAcc = m_fRunSoundTempo - 0.01f;
 			m_bAction = false;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		m_fRunSpeed = 8.f;
@@ -539,9 +531,9 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
+		m_bSpinComboHit = false;
 		GI->PlaySoundW(L"SpinComboStart.ogg", SD_PLAYER1, 0.6f);
 		CRM->Start_Fov(50.f, 100.f);
 		m_fNowMp -= 15.f;
@@ -555,9 +547,9 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
+		m_bFastComboHit = false;
 		GI->PlaySoundW(L"FastVoice.ogg", SD_PLAYERVOICE, 0.9f);
 		m_fNowMp -= 10.f;
 		m_fFastComboStartSpeed = 5.f;
@@ -569,7 +561,6 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		m_bAction = true;
@@ -593,7 +584,6 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		m_bCharge1 = false;
@@ -610,7 +600,6 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"AttackVoice1.ogg", SD_PLAYERVOICE, 0.9f);
@@ -656,7 +645,6 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"VoidFront.ogg", SD_PLAYER1, 0.6f);
@@ -670,7 +658,6 @@ void CPlayer::Set_State(STATE eState)
 		if (m_bAction)
 		{
 			m_bAction = false;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(false);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"VoidBack.ogg", SD_PLAYER1, 0.6f);
@@ -683,7 +670,6 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		Update_SwordTrails(NOMALCOMBO1);
@@ -711,6 +697,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::NOMALCOMBO3:
+		m_bNomal3Hit = false;
 		CRM->Fix_Fov(40.f, 90.f);
 		RastAttackVoice();
 		GI->PlaySoundW(L"NormalCombo3.ogg", SD_PLAYER1, 0.6f);
@@ -720,6 +707,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(2);
 		break;
 	case Client::CPlayer::NOMALCOMBO4:
+		m_bNomal4Hit = false;
 		CRM->Fix_Fov(40.f, 90.f);
 		RastAttackVoice();
 		GI->PlaySoundW(L"NormalCombo4.ogg", SD_PLAYER1, 0.6f);
@@ -750,7 +738,6 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"BladeAttackStart.ogg", SD_PLAYER1, 1.f);
@@ -762,7 +749,6 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		m_bDoubleSlash = true;
@@ -779,7 +765,6 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		GI->PlaySoundW(L"AttackVoice6.ogg", SD_PLAYERVOICE, 0.9f);
@@ -799,7 +784,6 @@ void CPlayer::Set_State(STATE eState)
 		if (!m_bAction)
 		{
 			m_bAction = true;
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_Trail(true);
 			Change_WeaponPos();
 		}
 		m_bCharge1 = false;
@@ -1251,10 +1235,12 @@ void CPlayer::Get_KeyInput(_float fTimeDelta)
 }
 
 void CPlayer::Set_FastComboTime(_float fTimeDelta)
-{
-	
+{	
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
-	{
+	{		
+		m_bFastComboHit = true;
+		HitEffect();
+		
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
 		CRM->Start_Fov(57.f, 100.f);
 		CRM->Set_FovDir(true);
@@ -1266,6 +1252,8 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
 	{
+		m_bFastComboHit = false;
+		HitEffect();
 		CRM->Start_Fov(57.f, 100.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
@@ -1277,6 +1265,8 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(5) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(6))
 	{
+		m_bFastComboHit = true;
+		HitEffect();
 		CRM->Start_Fov(57.f, 100.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
@@ -1288,6 +1278,8 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(7) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(8))
 	{
+		m_bFastComboHit = false;
+		HitEffect();
 		CRM->Start_Fov(57.f, 100.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
@@ -1299,6 +1291,8 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(9) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(10))
 	{
+		m_bFastComboHit = true;
+		HitEffect();
 		CRM->Start_Fov(57.f, 100.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
@@ -1310,6 +1304,8 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(11) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(12))
 	{
+		m_bFastComboHit = false;
+		HitEffect();
 		CRM->Start_Fov(57.f, 100.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
@@ -1321,6 +1317,8 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(13) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(14))
 	{
+		m_bFastComboHit = true;
+		HitEffect();
 		CRM->Start_Fov(57.f, 100.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
@@ -1332,6 +1330,8 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(15) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(16))
 	{
+		m_bFastComboHit = false;
+		HitEffect();
 		CRM->Start_Fov(57.f, 100.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
@@ -1343,6 +1343,8 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(17) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(18))
 	{
+		m_bFastComboHit = true;
+		HitEffect();
 		CRM->Start_Fov(57.f, 100.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
@@ -1354,6 +1356,8 @@ void CPlayer::Set_FastComboTime(_float fTimeDelta)
 
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(19) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(20))
 	{
+		m_bFastComboHit = false;
+		HitEffect();
 		CRM->Start_Fov(57.f, 100.f);
 		CRM->Start_Shake(0.2f, 3.f, 0.03f);
 		m_Parts[PARTS_SWORD]->Set_Collision(true);
@@ -1889,6 +1893,7 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
+			HitEffect();
 			Update_SwordTrails(SPINCOMBOEND);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			CRM->Start_Shake(0.3f, 3.f, 0.03f);
@@ -1908,7 +1913,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 		m_fSpinComboAcc += 1.f * fTimeDelta;
 		if (m_fSpinComboAcc >= 0.3f)
-		{
+		{			
 			Update_SwordTrails(SPINCOMBOLOOF);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			m_fSpinComboAcc = 0.f;
@@ -1933,6 +1938,8 @@ void CPlayer::Update(_float fTimeDelta)
 
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
 		{
+			HitEffect();
+			m_bSpinComboHit = true;
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			Update_SwordTrails(SPINCOMBOSTART);
 
@@ -1944,7 +1951,7 @@ void CPlayer::Update(_float fTimeDelta)
 		{
 			m_fSpinComboLoofAcc += 1.f * fTimeDelta;
 			if (m_fSpinComboLoofAcc >= m_fSpinComboLoofTempo)
-			{
+			{			
 				Update_SwordTrails(SPINCOMBOLOOF);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				GI->PlaySoundW(L"SpinComboLoof.ogg", SD_PLAYER1, 0.6f);
@@ -1964,6 +1971,7 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 		{
+			HitEffect();
 			Update_SwordTrails(FASTCOMBOEND);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			CRM->Start_Shake(0.3f, 4.f, 0.04f);
@@ -2005,6 +2013,7 @@ void CPlayer::Update(_float fTimeDelta)
 				GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				CRM->Start_Shake(0.3f, 3.f, 0.03f);
+				HitEffect();
 
 			}
 			else
@@ -2161,7 +2170,10 @@ void CPlayer::Update(_float fTimeDelta)
 			Update_SwordTrails(AIRCOMBO1);
 
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		{
+			HitEffect();
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
@@ -2189,7 +2201,10 @@ void CPlayer::Update(_float fTimeDelta)
 			Update_SwordTrails(AIRCOMBO2);
 
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		{
+			HitEffect();
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
@@ -2217,7 +2232,10 @@ void CPlayer::Update(_float fTimeDelta)
 			Update_SwordTrails(AIRCOMBO3);
 
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		{
+			HitEffect();
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
@@ -2246,6 +2264,7 @@ void CPlayer::Update(_float fTimeDelta)
 				EffectInfo.WorldMatrix.r[1].m128_f32[1] = m_pNavigation->Get_PosY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
 				GI->Add_GameObjectToLayer(L"PlayerRockBreak", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
+				HitEffect();
 
 				{
 					_float4 WorldPos;
@@ -2271,6 +2290,11 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::VOIDFRONT:
 		if (UM->Get_Count() > 0)
 			m_bCollision = false;
+		for (auto& pPart : m_Parts)
+		{
+			if (pPart->Get_MaxHp() != 0.1f)
+				pPart->Set_Collision(false);
+		}
 		if (m_fVoidFront > 0.5f)
 			m_fVoidFront -= 0.5f;
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fVoidFront, m_pNavigation, fTimeDelta);
@@ -2284,6 +2308,11 @@ void CPlayer::Update(_float fTimeDelta)
 	case Client::CPlayer::VOIDBACK:
 		if (UM->Get_Count() > 0)
 			m_bCollision = false;
+		for (auto& pPart : m_Parts)
+		{
+			if (pPart->Get_MaxHp() != 0.1f)
+				pPart->Set_Collision(false);
+		}
 		if (m_fVoidBack > 0.5f)
 			m_fVoidBack += 0.2f;
 		m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), -m_fVoidBack, m_pNavigation, fTimeDelta);
@@ -2303,7 +2332,10 @@ void CPlayer::Update(_float fTimeDelta)
 			m_pTransformCom->Go_Dir(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fNC1Speed, m_pNavigation, fTimeDelta);
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+		{
+			HitEffect();
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
+		}
 		else
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 		break;
@@ -2323,7 +2355,10 @@ void CPlayer::Update(_float fTimeDelta)
 			}
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
+			{
+				HitEffect();
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
+			}
 			else
 				m_Parts[PARTS_SWORD]->Set_Collision(false);
 		}
@@ -2340,6 +2375,8 @@ void CPlayer::Update(_float fTimeDelta)
 			}
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			{
+				HitEffect();
+				m_bNomal3Hit = true;
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				return;
 			}
@@ -2373,6 +2410,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
 			{
+				HitEffect();
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				return;
 			}
@@ -2396,6 +2434,8 @@ void CPlayer::Update(_float fTimeDelta)
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(2) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(3))
 			{
+				HitEffect();
+				m_bNomal4Hit = true;
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				return;
 			}
@@ -2404,6 +2444,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
 			{
+				HitEffect();
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				return;
 			}
@@ -2434,6 +2475,7 @@ void CPlayer::Update(_float fTimeDelta)
 				GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.5f);
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				CRM->Start_Shake(0.2f, 2.f, 0.02f);
+				HitEffect();
 			}
 			else
 				m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -2462,6 +2504,7 @@ void CPlayer::Update(_float fTimeDelta)
 				m_Parts[PARTS_SWORD]->Set_Collision(true);
 				GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
 				CRM->Start_Shake(0.3f, 3.f, 0.03f);
+				HitEffect();
 			}
 			else
 				m_Parts[PARTS_SWORD]->Set_Collision(false);
@@ -2813,6 +2856,171 @@ void CPlayer::Set_SwordTrailMatrix()
 		_matrix PlayerMatrix = m_pAnimModel[MODEL_PLAYER]->Get_PivotMatrix()* m_pTransformCom->Get_WorldMatrix();
 		m_SwordTrails[i]->SetUp_State(PlayerMatrix);
 	}
+}
+
+void CPlayer::HitEffect()
+{	
+	CPlayerHit1::PLAYERHIT1INFO PlayerHit1Info;
+	PlayerHit1Info.vWorldMatrix = m_pTransformCom->Get_WorldMatrix();
+	_vector Look = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_vector Right = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+	
+	switch (m_eCurState)
+	{
+	
+	case Client::CPlayer::SPINCOMBOEND:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 7.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * 6.f;
+		PlayerHit1Info.vScale = _float3{ 12.f,12.f,12.f };
+		PlayerHit1Info.fRotation = 40.f;
+		break;
+	case Client::CPlayer::SPINCOMBOLOOF:
+		
+		break;
+	case Client::CPlayer::SPINCOMBOSTART:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 6.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * 5.5f;
+		PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+		PlayerHit1Info.fRotation = 40.f;	
+		break;
+	case Client::CPlayer::FASTCOMBOEND:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 6.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -8.5f;
+		PlayerHit1Info.vScale = _float3{ 12.f,12.f,12.f };
+		PlayerHit1Info.fRotation = -50.f;
+		break;
+	case Client::CPlayer::FASTCOMBOSTART:
+		if (!m_bFastComboHit)
+		{
+			PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 6.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * 8.5f;
+			PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+			PlayerHit1Info.fRotation = 50.f;
+		}
+		else
+		{
+			PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 6.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -8.5f;
+			PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+			PlayerHit1Info.fRotation = -50.f;
+		}
+		break;
+	case Client::CPlayer::ROCKBREAK:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 4.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * 0.6f;
+		PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+		PlayerHit1Info.fRotation = 10.f;
+		break;
+	case Client::CPlayer::CHARGECRASH:
+		break;	
+	case Client::CPlayer::AIRCOMBO1:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 4.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -1.f;
+		PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+		PlayerHit1Info.fRotation = -10.f;
+		break;
+	case Client::CPlayer::AIRCOMBO2:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 4.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * 1.5f;
+		PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+		PlayerHit1Info.fRotation = 20.f;
+		break;
+	case Client::CPlayer::AIRCOMBO3:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 4.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * 1.5f;
+		PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+		PlayerHit1Info.fRotation = 20.f;
+		break;
+	case Client::CPlayer::AIRCOMBO4:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 4.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -0.2f;
+		PlayerHit1Info.vScale = _float3{ 9.f,9.f,9.f };
+		PlayerHit1Info.fRotation = 0.f;
+		break;
+	case Client::CPlayer::AIRCOMBOEND:
+		break;
+	case Client::CPlayer::NOMALCOMBO1:	
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 6.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -9.f;
+		PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+		PlayerHit1Info.fRotation = -50.f;
+		break;
+	case Client::CPlayer::NOMALCOMBO2:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] += 1.3f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -11.5f;
+		PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+		PlayerHit1Info.fRotation = -90.f;
+		break;
+	case Client::CPlayer::NOMALCOMBO3:
+		if (!m_bNomal3Hit)
+		{
+			PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 4.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -3.f;
+			PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+			PlayerHit1Info.fRotation = -30.f;
+		}
+		else
+		{
+			PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] += 3.5f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -14.f;
+			PlayerHit1Info.vScale = _float3{ 10.f,10.f,10.f };
+			PlayerHit1Info.fRotation = -100.f;
+		}
+		break;
+	case Client::CPlayer::NOMALCOMBO4:
+		if (!m_bNomal4Hit)
+		{
+			PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 4.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -1.f;
+			PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+			PlayerHit1Info.fRotation = -10.f;
+		}
+		else
+		{
+			PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 4.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+			PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -1.f;
+			PlayerHit1Info.vScale = _float3{ 9.f,7.f,9.f };
+			PlayerHit1Info.fRotation = -10.f;
+		}
+		break;
+	case Client::CPlayer::NOMALCOMBO5:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 4.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -0.2f;
+		PlayerHit1Info.vScale = _float3{ 7.f,7.f,7.f };
+		PlayerHit1Info.fRotation = 0.f;
+		break;
+	case Client::CPlayer::NOMALCOMBO6:
+		PlayerHit1Info.vWorldMatrix.r[3].m128_f32[1] -= 4.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Look * 3.f;
+		PlayerHit1Info.vWorldMatrix.r[3] = PlayerHit1Info.vWorldMatrix.r[3] + Right * -0.2f;
+		PlayerHit1Info.vScale = _float3{ 9.f,9.f,9.f };
+		PlayerHit1Info.fRotation = 0.f;
+		break;
+	case Client::CPlayer::BLADEATTACK:
+		break;
+	case Client::CPlayer::SLASHATTACK:
+		break;	
+	case Client::CPlayer::EX1ATTACK:
+		break;	
+	}
+	GI->Add_GameObjectToLayer(L"PlayerHit1", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerHit1Info);
 }
 
 void CPlayer::Jump_KeyInput(_float fTimeDelta)

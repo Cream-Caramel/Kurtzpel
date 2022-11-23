@@ -58,7 +58,7 @@ HRESULT CGolem::Initialize(void * pArg)
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 	m_fOutLinePower = 10.f;
 
-	m_fMaxHp = 100;
+	m_fMaxHp = 500;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 90.f;
@@ -110,7 +110,9 @@ void CGolem::Tick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
 	if (GI->Key_Down(DIK_I))
-		m_bRockOn = true;
+	{
+
+	}
 
 	if (!m_bCollision)
 	{
@@ -301,6 +303,7 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 
 	if (sTag == "Player_Sword")
 	{
+
 		if (pOther->Can_Hit())
 		{
 			if (m_bPattern && pOther->Get_Damage() == 1.f || m_bPattern && pOther->Get_Damage() == 100.f)
@@ -1375,6 +1378,8 @@ void CGolem::CreateLight()
 		GI->Add_GameObjectToLayer(L"PlayerLight", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerLightInfo);
 	}
 }
+
+
 
 CGolem * CGolem::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {

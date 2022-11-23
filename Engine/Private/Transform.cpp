@@ -304,6 +304,15 @@ _float CTransform::Get_ScaleAxis(AXIS eAxis)
 	return 0.f;
 }
 
+void CTransform::TurnAngle(_fvector vAxis, _float _fAngle)
+{
+	_matrix		RotationMatrix = XMMatrixRotationAxis(vAxis, _fAngle);
+
+	Set_State(CTransform::STATE_RIGHT, XMVector3TransformNormal(Get_State(CTransform::STATE_RIGHT), RotationMatrix));
+	Set_State(CTransform::STATE_UP, XMVector3TransformNormal(Get_State(CTransform::STATE_UP), RotationMatrix));
+	Set_State(CTransform::STATE_LOOK, XMVector3TransformNormal(Get_State(CTransform::STATE_LOOK), RotationMatrix));
+}
+
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 {
 	_matrix		RotationMatrix = XMMatrixRotationAxis(vAxis, m_TransformDesc.fRotationPerSec * fTimeDelta);

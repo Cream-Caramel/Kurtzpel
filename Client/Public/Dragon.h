@@ -67,6 +67,7 @@ private:
 	void CreateFire2();
 	void CreateTrail(TRAILSTATE eTS);
 	void CreateLight(_float4 WorldPos);
+	void HitEffect();
 private:
 	STATE m_eCurState; // 현재 상태
 	STATE m_eNextState; // 바꿔야할 상태

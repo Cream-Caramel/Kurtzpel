@@ -76,6 +76,7 @@ public:
 	void Set_ScaleAxis(AXIS eAxis, _float fScale);
 	_float Get_ScaleAxis(AXIS eAxis);
 
+	void TurnAngle(_fvector vAxis, _float _fAngle);
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void Turn(_fvector StartLook, _fvector EndLook, _float _fRatio);
 	void TurnY(_fvector StartLook, _fvector EndLook, _float _fRatio);

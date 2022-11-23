@@ -205,6 +205,10 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CPlayerTrailSub2::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerHit1"),
+		CPlayerHit1::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerLight"),
 		CPlayerLight::Create(m_pDevice, m_pContext))))
 		return E_FAIL;

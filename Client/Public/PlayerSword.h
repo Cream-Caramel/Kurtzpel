@@ -27,11 +27,8 @@ public:
 	void Set_OBB(_float3 vSize);
 	void Set_RHand();
 	void Set_Spine();
-	void Set_Trail(_bool bTrail);
-
 
 private:
-	_bool m_bTrail = false;
 	CModel* m_pModel = nullptr;
 	COBB* m_pOBB = nullptr;
 	CPlayer* m_pPlayer = nullptr;

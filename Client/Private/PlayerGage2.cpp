@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\PlayerGage2.h"
 #include "GameInstance.h"
+#include "Pointer_Manager.h"
 
 CPlayerGage2::CPlayerGage2(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)

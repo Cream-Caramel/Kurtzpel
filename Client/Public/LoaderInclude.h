@@ -59,6 +59,7 @@
 #include "GolemSkillRock1.h"
 #include "GolemSkillRock2.h"
 #include "DragonTrail.h"
+#include "PlayerHit1.h"
 
 //Anim
 #include "PlayerRockBreak.h"

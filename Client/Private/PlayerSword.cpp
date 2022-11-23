@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "Trail.h"
 #include "Particle_Manager.h"
+#include "PlayerHit1.h"
 
 CPlayerSword::CPlayerSword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)
@@ -75,19 +76,24 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 
 void CPlayerSword::Tick(_float fTimeDelta)
 {
-	/*if (GI->Key_Down(DIK_0))
+	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
 
 	if (GI->Key_Down(DIK_P))
 	{
-		_float4 OriginPos;
+
+		/*_float4 OriginPos;
 		_float4 ParentPos;
 		XMStoreFloat4(&OriginPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-		XMStoreFloat4(&ParentPos, m_pParentTransformCom->Get_State(CTransform::STATE_POSITION));
-		_matrix _WorldMatrix;
-		_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix();
+		XMStoreFloat4(&ParentPos, m_pParentTransformCom->Get_State(CTransform::STATE_POSITION));*/
+		// * m_pParentTransformCom->Get_WorldMatrix()
+		/*_matrix _WorldMatrix;
+		_WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+		CPlayerHit1::PLAYERHIT1INFO PlayerHit1Info;
+		PlayerHit1Info.vWorldMatrix = _WorldMatrix;
+		GI->Add_GameObjectToLayer(L"PlayerHit1", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerHit1Info);*/
 
-		_float3 Center = m_pOBB->Get_Center();
+		/*_float3 Center = m_pOBB->Get_Center();
 		
 		XMStoreFloat3(&Center, XMVector3TransformCoord(XMLoadFloat3(&Center), _WorldMatrix));
 	
@@ -95,9 +101,12 @@ void CPlayerSword::Tick(_float fTimeDelta)
 		WorldPos.x = Center.x;
 		WorldPos.y = Center.y;
 		WorldPos.z = Center.z;
-		WorldPos.w = 1.f;
-		PTM->CreateParticle(L"Hit", WorldPos, true, CAlphaParticle::DIR_END);
-	}*/
+		WorldPos.w = 1.f;*/
+
+
+
+		//PTM->CreateParticle(L"Hit", WorldPos, true, CAlphaParticle::DIR_END);
+	}
 
 
 }
@@ -172,6 +181,13 @@ void CPlayerSword::Collision(CGameObject * pOther, string sTag)
 		GI->Set_StaticLight(0.2f, 8.f, vPos, 0);
 		CRM->Start_Shake(0.2f, 2.f, 0.03f);
 		
+	
+		/*_matrix _WorldMatrix;
+		_WorldMatrix = m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix();
+		CPlayerHit1::PLAYERHIT1INFO PlayerHit1Info;
+		PlayerHit1Info.vWorldMatrix = _WorldMatrix;
+		GI->Add_GameObjectToLayer(L"PlayerHit1", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerHit1Info);*/
+
 	}
 	
 
@@ -194,12 +210,6 @@ void CPlayerSword::Set_Spine()
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, _vector{ -0.3f,0.f,-0.4f,1.f });
 	m_pTransformCom->RotationThree(_float3{ 1.f,0.f,0.f }, 95.f, _float3{ 0.f,1.f,0.f }, 27.f, _float3{ 0.f,0.f,1.f }, 20.f);
 }
-
-void CPlayerSword::Set_Trail(_bool bTrail)
-{
-	m_bTrail = bTrail;
-}
-
 
 
 CPlayerSword * CPlayerSword::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

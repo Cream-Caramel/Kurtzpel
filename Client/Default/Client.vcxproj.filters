@@ -226,6 +226,9 @@
     <Filter Include="02.GameObjects\Effect\Dragon\DragonFire2">
       <UniqueIdentifier>{0142f1d1-7f7b-4f27-a0b0-2c45b137d5b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Player\Hit1">
+      <UniqueIdentifier>{001b1da8-7a8b-4aee-bae6-70181dc3716e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -501,6 +504,9 @@
     <ClInclude Include="..\Public\DragonFire2.h">
       <Filter>02.GameObjects\Effect\Dragon\DragonFire2</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PlayerHit1.h">
+      <Filter>02.GameObjects\Effect\Player\Hit1</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -757,6 +763,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\DragonFire2.cpp">
       <Filter>02.GameObjects\Effect\Dragon\DragonFire2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerHit1.cpp">
+      <Filter>02.GameObjects\Effect\Player\Hit1</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

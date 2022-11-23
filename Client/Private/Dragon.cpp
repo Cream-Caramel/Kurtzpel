@@ -1871,6 +1871,10 @@ void CDragon::CreateLight(_float4 WorldPos)
 	
 }
 
+void CDragon::HitEffect()
+{
+}
+
 CDragon * CDragon::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CDragon*		pInstance = new CDragon(pDevice, pContext);

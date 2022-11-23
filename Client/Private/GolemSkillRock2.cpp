@@ -5,7 +5,7 @@
 #include "OBB.h"
 #include "Collider_Manager.h"
 #include "Particle_Manager.h"
-
+#include "Pointer_Manager.h"
 CGolemSkillRock2::CGolemSkillRock2(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)
 {

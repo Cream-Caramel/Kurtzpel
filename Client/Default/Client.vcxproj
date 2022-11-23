@@ -226,6 +226,7 @@
     <ClInclude Include="..\Public\PlayerHairSide.h" />
     <ClInclude Include="..\Public\PlayerHairTail.h" />
     <ClInclude Include="..\Public\PlayerHead.h" />
+    <ClInclude Include="..\Public\PlayerHit1.h" />
     <ClInclude Include="..\Public\PlayerLight.h" />
     <ClInclude Include="..\Public\PlayerRockBreak.h" />
     <ClInclude Include="..\Public\PlayerSword.h" />
@@ -316,6 +317,7 @@
     <ClCompile Include="..\Private\PlayerHairSide.cpp" />
     <ClCompile Include="..\Private\PlayerHairTail.cpp" />
     <ClCompile Include="..\Private\PlayerHead.cpp" />
+    <ClCompile Include="..\Private\PlayerHit1.cpp" />
     <ClCompile Include="..\Private\PlayerLight.cpp" />
     <ClCompile Include="..\Private\PlayerRockBreak.cpp" />
     <ClCompile Include="..\Private\PlayerSword.cpp" />

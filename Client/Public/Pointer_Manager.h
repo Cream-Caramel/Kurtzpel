@@ -1,6 +1,7 @@
 #pragma once
 #include "Base.h"
 #include "Client_Defines.h"
+#include "Player.h"
 BEGIN(Client)
 class CPlayer;
 class CCamera_Player;
@@ -19,6 +20,8 @@ public:
 	_float3 Get_PlayerPos();
 	CAnimMesh* Get_BossPointer() { return m_pBoss; }
 	_float3 Get_BossPos();
+	_float3 Get_BossLook();
+	_float3 Get_BossRight();
 	void Add_CameraPlayer(CCamera_Player* pCameraPlayer);
 	CCamera_Player* Get_CameraPlayer() { return m_pCameraPlayer; }
 	_float3 Get_CameraPlayerPos();
@@ -35,6 +38,8 @@ public:
 	void Set_PlayerGage2_2(_bool bPlayerGage) { m_bPlayerGage2_2 = bPlayerGage; }
 	_bool Get_PlayerGage2_2() { return m_bPlayerGage2_2; }
 	_bool Get_GolemRockOn();
+	CPlayer::STATE Get_PlayerState();
+	
 
 private:
 	LEVEL m_eLevel;

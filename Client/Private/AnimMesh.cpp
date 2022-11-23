@@ -68,6 +68,20 @@ _float3 CAnimMesh::Get_Pos()
 	return Pos;
 }
 
+_float3 CAnimMesh::Get_Right()
+{
+	_float3 Right;
+	XMStoreFloat3(&Right, m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+	return Right;
+}
+
+_float3 CAnimMesh::Get_Look()
+{
+	_float3 Look;
+	XMStoreFloat3(&Look, m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+	return Look;
+}
+
 void CAnimMesh::Set_Pos(_float4 Pos)
 {
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&Pos));
