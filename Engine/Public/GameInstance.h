@@ -40,6 +40,7 @@ public: /* For.Graphic_Device */
 	HRESULT Clear_BackBuffer_View(_float4 vClearColor);
 	HRESULT Clear_DepthStencil_View();
 	HRESULT Present();
+	ID3D11DepthStencilView* Get_ShadowDepthStencil();
 
 
 public: /* For.Level_Manager */				

@@ -174,51 +174,36 @@ HRESULT CGraphic_Device::Ready_DepthStencilRenderTargetView(_uint iWinCX, _uint 
 	if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &pDepthStencilTexture)))
 		return E_FAIL;
 
-	/* RenderTarget */
-	/* ShaderResource */
-	/* DepthStencil */
-
-
-
 	if (FAILED(m_pDevice->CreateDepthStencilView(pDepthStencilTexture, nullptr, &m_pDepthStencilView)))
 		return E_FAIL;	
 
-	D3D11_DEPTH_STENCIL_DESC dsDesc;
-
-	// Depth test parameters
-	dsDesc.DepthEnable = true;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-
-	// Stencil test parameters
-	dsDesc.StencilEnable = true;
-	dsDesc.StencilReadMask = 0xFF;
-	dsDesc.StencilWriteMask = 0xFF;
-
-	// Stencil operations if pixel is front-facing
-	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-	// Stencil operations if pixel is back-facing
-	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-	// Create depth stencil state
-	ID3D11DepthStencilState * pDSState;
-	if ((FAILED(m_pDevice->CreateDepthStencilState(&dsDesc, &pDSState))))
-	{
-		MSG_BOX(TEXT("StencilState"));
-		return E_FAIL;
-	}
-
-	m_pDeviceContext->OMSetDepthStencilState(pDSState, 0);
-	Safe_Release(pDSState);
-
 	Safe_Release(pDepthStencilTexture);
+
+	ID3D11Texture2D*		pShadowDepthStencilTexture = nullptr;
+
+	ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+	TextureDesc.Width = 1280 * 2;
+	TextureDesc.Height = 720 * 2;
+	TextureDesc.MipLevels = 1;
+	TextureDesc.ArraySize = 1;
+	TextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	TextureDesc.SampleDesc.Quality = 0;
+	TextureDesc.SampleDesc.Count = 1;
+
+	TextureDesc.Usage = D3D11_USAGE_DEFAULT;
+	TextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	TextureDesc.CPUAccessFlags = 0;
+	TextureDesc.MiscFlags = 0;
+
+	if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &pShadowDepthStencilTexture)))
+		return E_FAIL;
+
+	if (FAILED(m_pDevice->CreateDepthStencilView(pShadowDepthStencilTexture, nullptr, &m_pShadowDepthStencilView)))
+		return E_FAIL;
+
+	Safe_Release(pShadowDepthStencilTexture);
 
 	return S_OK;
 }
@@ -229,6 +214,7 @@ void CGraphic_Device::Free()
 	Safe_Release(m_pDepthStencilView);
 	Safe_Release(m_pBackBufferRTV);
 	Safe_Release(m_pDeviceContext);
+	Safe_Release(m_pShadowDepthStencilView);
 
 //#if defined(DEBUG) || defined(_DEBUG)
 //	ID3D11Debug* d3dDebug;

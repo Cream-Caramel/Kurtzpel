@@ -16,6 +16,7 @@ public:
 	HRESULT Clear_BackBuffer_View(_float4 vClearColor);
 	HRESULT Clear_DepthStencil_View();
 	HRESULT Present();
+	ID3D11DepthStencilView* Get_ShadowDepthStencil() { return m_pShadowDepthStencilView; }
 private:	
 
 	/* 메모리 할당. (정점버퍼, 인덱스버퍼, 텍스쳐로드) */
@@ -29,6 +30,7 @@ private:
 	// ID3D11ShaderResourceView*
 	ID3D11RenderTargetView*		m_pBackBufferRTV = nullptr;
 	ID3D11DepthStencilView*		m_pDepthStencilView = nullptr;
+	ID3D11DepthStencilView*		m_pShadowDepthStencilView = nullptr;
 
 private:
 	HRESULT Ready_SwapChain(HWND hWnd, GRAPHICDESC::WINMODE WinMode, _uint iWinCX, _uint iWinCY);

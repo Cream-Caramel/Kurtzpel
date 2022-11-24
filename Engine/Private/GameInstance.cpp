@@ -116,6 +116,14 @@ HRESULT CGameInstance::Present()
 	return m_pGraphic_Device->Present();
 }
 
+ID3D11DepthStencilView* CGameInstance::Get_ShadowDepthStencil()
+{
+	if (nullptr == m_pGraphic_Device)
+		return nullptr;
+
+	return m_pGraphic_Device->Get_ShadowDepthStencil();
+}
+
 HRESULT CGameInstance::Open_Level(_uint iLevelIndex, CLevel * pNewLevel)
 {
 	if (nullptr == m_pLevel_Manager)

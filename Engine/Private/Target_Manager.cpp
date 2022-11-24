@@ -2,6 +2,7 @@
 #include "RenderTarget.h"
 #include "VIBuffer_Rect.h"
 #include "Shader.h"
+#include "GameInstance.h"
 
 IMPLEMENT_SINGLETON(CTarget_Manager)
 
@@ -73,12 +74,38 @@ HRESULT CTarget_Manager::Begin_MRT(ID3D11DeviceContext * pContext, const _tchar 
 	for (auto& pRenderTarget : *pMRTList)
 	{		
 		pRenderTarget->Clear();
+	
 		RTVs[iNumRTVs++] = pRenderTarget->Get_RTV();
 	}
 
 		
 
 	pContext->OMSetRenderTargets(iNumRTVs, RTVs, m_pOldDepthStencil);
+
+	return S_OK;
+}
+
+HRESULT CTarget_Manager::Begin_ShadowMRT(ID3D11DeviceContext * pContext, const _tchar * pMRTTag)
+{
+	list<CRenderTarget*>*		pMRTList = Find_MRT(pMRTTag);
+	if (nullptr == pMRTList)
+		return E_FAIL;
+
+	_uint		iNumViews = 8;
+	pContext->OMGetRenderTargets(iNumViews, m_pOldRenderTargets, &m_pOldDepthStencil);
+
+	_uint			iNumRTVs = 0;
+
+	ID3D11RenderTargetView*			RTVs[8] = { nullptr };
+
+	for (auto& pRenderTarget : *pMRTList)
+	{
+		pRenderTarget->Clear();
+
+		RTVs[iNumRTVs++] = pRenderTarget->Get_RTV();
+	}
+
+	pContext->OMSetRenderTargets(iNumRTVs, RTVs, CGameInstance::Get_Instance()->Get_ShadowDepthStencil());
 
 	return S_OK;
 }
