@@ -45,7 +45,7 @@ HRESULT CRenderer::Initialize_Prototype()
 	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Specular"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_ShadowDepth"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, &_float4(0.0f, 0.f, 0.f, 1.f))))
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_ShadowDepth"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, &_float4(1.f, 1.f, 1.f, 1.f))))
 		return E_FAIL;
 
 	/* For.MRT_Deferred */
@@ -68,7 +68,8 @@ HRESULT CRenderer::Initialize_Prototype()
 
 
 #ifdef _DEBUG
-
+	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_ShadowDepth"), ViewportDesc.Width - 75, 500.f, 150.f, 150.f)))
+		return E_FAIL;
 	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Diffuse"), 75.f, 200.f, 150.f, 150.f)))
 		return E_FAIL;
 	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Normal"), 75.f, 350.f, 150.f, 150.f)))
@@ -79,8 +80,7 @@ HRESULT CRenderer::Initialize_Prototype()
 		return E_FAIL;
 	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Specular"), ViewportDesc.Width - 75, 350.f, 150.f, 150.f)))
 		return E_FAIL;
-	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Specular"), ViewportDesc.Width - 75, 500.f, 150.f, 150.f)))
-		return E_FAIL;
+	
 
 	m_pShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_Deferred.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements);
 	if (nullptr == m_pShader)
@@ -189,16 +189,14 @@ HRESULT CRenderer::Render_ShadowDepth()
 	if (FAILED(m_pTarget_Manager->Begin_ShadowMRT(m_pContext, TEXT("MRT_LightDepth"))))                                                                                                                                           
 		return E_FAIL;
 
-
-
-	for (auto& pRenderObject : m_RenderObjects[RENDER_NONALPHABLEND])
+	for (auto& pRenderObject : m_RenderObjects[RENDER_SHADOW])
 	{
 		if (nullptr != pRenderObject)
-			pRenderObject->Render();
+			pRenderObject->Render_ShadowDepth();
 
 		Safe_Release(pRenderObject);
 	}
-	m_RenderObjects[RENDER_NONALPHABLEND].clear();
+	m_RenderObjects[RENDER_SHADOW].clear();
 
 	if (FAILED(m_pTarget_Manager->End_MRT(m_pContext)))
 		return E_FAIL;
@@ -308,6 +306,24 @@ HRESULT CRenderer::Render_Blend()
 		return E_FAIL;
 	if (FAILED(m_pShader->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4))))
 		return E_FAIL;
+
+	_vector		vLightEye = { 90.f, 7.f, 100.f };
+	_vector		vLightAt = { 60.f, 0.f, 60.f };
+	_vector		vLightUp = { 0.f, 1.f, 0.f };
+	_matrix		LightViewMatrix;
+
+	LightViewMatrix = XMMatrixLookAtLH(vLightEye, vLightAt, vLightUp);
+
+	LightViewMatrix = XMMatrixTranspose(LightViewMatrix);
+	if (FAILED(m_pShader->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
+		return E_FAIL;
+
+	_matrix		LightProjMatrix;
+	LightProjMatrix = XMMatrixTranspose(CPipeLine::Get_Instance()->Get_TransformMatrix(CPipeLine::D3DTS_PROJ));
+
+	if (FAILED(m_pShader->Set_RawValue("g_LightProjMatrix", &LightProjMatrix, sizeof(_float4x4))))
+		return E_FAIL;
+
 
 	if (FAILED(m_pTarget_Manager->Bind_SRV(TEXT("Target_Diffuse"), m_pShader, "g_DiffuseTexture")))
 		return E_FAIL;

@@ -23,6 +23,7 @@ public:
 	virtual void Tick(_float fTimeDelta);
 	virtual void LateTick(_float fTimeDelta);
 	virtual HRESULT Render();
+	virtual HRESULT Render_ShadowDepth() { return NOERROR; }
 	virtual void Collision(CGameObject* pOther, string sTag) {};
 	bool Get_Dead() { return m_bDead; }
 	void Set_Dead() { m_bDead = true; }

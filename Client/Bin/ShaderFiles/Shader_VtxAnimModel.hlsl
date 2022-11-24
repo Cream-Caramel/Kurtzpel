@@ -1,5 +1,5 @@
 #include "Client_Shader_Defines.hpp"
-matrix		g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+matrix		g_WorldMatrix, g_ViewMatrix, g_ProjMatrix, g_LightViewMatrix, g_LightProjMatrix;
 matrix g_WorldMatrixInverse, g_ViewMatrixInverse;
 vector g_vCamPos;
 float g_fDissolveAcc;
@@ -129,6 +129,80 @@ VS_OUT OutLine_MAIN(VS_IN In)
 
 	return Out;
 }
+
+
+
+struct VS_IN_SHADOW
+{
+	float3      vPosition : POSITION;
+	float3      vNormal : NORMAL;
+	float2      vTexUV : TEXCOORD0;
+	float3      vTangent : TANGENT;
+	uint4      vBlendIndex : BLENDINDEX;
+	float4      vBlendWeight : BLENDWEIGHT;
+};
+
+struct VS_OUT_SHADOW
+{
+	float4         vPosition : SV_POSITION;
+	float4         vProjPos : TEXCOORD0;
+};
+
+VS_OUT_SHADOW VS_MAIN_SHADOW(VS_IN_SHADOW In)
+{
+	VS_OUT_SHADOW      Out = (VS_OUT_SHADOW)0;
+
+	matrix      matWV, matWVP;
+
+	matWV = mul(g_WorldMatrix, g_LightViewMatrix);
+	matWVP = mul(matWV, g_LightProjMatrix);
+
+	float      fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+
+	float4x4   BoneMatrix = g_BoneMatrices.BoneMatrix[In.vBlendIndex.x] * In.vBlendWeight.x +
+		g_BoneMatrices.BoneMatrix[In.vBlendIndex.y] * In.vBlendWeight.y +
+		g_BoneMatrices.BoneMatrix[In.vBlendIndex.z] * In.vBlendWeight.z +
+		g_BoneMatrices.BoneMatrix[In.vBlendIndex.w] * fWeightW;
+
+	vector      vPosition = mul(vector(In.vPosition, 1.f), BoneMatrix);
+	vector      vNormal = mul(vector(In.vNormal, 0.f), BoneMatrix);
+
+
+	Out.vPosition = mul(vPosition, matWVP);
+	Out.vProjPos = Out.vPosition;
+
+	return Out;
+}
+
+struct PS_IN_SHADOW
+{
+	float4         vPosition : SV_POSITION;
+	float4         vProjPos : TEXCOORD0;
+};
+
+struct PS_OUT_SHADOW
+{
+	float4         vLightDepth : SV_TARGET0;
+};
+
+PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN_SHADOW In)
+{
+	PS_OUT_SHADOW      Out = (PS_OUT_SHADOW)0;
+
+
+	// 빛에서 바라본 
+	//               0~ 300    0~1
+	Out.vLightDepth.r = In.vProjPos.w / 300.f;
+
+	// Out.vLightDepth.r = 1.f;
+
+
+	Out.vLightDepth.a = 1.f;
+
+
+	return Out;
+}
+
 
 struct PS_IN
 {
@@ -520,6 +594,17 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 GolemPattern_MAIN();
+	}
+
+	pass Shadow_Depth
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Shadow, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN_SHADOW();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
 	}
 
 }

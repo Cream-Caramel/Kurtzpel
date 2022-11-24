@@ -159,11 +159,14 @@ void CPlayer::LateTick(_float fTimeDelta)
 		pTrail->LateTick(fTimeDelta);
 
 	for (auto& pPart : m_Parts)
+	{
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, pPart);
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, pPart);
-
+	}
 	for (int i = 0; i < OBB_END; ++i)
 		m_pOBB[i]->Update(m_pTransformCom->Get_WorldMatrix());
 
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	
 	if(m_bCollision)
@@ -272,6 +275,45 @@ HRESULT CPlayer::Render()
 	m_pNavigation->Render();
 
 	
+	return S_OK;
+}
+
+HRESULT CPlayer::Render_ShadowDepth()
+{
+	_vector		vLightEye = { 90.f, 7.f, 100.f };
+	_vector		vLightAt = { 60.f, 0.f, 60.f };
+	_vector		vLightUp = { 0.f, 1.f, 0.f };
+	_matrix		LightViewMatrix;
+
+	LightViewMatrix = XMMatrixLookAtLH(vLightEye, vLightAt, vLightUp);
+
+	LightViewMatrix = XMMatrixTranspose(LightViewMatrix);
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
+		return E_FAIL;
+
+	_matrix		LightProjMatrix;
+	LightProjMatrix = XMMatrixTranspose(GI->Get_TransformMatrix(CPipeLine::D3DTS_PROJ));
+	
+	if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &LightProjMatrix, sizeof(_float4x4))))
+		return E_FAIL;
+	for (int i = 0; i < MODEL_END; ++i)
+	{
+		if (m_pAnimModel[i] != nullptr)
+		{
+			_uint		iNumMeshes = m_pAnimModel[i]->Get_NumMeshes();
+			for (_uint j = 0; j < iNumMeshes; ++j)
+			{
+				if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_SHADOW)))
+					return E_FAIL;
+			}
+		}
+	}
+	
+
 	return S_OK;
 }
 

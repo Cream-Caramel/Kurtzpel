@@ -17,6 +17,11 @@ CullMode = None;
 
 };
 
+DepthStencilState DSS_Shadow
+{
+	DepthWriteMask = false;
+};
+
 RasterizerState RS_OutLine
 {
 

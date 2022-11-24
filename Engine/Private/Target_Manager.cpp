@@ -76,9 +76,7 @@ HRESULT CTarget_Manager::Begin_MRT(ID3D11DeviceContext * pContext, const _tchar 
 		pRenderTarget->Clear();
 	
 		RTVs[iNumRTVs++] = pRenderTarget->Get_RTV();
-	}
-
-		
+	}	
 
 	pContext->OMSetRenderTargets(iNumRTVs, RTVs, m_pOldDepthStencil);
 
@@ -104,7 +102,7 @@ HRESULT CTarget_Manager::Begin_ShadowMRT(ID3D11DeviceContext * pContext, const _
 
 		RTVs[iNumRTVs++] = pRenderTarget->Get_RTV();
 	}
-
+	pContext->ClearDepthStencilView(CGameInstance::Get_Instance()->Get_ShadowDepthStencil(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 	pContext->OMSetRenderTargets(iNumRTVs, RTVs, CGameInstance::Get_Instance()->Get_ShadowDepthStencil());
 
 	return S_OK;
