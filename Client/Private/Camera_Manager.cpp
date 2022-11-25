@@ -16,6 +16,7 @@ CCamera_Manager::CCamera_Manager()
 	Load_Scene("Scene_Stage4");
 	Load_Scene("Scene_Stage4Boss");
 	Load_Scene("Scene_DragonFinish");
+	Load_Scene("Test1");
 
 }
 
@@ -192,6 +193,10 @@ void CCamera_Manager::Push_CamPosInfo(const char* FileName, vector<POSINFO> PosI
 	{
 		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
 	}
+	if (!strcmp(FileName, "Test1"))
+	{
+		m_CamPosInfo.push_back(make_pair(FileName, PosInfos));
+	}
 
 }
 
@@ -231,6 +236,10 @@ void CCamera_Manager::Push_CamLookInfo(const char * FileName, vector<LOOKINFO> L
 		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
 	}
 	if (!strcmp(FileName, "Scene_DragonFinish"))
+	{
+		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
+	}
+	if (!strcmp(FileName, "Test1"))
 	{
 		m_CamLookInfo.push_back(make_pair(FileName, LookInfos));
 	}

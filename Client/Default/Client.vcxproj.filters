@@ -220,14 +220,17 @@
     <Filter Include="02.GameObjects\Effect\Dragon\DragonFire1">
       <UniqueIdentifier>{7fbe819f-a1ae-42c9-b349-c29470ca31fc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Effect\Dragon\DragonTrail">
-      <UniqueIdentifier>{6593cfb3-7b5d-4068-bc28-5d32151a7308}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Effect\Dragon\DragonFire2">
       <UniqueIdentifier>{0142f1d1-7f7b-4f27-a0b0-2c45b137d5b8}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Effect\Player\Hit1">
       <UniqueIdentifier>{001b1da8-7a8b-4aee-bae6-70181dc3716e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\AnimMesh\Monster\Theo\DragonTrail">
+      <UniqueIdentifier>{6593cfb3-7b5d-4068-bc28-5d32151a7308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Player\Rage">
+      <UniqueIdentifier>{6200e069-1d83-4c9b-81f6-104f4401bba1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -499,13 +502,16 @@
       <Filter>02.GameObjects\Effect\Dragon\DragonFire1</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DragonTrail.h">
-      <Filter>02.GameObjects\Effect\Dragon\DragonTrail</Filter>
+      <Filter>02.GameObjects\AnimMesh\Monster\Theo\DragonTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DragonFire2.h">
       <Filter>02.GameObjects\Effect\Dragon\DragonFire2</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PlayerHit1.h">
       <Filter>02.GameObjects\Effect\Player\Hit1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerRageSword.h">
+      <Filter>02.GameObjects\Effect\Player\Rage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -759,13 +765,16 @@
       <Filter>02.GameObjects\Effect\Dragon\DragonFire1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DragonTrail.cpp">
-      <Filter>02.GameObjects\Effect\Dragon\DragonTrail</Filter>
+      <Filter>02.GameObjects\AnimMesh\Monster\Theo\DragonTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DragonFire2.cpp">
       <Filter>02.GameObjects\Effect\Dragon\DragonFire2</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PlayerHit1.cpp">
       <Filter>02.GameObjects\Effect\Player\Hit1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerRageSword.cpp">
+      <Filter>02.GameObjects\Effect\Player\Rage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

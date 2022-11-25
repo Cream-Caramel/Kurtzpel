@@ -125,6 +125,44 @@ HRESULT CPlayerHairBack::Render()
 	return S_OK;
 }
 
+HRESULT CPlayerHairBack::Render_ShadowDepth()
+{
+	if (m_pModel != nullptr)
+	{
+		_uint		iNumMeshes = m_pModel->Get_NumMeshes();
+		for (_uint j = 0; j < iNumMeshes; ++j)
+		{
+			_matrix		LightViewMatrix;
+
+			LightViewMatrix = XMMatrixTranspose(GI->Get_PlayerMatrix());
+
+			_float4x4		WorldMatrix;
+
+			XMStoreFloat4x4(&WorldMatrix, XMMatrixTranspose(m_pTransformCom->Get_WorldMatrix() * m_pParentTransformCom->Get_WorldMatrix()));
+
+			if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
+				return E_FAIL;
+
+			_matrix		LightProjMatrix;
+			LightProjMatrix = XMMatrixTranspose(GI->Get_TransformMatrix(CPipeLine::D3DTS_PROJ));
+
+			if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &LightProjMatrix, sizeof(_float4x4))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Begin(MODEL_SHADOW)))
+				return E_FAIL;
+
+			if (FAILED(m_pModel->Render(j)))
+				return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
 CMesh * CPlayerHairBack::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CPlayerHairBack*		pInstance = new CPlayerHairBack(pDevice, pContext);

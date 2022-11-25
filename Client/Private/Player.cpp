@@ -17,6 +17,7 @@
 #include "PlayerGage2.h"
 #include "Wall.h"
 #include "Ring.h"
+#include "PlayerRageSword.h"
 #include "PlayerHit1.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -75,10 +76,9 @@ HRESULT CPlayer::Initialize(void * pArg)
 	PM->Add_Player(this);
 	Ready_Sockets();
 	Ready_PlayerParts();
-
+	ReadyRageSword();
 	UM->Add_Player(this);
 	m_bColliderRender = false;
-	
 	m_pTransformCom->Set_Gravity(0.f);
 	m_pTransformCom->Set_JumpPower(0.4f);
 	m_bAction = false;
@@ -104,7 +104,7 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_5))
 	{	
-	
+		m_bCollision = false;
 	}
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
@@ -158,23 +158,48 @@ void CPlayer::LateTick(_float fTimeDelta)
 	for (auto& pTrail : m_SwordTrails)
 		pTrail->LateTick(fTimeDelta);
 
-	for (auto& pPart : m_Parts)
-	{
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, pPart);
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, pPart);
-	}
+	
 	for (int i = 0; i < OBB_END; ++i)
 		m_pOBB[i]->Update(m_pTransformCom->Get_WorldMatrix());
 
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
-	
+	if (!m_bRageSkill)
+	{
+		
+		for (auto& pPart : m_Parts)
+		{
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, pPart);
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, pPart);
+		}
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		
+	}
+	else
+	{
+		for (auto& Sword : m_RageSowrds)
+		{
+			Sword->LateTick(fTimeDelta);
+		}
+		
+	}
+
 	if(m_bCollision)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYER, this, m_pOBB[OBB_BODY]);
 	
 	Check_Battle();
 	
 	Set_PlayerUseInfo();
+
+	if (!m_bFixShadow)	
+		m_vLightEye = { m_vPlayerPos.x - 4.f, m_vPlayerPos.y + 6.f, m_vPlayerPos.z - 4.f };	
+	else
+		m_vLightEye = { m_vPlayerPos.x - 5.f, m_vPlayerPos.y + 15.f, m_vPlayerPos.z - 5.f };
+	m_vLightAt = { m_vPlayerPos.x, m_vPlayerPos.y, m_vPlayerPos.z };
+	m_vLightUp = { 0.f, 1.f, 0.f };
+	m_LightViewMatrix;
+
+	XMStoreFloat4x4(&m_LightViewMatrix, XMMatrixLookAtLH(XMLoadFloat3(&m_vLightEye), XMLoadFloat3(&m_vLightAt), XMLoadFloat3(&m_vLightUp)));
+	GI->Set_PlayerMatrix(XMLoadFloat4x4(&m_LightViewMatrix));
 
 }
 
@@ -280,14 +305,14 @@ HRESULT CPlayer::Render()
 
 HRESULT CPlayer::Render_ShadowDepth()
 {
-	_vector		vLightEye = { 90.f, 7.f, 100.f };
+	
+	/*_vector		vLightEye = { 90.f, 7.f, 100.f };
 	_vector		vLightAt = { 60.f, 0.f, 60.f };
 	_vector		vLightUp = { 0.f, 1.f, 0.f };
+	_matrix		LightViewMatrix;*/
+	
 	_matrix		LightViewMatrix;
-
-	LightViewMatrix = XMMatrixLookAtLH(vLightEye, vLightAt, vLightUp);
-
-	LightViewMatrix = XMMatrixTranspose(LightViewMatrix);
+	LightViewMatrix = XMMatrixTranspose(GI->Get_PlayerMatrix());
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4))))
 		return E_FAIL;
@@ -300,6 +325,7 @@ HRESULT CPlayer::Render_ShadowDepth()
 	
 	if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &LightProjMatrix, sizeof(_float4x4))))
 		return E_FAIL;
+
 	for (int i = 0; i < MODEL_END; ++i)
 	{
 		if (m_pAnimModel[i] != nullptr)
@@ -418,7 +444,6 @@ HRESULT CPlayer::Ready_Collider()
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Head"), (CComponent**)&m_pOBB[OBB_BODY], &ColliderDesc)))
 		return E_FAIL;
 
-
 	return S_OK;
 }
 
@@ -465,6 +490,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
+		m_bFixShadow = false;
 		m_bAction = false;
 		break;
 	case Client::CPlayer::JUMPUP:
@@ -487,6 +513,7 @@ void CPlayer::Set_State(STATE eState)
 			WorldPos.y += 0.5f;
 			PTM->CreateParticle(L"PlayerJump", WorldPos, true, CAlphaParticle::DIR_END);
 		}
+		m_bFixShadow = true;
 		m_bAction = false;
 		GI->PlaySoundW(L"Jump.ogg", SD_PLAYER1, 0.6f);
 		m_pTransformCom->Set_Jump(true);
@@ -501,6 +528,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
+		m_bFixShadow = false;
 		m_bAction = false;
 		CRM->Set_FovSpeed(150.f);
 		CRM->Set_FovDir(true);
@@ -512,6 +540,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
+		m_bFixShadow = false;
 		GI->PlaySoundW(L"Dash.ogg", SD_PLAYER1, 0.6f);
 		m_bAction = false;
 		m_fNowMp -= 5.f;
@@ -554,6 +583,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
+		m_bFixShadow = false;
 		m_fRunSpeed = 8.f;
 		break;
 	case Client::CPlayer::RUNEND:
@@ -644,6 +674,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
+		m_bFixShadow = true;
 		GI->PlaySoundW(L"AttackVoice1.ogg", SD_PLAYERVOICE, 0.9f);
 		GI->PlaySoundW(L"AirCombo1.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
@@ -673,7 +704,7 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
-	
+		m_bFixShadow = false;
 		CRM->Start_Fov(50.f, 140.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.3f, 3.f, 0.03f);
@@ -782,6 +813,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
+		m_bFixShadow = true;
 		GI->PlaySoundW(L"BladeAttackStart.ogg", SD_PLAYER1, 1.f);
 		m_fNowMp -= 20.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
@@ -799,6 +831,7 @@ void CPlayer::Set_State(STATE eState)
 		GI->PlaySoundW(L"DoubleSlash.ogg", SD_PLAYER2, 0.6f);
 		m_Parts[PARTS_SWORD]->Set_Damage(5.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(30);
+		SetRageSword();
 		break;
 	case Client::CPlayer::ROCKSHOT:
 		
@@ -809,6 +842,8 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
+
+		m_bFixShadow = true;
 		GI->PlaySoundW(L"AttackVoice6.ogg", SD_PLAYERVOICE, 0.9f);
 		PM->Set_PlayerGage2_1(true);
 		PM->Set_PlayerGage2_2(true);
@@ -1111,6 +1146,7 @@ void CPlayer::End_Animation()
 		case Client::CPlayer::SLASHATTACK:			
 			Set_State(IDLE);
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
+			m_bRageSkill = false;
 			break;
 		case Client::CPlayer::ROCKSHOT:
 			break;
@@ -1554,6 +1590,85 @@ void CPlayer::CreateRing()
 	XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 	GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_PlayerEffect", &RingInfo);
 	
+}
+
+void CPlayer::SetRageSword()
+{
+	_float4 vSwordPos;
+	XMStoreFloat4(&vSwordPos, XMLoadFloat3(&m_vPlayerPos) +m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 7.f);
+	((CPlayerRageSword*)m_RageSowrds[0])->Set_On(vSwordPos);
+	
+	_float4 vSwordPos2;
+	XMStoreFloat4(&vSwordPos2, XMLoadFloat3(&m_vPlayerPos) + m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * -7.f);
+	((CPlayerRageSword*)m_RageSowrds[1])->Set_On(vSwordPos2);
+
+	_float4 vSwordPos3;
+	XMStoreFloat4(&vSwordPos3, XMLoadFloat3(&m_vPlayerPos) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 7.f);
+	((CPlayerRageSword*)m_RageSowrds[2])->Set_On(vSwordPos3);
+
+	_float4 vSwordPos4;
+	XMStoreFloat4(&vSwordPos4, XMLoadFloat3(&m_vPlayerPos) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -7.f);
+	((CPlayerRageSword*)m_RageSowrds[3])->Set_On(vSwordPos4);
+
+	_float4 vSwordPos5;
+	XMStoreFloat4(&vSwordPos5, XMLoadFloat3(&m_vPlayerPos) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 4.f + m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * -4.f);
+	vSwordPos5.y += 6.f;
+	((CPlayerRageSword*)m_RageSowrds[4])->Set_On(vSwordPos5);
+
+	_float4 vSwordPos6;
+	XMStoreFloat4(&vSwordPos6, XMLoadFloat3(&m_vPlayerPos) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * 4.f + m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 4.f);
+	vSwordPos6.y += 6.f;
+	((CPlayerRageSword*)m_RageSowrds[5])->Set_On(vSwordPos6);
+
+	_float4 vSwordPos7;
+	XMStoreFloat4(&vSwordPos7, XMLoadFloat3(&m_vPlayerPos) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -4.f + m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * -4.f);
+	vSwordPos7.y += 6.f;
+	((CPlayerRageSword*)m_RageSowrds[6])->Set_On(vSwordPos7);
+
+	_float4 vSwordPos8;
+	XMStoreFloat4(&vSwordPos8, XMLoadFloat3(&m_vPlayerPos) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -4.f + m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 4.f);
+	vSwordPos8.y += 6.f;
+	((CPlayerRageSword*)m_RageSowrds[7])->Set_On(vSwordPos8);
+	
+	
+	
+
+}
+
+void CPlayer::ReadyRageSword()
+{
+	CPlayerRageSword::RAGESOWRD RageInfo;
+	RageInfo.iSowrdNum = 1;
+	CGameObject*		Sword1 = GI->Clone_GameObject(TEXT("PlayerRageSword"), &RageInfo);
+	m_RageSowrds.push_back((CPlayerRageSword*)Sword1);
+
+	RageInfo.iSowrdNum = 2;
+	CGameObject*		Sword2 = GI->Clone_GameObject(TEXT("PlayerRageSword"), &RageInfo);
+	m_RageSowrds.push_back((CPlayerRageSword*)Sword2);
+
+	RageInfo.iSowrdNum = 3;
+	CGameObject*		Sword3 = GI->Clone_GameObject(TEXT("PlayerRageSword"), &RageInfo);
+	m_RageSowrds.push_back((CPlayerRageSword*)Sword3);
+
+	RageInfo.iSowrdNum = 4;
+	CGameObject*		Sword4 = GI->Clone_GameObject(TEXT("PlayerRageSword"), &RageInfo);
+	m_RageSowrds.push_back((CPlayerRageSword*)Sword4);
+
+	RageInfo.iSowrdNum = 5;
+	CGameObject*		Sword5 = GI->Clone_GameObject(TEXT("PlayerRageSword"), &RageInfo);
+	m_RageSowrds.push_back((CPlayerRageSword*)Sword5);
+
+	RageInfo.iSowrdNum = 6;
+	CGameObject*		Sword6 = GI->Clone_GameObject(TEXT("PlayerRageSword"), &RageInfo);
+	m_RageSowrds.push_back((CPlayerRageSword*)Sword6);
+
+	RageInfo.iSowrdNum = 6;
+	CGameObject*		Sword7 = GI->Clone_GameObject(TEXT("PlayerRageSword"), &RageInfo);
+	m_RageSowrds.push_back((CPlayerRageSword*)Sword7);
+
+	RageInfo.iSowrdNum = 5;
+	CGameObject*		Sword8 = GI->Clone_GameObject(TEXT("PlayerRageSword"), &RageInfo);
+	m_RageSowrds.push_back((CPlayerRageSword*)Sword8);
 }
 
 void CPlayer::Check_Battle()
@@ -2311,8 +2426,10 @@ void CPlayer::Update(_float fTimeDelta)
 				{
 					_float4 WorldPos;
 					XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-					WorldPos.y += 0.7f;
 					PTM->CreateParticle(L"PlayerAirComboEnd", WorldPos, true, CAlphaParticle::DIR_END);
+					WorldPos.y += 0.7f;
+					PTM->CreateParticle(L"PlayerAirComboEnd2", WorldPos, true, CAlphaParticle::DIR_END);
+					
 				}
 			}
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
@@ -2613,42 +2730,45 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::SLASHATTACK:
-		for (auto& pPart : m_Parts)
+		if (!m_pAnimModel[0]->GetChangeBool())
 		{
-			if (pPart->Get_MaxHp() != 0.1f)
-				pPart->Set_Collision(false);
-		}
-		m_bCollision = false;
-		m_bMotionChange = false;
-		Set_SwordTrailMatrix();
-		if (m_bDoubleSlash)
-		{
-			CRM->Set_PlayerScene(true);
-			CRM->Start_Scene("PlayerDoubleSlash");
-			m_bDoubleSlash = false;
-			return;
-		}
-		if (m_bDoubleSlashFov)
-		{
-			CRM->Start_Fov(30.f, 40.f);
+			for (auto& pPart : m_Parts)
+			{
+				if (pPart->Get_MaxHp() != 0.1f)
+					pPart->Set_Collision(false);
+			}
+			m_bCollision = false;
+			m_bMotionChange = false;
+			Set_SwordTrailMatrix();
 
-		}
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
-		{
-			Update_SwordTrails(FASTCOMBOSTART);
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			GI->PlaySoundW(L"DoubleSlashStart.ogg", SD_PLAYER1, 0.6f);
-			return;
-		}
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
+			{
+				Update_SwordTrails(FASTCOMBOSTART);
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				GI->PlaySoundW(L"DoubleSlashStart.ogg", SD_PLAYER1, 0.6f);
+				CRM->Set_PlayerScene(true);
+				CRM->Start_Scene("Test1");
+				for (auto& iter : m_RageSowrds)
+					((CPlayerRageSword*)iter)->Set_Off();
+				return;
+			}
 
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(5))
-		{
-			CRM->Set_FovSpeed(300.f);
-			CRM->Set_FovDir(true);
-			m_bDoubleSlashFov = false;
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+			{
+				m_bRageSkill = true;
+				CAnimMesh::EFFECTINFO EffectInfo;
+				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				EffectInfo.WorldMatrix.r[1].m128_f32[1] = m_pNavigation->Get_PosY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
+				GI->Add_GameObjectToLayer(L"PlayerRockBreak", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
+				_float4 WorldPos;
+				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
+				
+			}
 		}
-
-		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
+		
+		/*if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3{ 4.f,4.f,4.f });
@@ -2660,7 +2780,7 @@ void CPlayer::Update(_float fTimeDelta)
 		{
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3(0.3f, 2.2f, 0.3f));
-		}
+		}*/
 		break;
 	case Client::CPlayer::ROCKSHOT:
 		break;
@@ -4737,6 +4857,9 @@ void CPlayer::Free()
 
 	for (auto& pSwordTrail : m_SwordTrails)
 		Safe_Release(pSwordTrail);
+
+	for (auto& Sword : m_RageSowrds)
+		Safe_Release(Sword);
 
 	Safe_Release(m_pSwordEx);
 

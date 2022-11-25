@@ -6,6 +6,7 @@ BEGIN(Engine)
 class CHierarchyNode;
 class COBB;
 class CNavigation;
+class CPlayerRageSword;
 END
 
 BEGIN(Client)
@@ -96,6 +97,8 @@ private:
 	void ChargeAttackLight();
 	void CreateGage(_bool Gage2_1);
 	void CreateRing();
+	void ReadyRageSword();
+	void SetRageSword();
 #pragma region PrivateFunction
 
 #pragma region KeyInput
@@ -155,6 +158,8 @@ private:
 	_bool m_bNomal4Hit = false;
 	_bool m_bFastComboHit = false;
 	_bool m_bSpinComboHit = false;
+	_bool m_bFixShadow = false;
+	_bool m_bRageSkill = false;
 
 	_float m_fJumpSpeed = 15.f; // 점프중 스피드
 	_float m_fRunSpeed = 8.f; // 달리기이동스피드
@@ -194,6 +199,10 @@ private:
 	_float m_fMoveSpeed = 0.f;
 	_float m_fMoveSpeedTempo = 0.f;
 	_float3 m_vMoveDir = { 1.f,0.f,0.f };
+	_float3 m_vLightEye;
+	_float3 m_vLightAt;
+	_float3 m_vLightUp;
+	_float4x4 m_LightViewMatrix;		
 	_matrix m_SwordTrailMatrix;
 	CMesh::TURNDIR m_eTurnDir;
 
@@ -206,7 +215,8 @@ private:
 	DIR m_eDir = DIR_UP; // 현재 방향
 	_float3 m_vTargetLook; // 플레이어가 바라봐야할 방향
 	_float3 m_vPlayerPos; // 현재 플레이어의 위치
-	
+	_uint m_iNowRageSowrd = 0;
+
 private:
 	CAnimModel* m_pAnimModel[MODEL_END]; // 플레이어, 상의, 하의 모델
 	COBB* m_pOBB[OBB_END]{ nullptr };
@@ -216,6 +226,7 @@ private:
 	vector<CMesh*>				m_SwordTrails;
 	CMesh*						m_pSwordEx = nullptr;
 	vector<class CHierarchyNode*>		m_Sockets;
+	vector<CMesh*> m_RageSowrds;
 	HRESULT Ready_Sockets();
 	HRESULT Ready_PlayerParts();
 	HRESULT Update_Parts();

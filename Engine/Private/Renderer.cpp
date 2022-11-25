@@ -5,6 +5,7 @@
 #include "VIBuffer_Rect.h"
 #include "Light_Manager.h"
 #include "PipeLine.h"
+#include "GameInstance.h"
 
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent(pDevice, pContext)
@@ -307,12 +308,27 @@ HRESULT CRenderer::Render_Blend()
 	if (FAILED(m_pShader->Set_RawValue("g_ProjMatrix", &m_ProjMatrix, sizeof(_float4x4))))
 		return E_FAIL;
 
-	_vector		vLightEye = { 90.f, 7.f, 100.f };
+	/*_vector		vLightEye = { 90.f, 7.f, 100.f };
 	_vector		vLightAt = { 60.f, 0.f, 60.f };
 	_vector		vLightUp = { 0.f, 1.f, 0.f };
 	_matrix		LightViewMatrix;
 
 	LightViewMatrix = XMMatrixLookAtLH(vLightEye, vLightAt, vLightUp);
+
+	LightViewMatrix = XMMatrixTranspose(LightViewMatrix);
+	if (FAILED(m_pShader->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
+		return E_FAIL;
+
+	_matrix		LightProjMatrix;
+	LightProjMatrix = XMMatrixTranspose(CPipeLine::Get_Instance()->Get_TransformMatrix(CPipeLine::D3DTS_PROJ));
+
+	if (FAILED(m_pShader->Set_RawValue("g_LightProjMatrix", &LightProjMatrix, sizeof(_float4x4))))
+		return E_FAIL;*/
+
+	
+	_matrix		LightViewMatrix;
+
+	LightViewMatrix = CGameInstance::Get_Instance()->Get_PlayerMatrix();
 
 	LightViewMatrix = XMMatrixTranspose(LightViewMatrix);
 	if (FAILED(m_pShader->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))

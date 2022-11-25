@@ -74,18 +74,18 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	Set_Dir();
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-	return E_FAIL;
+	return E_FAIL;*/
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 172;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
 	m_pNavigation->Set_BattleIndex(145);
-	CRM->Start_Scene("Scene_Stage4Boss");*/
+	CRM->Start_Scene("Scene_Stage4Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");

@@ -1,5 +1,5 @@
 #include "Client_Shader_Defines.hpp"
-matrix		g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+matrix		g_WorldMatrix, g_ViewMatrix, g_ProjMatrix, g_LightViewMatrix, g_LightProjMatrix;
 matrix g_WorldMatrixInverse, g_ViewMatrixInverse;
 texture2D	g_DiffuseTexture;
 texture2D	g_NormalTexture;
@@ -86,6 +86,64 @@ VS_OUT OutLine_MAIN(VS_IN In)
 	return Out;
 }
 
+struct VS_IN_SHADOW
+{
+	float3      vPosition : POSITION;
+	float3      vNormal : NORMAL;
+	float2      vTexUV : TEXCOORD0;
+	float3      vTangent : TANGENT;
+};
+
+struct VS_OUT_SHADOW
+{
+	float4         vPosition : SV_POSITION;
+	float4         vProjPos : TEXCOORD0;
+};
+
+VS_OUT_SHADOW VS_MAIN_SHADOW(VS_IN_SHADOW In)
+{
+	VS_OUT_SHADOW		Out = (VS_OUT_SHADOW)0;
+
+	matrix		matWV, matWVP;
+
+	matWV = mul(g_WorldMatrix, g_LightViewMatrix);
+	matWVP = mul(matWV, g_LightProjMatrix);
+
+	Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
+	Out.vProjPos = Out.vPosition;
+
+	return Out;
+}
+
+struct PS_IN_SHADOW
+{
+	float4         vPosition : SV_POSITION;
+	float4         vProjPos : TEXCOORD0;
+};
+
+struct PS_OUT_SHADOW
+{
+	float4         vLightDepth : SV_TARGET0;
+};
+
+PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN_SHADOW In)
+{
+	PS_OUT_SHADOW      Out = (PS_OUT_SHADOW)0;
+
+
+	// 빛에서 바라본 
+	//               0~ 300    0~1
+	Out.vLightDepth.r = In.vProjPos.w / 300.f;
+
+	// Out.vLightDepth.r = 1.f;
+
+
+	Out.vLightDepth.a = 1.f;
+
+
+	return Out;
+}
+
 struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
@@ -119,7 +177,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 
 
 	if (0 == Out.vDiffuse.a)
@@ -136,7 +194,7 @@ PS_OUT NPS_MAIN(PS_IN In)
 
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 
 	if (0 == Out.vDiffuse.a)
 		discard;
@@ -175,7 +233,7 @@ PS_OUT EndDissolve_MAIN(PS_IN In)
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 
 	float fDissolve = length(g_DissolveTexture.Sample(DefaultSampler, In.vTexUV));
 	fDissolve = smoothstep(0.f, 4.f, fDissolve);
@@ -205,7 +263,7 @@ PS_OUT NEndDissolve_MAIN(PS_IN In)
 
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 
 	float fDissolve = length(g_DissolveTexture.Sample(DefaultSampler, In.vTexUV));
 	fDissolve = smoothstep(0.f, 4.f, fDissolve);
@@ -243,7 +301,7 @@ PS_OUT StartDissolve_MAIN(PS_IN In)
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 
 	float fDissolve = length(g_DissolveTexture.Sample(DefaultSampler, In.vTexUV));
 	fDissolve = smoothstep(0.f, 5.f, fDissolve);
@@ -273,7 +331,7 @@ PS_OUT NStartDissolve_MAIN(PS_IN In)
 
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 
 	float fDissolve = length(g_DissolveTexture.Sample(DefaultSampler, In.vTexUV));
 	fDissolve = smoothstep(0.f, 5.f, fDissolve);
@@ -299,7 +357,7 @@ PS_OUT Hit_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 	Out.vDiffuse = (vector)1.f;
-
+	//Out.vDepth = vector(0.f , 0.5f, 0.0f);
 	Out.vDiffuse.gb = 0.f;
 	return Out;
 }
@@ -397,6 +455,17 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 OutLine_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 Hit_MAIN();
+	}
+
+	pass Shadow_Depth
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Shadow, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN_SHADOW();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
 	}
 
 

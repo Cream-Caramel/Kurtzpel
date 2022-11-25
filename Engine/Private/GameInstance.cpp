@@ -381,6 +381,16 @@ HRESULT CGameInstance::Reset_Lights()
 	return m_pLight_Manager->Reset_Lights();
 }
 
+_matrix CGameInstance::Get_PlayerMatrix()
+{
+	return m_pLight_Manager->Get_PlayerMatrix();
+}
+
+void CGameInstance::Set_PlayerMatrix(_matrix Matrix)
+{
+	m_pLight_Manager->Set_PlayerMatrix(Matrix);
+}
+
 HRESULT CGameInstance::Add_Fonts(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _tchar * pFontTag, const _tchar * pFontFilePath)
 {
 	if (nullptr == m_pFont_Manager)

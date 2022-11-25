@@ -45,7 +45,6 @@ struct VS_OUT
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
 	float4		vWorldPos : TEXCOORD2;
-	float3      vTestNormal : TEXCOORD3;
 };
 
 
@@ -79,7 +78,7 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vTexUV = In.vTexUV;
 	Out.vProjPos = Out.vPosition;
 
-	Out.vTestNormal = normalize(mul(normalize(vNormal), g_WorldMatrix));
+	//Out.vTestNormal = normalize(mul(normalize(vNormal), g_WorldMatrix));
 
 	Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
 	
@@ -109,10 +108,10 @@ VS_OUT OutLine_MAIN(VS_IN In)
 
 	Out.vPosition = mul(vPosition, matWVP);
 	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
-	Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix)).xyz;
+	/*Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix)).xyz;
 	Out.vBinormal = normalize(cross(Out.vNormal, Out.vTangent));
 
-	Out.vTexUV = In.vTexUV;
+	Out.vTexUV = In.vTexUV;*/
 	Out.vProjPos = Out.vPosition;
 	Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
 
@@ -193,7 +192,7 @@ PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN_SHADOW In)
 	// 빛에서 바라본 
 	//               0~ 300    0~1
 	Out.vLightDepth.r = In.vProjPos.w / 300.f;
-
+	Out.vLightDepth.g = 0.5f;
 	// Out.vLightDepth.r = 1.f;
 
 
@@ -213,7 +212,6 @@ struct PS_IN
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
 	float4		vWorldPos : TEXCOORD2;
-	float3		vTestNormal : TEXCOORD3;
 };
 
 struct PS_OUT
@@ -239,7 +237,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 
 	if (0 == Out.vDiffuse.a)
 		discard;
@@ -274,7 +272,7 @@ PS_OUT NPS_MAIN(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 
 	if (0 == Out.vDiffuse.a)
 		discard;
@@ -298,7 +296,7 @@ PS_OUT Pattern_MAIN(PS_IN In)
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 	Out.vDiffuse.b = 1.f;
 
 	if (0 == Out.vDiffuse.a)
@@ -314,7 +312,7 @@ PS_OUT NPattern_MAIN(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 	Out.vDiffuse.b = 1.f;
 
 	if (0 == Out.vDiffuse.a)
@@ -349,7 +347,7 @@ PS_OUT Finish_MAIN(PS_IN In)
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 	Out.vDiffuse.r = 0.8f;
 
 	if (0 == Out.vDiffuse.a)
@@ -365,7 +363,7 @@ PS_OUT NFinish_MAIN(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 	Out.vDiffuse.r = 0.8f;
 
 	if (0 == Out.vDiffuse.a)
@@ -390,7 +388,7 @@ PS_OUT Dissolve_MAIN(PS_IN In)
 	vNormal = normalize(mul(vNormal, WorldMatrix));
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 	Out.vDiffuse.r = 0.8f;
 
 	float fDissolve = length(g_DissolveTexture.Sample(DefaultSampler, In.vTexUV));
@@ -421,7 +419,7 @@ PS_OUT NDissolve_MAIN(PS_IN In)
 	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
 
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 	Out.vDiffuse.r = 0.8f;
 
 	float fDissolve = length(g_DissolveTexture.Sample(DefaultSampler, In.vTexUV));
@@ -462,7 +460,7 @@ PS_OUT GolemPattern_MAIN(PS_IN In)
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.0f, 0.0f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
 
 	Out.vDiffuse.r += g_fGolemPattern;
 	Out.vDiffuse.gb -= min(0.6f, g_fGolemPattern);

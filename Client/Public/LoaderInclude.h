@@ -52,6 +52,7 @@
 #include "PlayerTrailSub1.h"
 #include "PlayerTrailSub2.h"
 #include "PlayerEx.h"
+#include "PlayerRageSword.h"
 #include "PlayerLight.h"
 #include "PlayerGage2.h"
 #include "Wall.h"
