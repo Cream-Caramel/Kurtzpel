@@ -2750,6 +2750,7 @@ void CPlayer::Update(_float fTimeDelta)
 				CRM->Start_Scene("Test1");
 				for (auto& iter : m_RageSowrds)
 					((CPlayerRageSword*)iter)->Set_Off();
+
 				return;
 			}
 
