@@ -80,6 +80,16 @@ HRESULT CLevel_Stage3::Ready_Lights()
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
 
+	_vector vLightEye = { 75.f, 60.f, 55.f };
+	_vector vLightAt = { 100.f, 0.f, 90.f };
+	_vector vLightUp = { 0.f, 1.f, 0.f };
+	_matrix LightViewMatrix;
+
+	LightViewMatrix = XMMatrixLookAtLH(vLightEye, vLightAt, vLightUp);
+	GI->Set_LightMatrix(LightViewMatrix);
+
+	_vector vPos = { 77.43f, 0.06f, 52.49f, 1.f };
+
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;

@@ -43,6 +43,7 @@ public:
 	virtual void Tick(_float fTimeDelta) override;
 	virtual void LateTick(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual HRESULT Render_ShadowDepth() override;
 	virtual void Collision(CGameObject* pOther, string sTag)override;
 	HRESULT Ready_Collider();
 	void Set_NextMotion();

@@ -134,7 +134,7 @@ HRESULT CPlayerHairBack::Render_ShadowDepth()
 		{
 			_matrix		LightViewMatrix;
 
-			LightViewMatrix = XMMatrixTranspose(GI->Get_PlayerMatrix());
+			LightViewMatrix = XMMatrixTranspose(GI->Get_LightMatrix());
 
 			_float4x4		WorldMatrix;
 
@@ -146,10 +146,9 @@ HRESULT CPlayerHairBack::Render_ShadowDepth()
 			if (FAILED(m_pShaderCom->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
 				return E_FAIL;
 
-			_matrix		LightProjMatrix;
-			LightProjMatrix = XMMatrixTranspose(GI->Get_TransformMatrix(CPipeLine::D3DTS_PROJ));
+			_matrix Fov60 = XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f), (_float)1280.f / 720.f, 0.2f, 300.f);
 
-			if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &LightProjMatrix, sizeof(_float4x4))))
+			if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &XMMatrixTranspose(Fov60), sizeof(_float4x4))))
 				return E_FAIL;
 
 			if (FAILED(m_pShaderCom->Begin(MODEL_SHADOW)))

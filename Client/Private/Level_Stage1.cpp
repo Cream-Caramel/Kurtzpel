@@ -135,21 +135,17 @@ HRESULT CLevel_Stage1::Ready_Lights()
 	if (FAILED(pGameInstance->Add_StaticLight(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
 
-	/*ZeroMemory(&LightDesc, sizeof(LIGHTDESC));
-	LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	LightDesc.bRender = true;
-	LightDesc.vPosition = _float4(90.0f, 20.0f, 103.f, 1.f);
-	LightDesc.fRange = 100.f;
-	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
-	LightDesc.vAmbient = _float4(1.f, 0.f, 0.f, 1.f);
-	LightDesc.vSpecular = LightDesc.vDiffuse;
-
-	for (int i = 0; i < 100; ++i)
-	{
-		if (FAILED(pGameInstance->Add_StaticLight(m_pDevice, m_pContext, LightDesc)))
-			return E_FAIL;
-	}*/
 	
+	_vector vLightEye = { 90.f, 30.f, 60.f };
+	_vector vLightAt = { 90.f, 0.f, 90.f };
+	_vector vLightUp = { 0.f, 1.f, 0.f };
+	_matrix LightViewMatrix;
+
+	LightViewMatrix =  XMMatrixLookAtLH(vLightEye, vLightAt, vLightUp);
+	GI->Set_LightMatrix(LightViewMatrix);
+
+	
+
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;

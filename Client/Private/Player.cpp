@@ -107,7 +107,7 @@ void CPlayer::Tick(_float fTimeDelta)
 	{	
 	
 		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
-		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 20.f);
 		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
 		PlayerRageHit.fRotation = 90.f;
 		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
@@ -195,17 +195,6 @@ void CPlayer::LateTick(_float fTimeDelta)
 	Check_Battle();
 	
 	Set_PlayerUseInfo();
-
-	if (!m_bFixShadow)	
-		m_vLightEye = { m_vPlayerPos.x - 4.f, m_vPlayerPos.y + 6.f, m_vPlayerPos.z - 4.f };	
-	else
-		m_vLightEye = { m_vPlayerPos.x - 5.f, m_vPlayerPos.y + 15.f, m_vPlayerPos.z - 5.f };
-	m_vLightAt = { m_vPlayerPos.x, m_vPlayerPos.y, m_vPlayerPos.z };
-	m_vLightUp = { 0.f, 1.f, 0.f };
-	m_LightViewMatrix;
-
-	XMStoreFloat4x4(&m_LightViewMatrix, XMMatrixLookAtLH(XMLoadFloat3(&m_vLightEye), XMLoadFloat3(&m_vLightAt), XMLoadFloat3(&m_vLightUp)));
-	GI->Set_PlayerMatrix(XMLoadFloat4x4(&m_LightViewMatrix));
 
 }
 
@@ -312,13 +301,8 @@ HRESULT CPlayer::Render()
 HRESULT CPlayer::Render_ShadowDepth()
 {
 	
-	/*_vector		vLightEye = { 90.f, 7.f, 100.f };
-	_vector		vLightAt = { 60.f, 0.f, 60.f };
-	_vector		vLightUp = { 0.f, 1.f, 0.f };
-	_matrix		LightViewMatrix;*/
-	
 	_matrix		LightViewMatrix;
-	LightViewMatrix = XMMatrixTranspose(GI->Get_PlayerMatrix());
+	LightViewMatrix = XMMatrixTranspose(GI->Get_LightMatrix());
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4))))
 		return E_FAIL;
@@ -326,10 +310,9 @@ HRESULT CPlayer::Render_ShadowDepth()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
 		return E_FAIL;
 
-	_matrix		LightProjMatrix;
-	LightProjMatrix = XMMatrixTranspose(GI->Get_TransformMatrix(CPipeLine::D3DTS_PROJ));
+	_matrix Fov60 = XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f), (_float)1280.f / 720.f, 0.2f, 300.f);
 	
-	if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &LightProjMatrix, sizeof(_float4x4))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &XMMatrixTranspose(Fov60), sizeof(_float4x4))))
 		return E_FAIL;
 
 	for (int i = 0; i < MODEL_END; ++i)
@@ -345,7 +328,6 @@ HRESULT CPlayer::Render_ShadowDepth()
 		}
 	}
 	
-
 	return S_OK;
 }
 
@@ -1645,13 +1627,14 @@ void CPlayer::SetRageSword()
 void CPlayer::CreateRageHit(_float fTimeDelta)
 {
 	m_fRageAcc += 1.f * fTimeDelta;
-	if (m_fRageAcc >= 0.f && m_fRageAcc <= 0.1f)
+	if (m_fRageAcc >= m_fRageSpeed)
 	{
 		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
-		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 20.f);
 		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-		PlayerRageHit.fRotation = 180.f;
+		PlayerRageHit.fRotation = 90.f;
 		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
+		m_fRageAcc = 0.f;
 	}
 }
 

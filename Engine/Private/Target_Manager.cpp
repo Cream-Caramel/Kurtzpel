@@ -105,6 +105,17 @@ HRESULT CTarget_Manager::Begin_ShadowMRT(ID3D11DeviceContext * pContext, const _
 	pContext->ClearDepthStencilView(CGameInstance::Get_Instance()->Get_ShadowDepthStencil(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 	pContext->OMSetRenderTargets(iNumRTVs, RTVs, CGameInstance::Get_Instance()->Get_ShadowDepthStencil());
 
+	D3D11_VIEWPORT			ViewPortDesc;
+	ZeroMemory(&ViewPortDesc, sizeof(D3D11_VIEWPORT));
+	ViewPortDesc.TopLeftX = 0;
+	ViewPortDesc.TopLeftY = 0;
+	ViewPortDesc.Width = _float(1280 * 6);
+	ViewPortDesc.Height = _float(720 * 6);
+	ViewPortDesc.MinDepth = 0.f;
+	ViewPortDesc.MaxDepth = 1.f;
+
+	pContext->RSSetViewports(1, &ViewPortDesc);
+
 	return S_OK;
 }
 
@@ -118,6 +129,17 @@ HRESULT CTarget_Manager::End_MRT(ID3D11DeviceContext * pContext)
 		Safe_Release(m_pOldRenderTargets[i]);
 
 	Safe_Release(m_pOldDepthStencil);
+
+	D3D11_VIEWPORT			ViewPortDesc;
+	ZeroMemory(&ViewPortDesc, sizeof(D3D11_VIEWPORT));
+	ViewPortDesc.TopLeftX = 0;
+	ViewPortDesc.TopLeftY = 0;
+	ViewPortDesc.Width = _float(1280.f);
+	ViewPortDesc.Height = _float(720.f);
+	ViewPortDesc.MinDepth = 0.f;
+	ViewPortDesc.MaxDepth = 1.f;
+
+	pContext->RSSetViewports(1, &ViewPortDesc);
 
 	return S_OK;
 }

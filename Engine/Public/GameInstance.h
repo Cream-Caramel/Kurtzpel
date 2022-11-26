@@ -81,6 +81,7 @@ public: /* For.PipeLine */
 	_float4x4 Get_TransformFloat4x4_Inverse(CPipeLine::TRANSFORMSTATE eTransformState) const;
 	_float4x4 Get_TransformFloat4x4_TP(CPipeLine::TRANSFORMSTATE eTransformState) const;
 	_float4 Get_CamPosition();
+	_float3 Get_CamDir(CPipeLine::DIRSTATE eState);
 
 public: /* For.Light_Manager */
 	const LIGHTDESC* Get_LightDesc(_uint iIndex);
@@ -89,8 +90,8 @@ public: /* For.Light_Manager */
 	HRESULT Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
 	HRESULT Add_StaticLight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
 	HRESULT Reset_Lights();
-	_matrix Get_PlayerMatrix();
-	void Set_PlayerMatrix(_matrix Matrix);
+	_matrix Get_LightMatrix();
+	void Set_LightMatrix(_matrix Matrix);
 
 public: /* For.Font_Manager */
 	HRESULT Add_Fonts(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontTag, const _tchar* pFontFilePath);

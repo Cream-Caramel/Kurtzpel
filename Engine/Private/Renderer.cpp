@@ -46,7 +46,7 @@ HRESULT CRenderer::Initialize_Prototype()
 	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Specular"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_ShadowDepth"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, &_float4(1.f, 1.f, 1.f, 1.f))))
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_ShadowDepth"), (_uint)ViewportDesc.Width * 6, (_uint)ViewportDesc.Height * 6, DXGI_FORMAT_R32G32B32A32_FLOAT, &_float4(1.f, 1.f, 1.f, 1.f))))
 		return E_FAIL;
 
 	/* For.MRT_Deferred */
@@ -328,16 +328,14 @@ HRESULT CRenderer::Render_Blend()
 	
 	_matrix		LightViewMatrix;
 
-	LightViewMatrix = CGameInstance::Get_Instance()->Get_PlayerMatrix();
+	LightViewMatrix = CGameInstance::Get_Instance()->Get_LightMatrix();
 
 	LightViewMatrix = XMMatrixTranspose(LightViewMatrix);
 	if (FAILED(m_pShader->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
 		return E_FAIL;
 
-	_matrix		LightProjMatrix;
-	LightProjMatrix = XMMatrixTranspose(CPipeLine::Get_Instance()->Get_TransformMatrix(CPipeLine::D3DTS_PROJ));
-
-	if (FAILED(m_pShader->Set_RawValue("g_LightProjMatrix", &LightProjMatrix, sizeof(_float4x4))))
+	_matrix Fov60 = XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f), (_float)1280.f / 720.f, 0.2f, 300.f);
+	if (FAILED(m_pShader->Set_RawValue("g_LightProjMatrix", &XMMatrixTranspose(Fov60), sizeof(_float4x4))))
 		return E_FAIL;
 
 

@@ -333,6 +333,14 @@ _float4 CGameInstance::Get_CamPosition()
 	return m_pPipeLine->Get_CamPosition();
 }
 
+_float3 CGameInstance::Get_CamDir(CPipeLine::DIRSTATE eState)
+{
+	if (nullptr == m_pPipeLine)
+		return _float3();
+
+	return m_pPipeLine->Get_CamDir(eState);
+}
+
 const LIGHTDESC * CGameInstance::Get_LightDesc(_uint iIndex)
 {
 	if (nullptr == m_pLight_Manager)
@@ -381,14 +389,14 @@ HRESULT CGameInstance::Reset_Lights()
 	return m_pLight_Manager->Reset_Lights();
 }
 
-_matrix CGameInstance::Get_PlayerMatrix()
+_matrix CGameInstance::Get_LightMatrix()
 {
-	return m_pLight_Manager->Get_PlayerMatrix();
+	return m_pLight_Manager->Get_LightMatrix();
 }
 
-void CGameInstance::Set_PlayerMatrix(_matrix Matrix)
+void CGameInstance::Set_LightMatrix(_matrix Matrix)
 {
-	m_pLight_Manager->Set_PlayerMatrix(Matrix);
+	m_pLight_Manager->Set_LightMatrix(Matrix);
 }
 
 HRESULT CGameInstance::Add_Fonts(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _tchar * pFontTag, const _tchar * pFontFilePath)

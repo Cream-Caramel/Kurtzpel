@@ -139,7 +139,7 @@ HRESULT CPlayerHead::Render_ShadowDepth()
 
 			_matrix		LightViewMatrix;
 
-			LightViewMatrix = XMMatrixTranspose(GI->Get_PlayerMatrix());
+			LightViewMatrix = XMMatrixTranspose(GI->Get_LightMatrix());
 
 			_float4x4		WorldMatrix;
 

@@ -192,7 +192,6 @@ PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN_SHADOW In)
 	// 빛에서 바라본 
 	//               0~ 300    0~1
 	Out.vLightDepth.r = In.vProjPos.w / 300.f;
-	Out.vLightDepth.g = 0.5f;
 	// Out.vLightDepth.r = 1.f;
 
 
@@ -597,7 +596,7 @@ technique11 DefaultTechnique
 	pass Shadow_Depth
 	{
 		SetRasterizerState(RS_Default);
-		SetDepthStencilState(DSS_Shadow, 0);
+		SetDepthStencilState(DSS_Default, 0);
 		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
 		VertexShader = compile vs_5_0 VS_MAIN_SHADOW();

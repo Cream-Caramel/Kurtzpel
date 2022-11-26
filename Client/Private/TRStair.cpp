@@ -40,6 +40,7 @@ void CTRStair::Tick(_float fTimeDelta)
 
 void CTRStair::LateTick(_float fTimeDelta)
 {
+	//m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 
 }
@@ -87,6 +88,43 @@ HRESULT CTRStair::Render()
 		if (FAILED(m_pModel->Render(i)))
 			return E_FAIL;
 	}
+	return S_OK;
+}
+
+HRESULT CTRStair::Render_ShadowDepth()
+{
+	_matrix		LightViewMatrix;
+	LightViewMatrix = XMMatrixTranspose(GI->Get_LightMatrix());
+
+	_float4x4		WorldMatrix;
+	XMStoreFloat4x4(&WorldMatrix, XMMatrixIdentity());
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
+		return E_FAIL;
+
+	_matrix		LightProjMatrix;
+	LightProjMatrix = XMMatrixTranspose(GI->Get_TransformMatrix(CPipeLine::D3DTS_PROJ));
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &LightProjMatrix, sizeof(_float4x4))))
+		return E_FAIL;
+
+
+	if (m_pModel != nullptr)
+	{
+		_uint		iNumMeshes = m_pModel->Get_NumMeshes();
+		for (_uint j = 0; j < iNumMeshes; ++j)
+		{
+			if (FAILED(m_pShaderCom->Begin(INSTANCEMODEL_SHADOW)))
+				return E_FAIL;
+
+			if (FAILED(m_pModel->Render(j)))
+				return E_FAIL;
+		}
+	}
+
 	return S_OK;
 }
 

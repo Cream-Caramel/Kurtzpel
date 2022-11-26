@@ -23,14 +23,14 @@ public:
 	HRESULT Add_StaticLight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const LIGHTDESC& LightDesc);
 	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 	void Tick(_float fTimeDelta);
-	_matrix Get_PlayerMatrix() { return m_PlayerMatrix; }
-	void Set_PlayerMatrix(_matrix matrix) { m_PlayerMatrix = matrix; }
+	_matrix Get_LightMatrix() { return m_LightMatrix; }
+	void Set_LightMatrix(_matrix matrix) { m_LightMatrix = matrix; }
 private:
 	list<class CLight*>			m_Lights;
 	typedef list<class CLight*>	LIGHTS;
 
 	list <class CLight*>	m_StaticLights;
-	_matrix m_PlayerMatrix;
+	_matrix m_LightMatrix;
 public:
 	virtual void Free() override;
 };
