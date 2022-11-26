@@ -153,6 +153,10 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CPlayerEx::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerRageHit"),
+		CPlayerRageHit::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("PlayerRageSword"),
 		CPlayerRageSword::Create(m_pDevice, m_pContext))))
 		return E_FAIL;

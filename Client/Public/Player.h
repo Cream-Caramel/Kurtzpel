@@ -99,6 +99,7 @@ private:
 	void CreateRing();
 	void ReadyRageSword();
 	void SetRageSword();
+	void CreateRageHit(_float fTimeDelta);
 #pragma region PrivateFunction
 
 #pragma region KeyInput
@@ -191,7 +192,7 @@ private:
 	_float m_fSpinComboLoofTempo = 0.4f;
 	_float m_fEx1AttackSpeed = 0.f;
 	_float m_fExReadyAcc = 0.f;
-	
+	_float m_fRageAcc = 0.f;
 	
 	
 	_float m_fTurnSpeed = 0.f; //이팩트 턴스피드

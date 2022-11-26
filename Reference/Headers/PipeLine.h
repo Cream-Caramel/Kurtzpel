@@ -9,6 +9,7 @@ class CPipeLine	final : public CBase
 	DECLARE_SINGLETON(CPipeLine)
 public:
 	enum TRANSFORMSTATE { D3DTS_VIEW, D3DTS_PROJ, D3DTS_UIPROJ, D3DTS_IDENTITY,  D3DTS_END };
+	enum DIRSTATE {DIR_RIGHT, DIR_UP, DIR_LOOK, DIR_END};
 
 private:
 	CPipeLine();
@@ -41,6 +42,8 @@ public:
 	_float4 Get_CamPosition() const {
 		return m_vCamPosition;
 	}
+
+	_float3 Get_CamDir(DIRSTATE eState);
 
 public:
 	void Update();

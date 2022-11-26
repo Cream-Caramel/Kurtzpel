@@ -19,6 +19,7 @@
 #include "Ring.h"
 #include "PlayerRageSword.h"
 #include "PlayerHit1.h"
+#include "PlayerRageHit.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CAnimMesh(pDevice, pContext)
@@ -104,7 +105,12 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_5))
 	{	
-		m_bCollision = false;
+	
+		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
+		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+		PlayerRageHit.fRotation = 90.f;
+		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
 	}
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
@@ -825,6 +831,7 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
+		m_fRageAcc = 0.f;
 		m_bDoubleSlash = true;
 		m_fNowMp -= 30.f;
 		GI->PlaySoundW(L"SlashVoice.ogg", SD_PLAYERVOICE, 0.9f);
@@ -1633,6 +1640,19 @@ void CPlayer::SetRageSword()
 	
 	
 
+}
+
+void CPlayer::CreateRageHit(_float fTimeDelta)
+{
+	m_fRageAcc += 1.f * fTimeDelta;
+	if (m_fRageAcc >= 0.f && m_fRageAcc <= 0.1f)
+	{
+		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
+		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+		PlayerRageHit.fRotation = 180.f;
+		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
+	}
 }
 
 void CPlayer::ReadyRageSword()
@@ -2765,6 +2785,7 @@ void CPlayer::Update(_float fTimeDelta)
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
+				CreateRageHit(fTimeDelta);
 				
 			}
 		}

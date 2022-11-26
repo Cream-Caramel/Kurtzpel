@@ -1,28 +1,28 @@
 #include "stdafx.h"
-#include "..\Public\PlayerHit1.h"
+#include "..\Public\PlayerRageHit.h"
 #include "GameInstance.h"
 #include "Pointer_Manager.h"
 
-CPlayerHit1::CPlayerHit1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPlayerRageHit::CPlayerRageHit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMesh(pDevice, pContext)
 {
 	m_pModel = nullptr;
 }
 
-CPlayerHit1::CPlayerHit1(const CPlayerHit1& rhs)
+CPlayerRageHit::CPlayerRageHit(const CPlayerRageHit& rhs)
 	: CMesh(rhs)
 {
 }
 
-HRESULT CPlayerHit1::Initialize_Prototype()
+HRESULT CPlayerRageHit::Initialize_Prototype()
 {
 	__super::Initialize_Prototype();
 	return S_OK;
 }
 
-HRESULT CPlayerHit1::Initialize(void * pArg)
+HRESULT CPlayerRageHit::Initialize(void * pArg)
 {
-	m_PlayerHit1Info = (*(PLAYERHIT1INFO*)pArg);
+	m_PlayerRageHitInfo = (*(PLAYERRAGEHITINFO*)pArg);
 
 	CTransform::TRANSFORMDESC		TransformDesc;
 	ZeroMemory(&TransformDesc, sizeof(TransformDesc));
@@ -58,13 +58,16 @@ HRESULT CPlayerHit1::Initialize(void * pArg)
 	m_fMaxUVIndexY = 2;
 	m_fUVSpeed = 0.04f;
 	
-	m_pTransformCom->Set_WorldMatrix(m_PlayerHit1Info.vWorldMatrix);
-	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_PlayerHit1Info.vScale));
-	m_pTransformCom->TurnAngle(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMConvertToRadians(m_PlayerHit1Info.fRotation));
+	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_PlayerRageHitInfo.vWorldPos));
+	_vector CamLook = XMLoadFloat4(&GI->Get_CamPosition()) - XMLoadFloat4(&m_PlayerRageHitInfo.vWorldPos);
+	//m_pTransformCom->LookAt(CamLook);
+	m_pTransformCom->Set_Scale(XMLoadFloat3(&m_PlayerRageHitInfo.vScale));
+	m_pTransformCom->TurnAngle(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMConvertToRadians(m_PlayerRageHitInfo.fRotation));
+	//m_pTransformCom->TurnAngle(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMConvertToRadians(m_PlayerRageHitInfo.fRotation));
 	return S_OK;
 }
 
-void CPlayerHit1::Tick(_float fTimeDelta)
+void CPlayerRageHit::Tick(_float fTimeDelta)
 {
 	if (!m_bEnd)
 	{
@@ -96,7 +99,7 @@ void CPlayerHit1::Tick(_float fTimeDelta)
 
 }
 
-void CPlayerHit1::LateTick(_float fTimeDelta)
+void CPlayerRageHit::LateTick(_float fTimeDelta)
 {
 	if (nullptr == m_pRendererCom)
 		return;
@@ -107,7 +110,7 @@ void CPlayerHit1::LateTick(_float fTimeDelta)
 
 }
 
-HRESULT CPlayerHit1::Render()
+HRESULT CPlayerRageHit::Render()
 {
 	if (nullptr == m_pModel ||
 		nullptr == m_pShaderCom)
@@ -145,33 +148,33 @@ HRESULT CPlayerHit1::Render()
 	return S_OK;
 }
 
-CMesh * CPlayerHit1::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMesh * CPlayerRageHit::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CPlayerHit1*		pInstance = new CPlayerHit1(pDevice, pContext);
+	CPlayerRageHit*		pInstance = new CPlayerRageHit(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed To Created : CPlayerHit1"));
+		MSG_BOX(TEXT("Failed To Created : CPlayerRageHit"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject * CPlayerHit1::Clone(void * pArg)
+CGameObject * CPlayerRageHit::Clone(void * pArg)
 {
-	CPlayerHit1*		pInstance = new CPlayerHit1(*this);
+	CPlayerRageHit*		pInstance = new CPlayerRageHit(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed To Cloned : CPlayerHit1"));
+		MSG_BOX(TEXT("Failed To Cloned : CPlayerRageHit"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPlayerHit1::Free()
+void CPlayerRageHit::Free()
 {
 	__super::Free();
 	Safe_Release(m_pModel);

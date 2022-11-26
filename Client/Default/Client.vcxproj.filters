@@ -232,6 +232,9 @@
     <Filter Include="02.GameObjects\Effect\Player\Rage">
       <UniqueIdentifier>{6200e069-1d83-4c9b-81f6-104f4401bba1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Player\RageHit">
+      <UniqueIdentifier>{8541bc2f-d9de-49b0-ac11-0e200a0c5366}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -513,6 +516,9 @@
     <ClInclude Include="..\Public\PlayerRageSword.h">
       <Filter>02.GameObjects\Effect\Player\Rage</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PlayerRageHit.h">
+      <Filter>02.GameObjects\Effect\Player\RageHit</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -775,6 +781,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\PlayerRageSword.cpp">
       <Filter>02.GameObjects\Effect\Player\Rage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerRageHit.cpp">
+      <Filter>02.GameObjects\Effect\Player\RageHit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
