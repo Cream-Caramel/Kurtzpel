@@ -40,7 +40,7 @@ void CTRStair::Tick(_float fTimeDelta)
 
 void CTRStair::LateTick(_float fTimeDelta)
 {
-	//m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 
 }
@@ -105,10 +105,9 @@ HRESULT CTRStair::Render_ShadowDepth()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
 		return E_FAIL;
 
-	_matrix		LightProjMatrix;
-	LightProjMatrix = XMMatrixTranspose(GI->Get_TransformMatrix(CPipeLine::D3DTS_PROJ));
+	_matrix Fov60 = XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f), (_float)1280.f / 720.f, 0.2f, 300.f);
 
-	if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &LightProjMatrix, sizeof(_float4x4))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &XMMatrixTranspose(Fov60), sizeof(_float4x4))))
 		return E_FAIL;
 
 

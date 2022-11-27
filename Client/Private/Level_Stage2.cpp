@@ -78,14 +78,14 @@ HRESULT CLevel_Stage2::Ready_Lights()
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
 
-	_vector vLightEye = { 60.f, 40.f, 80.f };
-	_vector vLightAt = { 90.f, 0.f, 130.f };
+	_vector vLightEye = { 180.f, 60.f, -20.f };
+	_vector vLightAt = { 0.f, 0.f, 100.f };
 	_vector vLightUp = { 0.f, 1.f, 0.f };
 	_matrix LightViewMatrix;
 
 	LightViewMatrix = XMMatrixLookAtLH(vLightEye, vLightAt, vLightUp);
 	GI->Set_LightMatrix(LightViewMatrix);
-
+	_vector vPos = { 100.2f, 0.147f, -1.5f, 1.f };
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;

@@ -179,6 +179,7 @@ void CTheo::LateTick(_float fTimeDelta)
 		if (m_bRHand)
 			CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB[OBB_RHAND]);
 	}
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
@@ -270,6 +271,39 @@ HRESULT CTheo::Render()
 		if(m_bColliderRender)
 			m_pOBB[i]->Render();
 	}
+	return S_OK;
+}
+
+HRESULT CTheo::Render_ShadowDepth()
+{
+	_matrix		LightViewMatrix;
+	LightViewMatrix = XMMatrixTranspose(GI->Get_LightMatrix());
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
+		return E_FAIL;
+
+	_matrix Fov60 = XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f), (_float)1280.f / 720.f, 0.2f, 300.f);
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &XMMatrixTranspose(Fov60), sizeof(_float4x4))))
+		return E_FAIL;
+
+	for (int i = 0; i < MODEL_END; ++i)
+	{
+		if (m_pAnimModel != nullptr)
+		{
+			_uint		iNumMeshes = m_pAnimModel->Get_NumMeshes();
+			for (_uint j = 0; j < iNumMeshes; ++j)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_SHADOW)))
+					return E_FAIL;
+			}
+		}
+	}
+
+
 	return S_OK;
 }
 
@@ -1069,7 +1103,7 @@ void CTheo::Update(_float fTimeDelta)
 	{
 		if (!m_pAnimModel->GetChangeBool())
 		{
-			m_fWalkSpeed = 1.5f;
+			m_fWalkSpeed = 5.f;
 			Set_Dir();
 			_float Distance = XMVectorGetX(XMVector4Length(XMLoadFloat3(&m_pTarget->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION)));
 			if (Distance < 5.f)

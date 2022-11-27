@@ -98,7 +98,7 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_4))
 	{
-		
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,1.f,0.f });
 	}
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
@@ -106,11 +106,12 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_5))
 	{	
 	
-		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
+		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,1.f,0.f });
+		/*CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
 		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 20.f);
 		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
 		PlayerRageHit.fRotation = 90.f;
-		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
+		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);*/
 	}
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
@@ -478,7 +479,6 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
-		m_bFixShadow = false;
 		m_bAction = false;
 		break;
 	case Client::CPlayer::JUMPUP:
@@ -501,7 +501,6 @@ void CPlayer::Set_State(STATE eState)
 			WorldPos.y += 0.5f;
 			PTM->CreateParticle(L"PlayerJump", WorldPos, true, CAlphaParticle::DIR_END);
 		}
-		m_bFixShadow = true;
 		m_bAction = false;
 		GI->PlaySoundW(L"Jump.ogg", SD_PLAYER1, 0.6f);
 		m_pTransformCom->Set_Jump(true);
@@ -516,7 +515,6 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
-		m_bFixShadow = false;
 		m_bAction = false;
 		CRM->Set_FovSpeed(150.f);
 		CRM->Set_FovDir(true);
@@ -528,7 +526,6 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
-		m_bFixShadow = false;
 		GI->PlaySoundW(L"Dash.ogg", SD_PLAYER1, 0.6f);
 		m_bAction = false;
 		m_fNowMp -= 5.f;
@@ -571,7 +568,6 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
-		m_bFixShadow = false;
 		m_fRunSpeed = 8.f;
 		break;
 	case Client::CPlayer::RUNEND:
@@ -662,7 +658,6 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
-		m_bFixShadow = true;
 		GI->PlaySoundW(L"AttackVoice1.ogg", SD_PLAYERVOICE, 0.9f);
 		GI->PlaySoundW(L"AirCombo1.ogg", SD_PLAYER1, 0.6f);
 		m_fNowMp -= 3.f;
@@ -692,7 +687,6 @@ void CPlayer::Set_State(STATE eState)
 		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::AIRCOMBOEND:
-		m_bFixShadow = false;
 		CRM->Start_Fov(50.f, 140.f);
 		CRM->Set_FovDir(true);
 		CRM->Start_Shake(0.3f, 3.f, 0.03f);
@@ -801,7 +795,6 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
-		m_bFixShadow = true;
 		GI->PlaySoundW(L"BladeAttackStart.ogg", SD_PLAYER1, 1.f);
 		m_fNowMp -= 20.f;
 		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
@@ -832,7 +825,6 @@ void CPlayer::Set_State(STATE eState)
 			Change_WeaponPos();
 		}
 
-		m_bFixShadow = true;
 		GI->PlaySoundW(L"AttackVoice6.ogg", SD_PLAYERVOICE, 0.9f);
 		PM->Set_PlayerGage2_1(true);
 		PM->Set_PlayerGage2_2(true);

@@ -159,7 +159,6 @@ private:
 	_bool m_bNomal4Hit = false;
 	_bool m_bFastComboHit = false;
 	_bool m_bSpinComboHit = false;
-	_bool m_bFixShadow = false;
 	_bool m_bRageSkill = false;
 
 	_float m_fJumpSpeed = 15.f; // 점프중 스피드

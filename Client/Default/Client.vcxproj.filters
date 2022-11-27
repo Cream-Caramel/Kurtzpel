@@ -226,14 +226,14 @@
     <Filter Include="02.GameObjects\Effect\Player\Hit1">
       <UniqueIdentifier>{001b1da8-7a8b-4aee-bae6-70181dc3716e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\AnimMesh\Monster\Theo\DragonTrail">
-      <UniqueIdentifier>{6593cfb3-7b5d-4068-bc28-5d32151a7308}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Effect\Player\Rage">
       <UniqueIdentifier>{6200e069-1d83-4c9b-81f6-104f4401bba1}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\Effect\Player\RageHit">
       <UniqueIdentifier>{8541bc2f-d9de-49b0-ac11-0e200a0c5366}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Dragon\DragonTrail">
+      <UniqueIdentifier>{6593cfb3-7b5d-4068-bc28-5d32151a7308}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -505,7 +505,7 @@
       <Filter>02.GameObjects\Effect\Dragon\DragonFire1</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DragonTrail.h">
-      <Filter>02.GameObjects\AnimMesh\Monster\Theo\DragonTrail</Filter>
+      <Filter>02.GameObjects\Effect\Dragon\DragonTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DragonFire2.h">
       <Filter>02.GameObjects\Effect\Dragon\DragonFire2</Filter>
@@ -771,7 +771,7 @@
       <Filter>02.GameObjects\Effect\Dragon\DragonFire1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DragonTrail.cpp">
-      <Filter>02.GameObjects\AnimMesh\Monster\Theo\DragonTrail</Filter>
+      <Filter>02.GameObjects\Effect\Dragon\DragonTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DragonFire2.cpp">
       <Filter>02.GameObjects\Effect\Dragon\DragonFire2</Filter>

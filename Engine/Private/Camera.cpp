@@ -25,9 +25,13 @@ HRESULT CCamera::Initialize_Prototype()
 HRESULT CCamera::Initialize(void * pArg)
 {
 	memcpy(&m_CameraDesc, pArg, sizeof(CAMERADESC));
-
+	
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&m_CameraDesc.vEye));
 	m_pTransformCom->LookAt(XMLoadFloat4(&m_CameraDesc.vAt));
+	CPipeLine*			pPipeLine = GET_INSTANCE(CPipeLine);
+	pPipeLine->Set_Transform(CPipeLine::D3DTS_IDENTITY, XMMatrixIdentity());
+	pPipeLine->Set_Transform(CPipeLine::D3DTS_UIPROJ, XMMatrixTranspose(XMMatrixOrthographicLH(1280, 720, 0.f, 1.f)));
+	RELEASE_INSTANCE(CPipeLine);
 
 	return S_OK;
 }
@@ -38,8 +42,8 @@ void CCamera::Tick(_float fTimeDelta)
 
 	pPipeLine->Set_Transform(CPipeLine::D3DTS_VIEW, m_pTransformCom->Get_WorldMatrixInverse());
 	pPipeLine->Set_Transform(CPipeLine::D3DTS_PROJ, XMMatrixPerspectiveFovLH(m_CameraDesc.fFovy, m_CameraDesc.fAspect, m_CameraDesc.fNear, m_CameraDesc.fFar));
-	pPipeLine->Set_Transform(CPipeLine::D3DTS_UIPROJ, XMMatrixTranspose(XMMatrixOrthographicLH(1280, 720, 0.f, 1.f)));
-	pPipeLine->Set_Transform(CPipeLine::D3DTS_IDENTITY, XMMatrixIdentity());
+	
+	
 	RELEASE_INSTANCE(CPipeLine);
 }
 

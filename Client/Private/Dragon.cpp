@@ -207,6 +207,7 @@ void CDragon::LateTick(_float fTimeDelta)
 		if (m_bAttack)
 			CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB[OBB_ATTACK]);
 	}
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
@@ -277,6 +278,39 @@ HRESULT CDragon::Render()
 			m_pOBB[i]->Render();
 	}
 	
+	return S_OK;
+}
+
+HRESULT CDragon::Render_ShadowDepth()
+{
+	_matrix		LightViewMatrix;
+	LightViewMatrix = XMMatrixTranspose(GI->Get_LightMatrix());
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &m_pTransformCom->Get_WorldFloat4x4_TP(), sizeof(_float4x4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_LightViewMatrix", &LightViewMatrix, sizeof(_float4x4))))
+		return E_FAIL;
+
+	_matrix Fov60 = XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f), (_float)1280.f / 720.f, 0.2f, 300.f);
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_LightProjMatrix", &XMMatrixTranspose(Fov60), sizeof(_float4x4))))
+		return E_FAIL;
+
+	for (int i = 0; i < MODEL_END; ++i)
+	{
+		if (m_pAnimModel != nullptr)
+		{
+			_uint		iNumMeshes = m_pAnimModel->Get_NumMeshes();
+			for (_uint j = 0; j < iNumMeshes; ++j)
+			{
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_SHADOW)))
+					return E_FAIL;
+			}
+		}
+	}
+
+
 	return S_OK;
 }
 

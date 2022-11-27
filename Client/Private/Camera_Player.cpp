@@ -50,7 +50,7 @@ void CCamera_Player::Tick(_float fTimeDelta)
 {
 	if (!CRM->Get_bScene())
 	{
-	
+
 		_long	MouseMove = 0;
 
 		if (MouseMove = GI->Get_DIMMoveState(DIMM_X))
@@ -62,16 +62,6 @@ void CCamera_Player::Tick(_float fTimeDelta)
 		{
 			m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), MouseMove * fTimeDelta * 0.05f);
 		}
-
-	}
-	
-}
-
-void CCamera_Player::LateTick(_float fTimeDelta)
-{
-	if (!CRM->Get_bScene())
-	{
-		
 		if (m_bShake)
 			Shake(fTimeDelta);
 		else
@@ -83,7 +73,7 @@ void CCamera_Player::LateTick(_float fTimeDelta)
 		}
 		_float4 _vCurPos;
 		XMStoreFloat4(&_vCurPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-		
+
 		if (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] < m_pPlayer->Get_NaviPosY() + 0.1f)
 		{
 			_float4 Pos;
@@ -92,27 +82,27 @@ void CCamera_Player::LateTick(_float fTimeDelta)
 			if (m_vDistance.z < -2.f)
 			{
 				m_vDistance.z += 0.1f;
-			}		
+			}
 		}
 		else if (m_vDistance.z > -6.f && (m_pTransformCom->Get_State(CTransform::STATE_POSITION).m128_f32[1] > m_pPlayer->Get_NaviPosY() + 0.2f))
 		{
 			m_vDistance.z -= 0.1f;
-		}
-
-			
-	
-		__super::Tick(fTimeDelta);
-	}	
-	else
-	{	
-		PlayScene(fTimeDelta);	
-		__super::Tick(fTimeDelta);
+		}	
 	}
-
-	if(CRM->Get_bFov())
+	else
+	{
+		PlayScene(fTimeDelta);
+	}
+	if (CRM->Get_bFov())
 		Fov(fTimeDelta);
 
 	m_CameraDesc.fFovy = XMConvertToRadians(m_fNowFOV);
+	__super::Tick(fTimeDelta);
+}
+
+void CCamera_Player::LateTick(_float fTimeDelta)
+{
+	__super::Tick(fTimeDelta);
 }
 
 HRESULT CCamera_Player::Render()
