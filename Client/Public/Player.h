@@ -2,6 +2,7 @@
 #include "Client_Defines.h"
 #include "AnimMesh.h"
 #include "Mesh.h"
+#include "PlayerRageHit.h"
 BEGIN(Engine)
 class CHierarchyNode;
 class COBB;
@@ -42,6 +43,14 @@ public:
 		, STATE_END};
 	enum OBB {OBB_BODY, OBB_END};
 
+public:
+	typedef struct tagRageHitCreateInfo
+	{
+		_float fRight;
+		_float fHeight;
+		_float fRotation;
+		_float3 vScale;
+	}RAGEHITCREATE;
 private:
 	CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
 	CPlayer(const CPlayer& rhs);
@@ -99,6 +108,7 @@ private:
 	void CreateRing();
 	void ReadyRageSword();
 	void SetRageSword();
+	void CreateRageHitInfo();
 	void CreateRageHit(_float fTimeDelta);
 #pragma region PrivateFunction
 
@@ -192,7 +202,7 @@ private:
 	_float m_fEx1AttackSpeed = 0.f;
 	_float m_fExReadyAcc = 0.f;
 	_float m_fRageAcc = 0.f;
-	_float m_fRageSpeed = 0.1f;
+	_float m_fRageSpeed = 0.02f;
 	
 	
 	_float m_fTurnSpeed = 0.f; //이팩트 턴스피드
@@ -217,6 +227,9 @@ private:
 	_float3 m_vTargetLook; // 플레이어가 바라봐야할 방향
 	_float3 m_vPlayerPos; // 현재 플레이어의 위치
 	_uint m_iNowRageSowrd = 0;
+	_uint m_iRageHitIndex = 0;
+	_uint m_iRageCreateCount = 0;
+	vector<RAGEHITCREATE> m_RageHits;
 
 private:
 	CAnimModel* m_pAnimModel[MODEL_END]; // 플레이어, 상의, 하의 모델

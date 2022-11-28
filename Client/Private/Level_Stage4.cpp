@@ -79,7 +79,7 @@ HRESULT CLevel_Stage4::Ready_Lights()
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
 
-	_vector vLightEye = { 60.f, 70.f, -2.f };
+	_vector vLightEye = { 60.f, 70.f, -5.f };
 	_vector vLightAt = { 50.f, 0.f, 40.f };
 	_vector vLightUp = { 0.f, 1.f, 0.f };
 	_matrix LightViewMatrix;

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\Player.h"
+
 #include "GameInstance.h"
 #include "HierarchyNode.h"
 #include "Pointer_Manager.h"
@@ -83,6 +84,8 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_pTransformCom->Set_Gravity(0.f);
 	m_pTransformCom->Set_JumpPower(0.4f);
 	m_bAction = false;
+	CreateRageHitInfo();
+
 
 	return S_OK;
 }
@@ -98,20 +101,27 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_4))
 	{
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) - _vector{ 0.f,1.f,0.f });
+		
 	}
 	if (GI->Key_Down(DIK_0))
 		m_bColliderRender = !m_bColliderRender;
 
 	if (GI->Key_Down(DIK_5))
 	{	
-	
-		m_pTransformCom->Set_State(CTransform::STATE_POSITION, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + _vector{ 0.f,1.f,0.f });
-		/*CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
-		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 20.f);
+		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
+		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 5.f);
+		PlayerRageHit.vWorldPos.y += 10.f;
 		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-		PlayerRageHit.fRotation = 90.f;
-		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);*/
+		PlayerRageHit.fRotation = 140.f;
+		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
+	}
+	if (GI->Key_Down(DIK_6))
+	{
+		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
+		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 5.f);
+		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+		PlayerRageHit.fRotation = 50.f;
+		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
 	}
 	if (GI->Key_Down(DIK_8))
 		m_pNavigation->Set_NaviRender();
@@ -806,6 +816,9 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
+		m_iRageCreateCount = 0;
+		m_fRageSpeed = 0.4f;
+		m_iRageHitIndex = 0;
 		m_fRageAcc = 0.f;
 		m_bDoubleSlash = true;
 		m_fNowMp -= 30.f;
@@ -1616,17 +1629,218 @@ void CPlayer::SetRageSword()
 
 }
 
+void CPlayer::CreateRageHitInfo()
+{
+	RAGEHITCREATE PlayerRageHit;
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 90.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 80.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 70.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 60.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 90.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 80.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 70.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 60.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 90.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 80.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 70.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 60.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 90.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 80.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 70.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 60.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 90.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 80.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 70.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 60.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 90.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 80.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 70.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 60.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 90.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 80.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 70.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 60.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 90.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 80.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 70.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 60.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 90.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 80.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 70.f;
+	m_RageHits.push_back(PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 60.f;
+	m_RageHits.push_back(PlayerRageHit);
+
+	//GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
+
+	
+}
+
 void CPlayer::CreateRageHit(_float fTimeDelta)
 {
 	m_fRageAcc += 1.f * fTimeDelta;
 	if (m_fRageAcc >= m_fRageSpeed)
 	{
-		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
-		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 20.f);
-		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-		PlayerRageHit.fRotation = 90.f;
-		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
-		m_fRageAcc = 0.f;
+		if (m_iRageHitIndex < m_RageHits.size())
+		{
+			CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
+			XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * m_RageHits[m_iRageHitIndex].fRight);
+			PlayerRageHit.vWorldPos.y += m_RageHits[m_iRageHitIndex].fHeight;
+			PlayerRageHit.vScale = m_RageHits[m_iRageHitIndex].vScale;
+			PlayerRageHit.fRotation = m_RageHits[m_iRageHitIndex].fRotation;
+			GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
+			++m_iRageCreateCount;
+			m_fRageAcc = 0.f;
+			++m_iRageHitIndex;
+			if (m_iRageCreateCount >= 2)
+				if (m_fRageSpeed >= 0.1f)
+				{
+					m_fRageSpeed -= 0.05f;
+					m_iRageCreateCount = 0;
+				}
+		}
 	}
 }
 
@@ -2760,8 +2974,11 @@ void CPlayer::Update(_float fTimeDelta)
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
-				CreateRageHit(fTimeDelta);
-				
+				return;
+			}
+			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4))
+			{
+				//CreateRageHit(fTimeDelta);
 			}
 		}
 		

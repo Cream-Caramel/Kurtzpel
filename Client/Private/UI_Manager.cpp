@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "..\Public\UI_Manager.h"
 #include "UIInclude.h"
-
+#include "Mesh.h"
+#include "AnimMesh.h"
 
 IMPLEMENT_SINGLETON(CUI_Manager)
 
