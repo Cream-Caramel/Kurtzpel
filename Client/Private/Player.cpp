@@ -109,18 +109,19 @@ void CPlayer::Tick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_5))
 	{	
 		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
-		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 5.f);
-		PlayerRageHit.vWorldPos.y += 10.f;
+		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 0.f);
+		PlayerRageHit.vWorldPos.y -= 20.f;
 		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-		PlayerRageHit.fRotation = 140.f;
+		PlayerRageHit.fRotation = 0.f;
 		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
 	}
 	if (GI->Key_Down(DIK_6))
 	{
 		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
-		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 5.f);
+		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * -3.f);
+		PlayerRageHit.vWorldPos.y -= 18.f;
 		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-		PlayerRageHit.fRotation = 50.f;
+		PlayerRageHit.fRotation = -10.f;
 		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
 	}
 	if (GI->Key_Down(DIK_8))
@@ -191,14 +192,14 @@ void CPlayer::LateTick(_float fTimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 		
 	}
-	else
+	if (m_bRageSwordStart)
 	{
 		for (auto& Sword : m_RageSowrds)
 		{
 			Sword->LateTick(fTimeDelta);
 		}
-		
 	}
+	
 
 	if(m_bCollision)
 		CM->Add_OBBObject(CCollider_Manager::COLLIDER_PLAYER, this, m_pOBB[OBB_BODY]);
@@ -807,8 +808,8 @@ void CPlayer::Set_State(STATE eState)
 		}
 		GI->PlaySoundW(L"BladeAttackStart.ogg", SD_PLAYER1, 1.f);
 		m_fNowMp -= 20.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(4.f);
-		m_Parts[PARTS_SWORD]->Set_MaxHit(10);
+		m_Parts[PARTS_SWORD]->Set_Damage(2.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(20);
 		break;
 	case Client::CPlayer::SLASHATTACK:
 		if (!m_bAction)
@@ -816,20 +817,33 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = true;
 			Change_WeaponPos();
 		}
+		((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3(30.f, 30.f, 30.f));
 		m_iRageCreateCount = 0;
 		m_fRageSpeed = 0.4f;
 		m_iRageHitIndex = 0;
 		m_fRageAcc = 0.f;
 		m_bDoubleSlash = true;
+		m_bRageSwordStart = true;
+		m_iSwordIndex = 0;
 		m_fNowMp -= 30.f;
 		GI->PlaySoundW(L"SlashVoice.ogg", SD_PLAYERVOICE, 0.9f);
 		GI->PlaySoundW(L"DoubleSlash.ogg", SD_PLAYER2, 0.6f);
-		m_Parts[PARTS_SWORD]->Set_Damage(5.f);
-		m_Parts[PARTS_SWORD]->Set_MaxHit(30);
+		m_Parts[PARTS_SWORD]->Set_Damage(5.5f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(70);
 		SetRageSword();
 		break;
 	case Client::CPlayer::ROCKSHOT:
-		
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
+		m_bAction = true;	
+		m_fRockBreakSpeed = 6.f;
+		RockBreakVoice();
+		GI->PlaySoundW(L"RockBreakStart.ogg", SD_PLAYER1, 0.6f);
+		m_Parts[PARTS_SWORD]->Set_Damage(10.f);
+		m_Parts[PARTS_SWORD]->Set_MaxHit(1);
 		break;
 	case Client::CPlayer::EX1ATTACK:
 		if (!m_bAction)
@@ -847,7 +861,12 @@ void CPlayer::Set_State(STATE eState)
 		
 		break;
 	case Client::CPlayer::EX2ATTACK:
-		
+		if (!m_bAction)
+		{
+			m_bAction = true;
+			Change_WeaponPos();
+		}
+		break;
 	case Client::CPlayer::EX1READY:
 		
 		break;
@@ -1143,12 +1162,16 @@ void CPlayer::End_Animation()
 			m_bRageSkill = false;
 			break;
 		case Client::CPlayer::ROCKSHOT:
-			break;
-		case Client::CPlayer::EX1ATTACK:
+			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3(0.3f, 2.2f, 0.3f));
 			Set_State(IDLE);
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
+		case Client::CPlayer::EX1ATTACK:
+			
+			break;
 		case Client::CPlayer::EX2ATTACK:
+			Set_State(IDLE);
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::EX1READY:
 			break;
@@ -1623,198 +1646,312 @@ void CPlayer::SetRageSword()
 	XMStoreFloat4(&vSwordPos8, XMLoadFloat3(&m_vPlayerPos) + m_pTransformCom->Get_State(CTransform::STATE_LOOK) * -4.f + m_pTransformCom->Get_State(CTransform::STATE_RIGHT) * 4.f);
 	vSwordPos8.y += 6.f;
 	((CPlayerRageSword*)m_RageSowrds[7])->Set_On(vSwordPos8);
-	
-	
-	
 
 }
 
 void CPlayer::CreateRageHitInfo()
 {
 	RAGEHITCREATE PlayerRageHit;
+	//1
 	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.fHeight = -15.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 90.f;
+	PlayerRageHit.fRotation = 50.f;
 	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	//2
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 80.f;
+	PlayerRageHit.fRotation = 140.f;
 	m_RageHits.push_back(PlayerRageHit);
+	//3
 	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.fHeight = 5.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 70.f;
+	PlayerRageHit.fRotation = 100.f;
 	m_RageHits.push_back(PlayerRageHit);
+	//4
 	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.fHeight = -3.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 60.f;
+	PlayerRageHit.fRotation = 75.f;
 	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	//5
+	PlayerRageHit.fRight = 15.f;
+	PlayerRageHit.fHeight = -10.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 90.f;
+	PlayerRageHit.fRotation = 50.f;
 	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	//6
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 80.f;
+	PlayerRageHit.fRotation = 140.f;
 	m_RageHits.push_back(PlayerRageHit);
+	//7
 	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.fHeight = 5.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 70.f;
+	PlayerRageHit.fRotation = 100.f;
 	m_RageHits.push_back(PlayerRageHit);
+	//8
 	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	PlayerRageHit.fHeight = -3.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 60.f;
+	PlayerRageHit.fRotation = 75.f;
 	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	//9
+	PlayerRageHit.fRight = -3.f;
+	PlayerRageHit.fHeight = -18.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 90.f;
+	PlayerRageHit.fRotation = -10.f;
 	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	//10
+	PlayerRageHit.fRight = 6.f;
+	PlayerRageHit.fHeight = -17.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 80.f;
+	PlayerRageHit.fRotation = 20.f;
 	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	//11
+	PlayerRageHit.fRight = 14.f;
+	PlayerRageHit.fHeight = -15.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 70.f;
+	PlayerRageHit.fRotation = 40.f;
 	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
+	//12
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
 	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 60.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 90.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 80.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 70.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 60.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 90.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 80.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 70.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 60.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 90.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 80.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 70.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 60.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 90.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 80.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 70.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 60.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 90.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 80.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 70.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 60.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 90.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 80.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 70.f;
-	m_RageHits.push_back(PlayerRageHit);
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 2.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 60.f;
+	PlayerRageHit.fRotation = 140.f;
 	m_RageHits.push_back(PlayerRageHit);
 
-	//GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = -15.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 50.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//2
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 140.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//3
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 5.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 100.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//4
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = -3.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 75.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//5
+	PlayerRageHit.fRight = 15.f;
+	PlayerRageHit.fHeight = -10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 50.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//6
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 140.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//7
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 5.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 100.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//8
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = -3.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 75.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//9
+	PlayerRageHit.fRight = -3.f;
+	PlayerRageHit.fHeight = -18.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = -10.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//10
+	PlayerRageHit.fRight = 6.f;
+	PlayerRageHit.fHeight = -17.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 20.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//11
+	PlayerRageHit.fRight = 14.f;
+	PlayerRageHit.fHeight = -15.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 40.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//12
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 140.f;
+	m_RageHits.push_back(PlayerRageHit);
 
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = -15.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 50.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//2
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 140.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//3
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 5.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 100.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//4
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = -3.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 75.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//5
+	PlayerRageHit.fRight = 15.f;
+	PlayerRageHit.fHeight = -10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 50.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//6
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 140.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//7
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 5.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 100.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//8
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = -3.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 75.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//9
+	PlayerRageHit.fRight = -3.f;
+	PlayerRageHit.fHeight = -18.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = -10.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//10
+	PlayerRageHit.fRight = 6.f;
+	PlayerRageHit.fHeight = -17.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 20.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//11
+	PlayerRageHit.fRight = 14.f;
+	PlayerRageHit.fHeight = -15.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 40.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//12
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 140.f;
+	m_RageHits.push_back(PlayerRageHit);
+
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = -15.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 50.f;
+	m_RageHits.push_back(PlayerRageHit);
+
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 140.f;
+	m_RageHits.push_back(PlayerRageHit);
+
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 5.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 100.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//4
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = -3.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 75.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//5
+	PlayerRageHit.fRight = 15.f;
+	PlayerRageHit.fHeight = -10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 50.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//6
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 140.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//7
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = 5.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 100.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//8
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = -3.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 75.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//9
+	PlayerRageHit.fRight = -3.f;
+	PlayerRageHit.fHeight = -18.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = -10.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//10
+	PlayerRageHit.fRight = 6.f;
+	PlayerRageHit.fHeight = -17.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 20.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//11
+	PlayerRageHit.fRight = 14.f;
+	PlayerRageHit.fHeight = -15.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 40.f;
+	m_RageHits.push_back(PlayerRageHit);
+	//12
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 140.f;
+	m_RageHits.push_back(PlayerRageHit);
+
+	PlayerRageHit.fRight = 20.f;
+	PlayerRageHit.fHeight = -15.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 50.f;
+	m_RageHits.push_back(PlayerRageHit);
+
+	PlayerRageHit.fRight = 10.f;
+	PlayerRageHit.fHeight = 10.f;
+	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	PlayerRageHit.fRotation = 140.f;
+	m_RageHits.push_back(PlayerRageHit);
 	
 }
 
@@ -1825,21 +1962,33 @@ void CPlayer::CreateRageHit(_float fTimeDelta)
 	{
 		if (m_iRageHitIndex < m_RageHits.size())
 		{
+
 			CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
 			XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * m_RageHits[m_iRageHitIndex].fRight);
 			PlayerRageHit.vWorldPos.y += m_RageHits[m_iRageHitIndex].fHeight;
 			PlayerRageHit.vScale = m_RageHits[m_iRageHitIndex].vScale;
 			PlayerRageHit.fRotation = m_RageHits[m_iRageHitIndex].fRotation;
+			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
 			++m_iRageCreateCount;
 			m_fRageAcc = 0.f;
-			++m_iRageHitIndex;
-			if (m_iRageCreateCount >= 2)
-				if (m_fRageSpeed >= 0.1f)
-				{
-					m_fRageSpeed -= 0.05f;
-					m_iRageCreateCount = 0;
-				}
+			++m_iRageHitIndex;			
+			CRM->Start_Shake(0.2f, 3.f, 0.03f);			
+
+			if (m_fRageSpeed >= 0.08f)
+			{
+				CRM->Fix_Fov(CRM->Get_Fov() - 0.9f, 60.f);
+				CRM->Set_FovDir(false);
+				m_fRageSpeed -= 0.02f;
+				m_iRageCreateCount = 0;	
+			}
+		}
+		else
+		{
+			Set_State(EX1ATTACK);
+			m_bRageSkill = false;
+			m_bRageSwordStart = false;
+			m_bCharge1 = true;
 		}
 	}
 }
@@ -2418,7 +2567,6 @@ void CPlayer::Update(_float fTimeDelta)
 				if (m_bCharge1)
 				{
 					CWall::WALLINFO WallInfo;
-					m_Parts[PARTS_SWORD]->Set_Damage(100.f);
 					WallInfo.fMaxUVIndexX = 1.f;
 					WallInfo.fMaxUVIndexY = 4.f;
 					WallInfo.fUVSpeed = 0.05f;
@@ -2946,8 +3094,8 @@ void CPlayer::Update(_float fTimeDelta)
 				if (pPart->Get_MaxHp() != 0.1f)
 					pPart->Set_Collision(false);
 			}
+			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			m_bCollision = false;
-			m_bMotionChange = false;
 			Set_SwordTrailMatrix();
 
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
@@ -2957,9 +3105,6 @@ void CPlayer::Update(_float fTimeDelta)
 				GI->PlaySoundW(L"DoubleSlashStart.ogg", SD_PLAYER1, 0.6f);
 				CRM->Set_PlayerScene(true);
 				CRM->Start_Scene("Test1");
-				for (auto& iter : m_RageSowrds)
-					((CPlayerRageSword*)iter)->Set_Off();
-
 				return;
 			}
 
@@ -2974,27 +3119,19 @@ void CPlayer::Update(_float fTimeDelta)
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
+				m_Parts[PARTS_SWORD]->Set_Damage(3.f);
+
+				for (auto& iter : m_RageSowrds)
+				{
+					((CPlayerRageSword*)iter)->Set_Off();
+				}
 				return;
 			}
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4))
 			{
-				//CreateRageHit(fTimeDelta);
+				CreateRageHit(fTimeDelta);
 			}
 		}
-		
-		/*if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
-		{
-			m_Parts[PARTS_SWORD]->Set_Collision(true);
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3{ 4.f,4.f,4.f });
-			if (!m_bDoubleSlashFov && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
-				m_bDoubleSlashFov = true;
-		}
-
-		else
-		{
-			m_Parts[PARTS_SWORD]->Set_Collision(false);
-			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3(0.3f, 2.2f, 0.3f));
-		}*/
 		break;
 	case Client::CPlayer::ROCKSHOT:
 		break;
@@ -3007,7 +3144,7 @@ void CPlayer::Update(_float fTimeDelta)
 			else
 				GI->Set_Speed(L"Timer_Main", 1.f);
 		}
-	
+	                       
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
 		{
 			m_pTransformCom->Go_Dir(XMLoadFloat3(&m_vTargetLook), m_fEx1AttackSpeed, m_pNavigation, fTimeDelta);
@@ -3051,7 +3188,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
 				PTM->CreateParticle(L"Player1", WorldPos, true, CAlphaParticle::DIR_END);
-				m_Parts[PARTS_SWORD]->Set_Damage(90.f);
+				m_Parts[PARTS_SWORD]->Set_Damage(63.f);
 				Ex1AttackLight();
 				CreateRing();
 			}
@@ -3104,6 +3241,7 @@ void CPlayer::Update(_float fTimeDelta)
 			PTM->CreateParticle(L"ChargeOrange2", WorldPos, true, CAlphaParticle::DIR_PLAYER);
 			CRM->Start_Shake(0.2f, 2.f, 0.03f);
 			m_bCharge1 = true;
+			m_bCharge2 = false;
 		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 		{

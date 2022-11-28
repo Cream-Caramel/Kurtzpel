@@ -91,8 +91,10 @@ void CCamera_Player::Tick(_float fTimeDelta)
 	}
 	else
 	{
-		PlayScene(fTimeDelta);
+		if (!m_bStopScene)
+			PlayScene(fTimeDelta);
 	}
+
 	if (CRM->Get_bFov())
 		Fov(fTimeDelta);
 
@@ -204,8 +206,7 @@ void CCamera_Player::PlayScene(_float fTimeDelta)
 			}
 			else
 			{
-				m_pTransformCom->TurnY(m_vStartLook, test, 0.9f);
-				
+				m_pTransformCom->TurnY(m_vStartLook, test, 0.9f);				
 			}
 		}	
 	}
@@ -263,7 +264,7 @@ void CCamera_Player::Set_ScenePosInfo(vector<POSINFO> PosInfos)
 		_vector FixPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		POSINFO EndInfo;
 		XMStoreFloat3(&EndInfo.vPos, _vector{ FixPos.m128_f32[0], FixPos.m128_f32[1] , FixPos.m128_f32[2] });
-		EndInfo.fCamSpeed = 20.f;
+		EndInfo.fCamSpeed = 60.f;
 		EndInfo.fStopLimit = 0.f;
 		m_PosInfo.push_back(EndInfo);
 		m_bPosPlay = true;
@@ -273,7 +274,7 @@ void CCamera_Player::Set_ScenePosInfo(vector<POSINFO> PosInfos)
 	_vector FixPos = m_pTransformCom->Get_State(CTransform::STATE_POSITION);
 		POSINFO StartInfo;
 		XMStoreFloat3(&StartInfo.vPos, _vector{ FixPos.m128_f32[0], FixPos.m128_f32[1] , FixPos.m128_f32[2] });
-		StartInfo.fCamSpeed = 20.f;
+		StartInfo.fCamSpeed = 60.f;
 		StartInfo.fStopLimit = 0.f;
 		m_PosInfo.insert(m_PosInfo.begin(), StartInfo);
 	
@@ -449,6 +450,8 @@ void CCamera_Player::FixFov(_float fFov, _float fFovSpeed)
 	if (fFov == m_fTargetFOV)
 		return;
 
+	CRM->Set_Fov(true);
+
 	if (fFov > m_fTargetFOV)
 	{
 		m_eFovDir = FOVUP;
@@ -470,6 +473,27 @@ void CCamera_Player::End_Fov()
 	m_eFovDir = FOVEND;
 	m_iFovCount = 0;
 	CRM->EndFov();
+}
+
+
+void CCamera_Player::Stop_Scene()
+{
+	if (CRM->Get_bScene())
+	{
+		_vector test = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+
+		if (fabs(XMVectorGetX(m_vStartLook - test)) < 0.05f)
+		{
+			CRM->End_Scene();
+			CRM->Set_PlayerScene(false);
+			m_bStopScene = false;
+			m_pTransformCom->LookAt(m_pPlayer->Get_PlayerPos() + _vector{ 0.f,4.f,0.f,0.f });
+		}
+		else
+		{
+			m_pTransformCom->TurnY(m_vStartLook, test, 0.9f);
+		}
+	}
 }
 
 CCamera_Player * CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

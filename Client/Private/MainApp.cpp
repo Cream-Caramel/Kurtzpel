@@ -67,11 +67,19 @@ void CMainApp::Tick(_float fTimeDelta)
 
 	if (m_bScreen)
 	{
-		RECT Clip;
-		GetClientRect(g_hWnd, &Clip);
-		ClientToScreen(g_hWnd, (LPPOINT)&Clip);
-		ClientToScreen(g_hWnd, (LPPOINT)(&Clip.right));
-		ClipCursor(&Clip);
+	
+		GetClientRect(g_hWnd, &m_Clip);
+		m_p1.x = m_Clip.left + (LONG)300.f;
+		m_p1.y = m_Clip.top + (LONG)300.f;
+		m_p2.x = m_Clip.right - (LONG)300.f;
+		m_p2.y = m_Clip.bottom - (LONG)300.f;
+		ClientToScreen(g_hWnd, &m_p1);
+		ClientToScreen(g_hWnd, &m_p2);
+		m_Clip.left = m_p1.x;
+		m_Clip.top = m_p1.y;
+		m_Clip.right = m_p2.x;
+		m_Clip.bottom = m_p2.y;
+		ClipCursor(&m_Clip);
 	}
 	else
 	{

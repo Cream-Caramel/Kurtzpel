@@ -229,6 +229,8 @@ private:
 	_uint m_iNowRageSowrd = 0;
 	_uint m_iRageHitIndex = 0;
 	_uint m_iRageCreateCount = 0;
+	_uint m_iSwordIndex = 0;
+	_bool m_bRageSwordStart = false;
 	vector<RAGEHITCREATE> m_RageHits;
 
 private:

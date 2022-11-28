@@ -26,7 +26,9 @@ private:
 	_bool						m_bScreen = false;
 	CGameInstance*				m_pGameInstance = nullptr;
 	CRenderer*					m_pRenderer = nullptr;
-
+	RECT m_Clip;
+	POINT m_p1;
+	POINT m_p2;
 private:
 	ID3D11Device*				m_pDevice = nullptr;
 	ID3D11DeviceContext*		m_pContext = nullptr;

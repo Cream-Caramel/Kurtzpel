@@ -34,6 +34,7 @@ private:
 	_bool m_bEndDissolve = false;
 	_float m_fDissolveAcc = 0.f;
 	RAGESOWRD m_RageSowrdInfo;
+	_bool m_bRender = false;
 
 public:
 	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

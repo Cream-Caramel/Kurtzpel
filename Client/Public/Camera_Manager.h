@@ -28,8 +28,11 @@ public:
 	void Start_Fov(_float fFov, _float fFovSpeed);
 	void Fix_Fov(_float fFov, _float fFovSpeed);
 	void EndFov();
+	void Set_Fov(_bool bFov) { m_bFov = bFov; }
 	void Set_FovDir(_bool bFovDir) { m_bFovDIr = bFovDir; }
 	void Set_FovSpeed(_float fFovSpeed);
+	void Set_StopScene(_bool bStopScene);
+	_float Get_Fov();
 private:
 	_bool m_bScene = false;
 	_bool m_bPlayerScene = false;

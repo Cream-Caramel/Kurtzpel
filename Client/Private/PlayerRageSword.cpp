@@ -45,7 +45,8 @@ HRESULT CPlayerRageSword::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_bDead = false;
-	
+	m_bStartDissolve = false;
+	m_bEndDissolve = false;
 	/* For.Com_Model */
 	switch (m_RageSowrdInfo.iSowrdNum)
 	{
@@ -75,7 +76,7 @@ HRESULT CPlayerRageSword::Initialize(void * pArg)
 		break;
 	
 	}
-	m_pTransformCom->Set_Scale(_vector{ 1.f,1.f,1.f });
+	m_pTransformCom->Set_Scale(_vector{ 2.f,2.f,2.f });
 	//m_pTransformCom->Rotation(_vector{ 1.f,0.f,0.f }, 180.f);
 
 	return S_OK;
@@ -90,28 +91,29 @@ void CPlayerRageSword::LateTick(_float fTimeDelta)
 {
 	if (nullptr == m_pRendererCom)
 		return;
-
-	if (m_bStartDissolve)
+	if (m_bRender)
 	{
-		m_fDissolveAcc += 0.3f * fTimeDelta;
-		if (m_fDissolveAcc >= 0.67f)
+		if (m_bStartDissolve)
 		{
-			m_bStartDissolve = false;
-			m_fDissolveAcc = 0.f;
+			m_fDissolveAcc += 0.3f * fTimeDelta;
+			if (m_fDissolveAcc >= 6.f)
+			{
+				m_bStartDissolve = false;
+
+			}
 		}
-	}
-	else if (m_bEndDissolve)
-	{
-		m_fDissolveAcc += 0.3f * fTimeDelta;
-		if (m_fDissolveAcc >= 0.67f)
+		else if (m_bEndDissolve)
 		{
-			m_bEndDissolve = false;
-			m_fDissolveAcc = 0.f;
+			m_fDissolveAcc += 0.3f * fTimeDelta;
+			if (m_fDissolveAcc >= 6.f)
+			{
+		
+				m_bEndDissolve = false;
+				m_bRender = false;
+			}
 		}
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	}
-
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
-
 }
 
 HRESULT CPlayerRageSword::Render()
@@ -189,12 +191,14 @@ void CPlayerRageSword::Set_On(_float4 vPos)
 	m_bStartDissolve = true;
 	m_bEndDissolve = false;
 	m_fDissolveAcc = 0.f;
+	m_bRender = true;
 	vPos.w = 1.f;
 	m_pTransformCom->Set_State(CTransform::STATE_POSITION, XMLoadFloat4(&vPos));
 }
 
 void CPlayerRageSword::Set_Off()
 {
+	m_bStartDissolve = false;
 	m_bEndDissolve = true;
 	m_fDissolveAcc = 0.f;
 }

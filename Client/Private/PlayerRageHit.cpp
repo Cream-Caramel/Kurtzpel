@@ -139,7 +139,7 @@ HRESULT CPlayerRageHit::Render()
 		m_pShaderCom->Set_RawValue("g_fUVIndexX", &m_fShaderUVIndexX, sizeof(_float));
 		m_pShaderCom->Set_RawValue("g_fUVIndexY", &m_fShaderUVIndexY, sizeof(_float));
 
-		if (FAILED(m_pShaderCom->Begin(EFFECT_NDEFAULT)))
+		if (FAILED(m_pShaderCom->Begin(EFFECT_BACKPASS)))
 			return E_FAIL;
 
 		if (FAILED(m_pModel->Render(i)))

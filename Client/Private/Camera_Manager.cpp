@@ -273,6 +273,16 @@ void CCamera_Manager::Set_FovSpeed(_float fFovSpeed)
 	m_pCamPlayer->Set_FovSpeed(fFovSpeed);
 }
 
+void CCamera_Manager::Set_StopScene(_bool bStopScene)
+{
+	m_pCamPlayer->Set_StopScene(bStopScene);
+}
+
+_float CCamera_Manager::Get_Fov()
+{
+	return m_pCamPlayer->Get_Fov();
+}
+
 void CCamera_Manager::Free()
 {
 	Safe_Release(m_pCamPlayer);

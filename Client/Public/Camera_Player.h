@@ -38,8 +38,9 @@ public:
 	void FixFov(_float fFov, _float fFovSpeed);
 	void End_Fov();
 	void Set_FovSpeed(_float fFovSpeed) { m_fFovSpeed = fFovSpeed; }
-
-
+	_float Get_Fov() { return m_fNowFOV; }
+	void Stop_Scene();
+	void Set_StopScene(_bool bStopScene) { m_bStopScene = bStopScene; }
 private:
 	_float m_fOriginFOV = 60.f;
 	_float m_fTargetFOV = 0.f;
@@ -50,6 +51,7 @@ private:
 	_uint m_iFovCount = 0;
 	_bool m_bShake = false;
 	_bool m_bDir = false;
+	_bool m_bStopScene = false;
 	_float m_fShakeTime = 0.f;
 	_float m_fShakePower = 0.f;
 	_float m_fShakePowerAcc = 0.f;

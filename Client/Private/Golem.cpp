@@ -58,13 +58,13 @@ HRESULT CGolem::Initialize(void * pArg)
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 	m_fOutLinePower = 10.f;
 
-	m_fMaxHp = 100;
+	m_fMaxHp = 500;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 90.f;
 	m_fDamage = 10.f;
 
-	m_fColiisionTime = 0.1f;
+	m_fColiisionTime = 0.06f;
 
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
@@ -340,7 +340,7 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 
 		if (pOther->Can_Hit())
 		{
-			if (m_bPattern && pOther->Get_Damage() == 1.f || m_bPattern && pOther->Get_Damage() == 100.f)
+			if (pOther->Get_Damage() == 1.f || pOther->Get_Damage() == 100.f ||  pOther->Get_Damage() == 5.5f)
 			{
 				m_bFinish = false;
 				if (!m_bFinish)
@@ -366,10 +366,7 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 				CRM->Set_FovDir(true);
 			}
 
-			if (m_eCurState == RTDOWN || m_eCurState == DOWN)
-				m_fNowHp -= pOther->Get_Damage() * 2.f;
-
-			else if (m_eCurState == SKILL5_2)
+			if (m_eCurState == SKILL5_2)
 				m_fNowHp -= pOther->Get_Damage() * 0.2f;
 			else
 				m_fNowHp -= pOther->Get_Damage();
