@@ -218,6 +218,7 @@ struct PS_OUT
 	float4		vDiffuse : SV_TARGET0;
 	float4		vNormal : SV_TARGET1;
 	float4		vDepth : SV_TARGET2;
+	float4		vGrow : SV_TARGET3;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -237,7 +238,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
-
+	Out.vGrow = Out.vDiffuse;
 	if (0 == Out.vDiffuse.a)
 		discard;
 

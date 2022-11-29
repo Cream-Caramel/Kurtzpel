@@ -63,6 +63,11 @@ private:
 	HRESULT Render_FrontAlpha();
 	HRESULT Render_AlphaBlend();
 	HRESULT Render_UI();
+	HRESULT Render_BlurDownSample();
+	HRESULT Render_BlurHorizontal();
+	HRESULT Render_BlurVertical();
+	HRESULT Render_BlurUpSample();
+	HRESULT Render_Grow();
 
 #ifdef _DEBUG
 	HRESULT Render_Debug();

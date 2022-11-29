@@ -58,7 +58,7 @@ HRESULT CTarget_Manager::Bind_SRV(const _tchar * pTargetTag, CShader * pShader, 
 	return pRenderTarget->Bind_SRV(pShader, pConstantName);	
 }
 
-HRESULT CTarget_Manager::Begin_MRT(ID3D11DeviceContext * pContext, const _tchar * pMRTTag)
+HRESULT CTarget_Manager::Begin_MRT(ID3D11DeviceContext * pContext, const _tchar * pMRTTag, _bool bClear)
 {
 	list<CRenderTarget*>*		pMRTList = Find_MRT(pMRTTag);
 	if (nullptr == pMRTList)
@@ -71,10 +71,13 @@ HRESULT CTarget_Manager::Begin_MRT(ID3D11DeviceContext * pContext, const _tchar 
 
 	ID3D11RenderTargetView*			RTVs[8] = { nullptr };
 
+
 	for (auto& pRenderTarget : *pMRTList)
 	{		
-		pRenderTarget->Clear();
-	
+		if (bClear)
+		{
+			pRenderTarget->Clear();
+		}
 		RTVs[iNumRTVs++] = pRenderTarget->Get_RTV();
 	}	
 

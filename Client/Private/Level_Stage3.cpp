@@ -333,7 +333,7 @@ HRESULT CLevel_Stage3::Ready_Load_Model(char * DatName)
 		InstanceInfo->eLevel = LEVEL_STAGE3;
 		wstring Sky = ModelName;
 		if (Sky == L"S3Sky")
-			InstanceInfo->eRenderGroup = CRenderer::RENDER_PRIORITY;
+			InstanceInfo->eRenderGroup = CRenderer::RENDER_NONLIGHT;
 		
 		
 

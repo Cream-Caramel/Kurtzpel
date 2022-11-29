@@ -19,7 +19,7 @@ public:
 	HRESULT Bind_SRV(const _tchar* pTargetTag, class CShader* pShader, const char* pConstantName);
 
 	/* 기존에 있던 렌더타겟을 빼고, 지정한 렌더타겟들(mrt)을 장치에 순서대로 바인딩한다. */
-	HRESULT Begin_MRT(ID3D11DeviceContext* pContext, const _tchar* pMRTTag);
+	HRESULT Begin_MRT(ID3D11DeviceContext* pContext, const _tchar* pMRTTag, _bool bClear = true);
 	HRESULT Begin_ShadowMRT(ID3D11DeviceContext* pContext, const _tchar* pMRTTag);
 	/* 원래 상태로 복구한다.(BackBuffer를 장치에 셋한다.) */
 	HRESULT End_MRT(ID3D11DeviceContext* pContext);

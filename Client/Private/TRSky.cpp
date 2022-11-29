@@ -2,6 +2,7 @@
 #include "..\Public\TRSky.h"
 #include "GameInstance.h"
 #include "ModelsInstance.h"
+#include "Pointer_Manager.h"
 CTRSky::CTRSky(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	:CMeshInstance(pDevice, pContext)
 {
@@ -38,8 +39,7 @@ void CTRSky::Tick(_float fTimeDelta)
 
 void CTRSky::LateTick(_float fTimeDelta)
 {
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
-
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
 }
 
 HRESULT CTRSky::Render()
@@ -50,10 +50,10 @@ HRESULT CTRSky::Render()
 
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	_float4x4		WorldMatrix;
-	XMStoreFloat4x4(&WorldMatrix, XMMatrixIdentity());
+	_matrix		WorldMatrix;
+	WorldMatrix = XMMatrixIdentity();
 
-	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &WorldMatrix, sizeof(_float4x4))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrix", &XMMatrixTranspose(WorldMatrix), sizeof(_float4x4))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4_TP(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
 		return E_FAIL;

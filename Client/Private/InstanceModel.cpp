@@ -39,6 +39,7 @@ void CInstanceModel::Tick(_float fTimeDelta)
 
 void CInstanceModel::LateTick(_float fTimeDelta)
 {
+	//if(m_eRenderGroup != CRenderer::RENDER_PRIORITY)
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	m_pRendererCom->Add_RenderGroup(m_eRenderGroup, this);
 }
