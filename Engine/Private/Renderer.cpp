@@ -50,26 +50,26 @@ HRESULT CRenderer::Initialize_Prototype()
 		return E_FAIL;
 
 	/* For.Target_Blur */
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Blur"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Blur"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	/* For.Target_BlurDownSample */
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_BlurDownSample"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_BlurDownSample"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	/* For.Target_BlurHor */
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_BlurHor"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_BlurHor"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	/* For.Target_BlurVer */
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_BlurVer"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_BlurVer"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	/* For.Target_BlurUpSample */
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_BlurUpSample"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_BlurUpSample"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 	/* For.Target_Grow */
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Grow"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Grow"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
 	/* For.Target_Blend */
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Blend"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Blend"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.0f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
 
@@ -90,8 +90,16 @@ HRESULT CRenderer::Initialize_Prototype()
 		return E_FAIL;
 
 	/* For.MRT_Shadow */
-	if (FAILED(m_pTarget_Manager->Add_MRT(L"MRT_LightDepth", L"Target_ShadowDepth")))
+	if (FAILED(m_pTarget_Manager->Add_MRT(L"MRT_Shadow", L"Target_ShadowDepth")))
 		return E_FAIL;
+	/*if (FAILED(m_pTarget_Manager->Add_MRT(L"MRT_Shadow", L"Target_Diffuse")))
+		return E_FAIL;
+	if (FAILED(m_pTarget_Manager->Add_MRT(L"MRT_Shadow", L"Target_Normal")))
+		return E_FAIL;
+	if (FAILED(m_pTarget_Manager->Add_MRT(L"MRT_Shadow", L"Target_Depth")))
+		return E_FAIL;
+	if (FAILED(m_pTarget_Manager->Add_MRT(L"MRT_Shadow", L"Target_Blur")))
+		return E_FAIL;*/
 
 	/* For.MRT_BlurDownSample*/
 	if (FAILED(m_pTarget_Manager->Add_MRT(TEXT("MRT_BlurDownSample"), TEXT("Target_BlurDownSample"))))
@@ -126,7 +134,7 @@ HRESULT CRenderer::Initialize_Prototype()
 
 
 #ifdef _DEBUG
-	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_ShadowDepth"), ViewportDesc.Width - 75, 500.f, 150.f, 150.f)))
+	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_ShadowDepth"), ViewportDesc.Width - 75, 50.f, 150.f, 150.f)))
 		return E_FAIL;
 	if (FAILED(m_pTarget_Manager->Initialize_Debug(TEXT("Target_Diffuse"), 75.f, 200.f, 150.f, 150.f)))
 		return E_FAIL;
@@ -245,7 +253,7 @@ HRESULT CRenderer::Add_DebugGroup(CComponent* pDebugCom)
 
 HRESULT CRenderer::Render_Priority()
 {
-	if (FAILED(m_pTarget_Manager->Begin_ShadowMRT(m_pContext, TEXT("MRT_Blend"))))
+	if (FAILED(m_pTarget_Manager->Begin_MRT(m_pContext, TEXT("MRT_Blend"))))
 		return E_FAIL;
 
 	for (auto& pRenderObject : m_RenderObjects[RENDER_PRIORITY])
@@ -265,7 +273,7 @@ HRESULT CRenderer::Render_Priority()
 
 HRESULT CRenderer::Render_ShadowDepth()
 {
-	if (FAILED(m_pTarget_Manager->Begin_ShadowMRT(m_pContext, TEXT("MRT_LightDepth"))))                                                                                                                                           
+	if (FAILED(m_pTarget_Manager->Begin_ShadowMRT(m_pContext, TEXT("MRT_Shadow"))))                                                                                                                                           
 		return E_FAIL;
 
 	for (auto& pRenderObject : m_RenderObjects[RENDER_SHADOW])
@@ -761,7 +769,7 @@ HRESULT CRenderer::Render_Debug()
 		m_pTarget_Manager->Render_Debug(TEXT("MRT_Deferred"), m_pVIBuffer, m_pShader);
 		m_pTarget_Manager->Render_Debug(TEXT("MRT_LightAcc"), m_pVIBuffer, m_pShader);
 		m_pTarget_Manager->Render_Debug(TEXT("MRT_BlurUpSample"), m_pVIBuffer, m_pShader);
-		//m_pTarget_Manager->Render_Debug(TEXT("MRT_Blur"), m_pVIBuffer, m_pShader);
+		m_pTarget_Manager->Render_Debug(TEXT("MRT_Shadow"), m_pVIBuffer, m_pShader);
 	}
 
 	for (auto& pDebugCom : m_DebugObject)

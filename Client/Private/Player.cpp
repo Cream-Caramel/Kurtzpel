@@ -62,7 +62,7 @@ HRESULT CPlayer::Initialize(void * pArg)
 	m_eCurState = IDLE;
 	m_eNextState = IDLE;
 	m_vTargetLook = { 0.f,0.f,1.f};
-	m_fOutLinePower = 5.f;
+	m_fOutLinePower = 3.f;
 	Set_AniInfo();
 
 	for (int i = 0; i < MODEL_END; ++i)
@@ -108,12 +108,7 @@ void CPlayer::Tick(_float fTimeDelta)
 
 	if (GI->Key_Down(DIK_5))
 	{	
-		CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
-		XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * 0.f);
-		PlayerRageHit.vWorldPos.y -= 20.f;
-		PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-		PlayerRageHit.fRotation = 0.f;
-		GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
+		m_bCollision = false;
 	}
 	if (GI->Key_Down(DIK_6))
 	{
@@ -226,7 +221,7 @@ HRESULT CPlayer::Render()
 	{
 		if (m_pAnimModel[i] != nullptr)
 		{		
-			m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+			
 				
 			_uint		iNumMeshes = m_pAnimModel[i]->Get_NumMeshes();
 			for (_uint j = 0; j < iNumMeshes; ++j)
@@ -235,61 +230,42 @@ HRESULT CPlayer::Render()
 					return E_FAIL;
 
 				if (FAILED(m_pAnimModel[i]->SetUp_OnShader(m_pShaderCom, m_pAnimModel[i]->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
+					return E_FAIL;
+				else
 				{							
+
+					if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
+						return E_FAIL;
+
+					if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+						return E_FAIL;
+
+					_uint		iNumViewport = 1;
+
+					D3D11_VIEWPORT		ViewportDesc;
+
+					m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
+
+					m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
+					m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
+					m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+
+					if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, OUTLINEPASS)))
+						return E_FAIL;
 					
+					
+					if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_DEFAULT)))
+						return E_FAIL;
+
+
 					if (!m_bCollision)
 					{
-						if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
-							return E_FAIL;
+						m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));                                                                                                                                                                                             
 
-						if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-							return E_FAIL;
-
-						_uint		iNumViewport = 1;
-
-						D3D11_VIEWPORT		ViewportDesc;
-
-						m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
-
-						m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
-						m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
-						m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
 
 						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_NHIT)))
 							return E_FAIL;
-					}			
-					
-						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_NDEFAULT)))
-							return E_FAIL;
-					
-				}
-				else
-				{													
-					
-					if (!m_bCollision)
-					{
-						if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
-							return E_FAIL;
-
-						if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-							return E_FAIL;
-
-						_uint		iNumViewport = 1;
-
-						D3D11_VIEWPORT		ViewportDesc;
-
-						m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
-
-						m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
-						m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
-						m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
-
-						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_HIT)))
-							return E_FAIL;
-					}
-					
-						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_DEFAULT)))
-							return E_FAIL;
+					}	
 					
 				}		
 			}	
@@ -1977,10 +1953,16 @@ void CPlayer::CreateRageHit(_float fTimeDelta)
 
 			if (m_fRageSpeed >= 0.08f)
 			{
+				//m_Parts[PARTS_SWORD]->Set_Damage(4.f);
 				CRM->Fix_Fov(CRM->Get_Fov() - 0.9f, 60.f);
 				CRM->Set_FovDir(false);
 				m_fRageSpeed -= 0.02f;
-				m_iRageCreateCount = 0;	
+				
+			}
+			if (m_iRageCreateCount >= 10)
+			{
+				m_Parts[PARTS_SWORD]->Set_Damage(3.1f);
+				m_iRageCreateCount = 0;
 			}
 		}
 		else
@@ -3119,7 +3101,7 @@ void CPlayer::Update(_float fTimeDelta)
 				_float4 WorldPos;
 				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
-				m_Parts[PARTS_SWORD]->Set_Damage(3.f);
+				
 
 				for (auto& iter : m_RageSowrds)
 				{
@@ -3128,7 +3110,8 @@ void CPlayer::Update(_float fTimeDelta)
 				return;
 			}
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4))
-			{
+			{				
+				m_Parts[PARTS_SWORD]->Set_Damage(3.f);				
 				CreateRageHit(fTimeDelta);
 			}
 		}

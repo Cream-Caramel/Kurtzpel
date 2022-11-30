@@ -45,6 +45,7 @@ struct VS_OUT
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
 	float4		vWorldPos : TEXCOORD2;
+	float3		vWorldNormal : NORMAL1;
 };
 
 
@@ -78,7 +79,7 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vTexUV = In.vTexUV;
 	Out.vProjPos = Out.vPosition;
 
-	//Out.vTestNormal = normalize(mul(normalize(vNormal), g_WorldMatrix));
+	Out.vWorldNormal = normalize(mul(normalize(vNormal), g_WorldMatrix));
 
 	Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
 	
@@ -108,10 +109,7 @@ VS_OUT OutLine_MAIN(VS_IN In)
 
 	Out.vPosition = mul(vPosition, matWVP);
 	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix)).xyz;
-	/*Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix)).xyz;
-	Out.vBinormal = normalize(cross(Out.vNormal, Out.vTangent));
 
-	Out.vTexUV = In.vTexUV;*/
 	Out.vProjPos = Out.vPosition;
 	Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
 
@@ -139,6 +137,7 @@ struct VS_IN_SHADOW
 	float3      vTangent : TANGENT;
 	uint4      vBlendIndex : BLENDINDEX;
 	float4      vBlendWeight : BLENDWEIGHT;
+
 };
 
 struct VS_OUT_SHADOW
@@ -182,6 +181,7 @@ struct PS_IN_SHADOW
 struct PS_OUT_SHADOW
 {
 	float4         vLightDepth : SV_TARGET0;
+	float4			vDiffuse : SV_TARGET1;
 };
 
 PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN_SHADOW In)
@@ -211,6 +211,7 @@ struct PS_IN
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
 	float4		vWorldPos : TEXCOORD2;
+	float3		vWorldNormal : NORMAL1;
 };
 
 struct PS_OUT
@@ -220,6 +221,8 @@ struct PS_OUT
 	float4		vDepth : SV_TARGET2;
 	float4		vGrow : SV_TARGET3;
 };
+
+
 
 PS_OUT PS_MAIN(PS_IN In)
 {
@@ -238,31 +241,11 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
-	Out.vGrow = Out.vDiffuse;
+	
 	if (0 == Out.vDiffuse.a)
 		discard;
 
 	return Out;
-	//림라이트
-	//float3 rimColor = float3(1.f, 0.f, 0.f);
-
-	//if (rim <= 0.3f)
-	//{
-	//	//Out.vDiffuse.r *= rim;
-	//	Out.vDiffuse.r = 1.f;
-	//	Out.vDiffuse.gb = 0.f;
-	//}
-	//림라이트
-	
-
-	/*float rimWidth = 0.2f;
-	float RimLightColor = smoothstep(1.0f - rimWidth, 1.0f, 1 - max(0, dot(normalize(In.vNormal), vCameraPos)));
-
-	float3 rimColor = float3(1.f, 0.f, 0.f);
-
-	Out.vDiffuse.rgb += rimColor * RimLightColor;*/
-
-	
 }
 
 PS_OUT NPS_MAIN(PS_IN In)
@@ -324,11 +307,42 @@ PS_OUT NPattern_MAIN(PS_IN In)
 PS_OUT Hit_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
+
 	Out.vDiffuse = (vector)1.f;
 
-	Out.vDiffuse.gb = 0.f;
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+
+	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+	float3x3	WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+	vNormal = normalize(mul(vNormal, WorldMatrix));
+
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
+
+	float3 CamDir = normalize(g_vCamPos - In.vWorldPos);
+
+	float rim = dot(CamDir, In.vWorldNormal);
+
+	if (rim <= 0.3f)
+	{
+		Out.vDiffuse.r = 1.f;
+		Out.vDiffuse.gb = 0.f;
+	}
+
+	if (0 == Out.vDiffuse.a)
+		discard;
 
 	return Out;
+
+	/*float rimWidth = 0.2f;
+	float RimLightColor = smoothstep(1.0f - rimWidth, 1.0f, 1 - max(0, dot(normalize(In.vNormal), vCameraPos)));
+
+	float3 rimColor = float3(1.f, 0.f, 0.f);
+
+	Out.vDiffuse.rgb += rimColor * RimLightColor;*/
 }
 
 PS_OUT Finish_MAIN(PS_IN In)
@@ -471,6 +485,128 @@ PS_OUT GolemPattern_MAIN(PS_IN In)
 	return Out;
 }
 
+PS_OUT Line_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = (vector)0.f;
+
+	Out.vDiffuse.a = 1.f;
+
+	return Out;
+}
+
+PS_OUT Blur_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = (vector)1.f;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	
+	Out.vGrow = Out.vDiffuse;
+
+	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+
+	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+	float3x3	WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+	vNormal = normalize(mul(vNormal, WorldMatrix));
+
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
+
+	if (0 == Out.vDiffuse.a)
+		discard;
+
+	return Out;
+}
+
+PS_OUT PatternHit_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = (vector)1.f;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	Out.vDiffuse.b = 1.f;
+	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+
+	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+	float3x3	WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+	vNormal = normalize(mul(vNormal, WorldMatrix));
+
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
+
+	float3 CamDir = normalize(g_vCamPos - In.vWorldPos);
+
+	float rim = dot(CamDir, In.vWorldNormal);
+
+	if (rim <= 0.3f)
+	{
+		Out.vDiffuse.r = 1.f;
+		Out.vDiffuse.gb = 0.f;
+	}
+
+	if (0 == Out.vDiffuse.a)
+		discard;
+
+	return Out;
+
+	/*float rimWidth = 0.2f;
+	float RimLightColor = smoothstep(1.0f - rimWidth, 1.0f, 1 - max(0, dot(normalize(In.vNormal), vCameraPos)));
+
+	float3 rimColor = float3(1.f, 0.f, 0.f);
+
+	Out.vDiffuse.rgb += rimColor * RimLightColor;*/
+}
+
+PS_OUT FinishHit_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = (vector)1.f;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	Out.vDiffuse.r = 0.8f;
+	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+
+	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+	float3x3	WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+	vNormal = normalize(mul(vNormal, WorldMatrix));
+
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
+
+	float3 CamDir = normalize(g_vCamPos - In.vWorldPos);
+
+	float rim = dot(CamDir, In.vWorldNormal);
+
+	if (rim <= 0.3f)
+	{
+		Out.vDiffuse.r = 1.f;
+		Out.vDiffuse.gb = 0.f;
+	}
+
+	if (0 == Out.vDiffuse.a)
+		discard;
+
+	return Out;
+
+	/*float rimWidth = 0.2f;
+	float RimLightColor = smoothstep(1.0f - rimWidth, 1.0f, 1 - max(0, dot(normalize(In.vNormal), vCameraPos)));
+
+	float3 rimColor = float3(1.f, 0.f, 0.f);
+
+	Out.vDiffuse.rgb += rimColor * RimLightColor;*/
+}
+
 technique11 DefaultTechnique
 {
 	pass DefaultPass
@@ -517,24 +653,13 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 NPattern_MAIN();
 	}
 
-	pass HitPass
-	{
-		SetRasterizerState(RS_OutLine);
-		SetDepthStencilState(DSS_Default, 0);
-		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-		VertexShader = compile vs_5_0 OutLine_MAIN();
-		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 Hit_MAIN();
-	}
-
 	pass NHitPass
 	{
-		SetRasterizerState(RS_OutLine);
+		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DSS_Default, 0);
 		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-		VertexShader = compile vs_5_0 OutLine_MAIN();
+		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 Hit_MAIN();
 	}
@@ -603,6 +728,50 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_SHADOW();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
+	}
+
+	pass OutLinePass
+	{
+		SetRasterizerState(RS_OutLine);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 OutLine_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 Line_MAIN();
+	}
+
+	pass BlurPass
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 Blur_MAIN();
+	}
+
+	pass PatternHitPass
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 PatternHit_MAIN();
+	}
+
+	pass FinishHitPass
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 FinishHit_MAIN();
 	}
 
 }

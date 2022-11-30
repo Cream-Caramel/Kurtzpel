@@ -39,7 +39,7 @@ void CTRSky::Tick(_float fTimeDelta)
 
 void CTRSky::LateTick(_float fTimeDelta)
 {
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
 }
 
 HRESULT CTRSky::Render()

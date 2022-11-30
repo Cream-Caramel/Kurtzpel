@@ -56,34 +56,34 @@ HRESULT CTheo::Initialize(void * pArg)
 	m_eCurState = APPEAR;
 	m_eNextState = APPEAR;
 	m_vTargetLook = { 0.f,0.f,1.f };
-	m_fOutLinePower = 8.f;
+	m_fOutLinePower = 3.f;
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 100;
+	m_fMaxHp = 500;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 95.f;
 	m_fDamage = 10.f;
 
-	m_fColiisionTime = 0.1f;
+	m_fColiisionTime = 0.06f;
 
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
 	PM->Add_Boss(this);
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;*/
+		return E_FAIL;
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 42;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE2, L"NavigationStage2", TEXT("NavigationStage2"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
 	m_pNavigation->Set_BattleIndex(41);
 
-	CRM->Start_Scene("Scene_Stage2Boss");
+	CRM->Start_Scene("Scene_Stage2Boss");*/
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -201,24 +201,58 @@ HRESULT CTheo::Render()
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 
+		if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+			return E_FAIL;
+
+		m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+
+		if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, OUTLINEPASS)))
+			return E_FAIL;
+
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
 		{
 			if (m_bPattern)
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NPATTERN)))
 					return E_FAIL;
+
+				if (m_bHit)
+				{
+					m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+					if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERNHIT)))
+						return E_FAIL;
+				}
 			}
 
 			else if (m_bFinish)
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NFINISH)))
 					return E_FAIL;
+				if (m_bHit)
+				{
+					m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+					if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISHHIT)))
+						return E_FAIL;
+				}
 			}
 
 			else
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NDEFAULT)))
 					return E_FAIL;
+
+				if (m_bHit)
+				{
+					m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+					if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
+						return E_FAIL;
+				}
 			}
 		}
 		else
@@ -227,42 +261,45 @@ HRESULT CTheo::Render()
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
 					return E_FAIL;
+
+				if (m_bHit)
+				{
+					m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+					if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERNHIT)))
+						return E_FAIL;
+				}
 			}
 
 			else if (m_bFinish)
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
 					return E_FAIL;
+				if (m_bHit)
+				{
+					m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+					if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISHHIT)))
+						return E_FAIL;
+				}
 			}
 
 			else
 			{
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
 					return E_FAIL;
+
+				if (m_bHit)
+				{
+					m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+					if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
+						return E_FAIL;
+				}
 			}
 		}
 
-		if (m_bHit)
-		{
-			if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
-				return E_FAIL;
-
-			if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-				return E_FAIL;
-
-			_uint		iNumViewport = 1;
-
-			D3D11_VIEWPORT		ViewportDesc;
-
-			m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
-
-			m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
-			m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
-			m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
-
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
-				return E_FAIL;
-		}
+		
 	}
 
 
@@ -340,7 +377,7 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 		
 		if (pOther->Can_Hit())
 		{
-			if (m_bPattern && pOther->Get_Damage() == 1.f)
+			if (m_bPattern && pOther->Get_Damage() == 1.f || pOther->Get_Damage() == 5.5f)
 			{
 				m_bFinish = false;
 				if (!m_bFinish)

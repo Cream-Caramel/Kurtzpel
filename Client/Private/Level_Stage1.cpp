@@ -37,12 +37,12 @@ HRESULT CLevel_Stage1::Initialize()
 
 	PM->Get_PlayerPointer()->Create_Navigation("Level_Stage1");
 
-	/*CAnimMesh::MESHINFO MeshInfo;
+	CAnimMesh::MESHINFO MeshInfo;
 	MeshInfo.sTag = L"Dragon";
 	MeshInfo.fPos = _float4{ 90.f,0.6f,103.f,1.f };
 	MeshInfo.fScale = _float3{ 1.f,1.f,1.f };
 	MeshInfo.fAngle = _float3{ 1.f,1.f,1.f };
-	GI->Add_GameObjectToLayer(L"Dragon", LEVEL_STAGE1, L"Monster", &MeshInfo);*/
+	GI->Add_GameObjectToLayer(L"Dragon", LEVEL_STAGE1, L"Monster", &MeshInfo);
 
 	/*CAnimMesh::MESHINFO MeshInfo;
 	MeshInfo.sTag = L"Theo";

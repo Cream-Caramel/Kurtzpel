@@ -8,6 +8,7 @@ float		g_fDissolveAcc;
 float g_fOutLinePower;
 float g_fWinSizeX;
 float g_fWinSizeY;
+vector g_vCamPos;
 
 sampler DefaultSampler = sampler_state {
 
@@ -35,6 +36,8 @@ struct VS_OUT
 	float4		vProjPos : TEXCOORD1;
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
+	float4		vWorldPos : TEXCOORD2;
+	float3		vWorldNormal : NORMAL1;
 };
 
 
@@ -53,6 +56,10 @@ VS_OUT VS_MAIN(VS_IN In)
 	Out.vBinormal = normalize(cross(Out.vNormal, Out.vTangent));
 	Out.vTexUV = In.vTexUV;
 	Out.vProjPos = Out.vPosition;
+	
+	Out.vWorldNormal = normalize(mul(normalize(In.vNormal), g_WorldMatrix));
+
+	Out.vWorldPos = mul(vector(In.vPosition, 1.f), g_WorldMatrix);
 
 	return Out;
 }
@@ -79,8 +86,8 @@ VS_OUT OutLine_MAIN(VS_IN In)
 	vector tNormal = normalize(mul(In.vNormal, matWVInverse));
 
 	float2 offset = mul(g_ProjMatrix, tNormal.xy);
-	offset.x /= g_fWinSizeX;
-	offset.y /= g_fWinSizeY;
+	offset.x /= 1280.f;
+	offset.y /= 720.f;
 	Out.vPosition.xy += offset * Out.vPosition.z * g_fOutLinePower;
 
 	return Out;
@@ -152,6 +159,8 @@ struct PS_IN
 	float4		vProjPos : TEXCOORD1;
 	float3		vTangent : TANGENT;
 	float3		vBinormal : BINORMAL;
+	float4		vWorldPos : TEXCOORD2;
+	float3		vWorldNormal : NORMAL1;
 };
 
 struct PS_OUT
@@ -356,12 +365,48 @@ PS_OUT NStartDissolve_MAIN(PS_IN In)
 PS_OUT Hit_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
+
 	Out.vDiffuse = (vector)1.f;
-	//Out.vDepth = vector(0.f , 0.5f, 0.0f);
-	Out.vDiffuse.gb = 0.f;
+
+	Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+	vector		vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexUV);
+
+	float3		vNormal = vNormalDesc.xyz * 2.f - 1.f;
+
+	float3x3	WorldMatrix = float3x3(In.vTangent, In.vBinormal, In.vNormal);
+
+	vNormal = normalize(mul(vNormal, WorldMatrix));
+
+	Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.0f, 0.5f, 0.0f);
+
+	float3 CamDir = normalize(g_vCamPos - In.vWorldPos);
+
+	float rim = dot(CamDir, In.vWorldNormal);
+
+	if (rim <= 0.4f)
+	{
+		//Out.vDiffuse.r *= rim;
+		Out.vDiffuse.r = 1.f;
+		Out.vDiffuse.gb = 0.f;
+	}
+
+	if (0 == Out.vDiffuse.a)
+		discard;
+
 	return Out;
 }
 
+PS_OUT Line_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vDiffuse = (vector)0.f;
+
+	Out.vDiffuse.a = 1.f;
+
+	return Out;
+}
 
 
 
@@ -466,6 +511,17 @@ technique11 DefaultTechnique
 		VertexShader = compile vs_5_0 VS_MAIN_SHADOW();
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
+	}
+
+	pass OutLinePass
+	{
+		SetRasterizerState(RS_OutLine);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 OutLine_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 Line_MAIN();
 	}
 
 

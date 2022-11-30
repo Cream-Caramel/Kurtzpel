@@ -65,20 +65,40 @@ HRESULT CInstanceModel::Render()
 	RELEASE_INSTANCE(CGameInstance);
 
 
-
+	
 	_uint		iNumMeshes = m_pModel->Get_NumMeshes();
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
+		if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &XMMatrixInverse(nullptr, XMLoadFloat4x4(&WorldMatrix)), sizeof(_float4x4))))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+			return E_FAIL;
+
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
 		{
+			/*if (FAILED(m_pShaderCom->Begin(INSTANCEMODEL_OUTLINE)))
+				return E_FAIL;
+
+			if (FAILED(m_pModel->Render(i)))
+				return E_FAIL;*/
+
 			if (FAILED(m_pShaderCom->Begin(INSTANCEMODEL_DEFAULT)))
 				return E_FAIL;
+
+
 		}
 		else
 		{
+			/*if (FAILED(m_pShaderCom->Begin(INSTANCEMODEL_OUTLINE)))
+				return E_FAIL;
+
+			if (FAILED(m_pModel->Render(i)))
+				return E_FAIL;*/
+
 			if (FAILED(m_pShaderCom->Begin(INSTANCEMODEL_NDEFAULT)))
 				return E_FAIL;
 		}	

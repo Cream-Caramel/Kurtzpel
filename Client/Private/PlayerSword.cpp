@@ -69,6 +69,7 @@ HRESULT CPlayerSword::Initialize(void * pArg)
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Collider_OBB"), TEXT("OBB_Sword"), (CComponent**)&m_pOBB, &ColliderDesc)))
 		return E_FAIL;
 
+	m_fOutLinePower = 3.f;
 	m_pPlayer = PM->Get_PlayerPointer();
 
 	return S_OK;
@@ -151,14 +152,26 @@ HRESULT CPlayerSword::Render()
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 		
+		if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &XMMatrixTranspose(XMMatrixInverse(nullptr, XMLoadFloat4x4(&WorldMatrix))), sizeof(_float4x4))))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+			return E_FAIL;
+
+		m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+
+		if (FAILED(m_pShaderCom->Begin(MODEL_OUTLINE)))
+			return E_FAIL;
+
+		if (FAILED(m_pModel->Render(i)))
+			return E_FAIL;
+
 		if (FAILED(m_pShaderCom->Begin(MODEL_NDEFAULT)))
 			return E_FAIL;
 
 		if (FAILED(m_pModel->Render(i)))
 			return E_FAIL;
 	}
-	if(m_bColliderRender)
-		m_pOBB->Render();
 
 	
 	if (FAILED(m_pTexture->Set_SRV(m_pTexShader, "g_DiffuseTexture")))

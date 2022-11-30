@@ -60,13 +60,13 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 100;
+	m_fMaxHp = 500;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 90.f;
 	m_fDamage = 10.f;
-	m_fOutLinePower = 10.f;
-	m_fColiisionTime = 0.1f;
+	m_fOutLinePower = 3.f;
+	m_fColiisionTime = 0.06f;
 
 	m_pTarget = PM->Get_PlayerPointer();
 	Safe_AddRef(m_pTarget);
@@ -74,18 +74,18 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	Set_Dir();
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-	return E_FAIL;*/
+	return E_FAIL;
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 172;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
 	m_pNavigation->Set_BattleIndex(145);
-	CRM->Start_Scene("Scene_Stage4Boss");
+	CRM->Start_Scene("Scene_Stage4Boss");*/
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -229,6 +229,17 @@ HRESULT CDragon::Render()
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 
+		if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+			return E_FAIL;
+
+		m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+
+		if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, OUTLINEPASS)))
+			return E_FAIL;
+
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
 			return E_FAIL;
 
@@ -236,40 +247,42 @@ HRESULT CDragon::Render()
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
 				return E_FAIL;
+			if (m_bHit)
+			{
+				m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERNHIT)))
+					return E_FAIL;
+			}
 		}
 
 		else if (m_bFinish)
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
 				return E_FAIL;
+			if (m_bHit)
+			{
+				m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISHHIT)))
+					return E_FAIL;
+			}
 		}
 
 		else
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
 				return E_FAIL;
+
+			if (m_bHit)
+			{
+				m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
+					return E_FAIL;
+			}
 		}
-		if (m_bHit)
-		{
-			if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
-				return E_FAIL;
-
-			if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-				return E_FAIL;
-
-			_uint		iNumViewport = 1;
-
-			D3D11_VIEWPORT		ViewportDesc;
-
-			m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
-
-			m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
-			m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
-			m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
-
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
-				return E_FAIL;
-		}	
+		
 	}
 
 	for (int i = 0; i < OBB_END; ++i)
@@ -346,7 +359,7 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 	{
 		if (pOther->Can_Hit())
 		{
-			if (m_bPattern && pOther->Get_Damage() == 1.f || m_bPattern && pOther->Get_Damage() == 100.f)
+			if (m_bPattern && pOther->Get_Damage() == 1.f || pOther->Get_Damage() == 5.5f || pOther->Get_Damage() == 3.1f)
 			{
 				m_bFinish = false;
 				if(!m_bFinish)

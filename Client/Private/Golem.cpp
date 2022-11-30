@@ -56,7 +56,7 @@ HRESULT CGolem::Initialize(void * pArg)
 	m_pTransformCom->Rotation(_vector{ 0.f,1.f,0.f }, 180.f);
 	m_vTargetLook = { 0.f,0.f,1.f };
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
-	m_fOutLinePower = 10.f;
+	m_fOutLinePower = 3.f;
 
 	m_fMaxHp = 500;
 	m_fMaxMp = 100.f;
@@ -213,6 +213,17 @@ HRESULT CGolem::Render()
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 
+		if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+			return E_FAIL;
+
+		m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+
+		if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, OUTLINEPASS)))
+			return E_FAIL;
+
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
 			return E_FAIL;
 
@@ -220,17 +231,30 @@ HRESULT CGolem::Render()
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
 				return E_FAIL;
+			if (m_bHit)
+			{
+				m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERNHIT)))
+					return E_FAIL;
+			}
 		}
 
 		else if (m_bFinish)
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISH)))
 				return E_FAIL;
+			if (m_bHit)
+			{
+				m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_FINISHHIT)))
+					return E_FAIL;
+			}
 		}
 
 		else if (m_bFinishCharge)
 		{
-			_float a = m_fGolemPattern;
 			if (FAILED(m_pShaderCom->Set_RawValue("g_fGolemPattern", &m_fGolemPattern, sizeof(_float))))
 				return E_FAIL;
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_GOLEMPATTERN)))
@@ -241,29 +265,19 @@ HRESULT CGolem::Render()
 		{
 			if(FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DEFAULT)))
 				return E_FAIL;
+
+			if (m_bHit)
+			{
+				m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
+					return E_FAIL;
+			}
 		}
+		
+		
 
-		if (m_bHit)
-		{
-			if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
-				return E_FAIL;
-
-			if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-				return E_FAIL;
-
-			_uint		iNumViewport = 1;
-
-			D3D11_VIEWPORT		ViewportDesc;
-
-			m_pContext->RSGetViewports(&iNumViewport, &ViewportDesc);
-
-			m_pShaderCom->Set_RawValue("g_fWinSizeX", &ViewportDesc.Width, sizeof(_float));
-			m_pShaderCom->Set_RawValue("g_fWinSizeY", &ViewportDesc.Height, sizeof(_float));
-			m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
-
-			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
-				return E_FAIL;
-		}
+		
 	}
 
 	for (int i = 0; i < OBB_END; ++i)
@@ -340,7 +354,7 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 
 		if (pOther->Can_Hit())
 		{
-			if (pOther->Get_Damage() == 1.f || pOther->Get_Damage() == 100.f ||  pOther->Get_Damage() == 5.5f)
+			if (m_bPattern && pOther->Get_Damage() == 1.f ||  pOther->Get_Damage() == 5.5f)
 			{
 				m_bFinish = false;
 				if (!m_bFinish)
