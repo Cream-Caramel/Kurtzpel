@@ -105,6 +105,7 @@ void CGolemSkillRock1::LateTick(_float fTimeDelta)
 		PTM->CreateParticle(L"GolemSkill3", Pos, false, CAlphaParticle::DIR_END);
 		GI->Add_GameObjectToLayer(L"GolemRock3", PM->Get_NowLevel(), L"GolemEffect", &EffectInfo);	
 		CRM->Start_Shake(0.3f, 4.f, 0.04f);
+		GI->PlaySoundW(L"GolemAttack1_1.ogg", SD_MONSTER2, 1.5f);
 		Set_Dead();
 	}
 	
@@ -135,15 +136,11 @@ HRESULT CGolemSkillRock1::Render()
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
-		{
-			if (FAILED(m_pShaderCom->Begin(MODEL_NDEFAULT)))
-				return E_FAIL;
-		}
-		else
-		{
-			if (FAILED(m_pShaderCom->Begin(MODEL_DEFAULT)))
-				return E_FAIL;
-		}
+			return E_FAIL;
+		
+		if (FAILED(m_pShaderCom->Begin(MODEL_DEFAULT)))
+			return E_FAIL;
+		
 
 		if (FAILED(m_pModel->Render(i)))
 			return E_FAIL;

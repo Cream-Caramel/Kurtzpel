@@ -101,16 +101,28 @@ HRESULT CPlayerHead::Render()
 		if (FAILED(m_pModel->Render(i)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(MODEL_NDEFAULT)))
-			return E_FAIL;
+		
 
-		if (FAILED(m_pModel->Render(i)))
-			return E_FAIL;
+		if (m_bBlur)
+		{
+			if (FAILED(m_pShaderCom->Begin(MODEL_NBLUR)))
+				return E_FAIL;
+
+			if (FAILED(m_pModel->Render(i)))
+				return E_FAIL;
+		}
+		else
+		{
+			if (FAILED(m_pShaderCom->Begin(MODEL_NDEFAULT)))
+				return E_FAIL;
+
+			if (FAILED(m_pModel->Render(i)))
+				return E_FAIL;
 
 			if (!m_bCollision)
 			{
 				m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
-	
+
 				if (FAILED(m_pShaderCom->Begin(MODEL_NHIT)))
 					return E_FAIL;
 
@@ -118,6 +130,9 @@ HRESULT CPlayerHead::Render()
 					return E_FAIL;
 
 			}
+		}
+
+			
 
 		
 	}

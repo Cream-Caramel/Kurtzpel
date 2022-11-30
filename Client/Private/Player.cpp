@@ -220,9 +220,7 @@ HRESULT CPlayer::Render()
 	for (int i = 0; i < MODEL_END; ++i)
 	{
 		if (m_pAnimModel[i] != nullptr)
-		{		
-			
-				
+		{					
 			_uint		iNumMeshes = m_pAnimModel[i]->Get_NumMeshes();
 			for (_uint j = 0; j < iNumMeshes; ++j)
 			{
@@ -253,19 +251,28 @@ HRESULT CPlayer::Render()
 					if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, OUTLINEPASS)))
 						return E_FAIL;
 					
-					
-					if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_DEFAULT)))
-						return E_FAIL;
-
-
-					if (!m_bCollision)
+					if (m_bBlur)
 					{
-						m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));                                                                                                                                                                                             
-
-
-						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_NHIT)))
+						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_BLUR)))
 							return E_FAIL;
-					}	
+					}
+
+					else
+					{
+						if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_DEFAULT)))
+							return E_FAIL;
+
+						if (!m_bCollision)
+						{
+							m_pShaderCom->Set_RawValue("g_vCamPos", &GI->Get_CamPosition(), sizeof(_float4));
+
+
+							if (FAILED(m_pAnimModel[i]->Render(m_pShaderCom, j, ANIM_NHIT)))
+								return E_FAIL;
+						}
+					}
+
+					
 					
 				}		
 			}	
@@ -513,6 +520,9 @@ void CPlayer::Set_State(STATE eState)
 			m_bAction = false;
 			Change_WeaponPos();
 		}
+		m_bBlur = true;
+		for (auto& iter : m_Parts)
+			iter->Set_Blur(true);
 		GI->PlaySoundW(L"Dash.ogg", SD_PLAYER1, 0.6f);
 		m_bAction = false;
 		m_fNowMp -= 5.f;
@@ -596,7 +606,7 @@ void CPlayer::Set_State(STATE eState)
 		GI->PlaySoundW(L"FastVoice.ogg", SD_PLAYERVOICE, 0.9f);
 		m_fNowMp -= 10.f;
 		m_fFastComboStartSpeed = 5.f;
-		m_Parts[PARTS_SWORD]->Set_Damage(2.f);
+		m_Parts[PARTS_SWORD]->Set_Damage(3.f);
 		m_Parts[PARTS_SWORD]->Set_MaxHit(30);
 		m_fFastComboAcc = 0.f;
 		break;
@@ -973,7 +983,11 @@ void CPlayer::End_Animation()
 		case Client::CPlayer::IDLE:
 			break;
 		case Client::CPlayer::DASH:
+			m_bBlur = false;
+			for (auto& iter : m_Parts)
+				iter->Set_Blur(false);
 			Set_State(IDLE);
+
 			break;
 		case Client::CPlayer::DIE:
 			Set_State(RESPAWN);
@@ -1857,77 +1871,77 @@ void CPlayer::CreateRageHitInfo()
 	PlayerRageHit.fRotation = 140.f;
 	m_RageHits.push_back(PlayerRageHit);
 
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 5.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 100.f;
-	m_RageHits.push_back(PlayerRageHit);
-	//4
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = -3.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 75.f;
-	m_RageHits.push_back(PlayerRageHit);
-	//5
-	PlayerRageHit.fRight = 15.f;
-	PlayerRageHit.fHeight = -10.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 50.f;
-	m_RageHits.push_back(PlayerRageHit);
-	//6
-	PlayerRageHit.fRight = 10.f;
-	PlayerRageHit.fHeight = 10.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 140.f;
-	m_RageHits.push_back(PlayerRageHit);
-	//7
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = 5.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 100.f;
-	m_RageHits.push_back(PlayerRageHit);
-	//8
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = -3.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 75.f;
-	m_RageHits.push_back(PlayerRageHit);
-	//9
-	PlayerRageHit.fRight = -3.f;
-	PlayerRageHit.fHeight = -18.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = -10.f;
-	m_RageHits.push_back(PlayerRageHit);
-	//10
-	PlayerRageHit.fRight = 6.f;
-	PlayerRageHit.fHeight = -17.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 20.f;
-	m_RageHits.push_back(PlayerRageHit);
-	//11
-	PlayerRageHit.fRight = 14.f;
-	PlayerRageHit.fHeight = -15.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 40.f;
-	m_RageHits.push_back(PlayerRageHit);
-	//12
-	PlayerRageHit.fRight = 10.f;
-	PlayerRageHit.fHeight = 10.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 140.f;
-	m_RageHits.push_back(PlayerRageHit);
+	//PlayerRageHit.fRight = 20.f;
+	//PlayerRageHit.fHeight = 5.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 100.f;
+	//m_RageHits.push_back(PlayerRageHit);
+	////4
+	//PlayerRageHit.fRight = 20.f;
+	//PlayerRageHit.fHeight = -3.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 75.f;
+	//m_RageHits.push_back(PlayerRageHit);
+	////5
+	//PlayerRageHit.fRight = 15.f;
+	//PlayerRageHit.fHeight = -10.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 50.f;
+	//m_RageHits.push_back(PlayerRageHit);
+	////6
+	//PlayerRageHit.fRight = 10.f;
+	//PlayerRageHit.fHeight = 10.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 140.f;
+	//m_RageHits.push_back(PlayerRageHit);
+	////7
+	//PlayerRageHit.fRight = 20.f;
+	//PlayerRageHit.fHeight = 5.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 100.f;
+	//m_RageHits.push_back(PlayerRageHit);
+	////8
+	//PlayerRageHit.fRight = 20.f;
+	//PlayerRageHit.fHeight = -3.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 75.f;
+	//m_RageHits.push_back(PlayerRageHit);
+	////9
+	//PlayerRageHit.fRight = -3.f;
+	//PlayerRageHit.fHeight = -18.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = -10.f;
+	//m_RageHits.push_back(PlayerRageHit);
+	////10
+	//PlayerRageHit.fRight = 6.f;
+	//PlayerRageHit.fHeight = -17.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 20.f;
+	//m_RageHits.push_back(PlayerRageHit);
+	////11
+	//PlayerRageHit.fRight = 14.f;
+	//PlayerRageHit.fHeight = -15.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 40.f;
+	//m_RageHits.push_back(PlayerRageHit);
+	////12
+	//PlayerRageHit.fRight = 10.f;
+	//PlayerRageHit.fHeight = 10.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 140.f;
+	//m_RageHits.push_back(PlayerRageHit);
 
-	PlayerRageHit.fRight = 20.f;
-	PlayerRageHit.fHeight = -15.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 50.f;
-	m_RageHits.push_back(PlayerRageHit);
+	//PlayerRageHit.fRight = 20.f;
+	//PlayerRageHit.fHeight = -15.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 50.f;
+	//m_RageHits.push_back(PlayerRageHit);
 
-	PlayerRageHit.fRight = 10.f;
-	PlayerRageHit.fHeight = 10.f;
-	PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
-	PlayerRageHit.fRotation = 140.f;
-	m_RageHits.push_back(PlayerRageHit);
+	//PlayerRageHit.fRight = 10.f;
+	//PlayerRageHit.fHeight = 10.f;
+	//PlayerRageHit.vScale = _float3{ 12.f,12.f,12.f };
+	//PlayerRageHit.fRotation = 140.f;
+	//m_RageHits.push_back(PlayerRageHit);
 	
 }
 
@@ -1946,31 +1960,32 @@ void CPlayer::CreateRageHit(_float fTimeDelta)
 			PlayerRageHit.fRotation = m_RageHits[m_iRageHitIndex].fRotation;
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
-			++m_iRageCreateCount;
+			GI->PlaySoundW(L"Rage.ogg", SD_PLAYER2, 0.6f);
 			m_fRageAcc = 0.f;
 			++m_iRageHitIndex;			
-			CRM->Start_Shake(0.2f, 3.f, 0.03f);			
+			CRM->Start_Shake(0.2f, 2.f, 0.03f);
 
 			if (m_fRageSpeed >= 0.08f)
 			{
-				//m_Parts[PARTS_SWORD]->Set_Damage(4.f);
+				
 				CRM->Fix_Fov(CRM->Get_Fov() - 0.9f, 60.f);
 				CRM->Set_FovDir(false);
 				m_fRageSpeed -= 0.02f;
 				
-			}
-			if (m_iRageCreateCount >= 10)
-			{
-				m_Parts[PARTS_SWORD]->Set_Damage(3.1f);
-				m_iRageCreateCount = 0;
-			}
+			}			
 		}
 		else
 		{
+			_float3 BossPos = PM->Get_BossPointer()->Get_Pos();
+			if (BossPos.x == 10000.f)
+				m_fEx1AttackSpeed = 5.1f;
+			else
+				m_fEx1AttackSpeed = XMVectorGetX(XMVector4Length(XMLoadFloat3(&PM->Get_BossPointer()->Get_Pos()) - m_pTransformCom->Get_State(CTransform::STATE_POSITION))) * 1.f;
 			Set_State(EX1ATTACK);
 			m_bRageSkill = false;
 			m_bRageSwordStart = false;
 			m_bCharge1 = true;
+
 		}
 	}
 }
@@ -3689,7 +3704,14 @@ void CPlayer::Dash_KeyInput(_float fTimeDelta)
 	if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0))
 	{
 		if (Input_Direction())
+		{
 			Set_State(RUN);
+			m_bBlur = false;
+			for (auto& iter : m_Parts)
+				iter->Set_Blur(false);
+		}
+
+	
 	}
 }
 

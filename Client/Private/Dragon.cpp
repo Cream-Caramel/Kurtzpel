@@ -359,7 +359,7 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 	{
 		if (pOther->Can_Hit())
 		{
-			if (m_bPattern && pOther->Get_Damage() == 1.f || pOther->Get_Damage() == 5.5f || pOther->Get_Damage() == 3.1f)
+			if (m_bPattern && pOther->Get_Damage() == 1.f)
 			{
 				m_bFinish = false;
 				if(!m_bFinish)
@@ -375,21 +375,19 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 				CRM->Set_FovDir(true);
 			}		
 
-			if (pOther->Get_Damage() == 63.f || pOther->Get_Damage() == 73.f)
+			if (pOther->Get_Damage() == 63.f || pOther->Get_Damage() == 73.f || pOther->Get_Damage() == 5.5f)
 			{
 				m_bPattern = false;
 				m_bLHand = false;
 				m_bRHand = false;
+				GI->PlaySoundW(L"DragonGroggy.ogg", SD_MONSTERVOICE, 0.9f);
 				Set_State(GROGGYSTART);
 				CRM->Start_Shake(0.5f, 5.f, 0.06f);
 				CRM->Start_Fov(40.f, 120.f);
 				CRM->Set_FovDir(true);
 			}
-
-			if (m_eCurState == GROGGYSTART || m_eCurState == GROGGYLOOF)
-				m_fNowHp -= pOther->Get_Damage() * 2.f;
-			else
-				m_fNowHp -= pOther->Get_Damage();
+		
+			m_fNowHp -= pOther->Get_Damage();
 
 			m_bCollision = false;
 			m_bHit = true;
@@ -855,10 +853,10 @@ void CDragon::Update(_float fTimeDelta)
 		{
 			GI->PlaySoundW(L"DragonFly.ogg", SD_MONSTERVOICE, 0.9f);
 		}
-		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
+		/*if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(2) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(3))
 		{
 			m_bCollision = false;
-		}
+		}*/
 		break;
 	case Client::CDragon::GROGGYLOOF:
 		break;
@@ -944,14 +942,16 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(9) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(10))
 		{
 			CRM->Start_Shake(0.3f, 5.f, 0.04f);
-			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
+		
 			GI->PlaySoundW(L"DragonAttack1.ogg", SD_MONSTER1, 0.9f);
+			//GI->PlaySoundW(L"DragonAttack1_3.ogg", SD_MONSTERVOICE, 0.9f);
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(11) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(12))
 		{
 			CRM->Start_Shake(0.3f, 5.f, 0.04f);
-			GI->PlaySoundW(L"DragonAttack13.ogg", SD_MONSTER1, 0.9f);
+		
 			GI->PlaySoundW(L"DragonAttack1_2.ogg", SD_MONSTER1, 0.9f);
+		
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
 		{
@@ -1053,6 +1053,7 @@ void CDragon::Update(_float fTimeDelta)
 		{
 			CRM->Start_Shake(0.4f, 5.f, 0.04f);
 			CreateTrail(TS5);
+			GI->PlaySoundW(L"DragonAttack5_2.ogg", SD_MONSTERVOICE, 0.9f);
 			GI->PlaySoundW(L"DragonAttack5.ogg", SD_MONSTERVOICE, 0.9f);
 		}
 
@@ -1413,6 +1414,7 @@ void CDragon::Update(_float fTimeDelta)
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(5) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(6))
 		{
 			CreateTrail(TS13);
+			GI->PlaySoundW(L"DragonAttack1_3.ogg", SD_MONSTERVOICE, 0.9f);
 		}
 
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
@@ -1528,7 +1530,7 @@ void CDragon::Update(_float fTimeDelta)
 				EffectInfo.WorldMatrix.r[3] += Right * 4.7f;
 				EffectInfo.vScale = _float3{ 2.f,1.f,2.f };
 				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);			
-				GI->PlaySoundW(L"DragonAttack15.ogg", SD_MONSTER1, 0.9f);
+				GI->PlaySoundW(L"DragonAttack15_2.ogg", SD_MONSTER1, 0.9f);
 				CRM->Start_Shake(0.4f, 6.f, 0.05f);
 
 				PTM->CreateParticle(L"DragonRock", WorldPos, false, CAlphaParticle::DIR_END);
@@ -1703,7 +1705,7 @@ void CDragon::DebugKeyInput()
 		Set_State(SKILL5);
 
 	if (GI->Key_Down(DIK_NUMPAD1))
-		Set_State(SKILL1);
+		Set_State(BACKSTEP);
 
 	if (GI->Key_Down(DIK_NUMPAD2))
 		Set_State(SKILL9_1);
@@ -1718,7 +1720,7 @@ void CDragon::DebugKeyInput()
 		Set_State(SKILL6);
 
 	if (GI->Key_Down(DIK_NUMPAD6))
-		Set_State(SKILL7_1);
+		Set_State(SKILL5);
 
 	if (GI->Key_Down(DIK_NUMPAD7))
 		Set_State(SKILL8);

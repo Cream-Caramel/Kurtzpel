@@ -170,6 +170,7 @@ private:
 	_bool m_bFastComboHit = false;
 	_bool m_bSpinComboHit = false;
 	_bool m_bRageSkill = false;
+	_bool m_bBlur = false;
 
 	_float m_fJumpSpeed = 15.f; // 점프중 스피드
 	_float m_fRunSpeed = 8.f; // 달리기이동스피드

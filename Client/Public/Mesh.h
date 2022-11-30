@@ -46,6 +46,7 @@ public:
 public:
 	void Rotation(_float3 vAxis, _float fRadian, _float3 vAxis2, _float fRadian2, _float3 vAxis3, _float fRadian3);
 	_float3 Get_Pos();
+	void Set_Blur(_bool bBlur) { m_bBlur = bBlur; }
 	void Set_Pos(_float4 Pos);
 
 protected:
@@ -62,6 +63,7 @@ protected:
 	_float m_fEndAcc = 0.f;
 	_float3 m_vTargetLook = { 0.f,0.f,0.f };	
 	TURNDIR m_eTurnDir = TURN_FRONT;
+	_bool m_bBlur = false;
 
 protected:
 	CShader*				m_pShaderCom = nullptr;
