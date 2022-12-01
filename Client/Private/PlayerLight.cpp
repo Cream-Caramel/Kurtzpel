@@ -95,7 +95,7 @@ HRESULT CPlayerLight::Render()
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 	
-		if (FAILED(m_pShaderCom->Begin(MODEL_NDEFAULT)))
+		if (FAILED(m_pShaderCom->Begin(MODEL_NBLUR)))
 			return E_FAIL;
 
 		if (FAILED(m_pModel->Render(i)))

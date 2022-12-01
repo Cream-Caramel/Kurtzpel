@@ -72,6 +72,7 @@ private:
 	_float m_fRunTempo = 0.f;
 	_float m_fRunTempoAcc = 0.f;
 	_float m_fGolemPattern = 0.f;
+	_float m_fDissolveAcc = 0.f;
 private:
 	_bool m_bFinishCharge = false;
 	_bool m_bFinishTime = false;
@@ -81,13 +82,14 @@ private:
 	_bool m_bPattern = false;
 	_bool m_bAttack = false;
 	_bool m_bRockOn = false;
+	_bool m_bDissolve = false;
 	_uint m_iPreMotion = 0;
 	_uint m_iNextMotion = 1;
 	_uint m_iPreRangeAttack = 0;
 	_uint m_iNextRangeAttack = 1;
 	_uint m_iPreCloseAttack = 0;
 	_uint m_iNextCloseAttack = 1;
-	
+	CTexture* m_pDissolveTexture = nullptr;
 	CNavigation* m_pNavigation = nullptr;
 	CAnimModel* m_pAnimModel = nullptr;
 	COBB* m_pOBB[OBB_END]{ nullptr };

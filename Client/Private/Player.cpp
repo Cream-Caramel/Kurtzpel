@@ -2351,6 +2351,8 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::DIE:
 		m_bCollision = false;
+		for (auto& iter : m_Parts)
+			iter->Set_Collision(false);
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(0) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(1))
 		{
 			GI->PlaySoundW(L"Die_1.ogg", SD_PLAYER1, 0.9f);
@@ -2361,6 +2363,8 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::RESPAWN:
+		for (auto& iter : m_Parts)
+			iter->Set_Collision(false);
 		m_bCollision = false;
 		break;
 	case Client::CPlayer::RUN:
@@ -3176,8 +3180,8 @@ void CPlayer::Update(_float fTimeDelta)
 				WallInfo.fMaxUVIndexX = 1.f;
 				WallInfo.fMaxUVIndexY = 4.f;
 				WallInfo.fUVSpeed = 0.05f;
-				WallInfo.vSize = { 1.5f,5.f,1.5f };
-				WallInfo.vSpeed = { 0.05f,0.f,0.05f };
+				WallInfo.vSize = { 1.5f,8.f,1.5f };
+				WallInfo.vSpeed = { 0.06f,0.f,0.06f };
 				WallInfo.eColor = CWall::WALL_ORANGE;
 				WallInfo.fLifeTime = 1.f;
 				WallInfo.fEndSpeed = 0.5f;

@@ -55,12 +55,14 @@ private:
 	_float m_fRushShakeAcc = 0.25f;
 	_float m_fRushTempo = 0.5f;
 	_float m_fFinishSpeed = 0.f;
+	_float m_fDissolveAcc = 0.f;
 private:
 	_bool m_bFinishStart = false;
 	_bool m_bLHand = false;
 	_bool m_bRHand = false;
 	_bool m_bPattern = false;
 	_bool m_bRushRight = true;
+	_bool m_bDissolve = false;
 	_uint m_iPreMotion = 0;
 	_uint m_iNextMotion = 1;
 	_uint m_iPreAttack = 0;
@@ -70,7 +72,7 @@ private:
 	CNavigation* m_pNavigation = nullptr;
 	CPlayer* m_pTarget = nullptr;
 	vector<class CHierarchyNode*>		m_Sockets;
-	
+	CTexture* m_pDissolveTexture = nullptr;
 
 public:
 	static CTheo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

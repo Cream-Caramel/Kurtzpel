@@ -93,6 +93,7 @@ private:
 	_bool m_bPattern = false;
 	_bool m_bAttack = false;
 	_bool m_bRushRight = true;
+	_bool m_bDissolve = false;
 	_uint m_iPreMotion = 0;
 	_uint m_iNextMotion = 1;
 	_uint m_iPreRangeAttack = 0;
@@ -105,10 +106,11 @@ private:
 	_float m_fRenderLimit = 0.f; //랜더 시간
 	_float m_fMoveSpeed = 0.f;
 	_float m_fMoveSpeedTempo = 0.f;
+	_float m_fDissolveAcc = 0.f;
 	_float3 m_vMoveDir = { 1.f,0.f,0.f };
 	_matrix m_TrailMatrix;
 	CMesh::TURNDIR m_eTurnDir;
-
+	CTexture* m_pDissolveTexture = nullptr;
 	CNavigation* m_pNavigation = nullptr;
 	CAnimModel* m_pAnimModel = nullptr;
 	COBB* m_pOBB[OBB_END]{ nullptr };

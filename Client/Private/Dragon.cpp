@@ -60,7 +60,7 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 500;
+	m_fMaxHp = 30;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 90.f;
@@ -89,6 +89,9 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Noise"), TEXT("Com_Texture"), (CComponent**)&m_pDissolveTexture)))
+		return E_FAIL;
 
 	CGameObject*		Trail1 = GI->Clone_GameObject(TEXT("DragonTrail"));
 	if (nullptr == Trail1)
@@ -152,6 +155,10 @@ void CDragon::Tick(_float fTimeDelta)
 	m_bPattern = false;
 	
 	Update(fTimeDelta);
+
+	if (m_bDissolve)
+		m_fDissolveAcc += 0.15f * fTimeDelta;
+	
 }
 
 void CDragon::LateTick(_float fTimeDelta)
@@ -166,6 +173,13 @@ void CDragon::LateTick(_float fTimeDelta)
 		m_bLHand = false;
 		m_bAttack = false;
 		GI->PlaySoundW(L"DragonDie.ogg", SD_MONSTERVOICE, 0.9f);
+	}
+
+	
+	if(m_fDissolveAcc >= 1.f)
+	{
+		PM->Delete_Boss();
+		Set_Dead();
 	}
 
 	for (auto& iter : m_Trails)
@@ -207,7 +221,8 @@ void CDragon::LateTick(_float fTimeDelta)
 		if (m_bAttack)
 			CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB[OBB_ATTACK]);
 	}
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+	if(m_fDissolveAcc <= 0.4f)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
@@ -229,21 +244,31 @@ HRESULT CDragon::Render()
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
-			return E_FAIL;
+		if (!m_bDissolve)
+		{
+			if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
+				return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-			return E_FAIL;
+			if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+				return E_FAIL;
 
-		m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+			m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
 
-		if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, OUTLINEPASS)))
-			return E_FAIL;
-
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, OUTLINEPASS)))
+				return E_FAIL;
+		}
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
 			return E_FAIL;
 
-		if (m_bPattern)
+		if (m_bDissolve)
+		{
+			m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
+			m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DISSOLVE)))
+				return E_FAIL;
+		}
+
+		else if (m_bPattern)
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
 				return E_FAIL;
@@ -721,8 +746,6 @@ void CDragon::End_Animation()
 			Set_NextAttack();
 			break;
 		case Client::CDragon::DIE:
-			PM->Delete_Boss();
-			Set_Dead();
 			break;
 		case Client::CDragon::GROGGYEND:
 			Set_NextMotion();
@@ -847,6 +870,10 @@ void CDragon::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CDragon::DIE:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+		{
+			m_bDissolve = true;
+		}
 		break;
 	case Client::CDragon::GROGGYEND:
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
@@ -1954,7 +1981,7 @@ void CDragon::Free()
 {
 	__super::Free();
 	Safe_Release(m_pAnimModel);
-
+	Safe_Release(m_pDissolveTexture);
 	Safe_Release(m_pTarget);
 	Safe_Release(m_pNavigation);
 

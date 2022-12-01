@@ -86,6 +86,9 @@ HRESULT CGolem::Initialize(void * pArg)
 
 	CRM->Start_Scene("Scene_Stage3Boss");*/
 
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Noise"), TEXT("Com_Texture"), (CComponent**)&m_pDissolveTexture)))
+		return E_FAIL;
+
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
 	
@@ -139,6 +142,9 @@ void CGolem::Tick(_float fTimeDelta)
 	m_bPattern = false;
 	
 	Update(fTimeDelta);
+
+	if (m_bDissolve)
+		m_fDissolveAcc += 0.2f * fTimeDelta;
 }
 
 void CGolem::LateTick(_float fTimeDelta)
@@ -153,6 +159,12 @@ void CGolem::LateTick(_float fTimeDelta)
 		m_bLHand = false;
 		m_bAttack = false;
 		
+	}
+
+	if (m_fDissolveAcc >= 0.8f)
+	{
+		PM->Delete_Boss();
+		Set_Dead();
 	}
 
 	m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_LOOK), XMLoadFloat3(&m_vTargetLook), 0.1f);
@@ -191,7 +203,8 @@ void CGolem::LateTick(_float fTimeDelta)
 		if (m_bAttack)
 			CM->Add_OBBObject(CCollider_Manager::COLLIDER_MONSTERATTACK, this, m_pOBB[OBB_ATTACK]);
 	}
-	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
+	if(!m_bDissolve)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOW, this);
 	m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
@@ -213,21 +226,31 @@ HRESULT CGolem::Render()
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_DIFFUSE, "g_DiffuseTexture")))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
-			return E_FAIL;
+		if (!m_bDissolve)
+		{
+			if (FAILED(m_pShaderCom->Set_RawValue("g_WorldMatrixInverse", &m_pTransformCom->Get_WorldMatrixInverse(), sizeof(_float4x4))))
+				return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
-			return E_FAIL;
+			if (FAILED(m_pShaderCom->Set_RawValue("g_ViewMatrixInverse", &GI->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW), sizeof(_float4x4))))
+				return E_FAIL;
 
-		m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
+			m_pShaderCom->Set_RawValue("g_fOutLinePower", &m_fOutLinePower, sizeof(_float));
 
-		if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, OUTLINEPASS)))
-			return E_FAIL;
-
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, OUTLINEPASS)))
+				return E_FAIL;
+		}
 		if (FAILED(m_pAnimModel->SetUp_OnShader(m_pShaderCom, m_pAnimModel->Get_MaterialIndex(j), TEX_NORMALS, "g_NormalTexture")))
 			return E_FAIL;
 
-		if (m_bPattern)
+		if (m_bDissolve)
+		{
+			m_pDissolveTexture->Set_SRV(m_pShaderCom, "g_DissolveTexture", 0);
+			m_pShaderCom->Set_RawValue("g_fDissolveAcc", &m_fDissolveAcc, sizeof(float));
+			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_DISSOLVE)))
+				return E_FAIL;
+		}
+
+		else if (m_bPattern)
 		{
 			if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_PATTERN)))
 				return E_FAIL;
@@ -273,11 +296,7 @@ HRESULT CGolem::Render()
 				if (FAILED(m_pAnimModel->Render(m_pShaderCom, j, ANIM_NHIT)))
 					return E_FAIL;
 			}
-		}
-		
-		
-
-		
+		}	
 	}
 
 	for (int i = 0; i < OBB_END; ++i)
@@ -581,7 +600,7 @@ void CGolem::Set_State(STATE eState)
 	{
 	case Client::CGolem::DOWN:
 		break;
-	case Client::CGolem::DIE:
+	case Client::CGolem::DIE:		
 		GI->PlaySoundW(L"GolemDie.ogg", SD_MONSTERVOICE, 0.9f);
 		break;
 	case Client::CGolem::RTDOWN:
@@ -761,6 +780,8 @@ void CGolem::Update(_float fTimeDelta)
 	case Client::CGolem::DOWN:
 		break;
 	case Client::CGolem::DIE:
+		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))
+			m_bDissolve = true;
 		break;
 	case Client::CGolem::RTDOWN:
 		break;
@@ -1456,7 +1477,7 @@ void CGolem::Free()
 {
 	__super::Free();
 	Safe_Release(m_pAnimModel);
-
+	Safe_Release(m_pDissolveTexture);
 	Safe_Release(m_pTarget);
 	Safe_Release(m_pNavigation);
 
