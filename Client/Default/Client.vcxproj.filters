@@ -235,6 +235,15 @@
     <Filter Include="02.GameObjects\Effect\Dragon\DragonTrail">
       <UniqueIdentifier>{6593cfb3-7b5d-4068-bc28-5d32151a7308}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.UI\LogoScene">
+      <UniqueIdentifier>{b934abe9-7088-4fd8-b312-76061ea8b346}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\FadeInOut">
+      <UniqueIdentifier>{c9ab4dfd-861e-4fca-9d51-0c81d59895ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.UI\PressKey">
+      <UniqueIdentifier>{f9a3853c-cbd7-4e5e-89a3-12cd2a9ac6c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -519,6 +528,15 @@
     <ClInclude Include="..\Public\PlayerRageHit.h">
       <Filter>02.GameObjects\Effect\Player\RageHit</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LogoScene.h">
+      <Filter>03.UI\LogoScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FadeInOut.h">
+      <Filter>03.UI\FadeInOut</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PressKey.h">
+      <Filter>03.UI\PressKey</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -784,6 +802,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\PlayerRageHit.cpp">
       <Filter>02.GameObjects\Effect\Player\RageHit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LogoScene.cpp">
+      <Filter>03.UI\LogoScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FadeInOut.cpp">
+      <Filter>03.UI\FadeInOut</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PressKey.cpp">
+      <Filter>03.UI\PressKey</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include "GameInstance.h"
-#include "UI_Manager.h"
+//#include "UI_Manager.h"
 
 BEGIN(Engine)
 class CShader;

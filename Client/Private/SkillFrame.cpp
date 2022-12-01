@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\SkillFrame.h"
 #include "Pointer_Manager.h"
+#include "UI_Manager.h"
 
 CSkillFrame::CSkillFrame(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)

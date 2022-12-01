@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\MPBar.h"
 #include "Player.h"
-
+#include "UI_Manager.h"
 CMPBar::CMPBar(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)
 {

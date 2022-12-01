@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "..\Public\Count.h"
 #include "Pointer_Manager.h"
-
+#include "UI_Manager.h"
 CCount::CCount(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)
 {

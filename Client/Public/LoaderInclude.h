@@ -97,6 +97,9 @@
 #include "BossMPBar.h"
 #include "BossMPBarFrame.h"
 #include "Count.h"
+#include "LogoScene.h"
+#include "FadeInOut.h"
+#include "PressKey.h"
 #pragma endregion UI클래스
 
 #pragma region Particle클래스

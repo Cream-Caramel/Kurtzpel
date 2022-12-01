@@ -3,6 +3,7 @@
 #include "UIInclude.h"
 #include "Mesh.h"
 #include "AnimMesh.h"
+#include "FadeInOut.h"
 
 IMPLEMENT_SINGLETON(CUI_Manager)
 
@@ -32,6 +33,12 @@ void CUI_Manager::Add_Count(CCount * pCount)
 {
 	m_pCount = pCount;
 	Safe_AddRef(m_pCount);
+}
+
+void CUI_Manager::Add_FadeInOut(CFadeInOut * pFadeInOut)
+{
+	m_pFadeInOut = pFadeInOut;
+	Safe_AddRef(m_pFadeInOut);
 }
 
 _uint CUI_Manager::Get_Count()
@@ -214,6 +221,16 @@ void CUI_Manager::Reset_ExGaugeTex()
 	m_pExGauge->Reset_TextureNum();
 }
 
+void CUI_Manager::On_Fade()
+{
+	m_pFadeInOut->On_Fade();
+}
+
+void CUI_Manager::Set_Fade(CFadeInOut::FADE eFade)
+{
+	m_pFadeInOut->Set_Fade(eFade);
+}
+
 
 void CUI_Manager::Free()
 {
@@ -227,6 +244,7 @@ void CUI_Manager::Free()
 	Safe_Release(m_pKeyShift);
 	Safe_Release(m_pBoss);
 	Safe_Release(m_pCount);
+	Safe_Release(m_pFadeInOut);
 	for (auto& iter : m_SkillFrame)
 	{
 		Safe_Release(iter);

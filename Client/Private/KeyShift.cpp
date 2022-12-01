@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\KeyShift.h"
-
+#include "UI_Manager.h"
 
 CKeyShift::CKeyShift(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)

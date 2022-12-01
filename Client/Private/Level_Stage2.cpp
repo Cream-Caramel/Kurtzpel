@@ -8,7 +8,7 @@
 #include "UI.h"
 #include "InstanceModel.h"
 #include "Camera_Manager.h"
-
+#include "UI_Manager.h"
 
 CLevel_Stage2::CLevel_Stage2(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -37,6 +37,9 @@ HRESULT CLevel_Stage2::Initialize()
 
 	GI->StopAll();
 	GI->PlayBGM(L"Stage2.ogg", 0.6f);
+
+	UM->On_Fade();
+	UM->Set_Fade(CFadeInOut::FADEIN);
 
 	m_bScene = false;
 

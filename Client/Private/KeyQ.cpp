@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\KeyQ.h"
-
+#include "UI_Manager.h"
 
 CKeyQ::CKeyQ(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)

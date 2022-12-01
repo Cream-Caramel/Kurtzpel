@@ -27,6 +27,8 @@ public:
 	_float3 Get_CameraPlayerPos();
 	LEVEL Get_NowLevel() { return m_eLevel; }
 	void Set_Level(LEVEL eLevel) { m_eLevel = eLevel; }
+	void Set_NextLevel(LEVEL eLevel) { m_eNextLevel = eLevel; }
+	void Change_Level(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
 	HRESULT Add_Monster(const char* Level);
 	HRESULT Add_Boss(CAnimMesh* pBoss);
 	HRESULT Delete_Boss();
@@ -43,6 +45,7 @@ public:
 
 private:
 	LEVEL m_eLevel;
+	LEVEL m_eNextLevel;
 	CPlayer* m_pPlayer;
 	CAnimMesh* m_pBoss = nullptr;
 	CCamera_Player* m_pCameraPlayer;

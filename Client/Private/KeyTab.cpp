@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\KeyTab.h"
-
+#include "UI_Manager.h"
 
 CKeyTab::CKeyTab(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)

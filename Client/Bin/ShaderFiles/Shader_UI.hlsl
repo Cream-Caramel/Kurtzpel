@@ -8,6 +8,8 @@ float g_fNowPlayerHp;
 float g_fPrePlayerHp;
 float g_fPlayerMp;
 float g_fExGauge;
+float g_fFadeAcc;
+float g_fPressAcc;
 float4 g_fTileColor;
 float4 g_fTrailColor;
 
@@ -286,6 +288,32 @@ PS_OUT SkillIcon_MAIN(PS_IN In)
 	return Out;
 }
 
+PS_OUT FADE_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	Out.vColor.a = g_fFadeAcc;
+
+	clip(Out.vColor.a <= 0.f ? -1.f : 1.f);
+
+	return Out;
+}
+
+PS_OUT Press_MAIN(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexUV);
+
+	Out.vColor.a *= g_fPressAcc;
+
+	clip(Out.vColor.a <= 0.f ? -1.f : 1.f);
+
+	return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -419,6 +447,24 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_Trail();
 	}
 
+	pass Fade
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 FADE_MAIN();
+	}
+	pass Press
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DSS_Default, 0);
+		SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		PixelShader = compile ps_5_0 Press_MAIN();
+	}
 
 	
 }

@@ -18,3 +18,5 @@
 #include "BossMPBar.h"
 #include "BossMPBarFrame.h"
 #include "Count.h"
+#include "FadeInOut.h"
+#include "LogoScene.h"

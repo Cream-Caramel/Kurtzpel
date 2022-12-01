@@ -229,6 +229,8 @@ HRESULT CRenderer::Draw()
 	if (FAILED(Render_UI()))
 		return E_FAIL;
 
+	if (FAILED(Render_FrontUI()))
+		return E_FAIL;
 
 #ifdef _DEBUG
 
@@ -545,6 +547,20 @@ HRESULT CRenderer::Render_UI()
 	return S_OK;
 }
 
+HRESULT CRenderer::Render_FrontUI()
+{
+	for (auto& pRenderObject : m_RenderObjects[RENDER_FRONTUI])
+	{
+		if (nullptr != pRenderObject)
+			pRenderObject->Render();
+
+		Safe_Release(pRenderObject);
+	}
+	m_RenderObjects[RENDER_FRONTUI].clear();
+
+	return S_OK;
+}
+
 HRESULT CRenderer::Render_BlurDownSample()
 {
 	if (nullptr == m_pTarget_Manager)
@@ -757,6 +773,7 @@ HRESULT CRenderer::Render_Grow()
 
 	return S_OK;
 }
+
 
 #ifdef _DEBUG
 HRESULT CRenderer::Render_Debug()

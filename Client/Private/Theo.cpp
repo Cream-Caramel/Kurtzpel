@@ -71,19 +71,19 @@ HRESULT CTheo::Initialize(void * pArg)
 	Safe_AddRef(m_pTarget);
 	PM->Add_Boss(this);
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;
+		return E_FAIL;*/
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 42;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE2, L"NavigationStage2", TEXT("NavigationStage2"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
 	m_pNavigation->Set_BattleIndex(41);
 
-	CRM->Start_Scene("Scene_Stage2Boss");*/
+	CRM->Start_Scene("Scene_Stage2Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -155,6 +155,9 @@ void CTheo::LateTick(_float fTimeDelta)
 	if (m_fDissolveAcc >= 0.8f)
 	{
 		PM->Delete_Boss();
+		UM->On_Fade();
+		UM->Set_Fade(CFadeInOut::FADEOUT);
+		PM->Set_NextLevel(LEVEL_STAGE3);
 		Set_Dead();
 	}
 

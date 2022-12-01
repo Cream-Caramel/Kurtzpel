@@ -7,7 +7,7 @@
 #include "Pointer_Manager.h"
 #include "UI.h"
 #include "Level_Loading.h"
-
+#include "UI_Manager.h"
 
 CLevel_Stage1::CLevel_Stage1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -51,12 +51,12 @@ HRESULT CLevel_Stage1::Initialize()
 	MeshInfo.fAngle = _float3{ 1.f,1.f,1.f };
 	GI->Add_GameObjectToLayer(L"Theo", LEVEL_STAGE1, L"Monster", &MeshInfo);*/
 
-	CAnimMesh::MESHINFO MeshInfo;
+	/*CAnimMesh::MESHINFO MeshInfo;
 	MeshInfo.sTag = L"Golem";
 	MeshInfo.fPos = _float4{ 90.f,0.6f,103.f,1.f };
 	MeshInfo.fScale = _float3{ 1.f,1.f,1.f };
 	MeshInfo.fAngle = _float3{ 1.f,1.f,1.f };
-	GI->Add_GameObjectToLayer(L"Golem", LEVEL_STAGE1, L"Monster", &MeshInfo);
+	GI->Add_GameObjectToLayer(L"Golem", LEVEL_STAGE1, L"Monster", &MeshInfo);*/
 
 	PM->Set_Level(LEVEL_STAGE1);
 
@@ -65,14 +65,16 @@ HRESULT CLevel_Stage1::Initialize()
 
 	m_bScene = false;
 
+	UM->On_Fade();
+	UM->Set_Fade(CFadeInOut::FADEIN);
+	
+
 	return S_OK;
 }
 
 void CLevel_Stage1::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
-
-	
 
 	/*if (!m_bScene)
 	{
@@ -94,7 +96,9 @@ void CLevel_Stage1::Tick(_float fTimeDelta)
 	if (GI->Key_Down(DIK_J))
 	{
 		GI->StopAll();
-		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE2));
+		UM->On_Fade();
+		UM->Set_Fade(CFadeInOut::FADEOUT);
+		PM->Set_NextLevel(LEVEL_STAGE2);
 	}
 }
 

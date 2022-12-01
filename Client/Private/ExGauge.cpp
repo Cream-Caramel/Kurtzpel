@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\ExGauge.h"
-
+#include "UI_Manager.h"
 
 CExGauge::CExGauge(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)

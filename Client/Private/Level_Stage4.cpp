@@ -7,7 +7,7 @@
 #include "Pointer_Manager.h"
 #include "UI.h"
 #include "InstanceModel.h"
-
+#include "UI_Manager.h"
 
 CLevel_Stage4::CLevel_Stage4(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
@@ -40,6 +40,9 @@ HRESULT CLevel_Stage4::Initialize()
 	GI->PlayBGM(L"Stage4.ogg", 0.6f);
 
 	PM->Get_PlayerPointer()->Set_bBattle(false);
+
+	UM->On_Fade();
+	UM->Set_Fade(CFadeInOut::FADEIN);
 
 	return S_OK;
 }

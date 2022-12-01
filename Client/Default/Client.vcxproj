@@ -188,6 +188,7 @@
     <ClInclude Include="..\Public\Effect.h" />
     <ClInclude Include="..\Public\ExGauge.h" />
     <ClInclude Include="..\Public\ExSkillFrame.h" />
+    <ClInclude Include="..\Public\FadeInOut.h" />
     <ClInclude Include="..\Public\Golem.h" />
     <ClInclude Include="..\Public\GolemRock1.h" />
     <ClInclude Include="..\Public\GolemRock2.h" />
@@ -211,6 +212,7 @@
     <ClInclude Include="..\Public\Level_Static.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\LoaderInclude.h" />
+    <ClInclude Include="..\Public\LogoScene.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\MeshInstance.h" />
@@ -236,6 +238,7 @@
     <ClInclude Include="..\Public\PlayerTrailSub1.h" />
     <ClInclude Include="..\Public\PlayerTrailSub2.h" />
     <ClInclude Include="..\Public\Pointer_Manager.h" />
+    <ClInclude Include="..\Public\PressKey.h" />
     <ClInclude Include="..\Public\Release_Manager.h" />
     <ClInclude Include="..\Public\Ring.h" />
     <ClInclude Include="..\Public\Rock.h" />
@@ -282,6 +285,7 @@
     <ClCompile Include="..\Private\Effect.cpp" />
     <ClCompile Include="..\Private\ExGauge.cpp" />
     <ClCompile Include="..\Private\ExSkillFrame.cpp" />
+    <ClCompile Include="..\Private\FadeInOut.cpp" />
     <ClCompile Include="..\Private\Golem.cpp" />
     <ClCompile Include="..\Private\GolemRock1.cpp" />
     <ClCompile Include="..\Private\GolemRock2.cpp" />
@@ -304,6 +308,7 @@
     <ClCompile Include="..\Private\Level_Stage4.cpp" />
     <ClCompile Include="..\Private\Level_Static.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
+    <ClCompile Include="..\Private\LogoScene.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
     <ClCompile Include="..\Private\MeshInstance.cpp" />
@@ -329,6 +334,7 @@
     <ClCompile Include="..\Private\PlayerTrailSub1.cpp" />
     <ClCompile Include="..\Private\PlayerTrailSub2.cpp" />
     <ClCompile Include="..\Private\Pointer_Manager.cpp" />
+    <ClCompile Include="..\Private\PressKey.cpp" />
     <ClCompile Include="..\Private\Release_Manager.cpp" />
     <ClCompile Include="..\Private\Ring.cpp" />
     <ClCompile Include="..\Private\Rock.cpp" />

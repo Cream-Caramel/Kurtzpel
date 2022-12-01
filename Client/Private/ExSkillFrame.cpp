@@ -51,14 +51,8 @@ HRESULT CExSkillFrame::Render()
 	if (FAILED(m_pTextureCom->Set_SRV(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
 
-	
-
-
 	if (FAILED(m_pShaderCom->Begin(PASS_SKILLICON)))
-		return E_FAIL;
-	
-
-
+		return E_FAIL;	
 
 	if (FAILED(m_pVIBufferCom->Render()))
 		return E_FAIL;

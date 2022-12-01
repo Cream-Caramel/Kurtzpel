@@ -36,6 +36,7 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 
 	if (true == m_pLoader->Get_Finished())
 	{
+		
 			CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 			Safe_AddRef(pGameInstance);
 
@@ -46,7 +47,6 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			case LEVEL_STATIC:
 				pNewLevel = CLevel_Static::Create(m_pDevice, m_pContext);
 				break;
-
 			case LEVEL_LOGO:
 				pNewLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
 				break;
@@ -73,8 +73,9 @@ void CLevel_Loading::Tick(_float fTimeDelta)
 			if (FAILED(pGameInstance->Open_Level(m_eNextLevel, pNewLevel)))
 				goto except;
 
-			except:
+		except:
 			Safe_Release(pGameInstance);
+		
 	}
 }
 

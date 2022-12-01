@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "..\Public\BossMPBarFrame.h"
-
+#include "UI_Manager.h"
 
 CBossMPBarFrame::CBossMPBarFrame(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)

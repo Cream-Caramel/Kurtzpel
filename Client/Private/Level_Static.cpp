@@ -16,6 +16,7 @@ HRESULT CLevel_Static::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
+	
 
 	return S_OK;
 }
@@ -28,12 +29,11 @@ void CLevel_Static::Tick(_float fTimeDelta)
 	CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
 	Safe_AddRef(pGameInstance);
 
-	if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE1))))
-	return;
 
-	Safe_Release(pGameInstance);
-
+	if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_LOGO))))
+		return;
 	
+	Safe_Release(pGameInstance);
 }
 
 HRESULT CLevel_Static::Render()

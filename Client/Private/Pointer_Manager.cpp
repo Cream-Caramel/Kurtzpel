@@ -5,6 +5,7 @@
 #include "GameInstance.h"
 #include "AnimMesh.h"
 #include "Golem.h"
+#include "Level_Loading.h"
 
 IMPLEMENT_SINGLETON(CPointer_Manager)
 
@@ -47,6 +48,12 @@ void CPointer_Manager::Add_CameraPlayer(CCamera_Player * pCameraPlayer)
 _float3 CPointer_Manager::Get_CameraPlayerPos()
 {
 	return m_pCameraPlayer->Get_Pos();
+}
+
+void CPointer_Manager::Change_Level(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+{
+	GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(pDevice, pContext, m_eNextLevel));
+	GI->StopAll();	
 }
 
 HRESULT CPointer_Manager::Add_Monster(const char * Level)

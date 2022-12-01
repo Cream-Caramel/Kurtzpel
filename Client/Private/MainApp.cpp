@@ -130,9 +130,6 @@ HRESULT CMainApp::Open_Level(LEVEL eLevelID)
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
 
-	/* 특정 레벨을 할당하기 전에 로딩레벨을 거쳐 할당되는 형태로 가자. */
-
-	/* 할당한 레벨을 레벨매니져에 보관할 수 있또록. gksek. */
 	if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, eLevelID))))
 		return E_FAIL;
 

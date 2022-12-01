@@ -3161,6 +3161,12 @@ void CPlayer::Update(_float fTimeDelta)
 				PTM->CreateParticle(L"PlayerYellowTrail", WorldPos, true, CAlphaParticle::DIR_END);			
 			return;
 		}
+
+		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(4) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(5))
+		{
+			CRM->Set_FovSpeed(160.f);
+			CRM->Set_FovDir(true);
+		}
 		if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(1) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(2))
 		{
 			CAnimMesh::EFFECTINFO EffectInfo;
@@ -3170,7 +3176,6 @@ void CPlayer::Update(_float fTimeDelta)
 			GI->PlaySoundW(L"RockBreakEnd.ogg", SD_PLAYER1, 0.6f);
 			m_Parts[PARTS_SWORD]->Set_Collision(true);
 			CRM->Start_Shake(0.4f, 6.f, 0.05f);
-			CRM->Set_FovDir(true);
 			((CPlayerSword*)m_Parts[PARTS_SWORD])->Set_OBB(_float3{ 12.f,12.f,12.f });
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));

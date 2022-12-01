@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "..\Public\Level_Logo.h"
-
+#include "FadeInOut.h"
 #include "GameInstance.h"
 #include "Level_Loading.h"
-
-
+#include "UI_Manager.h"
+#include "Pointer_Manager.h"
 CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel(pDevice, pContext)
 {
@@ -15,9 +15,21 @@ HRESULT CLevel_Logo::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
-
-	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
+	if (FAILED(GI->Add_GameObjectToLayer(L"LogoScene", LEVEL_LOGO, L"Layer_UI")))
 		return E_FAIL;
+
+	if (FAILED(GI->Add_GameObjectToLayer(L"PressKey", LEVEL_LOGO, L"Layer_UI")))
+		return E_FAIL;
+
+	if (FAILED(GI->Add_GameObjectToLayer(L"FadeInOut", LEVEL_STATIC, L"Layer_UI")))
+		return E_FAIL;
+
+	UM->On_Fade();
+
+	UM->Set_Fade(CFadeInOut::FADEIN);
+	
+
+	GI->PlayBGM(L"LogoBGM.wav", 0.4f);
 
 	return S_OK;
 }
@@ -26,18 +38,11 @@ void CLevel_Logo::Tick(_float fTimeDelta)
 {
 	__super::Tick(fTimeDelta);
 
-	if (GetKeyState(VK_SPACE) & 0x8000)
+	if (GI->Key_Down(DIK_SPACE))
 	{
-		CGameInstance*		pGameInstance = CGameInstance::Get_Instance();
-		Safe_AddRef(pGameInstance);
-				
-		/*if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
-			return;*/
-
-
-
-		Safe_Release(pGameInstance);
-
+		UM->On_Fade();
+		UM->Set_Fade(CFadeInOut::FADEOUT);
+		PM->Set_NextLevel(LEVEL_STAGE1);
 	}
 }
 
@@ -45,8 +50,6 @@ HRESULT CLevel_Logo::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
-
-	SetWindowText(g_hWnd, TEXT("로고레벨임"));
 
 	return S_OK;
 }

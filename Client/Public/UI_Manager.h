@@ -2,6 +2,7 @@
 #include "Base.h"
 #include "Client_Defines.h"
 #include "Player.h"
+#include "FadeInOut.h"
 BEGIN(Client)
 class CPlayer;
 class CSkillFrame;
@@ -14,6 +15,7 @@ class CKeyTab;
 class CExGauge;
 class CAnimMesh;
 class CCount;
+class CFadeInOut;
 class CUI_Manager final : public CBase
 {
 	DECLARE_SINGLETON(CUI_Manager)
@@ -26,6 +28,7 @@ public:
 	void Add_Boss(CAnimMesh* pBoss);
 	void Add_ExGauge(CExGauge* pGauge);
 	void Add_Count(CCount* pCount);
+	void Add_FadeInOut(CFadeInOut* pFadeInOut);
 	_uint Get_Count();
 	void Set_Count(_uint iCount);
 	_bool Get_UseSkill(); // 플레이어의 상태가 스킬사용가능한상태인지 판단
@@ -56,6 +59,9 @@ public:
 	void AddKeyTab(CKeyTab* pKeyTab);
 	void Set_KeyDown(int iIndex);
 	void Reset_ExGaugeTex();
+	void On_Fade();
+	void Set_Fade(CFadeInOut::FADE eFade);
+	_bool Get_Fade();
 
 private:
 	CPlayer* m_pPlayer = nullptr;
@@ -69,6 +75,7 @@ private:
 	CKeyTab* m_pKeyTab = nullptr;	
 	vector<CSkillFrame*> m_SkillFrame;
 	CAnimMesh* m_pBoss = nullptr;
+	CFadeInOut* m_pFadeInOut = nullptr;
 
 public:
 	virtual void Free() override;

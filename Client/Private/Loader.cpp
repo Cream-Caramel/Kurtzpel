@@ -23,6 +23,7 @@ _uint APIENTRY LoadingMain(void* pArg)
 	{
 	case LEVEL_STATIC:
 		pLoader->Loading_ForStatic();
+		break;
 	case LEVEL_LOGO:
 		pLoader->Loading_ForLogoLevel();
 		break;
@@ -112,6 +113,11 @@ HRESULT CLoader::Loading_ForStatic()
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다.  "));
 
 	Safe_Release(pGameInstance);
+
+	if (FAILED(GI->Add_Prototype(LEVEL_STATIC, L"FadeInOut",
+		CTexture::Create(m_pDevice, m_pContext, L"../Bin/Resources/Textures/UI/Image/Back.dds", 1))))
+		return E_FAIL;
+
 
 	m_isFinished = true;
 
@@ -357,8 +363,20 @@ HRESULT CLoader::Loading_ObjectProtoType()
 		CMPBar::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("FadeInOut"),
+		CFadeInOut::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("PressKey"),
+		CPressKey::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("BarLine"),
 		CBarLine::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("LogoScene"),
+		CLogoScene::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("BossHPBarFrame"),
@@ -541,6 +559,15 @@ HRESULT CLoader::LoadInstance(const char * FileName)
 
 HRESULT CLoader::Loading_ForLogoLevel()
 {
+	if (FAILED(GI->Add_Prototype(LEVEL_LOGO, L"LogoScene",
+		CTexture::Create(m_pDevice, m_pContext, L"../Bin/Resources/Textures/UI/Image/LogoScene.png", 1))))
+		return E_FAIL;
+
+	if (FAILED(GI->Add_Prototype(LEVEL_LOGO, L"PressKey",
+		CTexture::Create(m_pDevice, m_pContext, L"../Bin/Resources/Textures/UI/Image/PressKey.png", 1))))
+		return E_FAIL;
+
+	m_isFinished = true;
 	return S_OK;
 }
 

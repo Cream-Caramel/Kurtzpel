@@ -58,7 +58,7 @@ HRESULT CGolem::Initialize(void * pArg)
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 	m_fOutLinePower = 3.f;
 
-	m_fMaxHp = 500;
+	m_fMaxHp = 50;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 90.f;
@@ -164,6 +164,9 @@ void CGolem::LateTick(_float fTimeDelta)
 	if (m_fDissolveAcc >= 0.8f)
 	{
 		PM->Delete_Boss();
+		UM->On_Fade();
+		UM->Set_Fade(CFadeInOut::FADEOUT);
+		PM->Set_NextLevel(LEVEL_STAGE4);
 		Set_Dead();
 	}
 
