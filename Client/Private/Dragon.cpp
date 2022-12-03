@@ -60,10 +60,10 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 30;
+	m_fMaxHp = 200;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
-	m_fNowMp = 90.f;
+	m_fNowMp = 95.f;
 	m_fDamage = 10.f;
 	m_fOutLinePower = 3.f;
 	m_fColiisionTime = 0.06f;
@@ -74,18 +74,18 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	Set_Dir();
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-	return E_FAIL;
+	return E_FAIL;*/
 
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 172;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE4, L"NavigationStage4", TEXT("NavigationStage4"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
 
 	m_pNavigation->Set_BattleIndex(145);
-	CRM->Start_Scene("Scene_Stage4Boss");*/
+	CRM->Start_Scene("Scene_Stage4Boss");
 
 	UM->Add_Boss(this);
 	Load_UI("BossBar");
@@ -178,6 +178,9 @@ void CDragon::LateTick(_float fTimeDelta)
 	
 	if(m_fDissolveAcc >= 1.f)
 	{
+		GI->StopAll();
+		UM->On_Fade();
+		UM->Set_Fade(CFadeInOut::FADEOUT);
 		PM->Delete_Boss();
 		Set_Dead();
 	}
@@ -368,15 +371,20 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 				m_fNowMp = 0.f;
 			}
 		}
-		else if (m_eCurState != SKILL7_2)
-			m_fNowMp += m_fDamage / 2.f;	
+		else
+		{
+			if (m_eCurState != SKILL7_2)
+				m_fNowMp += m_fDamage / 2.f;
 
-		if (m_fNowMp >= 100.f)		
-			m_bFinish = true;
-		
-		else		
-			m_bFinish = false;
-		
+			if (m_fNowMp >= 100.f)
+			{
+				m_bFinish = true;
+				UM->Set_Count(2);
+			}
+
+			else
+				m_bFinish = false;
+		}
 	
 	}
 
@@ -416,7 +424,7 @@ void CDragon::Collision(CGameObject * pOther, string sTag)
 
 			m_bCollision = false;
 			m_bHit = true;
-			UM->Set_ExGaugeTex(1);
+			UM->Set_ExGaugeTex(2);
 		}
 	}
 }

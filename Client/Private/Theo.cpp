@@ -59,7 +59,7 @@ HRESULT CTheo::Initialize(void * pArg)
 	m_fOutLinePower = 3.f;
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 50;
+	m_fMaxHp = 100;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 95.f;
@@ -389,20 +389,24 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 			else
 			{
 				m_bFinishStart = true;
+				m_bFinish = false;
 				m_fNowMp = 0.f;
 			}
 		}
-
-		else if(m_eCurState != SKILL3)
-			m_fNowMp += m_fDamage / 2.f;
-
-		if (m_fNowMp >= 100.f)
-		{
-			m_bFinish = true;
-		}
 		else
 		{
-			m_bFinish = false;
+			if (m_eCurState != SKILL3)
+				m_fNowMp += m_fDamage / 2.f;
+
+			if (m_fNowMp >= 100.f)
+			{
+				UM->Set_Count(2);
+				m_bFinish = true;
+			}
+			else
+			{
+				m_bFinish = false;
+			}
 		}
 	}
 
@@ -443,7 +447,7 @@ void CTheo::Collision(CGameObject * pOther, string sTag)
 				m_fNowHp -= pOther->Get_Damage() * 2;
 			else
 				m_fNowHp -= pOther->Get_Damage();
-			UM->Set_ExGaugeTex(1);
+			UM->Set_ExGaugeTex(2);
 		}
 	}
 }
@@ -1161,7 +1165,7 @@ void CTheo::Update(_float fTimeDelta)
 				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
 				GI->Add_GameObjectToLayer(L"GolemRock1", PM->Get_NowLevel(), L"Layer_GolemEffect", &EffectInfo);
 				GI->PlaySoundW(L"TheoAppearAttack.ogg", SD_MONSTERVOICE, 0.9f);
-				CRM->Start_Shake(0.2f, 3.f, 0.03f);
+				//CRM->Start_Shake(0.2f, 3.f, 0.03f);
 				return;
 			}
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(0) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(1))

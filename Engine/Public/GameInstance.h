@@ -103,6 +103,8 @@ public:/*For. Sound_Manager*/
 	HRESULT PlayBGM(TCHAR * pSoundKey, const float& fVolume);
 	HRESULT StopSound(const _uint& eID);
 	HRESULT StopAll();
+	int  VolumeUp(const _uint& eID, const _float& _vol);
+	int  VolumeDown(const _uint& eID, const _float& _vol);
 	
 
 private:

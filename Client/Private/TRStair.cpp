@@ -82,14 +82,22 @@ HRESULT CTRStair::Render()
 			return E_FAIL;
 		if (FAILED(m_pModel->SetUp_OnShader(m_pShaderCom, m_pModel->Get_MaterialIndex(i), TEX_NORMALS, "g_NormalTexture")))
 		{
-			
+			/*if (FAILED(m_pShaderCom->Begin(INSTANCEMODEL_OUTLINE)))
+				return E_FAIL;
+
+			if (FAILED(m_pModel->Render(i)))
+				return E_FAIL;*/
 
 			if (FAILED(m_pShaderCom->Begin(INSTANCEMODEL_DEFAULT)))
 				return E_FAIL;
 		}
 		else
 		{
-			
+		/*	if (FAILED(m_pShaderCom->Begin(INSTANCEMODEL_OUTLINE)))
+				return E_FAIL;
+
+			if (FAILED(m_pModel->Render(i)))
+				return E_FAIL;*/
 
 			if (FAILED(m_pShaderCom->Begin(INSTANCEMODEL_NDEFAULT)))
 				return E_FAIL;

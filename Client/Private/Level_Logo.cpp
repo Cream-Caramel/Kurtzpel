@@ -43,6 +43,7 @@ void CLevel_Logo::Tick(_float fTimeDelta)
 		UM->On_Fade();
 		UM->Set_Fade(CFadeInOut::FADEOUT);
 		PM->Set_NextLevel(LEVEL_STAGE1);
+		GI->PlaySoundW(L"Start.ogg", SD_PLAYERVOICE, 0.9f);
 	}
 }
 

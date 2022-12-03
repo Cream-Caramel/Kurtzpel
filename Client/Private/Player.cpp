@@ -3112,15 +3112,33 @@ void CPlayer::Update(_float fTimeDelta)
 			if (m_pAnimModel[0]->GetPlayTime() >= m_pAnimModel[0]->GetTimeLimit(3) && m_pAnimModel[0]->GetPlayTime() <= m_pAnimModel[0]->GetTimeLimit(4))
 			{
 				m_bRageSkill = true;
-				CAnimMesh::EFFECTINFO EffectInfo;
-				EffectInfo.WorldMatrix = m_pTransformCom->Get_WorldMatrix();
-				EffectInfo.WorldMatrix.r[1].m128_f32[1] = m_pNavigation->Get_PosY(m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-				EffectInfo.vScale = _float3{ 1.f,1.f,1.f };
-				GI->Add_GameObjectToLayer(L"PlayerRockBreak", PM->Get_NowLevel(), L"Layer_PlayerEffect", &EffectInfo);
-				_float4 WorldPos;
-				XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
-				PTM->CreateParticle(L"PlayerGage2_1", WorldPos, true, CAlphaParticle::DIR_END);
-				
+				CRing::RINGINFO RingInfo;
+				RingInfo.vSize = { 0.2f,0.3f,0.2f };
+				RingInfo.vSpeed = _float3{ 1.5f, 0.f, 1.5f };
+				RingInfo.fLifeTime = 0.3f;
+				RingInfo.eColor = CRing::RING_ORANGE;
+				XMStoreFloat4(&RingInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				GI->Add_GameObjectToLayer(L"Ring", PM->Get_NowLevel(), L"Layer_PlayerEffect", &RingInfo);
+				CWall::WALLINFO WallInfo;
+				WallInfo.fMaxUVIndexX = 1.f;
+				WallInfo.fMaxUVIndexY = 4.f;
+				WallInfo.fUVSpeed = 0.05f;
+				WallInfo.vSize = { 1.5f,8.f,1.5f };
+				WallInfo.vSpeed = { 0.1f,0.f,0.1f };
+				WallInfo.eColor = CWall::WALL_ORANGE;
+				WallInfo.fLifeTime = 1.f;
+				WallInfo.fEndSpeed = 0.5f;
+				XMStoreFloat4(&WallInfo.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
+				GI->Add_GameObjectToLayer(L"Wall", PM->Get_NowLevel(), L"Layer_PlayerEffect", &WallInfo);
+				CPlayerRageHit::PLAYERRAGEHITINFO PlayerRageHit;
+				XMStoreFloat4(&PlayerRageHit.vWorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION) + XMVector3Normalize(XMLoadFloat3(&GI->Get_CamDir(CPipeLine::DIR_RIGHT))) * m_RageHits[1].fRight);
+				PlayerRageHit.vWorldPos.y += m_RageHits[1].fHeight;
+				PlayerRageHit.vScale = m_RageHits[1].vScale;
+				PlayerRageHit.fRotation = m_RageHits[1].fRotation;
+				m_Parts[PARTS_SWORD]->Set_Collision(true);
+				GI->Add_GameObjectToLayer(L"PlayerRageHit", PM->Get_NowLevel(), L"Layer_PlayerEffect", &PlayerRageHit);
+				GI->PlaySoundW(L"Rage.ogg", SD_PLAYER2, 0.6f);
+				CRM->Start_Shake(0.3f, 4.f, 0.04f);
 
 				for (auto& iter : m_RageSowrds)
 				{

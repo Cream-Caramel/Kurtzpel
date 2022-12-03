@@ -451,6 +451,27 @@ HRESULT CGameInstance::StopAll()
 	return S_OK;
 }
 
+int CGameInstance::VolumeUp(const _uint & eID, const _float & _vol)
+{
+
+	if (m_pSound_Manager == nullptr)
+		return E_FAIL;
+
+	return m_pSound_Manager->VolumeUp(eID, _vol);
+
+	
+}
+
+int CGameInstance::VolumeDown(const _uint & eID, const _float & _vol)
+{
+	if (m_pSound_Manager == nullptr)
+		return E_FAIL;
+
+	return m_pSound_Manager->VolumeDown(eID, _vol);
+
+	
+}
+
 void CGameInstance::Release_Engine()
 {
 	CLight_Manager::Get_Instance()->Destroy_Instance();

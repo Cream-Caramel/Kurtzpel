@@ -52,10 +52,12 @@ void CFadeInOut::Tick(_float fTimeDelta)
 		else
 		{
 			m_fFadeAcc += 0.5f * fTimeDelta;
+			GI->VolumeDown(SD_BGM, m_fFadeAcc);
 			if (m_fFadeAcc >= 1.f)
 			{
 				m_fFadeAcc = 1.f;
 				m_bFade = false;
+				
 				PM->Change_Level(m_pDevice, m_pContext);
 			}
 		}

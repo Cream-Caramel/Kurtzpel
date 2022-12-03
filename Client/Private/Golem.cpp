@@ -58,10 +58,10 @@ HRESULT CGolem::Initialize(void * pArg)
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 	m_fOutLinePower = 3.f;
 
-	m_fMaxHp = 50;
+	m_fMaxHp = 200;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
-	m_fNowMp = 90.f;
+	m_fNowMp = 95.f;
 	m_fDamage = 10.f;
 
 	m_fColiisionTime = 0.06f;
@@ -70,12 +70,12 @@ HRESULT CGolem::Initialize(void * pArg)
 	Safe_AddRef(m_pTarget);
 	PM->Add_Boss(this);
 
-	CNavigation::NAVIGATIONDESC NaviDesc;
+	/*CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 1;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE1, L"NavigationStage1", TEXT("NavigationStage1"), (CComponent**)&m_pNavigation, &NaviDesc)))
-		return E_FAIL;
+		return E_FAIL;*/
 	
-	/*CNavigation::NAVIGATIONDESC NaviDesc;
+	CNavigation::NAVIGATIONDESC NaviDesc;
 	NaviDesc.iCurrentIndex = 478;
 	if (FAILED(__super::Add_Component(LEVEL_STAGE3, L"NavigationStage3", TEXT("NavigationStage3"), (CComponent**)&m_pNavigation, &NaviDesc)))
 		return E_FAIL;
@@ -84,7 +84,7 @@ HRESULT CGolem::Initialize(void * pArg)
 
 	Set_Dir();
 
-	CRM->Start_Scene("Scene_Stage3Boss");*/
+	CRM->Start_Scene("Scene_Stage3Boss");
 
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Noise"), TEXT("Com_Texture"), (CComponent**)&m_pDissolveTexture)))
 		return E_FAIL;
@@ -354,20 +354,24 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 			else
 			{
 				m_bFinishStart = true;
+				m_bFinish = false;
 				m_fNowMp = 0.f;
 			}
 		}
-
-		else if (m_eCurState != SKILL10_1)
-			m_fNowMp += m_fDamage / 2.f;
-
-		if (m_fNowMp >= 100.f)
-		{
-			m_bFinish = true;
-		}
 		else
 		{
-			m_bFinish = false;
+			if (m_eCurState != SKILL10_1)
+				m_fNowMp += m_fDamage / 2.f;
+
+			if (m_fNowMp >= 100.f)
+			{
+				m_bFinish = true;
+				UM->Set_Count(2);
+			}
+			else
+			{
+				m_bFinish = false;
+			}
 		}
 	}
 
@@ -409,7 +413,7 @@ void CGolem::Collision(CGameObject * pOther, string sTag)
 
 			m_bCollision = false;
 			m_bHit = true;
-			UM->Set_ExGaugeTex(1);
+			UM->Set_ExGaugeTex(2);
 		}
 	}
 }

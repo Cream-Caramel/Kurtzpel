@@ -83,19 +83,20 @@ void CLevel_Stage1::Tick(_float fTimeDelta)
 	}*/
 	if (GI->Key_Down(DIK_L))
 	{
-		GI->StopAll();
-		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE4));
+		UM->On_Fade();
+		UM->Set_Fade(CFadeInOut::FADEOUT);
+		PM->Set_NextLevel(LEVEL_STAGE4);
 	}
 
 	if (GI->Key_Down(DIK_K))
 	{
-		GI->StopAll();
-		GI->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_STAGE3));
+		UM->On_Fade();
+		UM->Set_Fade(CFadeInOut::FADEOUT);
+		PM->Set_NextLevel(LEVEL_STAGE3);
 	}
 
 	if (GI->Key_Down(DIK_J))
 	{
-		GI->StopAll();
 		UM->On_Fade();
 		UM->Set_Fade(CFadeInOut::FADEOUT);
 		PM->Set_NextLevel(LEVEL_STAGE2);
