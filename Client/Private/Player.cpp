@@ -997,6 +997,7 @@ void CPlayer::End_Animation()
 		case Client::CPlayer::RESPAWN:
 			Set_State(IDLE);
 			m_bRespawn = false;
+			m_bCollision = true;
 			break;
 		case Client::CPlayer::RUN:
 			break;
@@ -1157,11 +1158,11 @@ void CPlayer::End_Animation()
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
 			break;
 		case Client::CPlayer::EX1ATTACK:
-			
-			break;
-		case Client::CPlayer::EX2ATTACK:
 			Set_State(IDLE);
 			m_Parts[PARTS_SWORD]->Set_Collision(false);
+			break;
+		case Client::CPlayer::EX2ATTACK:
+			
 			break;
 		case Client::CPlayer::EX1READY:
 			break;
@@ -2804,9 +2805,8 @@ void CPlayer::Update(_float fTimeDelta)
 		break;
 	case Client::CPlayer::VOIDBACKEND:
 		break;
-	case Client::CPlayer::VOIDFRONT:
-		if (UM->Get_Count() > 0)
-			m_bCollision = false;
+	case Client::CPlayer::VOIDFRONT:		
+		m_bCollision = false;
 		for (auto& pPart : m_Parts)
 		{
 			if (pPart->Get_MaxHp() != 0.1f)
@@ -2823,8 +2823,7 @@ void CPlayer::Update(_float fTimeDelta)
 		}
 		break;
 	case Client::CPlayer::VOIDBACK:
-		if (UM->Get_Count() > 0)
-			m_bCollision = false;
+		m_bCollision = false;
 		for (auto& pPart : m_Parts)
 		{
 			if (pPart->Get_MaxHp() != 0.1f)

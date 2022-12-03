@@ -60,7 +60,7 @@ HRESULT CDragon::Initialize(void * pArg)
 
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 200;
+	m_fMaxHp = 600;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 95.f;
@@ -1768,6 +1768,9 @@ void CDragon::DebugKeyInput()
 
 	if (GI->Key_Down(DIK_M))
 		Set_State(SKILL10_1);
+
+	if (GI->Key_Down(DIK_N))
+		Set_State(SKILL14_1);
 }
 
 void CDragon::CreateFire1()

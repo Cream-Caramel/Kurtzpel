@@ -402,7 +402,7 @@ PS_OUT Line_MAIN(PS_IN In)
 {
 	PS_OUT		Out = (PS_OUT)0;
 
-	Out.vDiffuse = (vector)0.f;
+	Out.vDiffuse = (vector)0.2f;
 
 	Out.vDiffuse.a = 1.f;
 

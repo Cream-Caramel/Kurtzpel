@@ -82,14 +82,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (done) 
 			break;
 
-		pGameInstance->Update_Timer(TEXT("Timer_Default"));
+		//pGameInstance->Update_Timer(TEXT("Timer_Default"));
 
-		fTimeAcc += pGameInstance->Get_TimeDelta(TEXT("Timer_Default"));
+		fTimeAcc += pGameInstance->Update_Timer(TEXT("Timer_Default"));
 		
 		if (fTimeAcc >= 1.f / 60.0f)
 		{
-			pGameInstance->Update_Timer(TEXT("Timer_Main"));
-			pMainApp->Tick(pGameInstance->Get_TimeDelta(TEXT("Timer_Main")));
+			/*pGameInstance->Update_Timer(TEXT("Timer_Main"));
+			pMainApp->Tick(pGameInstance->Get_TimeDelta(TEXT("Timer_Main")));*/
+			pMainApp->Tick(pGameInstance->Update_Timer(TEXT("Timer_Main")));
 			pMainApp->Render();
 			
 			fTimeAcc = 0.f;

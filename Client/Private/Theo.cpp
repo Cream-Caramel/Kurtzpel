@@ -59,7 +59,7 @@ HRESULT CTheo::Initialize(void * pArg)
 	m_fOutLinePower = 3.f;
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 
-	m_fMaxHp = 100;
+	m_fMaxHp = 500;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 95.f;
@@ -1042,7 +1042,7 @@ void CTheo::Update(_float fTimeDelta)
 					m_bRushRight = true;
 				}
 			}
-			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed*1.3f, m_pNavigation, fTimeDelta))
+			if (m_pTransformCom->Go_NoSlide(m_pTransformCom->Get_State(CTransform::STATE_LOOK), m_fRushSpeed*1.8f, m_pNavigation, fTimeDelta))
 				Set_Dir();
 			_float4 WorldPos;
 			XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
@@ -1098,7 +1098,7 @@ void CTheo::Update(_float fTimeDelta)
 			}
 			if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(1) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(2))
 			{
-				m_fNowHp += 10.f;
+				m_fNowHp += 50.f;
 				m_fNowMp += 3.f;
 				if (m_fNowMp >= 100.f)
 					m_bFinish = true;			

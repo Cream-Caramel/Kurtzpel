@@ -58,7 +58,7 @@ HRESULT CGolem::Initialize(void * pArg)
 	m_pAnimModel->Set_AnimIndex(m_eCurState);
 	m_fOutLinePower = 3.f;
 
-	m_fMaxHp = 200;
+	m_fMaxHp = 550;
 	m_fMaxMp = 100.f;
 	m_fNowHp = m_fMaxHp;
 	m_fNowMp = 95.f;
@@ -1020,7 +1020,7 @@ void CGolem::Update(_float fTimeDelta)
 		_float4 WorldPos;
 		XMStoreFloat4(&WorldPos, m_pTransformCom->Get_State(CTransform::STATE_POSITION));
 		PTM->CreateParticle(L"GolemCharge", WorldPos, false, CAlphaParticle::DIR_GOLEM);
-		m_fNowHp += 0.2f;
+		m_fNowHp += 0.3f;
 		m_fNowMp += 0.1f;
 		if (m_fNowMp >= 100.f)
 			m_bFinish = true;
@@ -1125,12 +1125,10 @@ void CGolem::Update(_float fTimeDelta)
 			GolemInfo.vPos.z += -5.f;
 			GolemInfo.vScale = { 2.f, 1.f, 2.f };
 			GI->Add_GameObjectToLayer(L"GolemSkillRock2", PM->Get_NowLevel(), L"GolemEffect", &GolemInfo);
-			return;
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(10) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(11))
 		{
 			GI->PlaySoundW(L"GolemSkill8_2.ogg", SD_MONSTERVOICE, 0.9f);
-			return;
 		}
 		if (m_pAnimModel->GetPlayTime() >= m_pAnimModel->GetTimeLimit(8) && m_pAnimModel->GetPlayTime() <= m_pAnimModel->GetTimeLimit(9))
 		{

@@ -30,7 +30,7 @@ HRESULT CTimer_Manager::Add_Timer(const _tchar * pTimerTag)
 	return S_OK;
 }
 
-HRESULT CTimer_Manager::Update_Timer(const _tchar * pTimerTag)
+_float CTimer_Manager::Update_Timer(const _tchar * pTimerTag)
 {
 	CTimer*		pTimer = Find_Timer(pTimerTag);
 	if (nullptr == pTimer)
@@ -38,7 +38,7 @@ HRESULT CTimer_Manager::Update_Timer(const _tchar * pTimerTag)
 
 	pTimer->Update();	
 
-	return S_OK;
+	return pTimer->Get_TimeDelta();
 }
 
 void CTimer_Manager::Set_Speed(const _tchar * pTimerTag, _float fSpeed)

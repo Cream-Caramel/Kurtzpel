@@ -194,7 +194,7 @@ HRESULT CGameInstance::Add_Timer(const _tchar * pTimerTag)
 	return m_pTimer_Manager->Add_Timer(pTimerTag);
 }
 
-HRESULT CGameInstance::Update_Timer(const _tchar * pTimerTag)
+_float CGameInstance::Update_Timer(const _tchar * pTimerTag)
 {
 	if (nullptr == m_pTimer_Manager)
 		return E_FAIL;
