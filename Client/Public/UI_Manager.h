@@ -61,7 +61,6 @@ public:
 	void Reset_ExGaugeTex();
 	void On_Fade();
 	void Set_Fade(CFadeInOut::FADE eFade);
-	_bool Get_Fade();
 
 private:
 	CPlayer* m_pPlayer = nullptr;
